@@ -1,0 +1,99 @@
+{% extends 'bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block head %}
+
+{% endblock %}
+{% block title %}
+Index
+{% endblock title %}
+{% block breadcrumb %}
+
+{% endblock %}
+
+{% block container %}
+<div class="card-header">
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="col">
+            {% if request.session.plant and request.session.mach and request.session.data_date %}
+                <div class="row">
+                    <div class="col-8">
+                        <div class="row">
+                            <div class="col">
+                                <div class="header_title">{% trans "plant" %}</div>
+                                <div class="header_title value">{{ request.session.plant }}</div>
+                            </div>
+                            <div class="col">
+                                <div class="header_title">{% trans "mach_name" %}</div>
+                                <div class="header_title value">{{ request.session.mach }}</div>
+                            </div>
+                            <div class="col">
+                                <div class="header_title">{% trans "record_date" %}</div>
+                                <div class="header_title value">{{ request.session.data_date }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <form action="{% url 'prod_info_reset' %}" method="POST" id="form">
+                            {% csrf_token %}
+                            <button class="btn btn-info" type="submit">
+                                <i class="fas fa-edit"></i>
+                                {% trans 'Reset' %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+            <form action="{% url 'prod_info_save' %}" method="POST" id="form">
+                {% csrf_token %}
+                {% crispy info_form %}
+            </form>
+            {% endif %}
+        </div>
+        <div class="pr-3">
+        {% include 'bases/lang.html' %}
+        </div>
+        <div class="ml-md-auto">
+            <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<div class="row justify-content-center pt-3" style="height:500px">
+    <div class="col-1">
+        {% if request.session.plant %}
+        <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:180px;">
+
+            {% if lang == "zh-hant" %}
+                生產資料
+            {% elif lang == "vi" %}
+                phương tiện sản xuất
+            {% elif lang == "zh-hans" %}
+                生产资料
+            {% else %}
+                Production Data
+            {% endif %}
+        </a>
+        {% endif %}
+        {% for process in processes %}
+        <a href="{% url 'record' process.process_code %}" class="btn btn-info" style="width:180px;margin-top: 5px">
+            {% if lang == "zh-hant" %}
+                {{ process.process_tw }}
+            {% elif lang == "vi" %}
+                {{ process.process_vn }}
+            {% elif lang == "zh-hans" %}
+                {{ process.process_ch }}
+            {% else %}
+                {{ process.process_name }}
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    <div class="col-11 p-3">
+       {% block content %}
+       {% endblock content %}
+    </div>
+</div>
+{% endblock %}

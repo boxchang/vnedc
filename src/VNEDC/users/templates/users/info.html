@@ -1,0 +1,25 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    會員資料修改
+{% endblock %}
+
+{% block js %}
+
+{% endblock js %}
+
+{% block sub_container %}
+<form method="post" action="{% url 'user_info' %}">
+    {% csrf_token %}
+    {% crispy form %}
+    <div class="pb-4" style="text-align: center;">
+      <input class="btn btn-success" type="submit" value="儲存" />
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  <script>alert("{{ message }}")</script> {% endif %}
+
+        {% endfor %}
+    {% endif %}
+</form>
+{% endblock sub_container %}

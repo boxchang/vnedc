@@ -1,0 +1,25 @@
+# VNEDC/settings/test.py
+
+from .base import *
+
+SECRET_KEY = '+e9tzio&ivf94+ek0$_9l8op)gxc4r+t9pen@dov0j7c4zks%r'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'mssql',
+        'NAME': 'VNEDC',
+        'USER': 'vnedc',
+        'PASSWORD': 'vnedc#2024',
+        'HOST': '192.168.11.31',
+        'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+}

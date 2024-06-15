@@ -1,0 +1,47 @@
+{% extends 'collection/base.html' %}
+{% load crispy_forms_tags %}
+{% load custom_tags %}
+{% load i18n %}
+{% block content %}
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            <form action="" method="POST" onSubmit="return validation()" id="record_form">
+                {% csrf_token %}
+                <div class="col" style="height:450px; overflow:auto;">
+                    <div class="row">
+                    {% for define in defines %}
+                        {% for time in data_times %}
+                        <div class="col-3">
+                            <div id="div_id_{{ define.parameter_name }}_{{ time }}" class="form-group">
+                                <label for="id_mach_time" class="">
+                                {% if lang == "zh-hant" %}
+                                    {{ define.parameter_tw }}
+                                {% elif lang == "vi" %}
+                                    {{ define.parameter_vn }}
+                                {% elif lang == "zh-hans" %}
+                                    {{ define.parameter_ch }}
+                                {% else %}
+                                    {{ process.process_name }}
+                                {% endif %} {{ time }}:00
+                                </label>
+                                <div>
+                                    <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 20px;">
+                    <div class="col-12" style="text-align: center">
+                        <input class="btn btn-info" type="submit" style="width:150px;height: 50px;" value="{% trans "save" %}" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-1"></div>
+    </div>
+
+{% endblock content %}

@@ -1,0 +1,38 @@
+{# users/mbase.html #}
+
+{% extends "bases/base.html" %} {% load static %}
+
+{% block title %} {{ block.super}} {% endblock title %}
+
+{% block css %}
+
+{% endblock css %}
+
+{% block container %}
+<div class="card-header">
+    <div class="row">
+        <div class="col">
+            {% if perms.users.perm_user_manage %}
+            <button type="button" class="btn btn-success" onclick="location.href='{% url 'user_create' %}'">新增使用者</button>
+            {% endif %}
+            {% if user.is_superuser %}
+            <button type="button" class="btn btn-success" onclick="location.href='{% url 'user_list' %}'">使用者列表</button>
+            <button type="button" class="btn btn-success" onclick="location.href='{% url 'unit_list' %}'">部門列表</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        {% block sub_container %}
+        {% endblock sub_container %}
+    </div>
+    <div class="col-1"></div>
+</div>
+
+{% endblock container %}
+
+{% block js %}
+
+{% endblock js %}
