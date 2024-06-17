@@ -4,7 +4,7 @@
 
 html,body{
 #background: radial-gradient(54% 44%, #009FDF 55%, rgba(0, 205, 241, 0.00) 250%), url('/static/pictures/oil-facility.jpeg');
-background: url('/static/pictures/oil-facility.jpeg');
+background: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.6)),url('/static/pictures/cong-ty-quoc-te-kim-bao-son.jpg');
 background-size: cover;
 background-repeat: no-repeat;
 height: 100%;
