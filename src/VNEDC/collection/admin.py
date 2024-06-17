@@ -9,7 +9,7 @@ class PlantAdmin(admin.ModelAdmin):
 
 @admin.register(Machine)
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('mach_code', 'mach_name', 'update_at', 'update_by')
+    list_display = ('plant', 'mach_code', 'mach_name', 'update_at', 'update_by')
 
 
 @admin.register(Process_Type)

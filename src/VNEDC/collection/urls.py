@@ -1,6 +1,6 @@
 from django.urls import re_path as url
 
-from collection.views import record, daily_info_create, prod_info_save, prod_info_reset, index
+from collection.views import record, daily_info_create, prod_info_save, prod_info_reset, index, raw_data_api
 
 urlpatterns = [
     url(r'^index/$', index, name='collection_index'),
@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^prod_info_save/$', prod_info_save, name='prod_info_save'),
     url(r'^prod_info_reset/$', prod_info_reset, name='prod_info_reset'),
     url(r'^daily_info_create/$', daily_info_create, name='daily_info_create'),
+    url(r'^raw_data_api/(?P<data_date_start>\w+)/(?P<data_date_end>\w+)/(?P<process_type>\w+)/$', raw_data_api, name='raw_data_api'),
 ]

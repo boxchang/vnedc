@@ -15,6 +15,7 @@ class Plant(models.Model):
 
 
 class Machine(models.Model):
+    plant = models.ForeignKey(Plant, related_name='mach_plant', on_delete=models.CASCADE)
     mach_code = models.CharField(max_length=50, primary_key=True)
     mach_name = models.CharField(max_length=50)
     update_at = models.DateTimeField(default=timezone.now)
@@ -49,6 +50,11 @@ class ParameterDefine(models.Model):
     parameter_cn = models.CharField(max_length=50)  # 簡體中文
     parameter_vn = models.CharField(max_length=50)  # 越語
     show_order = models.IntegerField(default=0)  # 排列順序
+    unit = models.CharField(max_length=50, null=True, blank=True)
+    control_range_low = models.FloatField(null=True, blank=True)
+    base_line = models.FloatField(null=True, blank=True)
+    control_range_high = models.FloatField(null=True, blank=True)
+    sampling_frequency = models.CharField(max_length=50, null=True, blank=True)
     create_at = models.DateTimeField(default=timezone.now)
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_create_at')

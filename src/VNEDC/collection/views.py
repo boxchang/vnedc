@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.translation import get_language
@@ -130,4 +132,31 @@ def daily_info_create(request):
                 tmp_form.save()
 
     return render(request, 'collection/daily_info_create.html', locals())
+
+
+def raw_data_api(request, data_date_start, data_date_end, process_type):
+    records = []
+    data_date_start = datetime.strptime(data_date_start, '%Y%m%d')
+    data_date_end = datetime.strptime(data_date_end, '%Y%m%d') + timedelta(days=1)
+    date_list = [data_date_start + timedelta(days=x) for x in range(0, (data_date_end - data_date_start).days)]
+    process_type = process_type
+    TIMES = ["00", "06", "12", "18"]
+    control = ParameterDefine.objects.filter(plant="GDNBR", mach="01", process_type="ACID", parameter_name__icontains="TEMPERATURE").first()
+    defines = ParameterDefine.objects.filter(process_type="ACID", parameter_name__icontains="TEMPERATURE")
+
+    for data_date in date_list:
+        for time in TIMES:
+            record = {}
+            record["DATA_TIME"] = datetime.strftime(data_date, '%Y/%m/%d') + " " + time + ":00"
+            record["PROCESS_TYPE"] = process_type
+            for define in defines:
+                record["PLANT"] = define.plant.plant_code
+                data = ParameterValue.objects.filter(data_date=data_date, process_type=process_type, plant=define.plant, data_time=time, parameter_name=define.parameter_name, mach=define.mach).first()
+                record[define.mach.mach_code+"_"+define.parameter_name] = data.parameter_value if data else 0
+            record["RANGE_HIGH"] = control.control_range_high
+            record["BASE"] = control.base_line
+            record["RANGE_LOW"] = control.control_range_low
+            records.append(record)
+
+    return JsonResponse(records, safe=False)
 
