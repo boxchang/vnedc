@@ -101,7 +101,12 @@ function validate(evt) {
             </form>
         </div>
         <div class="pr-3">
-        {% include 'bases/lang.html' %}
+            <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}" target="_blank">
+                <i class="fas fa-cog"></i>
+            </a>
+        </div>
+        <div class="pr-3">
+            {% include 'bases/lang.html' %}
         </div>
         <div class="ml-md-auto">
             <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>

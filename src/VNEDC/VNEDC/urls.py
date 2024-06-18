@@ -25,6 +25,7 @@ from django.conf import settings
 
 urlpatterns = [
     url('admin/', admin.site.urls),
+    url(r'^users/', include('users.urls')),
     url('collection/', include('collection.urls')),
     url(r'^home', include('bases.urls')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
@@ -36,5 +37,4 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     url(r'^$', index, name='index'),
-    url(r'^users/', include('users.urls')),
 )

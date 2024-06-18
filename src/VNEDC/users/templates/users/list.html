@@ -16,19 +16,6 @@
 {% endblock js %}
 
 {% block sub_container %}
-{% if user.is_superuser %}
-<form method="POST" action="{% url 'user_sync' %}">
-    <div class="input-group" style="margin-bottom: 20px;margin-top: 20px;">
-        {% csrf_token %}
-        <div class="input-group-append">
-            <button class="btn btn-success" type="submit" id="search">
-                <i class="fas fa-sync">同步BPM組織</i>
-            </button>
-            <span style="color: #999999">　※BPM的人員資料必須要有部門才能同步</span>
-        </div>
-    </div>
-</form>
-{% endif %}
 <form method="POST" action="{% url 'user_list' %}">
     <div class="input-group" style="margin-bottom: 20px;margin-top: 20px;">
 
