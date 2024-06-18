@@ -28,6 +28,23 @@ if("{{ msg }}".length > 0) {
     alert("{{ msg }}");
 }
 
+function validate(evt) {
+  var theEvent = evt || window.event;
+
+  // Handle paste
+  if (theEvent.type === 'paste') {
+      key = event.clipboardData.getData('text/plain');
+  } else {
+  // Handle key press
+      var key = theEvent.keyCode || theEvent.which;
+      key = String.fromCharCode(key);
+  }
+  var regex = /[0-9]|\./;
+  if( !regex.test(key) ) {
+    theEvent.returnValue = false;
+    if(theEvent.preventDefault) theEvent.preventDefault();
+  }
+}
 </script>
 {% endblock %}
 
@@ -78,7 +95,7 @@ if("{{ msg }}".length > 0) {
                     </div>
                     <div class="col-md-3">
                         <label for="data_date">作業時間*</label>
-                        <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" />
+                        <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
                     </div>
                 </div>
             </form>

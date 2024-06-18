@@ -26,7 +26,7 @@
                                 {% endif %} {{ time }}:00
                                 </label>
                                 <div>
-                                    <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}">
+                                    <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" onkeypress="validate(event)">
                                 </div>
                             </div>
                         </div>
