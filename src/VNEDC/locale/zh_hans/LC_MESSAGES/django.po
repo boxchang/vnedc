@@ -1,0 +1,223 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-06-18 16:09+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: .\bases\templates\bases\attach_form.html:9
+msgid "attachment"
+msgstr ""
+
+#: .\bases\templates\bases\attach_form.html:12
+#: .\bases\templates\bases\attach_form.html:23
+msgid "file"
+msgstr ""
+
+#: .\bases\templates\bases\attach_form.html:17
+#: .\bases\templates\bases\attach_form.html:27
+msgid "desc"
+msgstr ""
+
+#: .\bases\templates\bases\attach_form.html:33
+#: .\bases\templates\bases\form.html:10
+#: .\collection\templates\collection\daily_info_create.html:31
+#: .\collection\templates\collection\record.html:42 .\users\forms.py:61
+msgid "save"
+msgstr ""
+
+#: .\bases\utils.py:61
+msgid "Update Status"
+msgstr ""
+
+#: .\collection\forms.py:11
+msgid "record_date"
+msgstr ""
+
+#: .\collection\forms.py:12
+msgid "plant"
+msgstr ""
+
+#: .\collection\forms.py:13
+msgid "mach_name"
+msgstr ""
+
+#: .\collection\templates\collection\base.html:104
+msgid "Personal Setting"
+msgstr ""
+
+#: .\collection\templates\collection\base.html:112
+msgid "logout"
+msgstr ""
+
+#: .\collection\views.py:89 .\collection\views.py:147
+msgid "Update Done"
+msgstr ""
+
+#: .\users\admin.py:28
+msgid "Personal info"
+msgstr ""
+
+#: .\users\admin.py:30
+msgid "Permissions"
+msgstr ""
+
+#: .\users\admin.py:32
+msgid "Important dates"
+msgstr ""
+
+#: .\users\forms.py:45
+msgid "user_type"
+msgstr ""
+
+#: .\users\forms.py:47 .\users\models.py:97
+msgid "active"
+msgstr ""
+
+#: .\users\forms.py:48
+msgid "password"
+msgstr ""
+
+#: .\users\forms.py:48
+msgid "Please type the password"
+msgstr ""
+
+#: .\users\forms.py:49 .\users\forms.py:115
+msgid "confirm_password"
+msgstr ""
+
+#: .\users\forms.py:49
+msgid "Please type the login password again"
+msgstr ""
+
+#: .\users\forms.py:50 .\users\models.py:79
+#: .\users\templates\users\login.html:168
+msgid "emp_no"
+msgstr ""
+
+#: .\users\forms.py:51 .\users\models.py:80
+msgid "sap_emp_no"
+msgstr ""
+
+#: .\users\forms.py:52
+msgid "name"
+msgstr ""
+
+#: .\users\forms.py:53
+msgid "dept"
+msgstr ""
+
+#: .\users\forms.py:105 .\users\forms.py:164
+msgid "The password is not same with the confirm password"
+msgstr ""
+
+#: .\users\forms.py:110
+msgid "login_account"
+msgstr ""
+
+#: .\users\forms.py:111
+msgid "old_password"
+msgstr ""
+
+#: .\users\forms.py:112
+msgid "Please type the login password"
+msgstr ""
+
+#: .\users\forms.py:113
+msgid "new_password"
+msgstr ""
+
+#: .\users\forms.py:114
+msgid "Please type the new password"
+msgstr ""
+
+#: .\users\forms.py:116
+msgid "Please type the confirm password"
+msgstr ""
+
+#: .\users\forms.py:130
+msgid "base_information"
+msgstr ""
+
+#: .\users\forms.py:141
+msgid "Change Password"
+msgstr ""
+
+#: .\users\forms.py:169
+msgid "The password is not correct"
+msgstr ""
+
+#: .\users\models.py:31
+msgid "類別"
+msgstr ""
+
+#: .\users\models.py:81
+msgid "username"
+msgstr ""
+
+#: .\users\models.py:82
+msgid "email address"
+msgstr ""
+
+#: .\users\models.py:84
+msgid "first name"
+msgstr ""
+
+#: .\users\models.py:85
+msgid "last name"
+msgstr ""
+
+#: .\users\models.py:87
+msgid "mobile number"
+msgstr ""
+
+#: .\users\models.py:89
+msgid "Required. digits and +-() only."
+msgstr ""
+
+#: .\users\models.py:91
+msgid "Enter a valid mobile number."
+msgstr ""
+
+#: .\users\models.py:94
+msgid "staff status"
+msgstr ""
+
+#: .\users\models.py:95
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: .\users\models.py:98
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: .\users\models.py:100
+msgid "date joined"
+msgstr ""
+
+#: .\users\models.py:110
+msgid "user"
+msgstr ""
+
+#: .\users\models.py:111
+msgid "users"
+msgstr ""
+
+#: .\users\templates\users\login.html:193
+msgid "Submit"
+msgstr ""
