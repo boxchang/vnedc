@@ -7,40 +7,6 @@ from collection.models import Plant, Machine, Daily_Prod_Info
 from django.utils.translation import gettext_lazy as _
 
 
-class InfoForm(forms.Form):
-    data_date = forms.DateField(label=_('record_date'))
-    plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
-    mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.all())
-
-
-    def __init__(self, *args, submit_title='Submit', **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.form_show_errors = True
-
-        self.helper.layout = Layout(
-            Div(
-                Div('plant', css_class='col-md-3'),
-                Div('mach', css_class='col-md-3'),
-                Div('data_date', css_class='col-md-3'),
-                Submit('submit', _('save'), css_class='btn btn-info m-3'),
-                css_class='row'),
-        )
-
-
-        self.fields['data_date'].widget = DatePickerInput(
-            attrs={'value': datetime.now().strftime('%Y-%m-%d')},
-            options={
-                "format": "YYYY-MM-DD",
-                "showClose": False,
-                "showClear": False,
-                "showTodayButton": False,
-            }
-        )
-
-
 class RecordForm(forms.Form):
     data_date = forms.DateField(label=_('record_date'))
     plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())

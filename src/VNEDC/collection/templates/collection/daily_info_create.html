@@ -23,20 +23,6 @@
             <form action="" method="POST" onSubmit="return validation()" id="record_form">
                 {% csrf_token %}
                 {% crispy form %}
-                <div class="row">
-                    <div class="col-md-2">
-
-                    </div>
-                    <div class="col-md-2">
-
-                    </div>
-                    <div class="col-md-2">
-
-                    </div>
-                    <div class="col-md-2">
-
-                    </div>
-                </div>
                 <div class="row" style="padding-top: 20px;">
                     <div class="col-8" style="text-align: center">
                         <input class="btn btn-info" style="width:150px;height: 50px;" type="submit" value="{% trans "save" %}" />

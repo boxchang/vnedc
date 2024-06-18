@@ -12,45 +12,76 @@ Index
 
 {% endblock %}
 
+{% block base_js %}
+<script>
+function set_session() {
+    var plant = $("#id_plant").val();
+    var mach = $("#id_mach").val();
+    var data_date = $("#id_data_date").val();
+    if(plant!="" && mach !="" && data_date != "") {
+
+        $("#session_form").submit();
+    }
+}
+
+if("{{ msg }}".length > 0) {
+    alert("{{ msg }}");
+}
+
+</script>
+{% endblock %}
+
+{% block ready %}
+    //$("#id_data_date").datepicker({"dateFormat" : "yy-mm-dd"})
+    $('#id_data_date').change(function() {
+        set_session();
+    })
+{% endblock ready %}
+
 {% block container %}
 <div class="card-header">
     {% if user.is_authenticated %}
     <div class="row">
         <div class="col">
-            {% if request.session.plant and request.session.mach and request.session.data_date %}
+            <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
+                {% csrf_token %}
                 <div class="row">
-                    <div class="col-8">
-                        <div class="row">
-                            <div class="col">
-                                <div class="header_title">{% trans "plant" %}</div>
-                                <div class="header_title value">{{ request.session.plant }}</div>
-                            </div>
-                            <div class="col">
-                                <div class="header_title">{% trans "mach_name" %}</div>
-                                <div class="header_title value">{{ request.session.mach }}</div>
-                            </div>
-                            <div class="col">
-                                <div class="header_title">{% trans "record_date" %}</div>
-                                <div class="header_title value">{{ request.session.data_date }}</div>
+                    <div class="col-md-3">
+                        <div id="div_id_plant" class="form-group">
+                            <label for="id_plant" class=" requiredField">
+                                工廠<span class="asteriskField">*</span>
+                            </label>
+                            <div>
+                                <select name="plant" onchange="set_session()" class="select custom-select" required="" id="id_plant">
+                                    <option value="">---------</option>
+                                    {% for plant in plants %}
+                                    <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <form action="{% url 'prod_info_reset' %}" method="POST" id="form">
-                            {% csrf_token %}
-                            <button class="btn btn-info" type="submit">
-                                <i class="fas fa-edit"></i>
-                                {% trans 'Reset' %}
-                            </button>
-                        </form>
+                    <div class="col-md-3">
+                        <div id="div_id_mach" class="form-group">
+                            <label for="id_mach" class=" requiredField">
+                                    機台<span class="asteriskField">*</span>
+                            </label>
+                            <div>
+                                <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
+                                    <option value="">---------</option>
+                                    {% for mach in machs %}
+                                    <option value="{{ mach }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="data_date">作業時間*</label>
+                        <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" />
                     </div>
                 </div>
-            {% else %}
-            <form action="{% url 'prod_info_save' %}" method="POST" id="form">
-                {% csrf_token %}
-                {% crispy info_form %}
             </form>
-            {% endif %}
         </div>
         <div class="pr-3">
         {% include 'bases/lang.html' %}
@@ -63,6 +94,7 @@ Index
 </div>
 <div class="row justify-content-center pt-3" style="height:500px">
     <div class="col-1">
+    {% if info %}
         {% if request.session.plant %}
         <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:180px;">
 
@@ -90,6 +122,7 @@ Index
             {% endif %}
         </a>
         {% endfor %}
+    {% endif %}
     </div>
     <div class="col-11 p-3">
        {% block content %}
