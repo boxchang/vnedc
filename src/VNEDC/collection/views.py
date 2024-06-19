@@ -9,12 +9,14 @@ from collection.forms import DailyInfoForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue
 
 
+@login_required
 def index(request):
     plants = Plant.objects.all()
     machs = Machine.objects.all()
     return render(request, 'collection/index.html', locals())
 
 
+@login_required
 def prod_info_reset(request):
     if request.method == 'POST':
         if 'plant' in request.session:
@@ -28,6 +30,7 @@ def prod_info_reset(request):
     return redirect(reverse('daily_info_create'))
 
 
+@login_required
 def page_init(request):
     plant = ""
     mach = ""
@@ -53,6 +56,7 @@ def page_init(request):
     return plant, mach, data_date, lang
 
 
+@login_required
 def prod_info_save(request):
     if request.method == 'POST':
         request.session['plant'] = request.POST.get('plant')
@@ -61,6 +65,7 @@ def prod_info_save(request):
     return redirect(reverse('daily_info_create'))
 
 
+@login_required
 def record(request, process_code):
     sPlant, sMach, sData_date, lang = page_init(request)
     process_type = Process_Type.objects.filter(process_code=process_code).first()
