@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="{% static 'jquery\jquery-3.3.1.min.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const labels = ['A', 'B', 'C'];
+        var chartData = {
+            labels: labels,
+			datasets: [
+            {
+              label: 'Dataset 1',
+              data: [1, 2, 3],
+              borderColor: '#36A2EB',
+              backgroundColor: '#9BD0F5',
+            },
+            {
+              label: 'Dataset 2',
+              data: [2, 3, 4],
+              borderColor: '#FF6384',
+              backgroundColor: '#FFB1C1',
+            }
+          ]
+		};
+
+		var config = {
+			type: 'line',
+			data: chartData,
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: ''
+				},
+				scales: {
+					xAxes: [{
+						type: 'time',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Date'
+						},
+						ticks: {
+							major: {
+								fontStyle: 'bold',
+								fontColor: '#FF0000'
+							}
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'value'
+						}
+					}]
+				}
+			}
+		};
+
+		$(document).ready(function () {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			const chart = new Chart(ctx, config);
+			//chart.update();
+
+		});
+    </script>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+</html>
