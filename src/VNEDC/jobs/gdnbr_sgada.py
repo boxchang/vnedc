@@ -148,7 +148,9 @@ class GDNBR:
 
     def run(self, start_date, end_date):
         plant = self.config["plant"]
+        print("開始執行{plant}".format(plant=plant))
         for line_info in self.config["lines"]:
+            print("目前執行機台{mach}".format(mach=line_info["line"]))
             param_define = self.get_param_define(plant, line_info)
             tmp_start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
             tmp_end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
