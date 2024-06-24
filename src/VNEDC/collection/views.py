@@ -76,6 +76,9 @@ def record(request, process_code):
 
     info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
 
+    plant = Plant.objects.get(plant_code=sPlant)
+    mach = Machine.objects.get(mach_code=sMach)
+
     if request.method == 'POST':
         if process_type:
             defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
@@ -84,7 +87,8 @@ def record(request, process_code):
                     value = request.POST.get(define.parameter_name+'_'+time)
                     try:
                         if value:
-                            ParameterValue.objects.update_or_create(plant=sPlant, mach=sMach,
+
+                            ParameterValue.objects.update_or_create(plant=plant, mach=mach,
                                                                     data_date=sData_date,
                                                                     process_type=process_type,
                                                                     data_time=time, parameter_name=define.parameter_name,
