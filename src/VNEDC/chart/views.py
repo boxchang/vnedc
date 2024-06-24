@@ -80,7 +80,7 @@ def param_value_api(request):
                     control_low_data.append(control_low)
                 form_control_range_low = control_low
 
-            datasets.append({'label': 'CONTROL RANGE HIGH', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2], 'options': {'plugins': {'datalabels': {'display': 'false'}}}})
+            datasets.append({'label': 'CONTROL RANGE HIGH', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
             datasets.append({'label': 'CONTROL RANGE LOW', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
 
             chart_data = {"labels": y_label, "datasets": datasets, "title": process_type, "control_high": form_control_range_high, "control_low": form_control_range_low}
