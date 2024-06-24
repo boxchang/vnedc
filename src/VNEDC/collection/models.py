@@ -62,6 +62,9 @@ class ParameterDefine(models.Model):
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_update_at')
 
+    def __str__(self):
+        return self.parameter_name
+
 
 class ParameterValue(models.Model):
     data_date = models.DateField()

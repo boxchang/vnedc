@@ -1,0 +1,232 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block head %}
+
+{% endblock %}
+{% block title %}
+Index
+{% endblock title %}
+{% block breadcrumb %}
+
+{% endblock %}
+
+{% block base_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script>
+// Register the plugin to all charts:
+Chart.register(ChartDataLabels);
+
+var chartData = {
+    datasets: []
+};
+
+var config = {
+    type: 'line',
+    data: chartData,
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: ''
+            },
+            datalabels: {
+                backgroundColor: function (context) {
+                    return context.dataset.backgroundColor;
+                },
+                borderRadius: 4,
+                color: 'white',
+                font: {
+                    weight: 'bold'
+                },
+                formatter: Math.round,
+                padding: 6
+            },
+        },
+    }
+};
+
+
+$(document).ready(function () {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    const chart = new Chart(ctx, config);
+    //chart.update();
+
+
+    $("#id_plant").on('change', function () {
+        Render();
+    });
+
+    $("#id_mach").on('change', function () {
+        Render();
+    });
+
+    $("#id_process_type").on('change', function () {
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
+        var process_type = $("#id_process_type").val();
+        if(plant != "" && mach != "" && process_type != "") {
+            process_type_change(plant, mach, process_type);
+        }else{
+            alert("工廠或機台尚未選擇");
+             $('#id_process_type').prop('selectedIndex',0);
+        }
+    });
+
+    $('#id_data_date_start').change(function() {
+        Render();
+    })
+
+    $('#id_data_date_end').change(function() {
+        Render();
+    })
+
+    $('#id_param_define').change(function() {
+        //Init control value
+        Init();
+        Render();
+    })
+
+    $('#id_control_high').change(function() {
+        Render();
+    })
+
+    $('#id_control_low').change(function() {
+        Render();
+    })
+
+    function Init() {
+        //Init control value
+        $("#id_control_high").val('');
+        $("#id_control_low").val('');
+    }
+
+    function Render() {
+        var data_date_start = $("#id_data_date_start").val();
+        var data_date_end = $("#id_data_date_end").val();
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
+        var process_type = $("#id_process_type").val();
+        var param_define = $("#id_param_define").val();
+        var control_high = $("#id_control_high").val();
+        var control_low = $("#id_control_low").val();
+
+        if(data_date_start != "" && data_date_end != "" && plant != "" && mach != "" && process_type != "" && param_define != "") {
+            $("body").loading();
+            ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_define, control_high, control_low);
+        }
+    }
+
+    function ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_define, control_high, control_low) {
+        var json_url = "{% url 'param_value_api' %}";
+        jQuery.support.cors = true;
+        $.ajax({
+            url: json_url,
+            type: "POST",
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", data_date_start: data_date_start, data_date_end: data_date_end, plant: plant, mach: mach, process_type: process_type, param_define: param_define, control_high: control_high, control_low: control_low},
+            timeout: 30000,
+            dataType: "json", // "xml", "json"
+            success: function(data) {
+                chartData.datasets = [];
+
+                for(var i=0;i<data.datasets.length;i++){
+                    chartData.datasets.push(data.datasets[i])
+                }
+
+                config.options.plugins.title["text"] = data.title;
+                chartData.labels = data.labels;
+                chart.update();
+                $("body").loading("stop");  //Loading Hide
+                $("#id_control_high").val(data.control_high);
+                $("#id_control_low").val(data.control_low);
+                $("#btnCondition").click(); //Menu Shrink
+
+            },
+            error: function(jqXHR, textStatus, ex) {
+                alert(textStatus + "," + ex + "," + jqXHR.responseText);
+            }
+        });
+    }
+
+    function process_type_change(plant, mach, process_type) {
+        $.ajax({
+            url: '{% url 'get_param_define_api' %}', type: 'post',
+            dataType: 'json',
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "mach": mach, "process_type": process_type},
+            success: function(data) {
+                //Update select Options
+                $("#id_param_define").html(data);
+
+                //Init control value
+                Init();
+            }
+        });
+    }
+
+    $("#btnCondition").click(function() {
+        var tmp = $("#hidCondition").val();
+        if(tmp == "Hide") {
+            $("#search_condition").hide("slow", function() {
+                $("#hidCondition").val('Show');
+            });
+        } else {
+            $("#search_condition").show("slow", function() {
+                $("#hidCondition").val('Hide');
+            });
+        }
+    });
+});
+
+
+
+</script>
+{% endblock %}
+
+{% block ready %}
+
+{% endblock ready %}
+
+{% block container %}
+<input type="hidden" id="hidCondition" value="Hide" />
+<div class="row p-3" id="search_condition">
+    <div class="col">
+        {% crispy search_form %}
+    </div>
+    <div class="row pr-3">
+        <div class="col">
+            <a class="box-nav-btn" href="{% url 'daily_info_create' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Record' %}">
+                <i class="fas fa-exchange-alt"></i>
+            </a>
+        </div>
+        <div class="col">
+            <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}" target="_blank">
+                <i class="fas fa-cog"></i>
+            </a>
+        </div>
+    </div>
+    <div class="pr-3">
+        {% include 'bases/lang.html' %}
+    </div>
+    <div class="ml-md-auto">
+        <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>
+    </div>
+</div>
+<div class="row p-3">
+    <input type="button" class="btn btn-light" style="width: 100%; height:2px;" id="btnCondition" />
+</div>
+<div class="row">
+    <div style="width:75%;">
+        <canvas id="canvas"></canvas>
+    </div>
+</div>
+{% endblock %}

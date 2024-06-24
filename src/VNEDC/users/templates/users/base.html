@@ -1,7 +1,6 @@
 {# users/mbase.html #}
-
 {% extends "bases/base.html" %} {% load static %}
-
+{% load i18n %}
 {% block title %} {{ block.super}} {% endblock title %}
 
 {% block css %}
@@ -16,6 +15,24 @@
             <button type="button" class="btn btn-success" onclick="location.href='{% url 'user_create' %}'">新增使用者</button>
             <button type="button" class="btn btn-success" onclick="location.href='{% url 'user_list' %}'">使用者列表</button>
             {% endif %}
+        </div>
+        <div class="row pr-3">
+            <div class="col">
+                <a class="box-nav-btn" href="{% url 'daily_info_create' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
+                    <i class="fas fa-exchange-alt"></i>
+                </a>
+            </div>
+            <div class="col">
+                <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}" target="_blank">
+                    <i class="fas fa-cog"></i>
+                </a>
+            </div>
+        </div>
+        <div class="pr-3">
+            {% include 'bases/lang.html' %}
+        </div>
+        <div class="ml-md-auto">
+            <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>
         </div>
     </div>
 </div>

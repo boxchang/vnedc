@@ -22,4 +22,16 @@ DATABASES = {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     },
+    'SGADA': {
+        'ENGINE': 'mssql',
+        'NAME': 'PMG_DEVICE',
+        'USER': 'scadauser',
+        'PASSWORD': 'pmgscada+123',
+        'HOST': '192.168.11.31',
+        'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
 }

@@ -22,14 +22,14 @@ class database:
             return data
 
 
-class bpm_database:
+class sgada_database:
     def select_sql(self, sql):
-        with connections['BPM'].cursor() as cur:
+        with connections['SGADA'].cursor() as cur:
             cur.execute(sql)
             return cur.fetchall()
 
     def select_sql_dict(self, sql):
-        with connections['BPM'].cursor() as cur:
+        with connections['SGADA'].cursor() as cur:
             cur.execute(sql)
             desc = cur.description
             column_names = [col[0] for col in desc]
@@ -38,26 +38,6 @@ class bpm_database:
             return data
 
     def execute_sql(self, sql):
-        with connections['BPM'].cursor() as cur:
-            cur.execute(sql)
-
-
-class dc_database:
-    def select_sql(self, sql):
-        with connections['DC'].cursor() as cur:
-            cur.execute(sql)
-            return cur.fetchall()
-
-    def select_sql_dict(self, sql):
-        with connections['DC'].cursor() as cur:
-            cur.execute(sql)
-            desc = cur.description
-            column_names = [col[0] for col in desc]
-            data = [dict(zip(column_names, row))
-                    for row in cur.fetchall()]
-            return data
-
-    def execute_sql(self, sql):
-        with connections['DC'].cursor() as cur:
+        with connections['SGADA'].cursor() as cur:
             cur.execute(sql)
 

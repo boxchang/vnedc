@@ -100,10 +100,17 @@ function validate(evt) {
                 </div>
             </form>
         </div>
-        <div class="pr-3">
-            <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}" target="_blank">
-                <i class="fas fa-cog"></i>
-            </a>
+        <div class="row pr-3">
+            <div class="col">
+                <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
+                    <i class="fas fa-chart-line"></i>
+                </a>
+            </div>
+            <div class="col">
+                <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}">
+                    <i class="fas fa-cog"></i>
+                </a>
+            </div>
         </div>
         <div class="pr-3">
             {% include 'bases/lang.html' %}
