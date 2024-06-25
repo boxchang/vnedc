@@ -55,6 +55,7 @@ class ParameterDefine(models.Model):
     base_line = models.FloatField(null=True, blank=True)
     control_range_high = models.FloatField(null=True, blank=True)
     sampling_frequency = models.CharField(max_length=50, null=True, blank=True)
+    auto_value = models.BooleanField(default=False)
     create_at = models.DateTimeField(default=timezone.now)
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_create_at')

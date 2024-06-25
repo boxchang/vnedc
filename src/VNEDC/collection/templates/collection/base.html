@@ -102,9 +102,11 @@ function validate(evt) {
         </div>
         <div class="row pr-3">
             <div class="col">
+                {% if user.is_superuser %}
                 <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
                     <i class="fas fa-chart-line"></i>
                 </a>
+                {% endif %}
             </div>
             <div class="col">
                 <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}">
