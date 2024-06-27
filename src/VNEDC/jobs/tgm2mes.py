@@ -88,10 +88,10 @@ class TGM2MES(object):
             if record["item_name"] == "Finger":
                 finger_tip = record["data_val"]
 
-        roll = cuff_list[0]
-        cuff = cuff_list[1]
-        palm = cuff_list[2]
-        finger = cuff_list[3]
+        roll = cuff_list[3]
+        cuff = cuff_list[2]
+        palm = cuff_list[1]
+        finger = cuff_list[0]
 
         # 呼叫存儲過程並獲取查詢結果
         cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", records[0]['file_name'], local_ip, roll, cuff, palm, finger, finger_tip)
