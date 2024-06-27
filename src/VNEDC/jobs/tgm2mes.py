@@ -17,8 +17,10 @@ class TGM2MES(object):
         self.last_time = self.get_last_time()
         records = self.get_measure_files()
         for record in records:
+            print(record['FILE_NAME'])
             data = self.get_measure_data(record['FILE_NAME'])
             if data:
+                print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
                 self.insert_mes(data)
         self.save_exec_time()
 
