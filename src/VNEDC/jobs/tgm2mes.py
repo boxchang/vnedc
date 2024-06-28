@@ -49,9 +49,9 @@ class TGM2MES(object):
 
         # Cuff的量測位置有4個數值，Finger有1個數值，滿足才回傳
         for record in records:
-            if record["item_name"] == "Cuff":
+            if record["item_name"] == " 1.Roll 2.Cuff 3.Palm 4.Finger":
                 cuff_count += 1
-            if record["item_name"] == "Finger":
+            if record["item_name"] == "5.FingerTip":
                 finger_count += 1
         if cuff_count == 4 and finger_count == 1:
             return records
@@ -85,9 +85,9 @@ class TGM2MES(object):
         cuff_list = []
         finger_tip = ""
         for record in records:
-            if record["item_name"] == "Cuff":
+            if record["item_name"] == " 1.Roll 2.Cuff 3.Palm 4.Finger":
                 cuff_list.append(record["data_val"])
-            if record["item_name"] == "Finger":
+            if record["item_name"] == "5.FingerTip":
                 finger_tip = record["data_val"]
 
         roll = cuff_list[3]

@@ -63,11 +63,11 @@ class MES2TGM(object):
 
                 if file_id:
                     # MEASURE_ITEM
-                    self.insert_measure_item(file_id, 'Cuff', lot_number, 4, 1)  # 袖
-                    self.insert_measure_item(file_id, 'Finger', lot_number, 4, 1)  # 指腹
-                    self.insert_measure_item(file_id, 'Palm', lot_number, 4, 1)  # 掌
-                    self.insert_measure_item(file_id, 'Roll', lot_number, 4, 1)  # 卷唇
-                    self.insert_measure_item(file_id, 'FingerTip', lot_number, 4, 2)  # 指尖
+                    self.insert_measure_item(file_id, ' 1.Roll 2.Cuff 3.Palm 4.Finger', lot_number, 4, 1)  # 卷唇
+                    #self.insert_measure_item(file_id, 'Cuff', lot_number, 4, 1)  # 袖
+                    #self.insert_measure_item(file_id, 'Palm', lot_number, 4, 1)  # 掌
+                    #self.insert_measure_item(file_id, 'Finger', lot_number, 4, 1)  # 指腹
+                    self.insert_measure_item(file_id, '5.FingerTip', lot_number, 4, 2)  # 指尖
 
                     # FILE_INFO
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
