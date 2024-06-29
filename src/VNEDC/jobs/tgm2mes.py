@@ -23,6 +23,7 @@ class TGM2MES(object):
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
                 self.insert_mes(data)
         self.save_exec_time()
+        self.clean_data()
 
     def get_measure_files(self):
         db = tgm_database()
@@ -119,6 +120,43 @@ class TGM2MES(object):
         current_time = datetime.now()
         with open(self.last_time_file, 'w') as file:
             file.write(current_time.strftime('%Y-%m-%d %H:%M:%S'))
+
+    def clean_data(self):
+        db = tgm_database()
+        sql = """
+            SELECT file_name, count(*) number
+            FROM [TGM].[dbo].[MEASURE_FILE] a, [TGM].[dbo].[MEASURE_DATA] b 
+            where a.FILE_NAME = b.LOT_NUMBER and data_datetime < getdate()-2
+            group by FILE_NAME having count(*) > 4
+        """
+        records = db.select_sql_dict(sql)
+
+        for record in records:
+            lot_number = record["file_name"]
+            self.delete_measure_file(db, lot_number)
+            self.delete_measure_item(db, lot_number)
+            self.delete_file_info(db, lot_number)
+            self.delete_measure_data(db, lot_number)
+
+
+    def delete_measure_file(self, db, file_name):
+        sql = "delete from measure_file where file_name = '{file_name}'".format(file_name=file_name)
+        db.execute_sql(sql)
+
+    def delete_measure_item(self, db, file_name):
+        sql = "delete from measure_item where file_name='{file_name}'".format(file_name=file_name)
+        db.execute_sql(sql)
+
+    def delete_file_info(self, db, file_name):
+        sql = "delete from file_info where file_info_val = '{file_name}'".format(file_name=file_name)
+        db.execute_sql(sql)
+
+    def delete_measure_data(self, db, file_name):
+        sql = """
+            delete FROM [TGM].[dbo].[MEASURE_DATA] 
+            where DATA_DATETIME < getdate()-90 and LOT_NUMBER = '{LOT_NUMBER}'
+        """
+        db.execute_sql(sql)
 
 tgm2mes = TGM2MES()
 tgm2mes.execute()
