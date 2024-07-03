@@ -15,7 +15,7 @@ USER_SELECTIONS = {
 def file_list(request, subpath=''):
     # Get the base directory based on user selection
     user_selection = request.GET.get('user_selection', 'NBR1')  # Default to NBR1 if not specified
-    base_directory = USER_SELECTIONS.get(user_selection, 'Z:\\')  # Default to Z:\ if selection not found
+    base_directory = USER_SELECTIONS.get(user_selection, 'X:\\')  # Default to X:\ if selection not found
 
     directory = os.path.join(base_directory, subpath)
     try:
