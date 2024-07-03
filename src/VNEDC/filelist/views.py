@@ -7,8 +7,8 @@ from datetime import datetime
 
 # Define mappings from user selections to directories
 USER_SELECTIONS = {
-    'NBR1': 'Z:\\',
-    'NBR2': 'Y:\\',
+    'NBR1': 'X:\\',
+    'NBR2': 'W:\\',
     # Add more mappings as needed
 }
 
