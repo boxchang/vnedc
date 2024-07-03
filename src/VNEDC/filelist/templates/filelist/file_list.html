@@ -1,0 +1,55 @@
+{% load filelist_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Files in {{ user_selection }}</h1>
+    <form method="get">
+        <label for="user_selection">Select directory:</label>
+        <select id="user_selection" name="user_selection">
+            {% for key in user_selections %}
+                <option value="{{ key }}" {% if key == user_selection %}selected{% endif %}>{{ key }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Select">
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last Modified</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dir, mod_date in dirs %}
+                <tr>
+                    <td><a href="{% url 'file_list_subpath' dir %}">{{ dir|basename }}</a></td>
+                    <td>{{ mod_date }}</td>
+                </tr>
+            {% endfor %}
+            {% for file, mod_date in files %}
+                <tr>
+                    <td><a href="{% url 'download_file' file %}">{{ file|basename }}</a></td>
+                    <td>{{ mod_date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

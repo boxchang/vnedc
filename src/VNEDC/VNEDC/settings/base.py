@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'filelist',
     'chart',
     'collection',
     'users',
@@ -233,4 +234,6 @@ LANGUAGES = [
 ]
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+
+FILE_LIST_DIRECTORY = 'Z:\\'
 
