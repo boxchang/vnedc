@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1>Files in {{ user_selection }}</h1>
+    <h1>Files in {{ user_selection }} (Only show in one year)</h1>
     {% if subpath %}
         <a href="{% if subpath|cut:'/' %}{% url 'file_list_subpath' subpath|cut:'/' %}{% else %}{% url 'file_list' %}{% endif %}">Up one level</a>
     {% endif %}
