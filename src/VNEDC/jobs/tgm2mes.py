@@ -121,6 +121,7 @@ class TGM2MES(object):
         with open(self.last_time_file, 'w') as file:
             file.write(current_time.strftime('%Y-%m-%d %H:%M:%S'))
 
+    # Runcard主檔的資料超過兩天就刪除，假定Runcard產生出來兩天內會做完
     def clean_data(self):
         db = tgm_database()
         sql = """
