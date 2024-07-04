@@ -86,9 +86,9 @@ class TGM2MES(object):
         cuff_list = []
         finger_tip = ""
         for record in records:
-            if record["item_name"] == " 1.Roll 2.Cuff 3.Palm 4.Finger":
+            if record["item_name"] == " 1.Cuon biên 2.Co tay 3.Bàn tay 4.Ngón tay":
                 cuff_list.append(record["data_val"])
-            if record["item_name"] == "5.FingerTip":
+            if record["item_name"] == "5.D Ngón tay":
                 finger_tip = record["data_val"]
 
         roll = cuff_list[3]
