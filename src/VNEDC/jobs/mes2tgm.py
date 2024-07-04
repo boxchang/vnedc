@@ -63,7 +63,7 @@ class MES2TGM(object):
 
                 if file_id:
                     # MEASURE_ITEM
-                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, 4, 1)  # 卷唇
+                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, 5, 1)  # 卷唇
                     #self.insert_measure_item(file_id, 'Cuff', lot_number, 4, 1)  # 袖
                     #self.insert_measure_item(file_id, 'Palm', lot_number, 4, 1)  # 掌
                     #self.insert_measure_item(file_id, 'Finger', lot_number, 4, 1)  # 指腹
