@@ -90,7 +90,7 @@ class MES2TGM(object):
     def insert_measure_item(self, FILE_ID, ITEM_NAME, LOT_NUMBER, COM_PORT, CHANNEL):
         db = tgm_database()
         today = datetime.today().strftime('%Y/%m/%d')
-        decimal = 2 # 小數位數
+        decimal = 3 # 小數位數
         sql = """insert into MEASURE_ITEM(FILE_ID, ITEM_NAME, MEMO, DP, UNIT, COM, CH, ITEM_BULID_DAY, FILE_NAME) 
                  Values ('{FILE_ID}', '{ITEM_NAME}', '', {decimal}, 'mm', {COM_PORT}, {CHANNEL}, '{ITEM_BULID_DAY}', '{FILE_NAME}')""" \
             .format(FILE_ID=FILE_ID, ITEM_NAME=ITEM_NAME, COM_PORT=COM_PORT, CHANNEL=CHANNEL,
