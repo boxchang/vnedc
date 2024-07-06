@@ -19,7 +19,7 @@ class TGM2MES(object):
         for record in records:
             print(record['FILE_NAME'])
 
-            # if record['FILE_NAME'] == "GP247060MT":
+            # if record['FILE_NAME'] == "GP247060P3":
             #     print("")
 
             data = self.get_measure_data(record['FILE_NAME'])
