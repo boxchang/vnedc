@@ -19,6 +19,9 @@ class TGM2MES(object):
         for record in records:
             print(record['FILE_NAME'])
 
+            # if record['FILE_NAME'] == "GP247060MT":
+            #     print("")
+
             data = self.get_measure_data(record['FILE_NAME'])
             if data:
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
