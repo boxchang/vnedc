@@ -14,7 +14,7 @@ class MES2TGM(object):
     def __init__(self, data_date):
         self.data_date = data_date
 
-    # 取得要作業的Runcard資料
+    # 取得要作業的Runcard資料，批號、廠、Com port
     def get_runcard_list(self, data_date):
         start_date = data_date
         end_date = (datetime.strptime(data_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -30,7 +30,6 @@ class MES2TGM(object):
         records = db.select_sql_dict(sql)
         return records
 
-
     # 先撈一版資料，用來比對資料是否存在
     def get_file_list(self, data_date):
         data_date = data_date.replace('-', '/')
@@ -40,7 +39,7 @@ class MES2TGM(object):
         list = [record['FILE_NAME'] for record in records]
         return list
 
-
+    # 執行主Function
     def execute(self):
         # 從MES取得Runcard批號
         runcards = self.get_runcard_list(self.data_date)
@@ -67,7 +66,6 @@ class MES2TGM(object):
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
                     self.insert_file_info(file_id, 'Plant', plant)
 
-
     # 新增量測主檔
     def insert_measure_file(self, LOT_NUMBER):
         db = tgm_database()
@@ -92,9 +90,11 @@ class MES2TGM(object):
     def insert_measure_item(self, FILE_ID, ITEM_NAME, LOT_NUMBER, COM_PORT, CHANNEL):
         db = tgm_database()
         today = datetime.today().strftime('%Y/%m/%d')
+        decimal = 2 # 小數位數
         sql = """insert into MEASURE_ITEM(FILE_ID, ITEM_NAME, MEMO, DP, UNIT, COM, CH, ITEM_BULID_DAY, FILE_NAME) 
-                 Values ('{FILE_ID}', '{ITEM_NAME}', '', 2, 'mm', {COM_PORT}, {CHANNEL}, '{ITEM_BULID_DAY}', '{FILE_NAME}')""" \
-            .format(FILE_ID=FILE_ID, ITEM_NAME=ITEM_NAME, COM_PORT=COM_PORT, CHANNEL=CHANNEL, ITEM_BULID_DAY=today, FILE_NAME=LOT_NUMBER)
+                 Values ('{FILE_ID}', '{ITEM_NAME}', '', {decimal}, 'mm', {COM_PORT}, {CHANNEL}, '{ITEM_BULID_DAY}', '{FILE_NAME}')""" \
+            .format(FILE_ID=FILE_ID, ITEM_NAME=ITEM_NAME, COM_PORT=COM_PORT, CHANNEL=CHANNEL,
+                    ITEM_BULID_DAY=today, FILE_NAME=LOT_NUMBER, decimal=decimal)
         db.execute_sql(sql)
 
     # 新增量測主檔資料
