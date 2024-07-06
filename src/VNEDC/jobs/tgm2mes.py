@@ -38,16 +38,16 @@ class TGM2MES(object):
         finger_count = 0
         db = tgm_database()
 
-        # if self.last_time != "":
-        #     sql_condition = "and data_datetime > '{last_time}'".format(last_time=self.last_time)
-        # else:
-        #     sql_condition = ""
+        if self.last_time != "":
+            sql_condition = "and data_datetime > '{last_time}'".format(last_time=self.last_time)
+        else:
+            sql_condition = ""
 
         sql = """SELECT top(5) file_name, item_name, data_val
                  FROM [TGM].[dbo].[MEASURE_DATA] d, MEASURE_ITEM i 
-                 where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}'
+                 where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}' {sql_condition}
                  order by data_datetime desc"""\
-            .format(LOT_NUMBER=LOT_NUMBER)
+            .format(LOT_NUMBER=LOT_NUMBER, last_time=self.last_time, sql_condition=sql_condition)
         records = db.select_sql_dict(sql)
 
         # Cuff的量測位置有4個數值，Finger有1個數值，滿足才回傳
