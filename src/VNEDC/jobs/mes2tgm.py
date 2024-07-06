@@ -59,8 +59,8 @@ class MES2TGM(object):
 
                 if file_id:
                     # MEASURE_ITEM
-                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, comport, 1)  # 卷唇
-                    self.insert_measure_item(file_id, '5.D Ngon tay', lot_number, comport, 2)  # 指尖
+                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, comport, 1, 2)  # 卷唇
+                    self.insert_measure_item(file_id, '5.D Ngon tay', lot_number, comport, 2, 3)  # 指尖
 
                     # FILE_INFO
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
@@ -87,14 +87,13 @@ class MES2TGM(object):
         return file_id
 
     # 新增量測項目
-    def insert_measure_item(self, FILE_ID, ITEM_NAME, LOT_NUMBER, COM_PORT, CHANNEL):
+    def insert_measure_item(self, FILE_ID, ITEM_NAME, LOT_NUMBER, COM_PORT, CHANNEL, DECIMAL):
         db = tgm_database()
         today = datetime.today().strftime('%Y/%m/%d')
-        decimal = 3 # 小數位數
         sql = """insert into MEASURE_ITEM(FILE_ID, ITEM_NAME, MEMO, DP, UNIT, COM, CH, ITEM_BULID_DAY, FILE_NAME) 
                  Values ('{FILE_ID}', '{ITEM_NAME}', '', {decimal}, 'mm', {COM_PORT}, {CHANNEL}, '{ITEM_BULID_DAY}', '{FILE_NAME}')""" \
             .format(FILE_ID=FILE_ID, ITEM_NAME=ITEM_NAME, COM_PORT=COM_PORT, CHANNEL=CHANNEL,
-                    ITEM_BULID_DAY=today, FILE_NAME=LOT_NUMBER, decimal=decimal)
+                    ITEM_BULID_DAY=today, FILE_NAME=LOT_NUMBER, decimal=DECIMAL)
         db.execute_sql(sql)
 
     # 新增量測主檔資料
