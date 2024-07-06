@@ -14,27 +14,22 @@ class MES2TGM(object):
     def __init__(self, data_date):
         self.data_date = data_date
 
-    def get_thickness_value(self, data_date):
+    # 取得要作業的Runcard資料
+    def get_runcard_list(self, data_date):
         start_date = data_date
-        end_date = (datetime.strptime(data_date, '%Y-%m-%d' ) +timedelta(days=1)).strftime('%Y-%m-%d')
+        end_date = (datetime.strptime(data_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
 
-        db = sgada_database()
-        conn = db.create_sgada_connection()
+        db = tgm_database()
+        sql = """
+        select  distinct RunCardId, WorkCenterTypeName,(case WorkCenterTypeName when 'NBR' then 9 when 'PVC' then 7 end) comport
+        from PMGMES.[dbo].[PMG_MES_RunCard_IPQCInspectIOptionMapping] t, [PMGMES].[dbo].[PMG_MES_RunCard] r
+		WITH(NOLOCK)
+		where GroupType='HAND' and t.RunCardId = r.Id
+		and  t.CreationTime between  '{start_date}' and '{end_date}'
+        """.format(start_date=start_date, end_date=end_date)
+        records = db.select_sql_dict(sql)
+        return records
 
-        # 連接到SQL Server
-        cursor = conn.cursor()
-
-        # 設定存儲過程名稱和參數
-        procedure_name = '[dbo].[SP_GetRunCard]'
-
-        # 呼叫存儲過程並獲取查詢結果
-        cursor.execute(f"{{CALL {procedure_name} (?, ?)}}", start_date, end_date)
-        rows = cursor.fetchall()
-
-        # 關閉連接
-        cursor.close()
-        conn.close()
-        return rows
 
     # 先撈一版資料，用來比對資料是否存在
     def get_file_list(self, data_date):
@@ -48,12 +43,14 @@ class MES2TGM(object):
 
     def execute(self):
         # 從MES取得Runcard批號
-        runcards = self.get_thickness_value(self.data_date)
+        runcards = self.get_runcard_list(self.data_date)
 
         # 撈取量測主檔
         files = self.get_file_list(self.data_date)
         for runcard in runcards:
-            lot_number = runcard[0]
+            lot_number = runcard['RunCardId']
+            plant = runcard['WorkCenterTypeName']
+            comport = runcard['comport']
             if lot_number not in files:  # 沒有資料才塞
                 # MEASURE_FILE
                 self.insert_measure_file(lot_number)
@@ -63,15 +60,15 @@ class MES2TGM(object):
 
                 if file_id:
                     # MEASURE_ITEM
-                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, 7, 1)  # 卷唇
-                    #self.insert_measure_item(file_id, 'Cuff', lot_number, 4, 1)  # 袖
-                    #self.insert_measure_item(file_id, 'Palm', lot_number, 4, 1)  # 掌
-                    #self.insert_measure_item(file_id, 'Finger', lot_number, 4, 1)  # 指腹
-                    self.insert_measure_item(file_id, '5.D Ngon tay', lot_number, 7, 2)  # 指尖
+                    self.insert_measure_item(file_id, ' 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay', lot_number, comport, 1)  # 卷唇
+                    self.insert_measure_item(file_id, '5.D Ngon tay', lot_number, comport, 2)  # 指尖
 
                     # FILE_INFO
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
+                    self.insert_file_info(file_id, 'Plant', plant)
 
+
+    # 新增量測主檔
     def insert_measure_file(self, LOT_NUMBER):
         db = tgm_database()
         today = datetime.today().strftime('%Y/%m/%d')
@@ -81,6 +78,7 @@ class MES2TGM(object):
         print(sql)
         db.execute_sql(sql)
 
+    # 取得量測主檔
     def get_file_id(self, LOT_NUMBER):
         file_id = ""
         db = tgm_database()
@@ -90,6 +88,7 @@ class MES2TGM(object):
             file_id = record[0]["FILE_ID"]
         return file_id
 
+    # 新增量測項目
     def insert_measure_item(self, FILE_ID, ITEM_NAME, LOT_NUMBER, COM_PORT, CHANNEL):
         db = tgm_database()
         today = datetime.today().strftime('%Y/%m/%d')
@@ -98,6 +97,7 @@ class MES2TGM(object):
             .format(FILE_ID=FILE_ID, ITEM_NAME=ITEM_NAME, COM_PORT=COM_PORT, CHANNEL=CHANNEL, ITEM_BULID_DAY=today, FILE_NAME=LOT_NUMBER)
         db.execute_sql(sql)
 
+    # 新增量測主檔資料
     def insert_file_info(self, FILE_ID, FILE_INFO_NAME, FILE_INFO_VALUE):
         db = tgm_database()
         sql = """insert into FILE_INFO(FILE_ID, FILE_INFO_NAME, FILE_INFO_VAL) 

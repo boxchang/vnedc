@@ -134,10 +134,11 @@ class TGM2MES(object):
 
         for record in records:
             lot_number = record["file_name"]
-            self.delete_measure_file(db, lot_number)
+
             self.delete_measure_item(db, lot_number)
             self.delete_file_info(db, lot_number)
             self.delete_measure_data(db, lot_number)
+            self.delete_measure_file(db, lot_number)
 
 
     def delete_measure_file(self, db, file_name):
