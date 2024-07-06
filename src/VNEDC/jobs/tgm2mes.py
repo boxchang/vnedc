@@ -18,8 +18,8 @@ class TGM2MES(object):
         records = self.get_measure_files()
         for record in records:
             print(record['FILE_NAME'])
-            if record['FILE_NAME'] == "GP247060L3":
-                print("")
+            # if record['FILE_NAME'] == "GP247060L3":
+            #     print("")
             data = self.get_measure_data(record['FILE_NAME'])
             if data:
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
@@ -102,9 +102,6 @@ class TGM2MES(object):
         cuff = cuff_list[2]
         palm = cuff_list[1]
         finger = cuff_list[0]
-
-        if records[0]['file_name'] == "GP247060L3":
-            print("xx")
 
         # 呼叫存儲過程並獲取查詢結果
         cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", records[0]['file_name'], local_ip, roll, cuff, palm, finger, finger_tip)
