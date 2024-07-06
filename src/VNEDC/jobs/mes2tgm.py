@@ -5,7 +5,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from datetime import datetime, timedelta
-from jobs.database import sgada_database, tgm_database
+from jobs.database import sgada_database, tgm_database, mes_database
 
 
 class MES2TGM(object):
@@ -19,7 +19,7 @@ class MES2TGM(object):
         start_date = data_date
         end_date = (datetime.strptime(data_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
 
-        db = tgm_database()
+        db = mes_database()
         sql = """
         select  distinct RunCardId, WorkCenterTypeName,(case WorkCenterTypeName when 'NBR' then 9 when 'PVC' then 7 end) comport
         from PMGMES.[dbo].[PMG_MES_RunCard_IPQCInspectIOptionMapping] t, [PMGMES].[dbo].[PMG_MES_RunCard] r
