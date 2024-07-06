@@ -18,6 +18,8 @@ class TGM2MES(object):
         records = self.get_measure_files()
         for record in records:
             print(record['FILE_NAME'])
+            if record['FILE_NAME'] == "GP247060L3":
+                print("")
             data = self.get_measure_data(record['FILE_NAME'])
             if data:
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
@@ -36,16 +38,16 @@ class TGM2MES(object):
         finger_count = 0
         db = tgm_database()
 
-        if self.last_time != "":
-            sql_condition = "and data_datetime > '{last_time}'".format(last_time=self.last_time)
-        else:
-            sql_condition = ""
+        # if self.last_time != "":
+        #     sql_condition = "and data_datetime > '{last_time}'".format(last_time=self.last_time)
+        # else:
+        #     sql_condition = ""
 
         sql = """SELECT top(5) file_name, item_name, data_val
                  FROM [TGM].[dbo].[MEASURE_DATA] d, MEASURE_ITEM i 
-                 where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}' {sql_condition}
+                 where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}'
                  order by data_datetime desc"""\
-            .format(LOT_NUMBER=LOT_NUMBER, last_time=self.last_time, sql_condition=sql_condition)
+            .format(LOT_NUMBER=LOT_NUMBER)
         records = db.select_sql_dict(sql)
 
         # Cuff的量測位置有4個數值，Finger有1個數值，滿足才回傳
@@ -95,6 +97,9 @@ class TGM2MES(object):
         cuff = cuff_list[2]
         palm = cuff_list[1]
         finger = cuff_list[0]
+
+        if records[0]['file_name'] == "GP247060L3":
+            print("xx")
 
         # 呼叫存儲過程並獲取查詢結果
         cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", records[0]['file_name'], local_ip, roll, cuff, palm, finger, finger_tip)
