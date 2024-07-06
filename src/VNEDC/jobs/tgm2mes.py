@@ -5,7 +5,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 import socket
-from datetime import datetime
+from datetime import datetime, timedelta
 from jobs.database import sgada_database, tgm_database
 
 
@@ -14,7 +14,7 @@ class TGM2MES(object):
     last_time_file = os.path.join(path, "last_time.config")
 
     def execute(self):
-        self.last_time = self.get_last_time()
+        self.last_time = self.get_last_time() - timedelta(minutes=2)  # 程式的最後的執行時間再往前兩分鐘
         records = self.get_measure_files()
         for record in records:
             print(record['FILE_NAME'])
@@ -43,7 +43,7 @@ class TGM2MES(object):
         else:
             sql_condition = ""
 
-        sql = """SELECT top(5) file_name, item_name, data_val
+        sql = """SELECT file_name, item_name, data_val
                  FROM [TGM].[dbo].[MEASURE_DATA] d, MEASURE_ITEM i 
                  where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}' {sql_condition}
                  order by data_datetime desc"""\
@@ -56,7 +56,7 @@ class TGM2MES(object):
                 cuff_count += 1
             if record["item_name"] == "5.D Ngon tay":
                 finger_count += 1
-        if cuff_count == 4 and finger_count == 1:
+        if cuff_count >= 4 and finger_count >= 1:
             return records
         else:
             return ""
@@ -87,11 +87,16 @@ class TGM2MES(object):
 
         cuff_list = []
         finger_tip = ""
+        item1_count = 1
+        item2_count = 1
         for record in records:
-            if record["item_name"] == " 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay":
+            if record["item_name"] == " 1.Cuon bien 2.Co tay 3.Ban tay 4.Ngon tay" and item1_count < 5:
                 cuff_list.append(record["data_val"])
-            if record["item_name"] == "5.D Ngon tay":
+                item1_count += 1
+            if record["item_name"] == "5.D Ngon tay"  and item2_count < 2:
                 finger_tip = record["data_val"]
+                item2_count += 1
+
 
         roll = cuff_list[3]
         cuff = cuff_list[2]
