@@ -105,6 +105,10 @@ class TGM2MES(object):
         palm = cuff_list[1]
         finger = cuff_list[0]
 
+        # 指、指尖要除以2
+        finger = finger/2
+        finger_tip = finger_tip/2
+
         # 呼叫存儲過程並獲取查詢結果
         cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", records[0]['file_name'], local_ip, roll, cuff, palm, finger, finger_tip)
         conn.commit()
@@ -130,13 +134,13 @@ class TGM2MES(object):
         with open(self.last_time_file, 'w') as file:
             file.write(current_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Runcard主檔的資料超過兩天就刪除，假定Runcard產生出來兩天內會做完
+    # Runcard主檔的資料超過一天就刪除，假定Runcard產生出來一天內會做完
     def clean_data(self):
         db = tgm_database()
         sql = """
             SELECT file_name, count(*) number
             FROM [TGM].[dbo].[MEASURE_FILE] a, [TGM].[dbo].[MEASURE_DATA] b 
-            where a.FILE_NAME = b.LOT_NUMBER and data_datetime < getdate()-2
+            where a.FILE_NAME = b.LOT_NUMBER and data_datetime < getdate()-1
             group by FILE_NAME having count(*) > 4
         """
         records = db.select_sql_dict(sql)
