@@ -14,12 +14,12 @@ class TGM2MES(object):
     last_time_file = os.path.join(path, "last_time.config")
 
     def execute(self):
-        self.last_time = self.get_last_time() - timedelta(minutes=2)  # 程式的最後的執行時間再往前兩分鐘
+        self.last_time = self.get_last_time() - timedelta(minutes=120)  # 程式的最後的執行時間再往前兩分鐘
         records = self.get_measure_files()
         for record in records:
             print(record['FILE_NAME'])
 
-            # if record['FILE_NAME'] == "GP247060P3":
+            # if record['FILE_NAME'] == "GN247080L6":
             #     print("")
 
             data = self.get_measure_data(record['FILE_NAME'])
@@ -106,8 +106,8 @@ class TGM2MES(object):
         finger = cuff_list[0]
 
         # 指、指尖要除以2
-        finger = finger/2
-        finger_tip = finger_tip/2
+        finger = round(float(finger)/2, 2)
+        finger_tip = round(float(finger_tip)/2, 3)
 
         # 呼叫存儲過程並獲取查詢結果
         cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", records[0]['file_name'], local_ip, roll, cuff, palm, finger, finger_tip)
