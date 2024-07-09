@@ -70,13 +70,19 @@ $(document).ready(function () {
         Render();
     });
 
-    $("#id_mach").on('change', function () {
+    $('input[name="mach"]').on('change', function () {
         Render();
     });
 
     $("#id_process_type").on('change', function () {
-        var plant = $("#id_plant").val();
-        var mach = $("#id_mach").val();
+        //var plant = $("#id_plant").val();
+        const plant = $('input[name="plant"]:checked').map(function () {
+            return $(this).val();
+        }).get();
+        //var mach = $("#id_mach").val();
+        const mach = $('input[name="mach"]:checked').map(function () {
+            return $(this).val();
+        }).get();
         var process_type = $("#id_process_type").val();
         if(plant != "" && mach != "" && process_type != "") {
             process_type_change(plant, mach, process_type);
@@ -117,8 +123,14 @@ $(document).ready(function () {
     function Render() {
         var data_date_start = $("#id_data_date_start").val();
         var data_date_end = $("#id_data_date_end").val();
-        var plant = $("#id_plant").val();
-        var mach = $("#id_mach").val();
+        //var plant = $("#id_plant").val();
+        const plant = $('input[name="plant"]:checked').map(function () {
+            return $(this).val();
+        }).get();
+        //var mach = $("#id_mach").val();
+        const mach = $('input[name="mach"]:checked').map(function () {
+            return $(this).val();
+        }).get();
         var process_type = $("#id_process_type").val();
         var param_define = $("#id_param_define").val();
         var control_high = $("#id_control_high").val();
