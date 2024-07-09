@@ -162,10 +162,11 @@ $(document).ready(function () {
     }
 
     function process_type_change(plant, mach, process_type) {
+        var lang = "{{ request.LANGUAGE_CODE }}";
         $.ajax({
             url: '{% url 'get_param_define_api' %}', type: 'post',
             dataType: 'json',
-            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "mach": mach, "process_type": process_type},
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "mach": mach, "process_type": process_type, "lang": lang},
             success: function(data) {
                 //Update select Options
                 $("#id_param_define").html(data);

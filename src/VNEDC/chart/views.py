@@ -80,8 +80,8 @@ def param_value_api(request):
                     control_low_data.append(control_low)
                 form_control_range_low = control_low
 
-            datasets.append({'label': 'CONTROL RANGE HIGH', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
-            datasets.append({'label': 'CONTROL RANGE LOW', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
 
             chart_data = {"labels": y_label, "datasets": datasets, "title": process_type, "control_high": form_control_range_high, "control_low": form_control_range_low}
         except Exception as e:
@@ -96,13 +96,22 @@ def get_param_define_api(request):
         plant = request.POST.getlist('plant[]')
         mach = request.POST.getlist('mach[]')
         process_type = request.POST.get('process_type')
+        lang = request.POST.get('lang')
         records = ParameterDefine.objects.filter(plant__in=plant, mach__in=mach, process_type=process_type).distinct()
         html = """<option value="" selected>---------</option>"""
         distinct = []
 
         for record in records:
             if record.parameter_name not in distinct:
-                html += """<option value="{value}">{name}</option>""".format(value=record.parameter_name, name=record.parameter_name)
+                if lang == 'zh-hans':
+                    name = record.parameter_cn
+                elif lang == 'zh-hant':
+                    name = record.parameter_tw
+                elif lang == 'vi':
+                    name = record.parameter_vi
+                else:
+                    name = record.parameter_name
+                html += """<option value="{value}">{name}</option>""".format(value=record.parameter_name, name=name)
                 distinct.append(record.parameter_name)
 
     return JsonResponse(html, safe=False)

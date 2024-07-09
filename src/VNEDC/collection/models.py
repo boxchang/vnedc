@@ -38,6 +38,14 @@ class Process_Type(models.Model):
                                   related_name='process_type_update_at')
 
     def __str__(self):
+        from django.utils.translation import get_language
+        lang = get_language()
+        if lang == 'zh-hans':
+            return self.process_cn
+        elif lang == 'zh-hant':
+            return self.process_tw
+        elif lang == 'vi':
+            return self.process_vn
         return self.process_name
 
 
@@ -64,6 +72,14 @@ class ParameterDefine(models.Model):
                                   related_name='param_define_update_at')
 
     def __str__(self):
+        from django.utils.translation import get_language
+        lang = get_language()
+        if lang == 'zh-hans':
+            return self.parameter_cn
+        elif lang == 'zh-hant':
+            return self.parameter_tw
+        elif lang == 'vi':
+            return self.parameter_vn
         return self.parameter_name
 
 
