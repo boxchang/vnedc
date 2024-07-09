@@ -52,7 +52,7 @@ class DailyInfoForm(forms.ModelForm):
     prod_size_b1 = forms.CharField(required=False, label='B1尺寸')
     prod_name_b2 = forms.CharField(required=False, label='B2品項')
     prod_size_b2 = forms.CharField(required=False, label='B2尺寸')
-    remark = forms.ChoiceField(label="備註", widget=forms.RadioSelect, choices=CHOICES,)
+    remark = forms.MultipleChoiceField(label="備註", widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
     coagulant_time_hour = forms.ChoiceField(required=False, label='換凝固劑時間(Hour)', choices=hour)
     coagulant_time_min = forms.ChoiceField(required=False, label='換凝固劑時間(Minute)', choices=min)
     latex_time_hour = forms.ChoiceField(required=False, label='換乳膠時間(Hour)', choices=hour)

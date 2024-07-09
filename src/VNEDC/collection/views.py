@@ -131,7 +131,7 @@ def daily_info_create(request):
     info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
 
     if info:
-        form = DailyInfoForm(instance=info)
+        form = DailyInfoForm(instance=info, initial={'remark': info.remark.split(',')})
 
     if request.method == 'POST':
         if not info:  # 新增
@@ -143,6 +143,8 @@ def daily_info_create(request):
                 tmp_form.data_date = sData_date
                 tmp_form.create_by = request.user
                 tmp_form.update_by = request.user
+                selected_options = form.cleaned_data['remark']
+                tmp_form.remark = ','.join(selected_options)
                 tmp_form.save()
 
                 # 重新取得最新資料
@@ -152,6 +154,8 @@ def daily_info_create(request):
             if form.is_valid():
                 tmp_form = form.save(commit=False)
                 tmp_form.update_by = request.user
+                selected_options = form.cleaned_data['remark']
+                tmp_form.remark = ','.join(selected_options)
                 tmp_form.save()
         msg = _("Update Done")
 
