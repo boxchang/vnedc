@@ -42,9 +42,10 @@ def param_value_api(request):
 
             for mach in machs:
                 dataset = {}
+                mach_index = mach[-2:]
                 dataset['label'] = mach
-                dataset['backgroundColor'] = backgroundColor[mach]
-                dataset['borderColor'] = borderColor[mach]
+                dataset['backgroundColor'] = backgroundColor[mach_index]
+                dataset['borderColor'] = borderColor[mach_index]
                 dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
                 data = []
                 for date_time in y_label:
