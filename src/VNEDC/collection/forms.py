@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class RecordForm(forms.Form):
     data_date = forms.DateField(label=_('record_date'))
     plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
-    mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.all())
+    mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.none())
 
 
     def __init__(self, *args, submit_title='Submit', **kwargs):

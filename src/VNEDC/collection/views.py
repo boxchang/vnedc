@@ -72,7 +72,11 @@ def record(request, process_code):
     processes = Process_Type.objects.all().order_by('show_order')
     data_times = ['00', '06', '12', '18']
     plants = Plant.objects.all()
-    machs = Machine.objects.all()
+
+    if sPlant:
+        machs = Machine.objects.filter(plant=sPlant)
+    else:
+        machs = None
 
     info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
 
@@ -121,7 +125,11 @@ def daily_info_create(request):
     sPlant, sMach, sData_date, lang = page_init(request)
     form = DailyInfoForm()
     plants = Plant.objects.all()
-    machs = Machine.objects.all()
+
+    if sPlant:
+        machs = Machine.objects.filter(plant=sPlant)
+    else:
+        machs = None
 
     processes = Process_Type.objects.all().order_by('show_order')
 
@@ -187,4 +195,14 @@ def raw_data_api(request, data_date_start, data_date_end, process_type):
             records.append(record)
 
     return JsonResponse(records, safe=False)
+
+def get_mach_api(request):
+    if request.method == 'POST':
+        plant = request.POST.get('plant')
+        machs = Machine.objects.filter(plant=plant)
+        html = """<option value="" selected>---------</option>"""
+
+        for mach in machs:
+            html += """<option value="{value}">{name}</option>""".format(value=mach.mach_code, name=mach.mach_name)
+    return JsonResponse(html, safe=False)
 

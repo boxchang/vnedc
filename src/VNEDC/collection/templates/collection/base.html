@@ -24,6 +24,17 @@ function set_session() {
     }
 }
 
+function plant_change() {
+    $.ajax({
+        url: '{% url 'get_mach_api' %}', type: 'post',
+        dataType: 'json',
+        data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": $("#id_plant :selected").val()},
+        success: function(data) {
+            $("#id_mach").html(data);
+        }
+    });
+}
+
 if("{{ msg }}".length > 0) {
     alert("{{ msg }}");
 }
@@ -69,7 +80,7 @@ function validate(evt) {
                                 工廠<span class="asteriskField">*</span>
                             </label>
                             <div>
-                                <select name="plant" onchange="set_session()" class="select custom-select" required="" id="id_plant">
+                                <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
                                     <option value="">---------</option>
                                     {% for plant in plants %}
                                     <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
@@ -87,7 +98,7 @@ function validate(evt) {
                                 <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
                                     <option value="">---------</option>
                                     {% for mach in machs %}
-                                    <option value="{{ mach }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach }}</option>
+                                    <option value="{{ mach.mach_code }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach.mach_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
