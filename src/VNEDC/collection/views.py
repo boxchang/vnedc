@@ -12,7 +12,7 @@ from collection.models import ParameterDefine, Process_Type, Plant, Machine, Dai
 @login_required
 def index(request):
     plants = Plant.objects.all()
-    machs = Machine.objects.all()
+    machs = Machine.objects.none()
     return render(request, 'collection/index.html', locals())
 
 
