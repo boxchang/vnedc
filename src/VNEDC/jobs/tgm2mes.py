@@ -14,7 +14,9 @@ class TGM2MES(object):
     last_time_file = os.path.join(path, "last_time.config")
 
     def execute(self):
-        self.last_time = self.get_last_time() - timedelta(minutes=2)  # 程式的最後的執行時間再往前兩分鐘
+        self.last_time = self.get_last_time()
+        self.save_exec_time()
+
         records = self.get_measure_files()
         for record in records:
             print(record['FILE_NAME'])
@@ -26,7 +28,7 @@ class TGM2MES(object):
             if data:
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
                 self.insert_mes(data)
-        self.save_exec_time()
+
         self.clean_data()
 
     def get_measure_files(self):
