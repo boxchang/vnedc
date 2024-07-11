@@ -48,9 +48,9 @@ class TGM2MES(object):
             sql_condition = ""
 
         sql = """SELECT file_name, item_name, data_val
-                 FROM [TGM].[dbo].[MEASURE_DATA] d, MEASURE_ITEM i 
+                 FROM [TGM].[dbo].[MEASURE_DATA] d, [TGM].[dbo].[MEASURE_ITEM] i
                  where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}' {sql_condition}
-                 order by data_datetime desc"""\
+                 order by data_datetime desc, DATA_ID desc """\
             .format(LOT_NUMBER=LOT_NUMBER, last_time=self.last_time, sql_condition=sql_condition)
         records = db.select_sql_dict(sql)
 
