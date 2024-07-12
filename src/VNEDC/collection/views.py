@@ -206,3 +206,7 @@ def get_mach_api(request):
             html += """<option value="{value}">{name}</option>""".format(value=mach.mach_code, name=mach.mach_name)
     return JsonResponse(html, safe=False)
 
+
+def test(request):
+    return render(request, 'collection/test.html', locals())
+

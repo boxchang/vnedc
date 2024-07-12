@@ -78,21 +78,21 @@ class DailyInfoForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Div(
-                Div('prod_name_a1', css_class='col-md-2'),
-                Div('prod_name_a2', css_class='col-md-2'),
-                Div('prod_name_b1', css_class='col-md-2'),
-                Div('prod_name_b2', css_class='col-md-2'),
+                Div('prod_name_a1', css_class='col-md-3'),
+                Div('prod_name_a2', css_class='col-md-3'),
+                Div('prod_name_b1', css_class='col-md-3'),
+                Div('prod_name_b2', css_class='col-md-3'),
                 css_class='row'),
             Div(
-                Div('prod_size_a1', css_class='col-md-2'),
-                Div('prod_size_a2', css_class='col-md-2'),
-                Div('prod_size_b1', css_class='col-md-2'),
-                Div('prod_size_b2', css_class='col-md-2'),
+                Div('prod_size_a1', css_class='col-md-3'),
+                Div('prod_size_a2', css_class='col-md-3'),
+                Div('prod_size_b1', css_class='col-md-3'),
+                Div('prod_size_b2', css_class='col-md-3'),
                 css_class='row'),
             Div(
                 Div(
                     Div('remark', css_class='col daily_info_remark')
-                , css_class='col-md-4'),
+                , css_class='col-md-6'),
                 Div(
                     Div(
                         Div('coagulant_time_hour', css_class='col'),
@@ -106,7 +106,7 @@ class DailyInfoForm(forms.ModelForm):
                         Div('tooling_time_hour', css_class='col'),
                         Div('tooling_time_min', css_class='col'),
                         css_class='row')
-                , css_class='col-md-4'),
+                , css_class='col-md-6'),
                 css_class='row'),
         )
 

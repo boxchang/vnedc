@@ -213,36 +213,25 @@ $(document).ready(function () {
 {% endblock ready %}
 
 {% block container %}
-<input type="hidden" id="hidCondition" value="Hide" />
-<div class="row p-3" id="search_condition">
-    <div class="col">
-        {% crispy search_form %}
-    </div>
-    <div class="row pr-3">
-        <div class="col">
+<div class="container-fluid">
+    <input type="hidden" id="hidCondition" value="Hide" />
+    <div class="row pl-3" id="search_condition">
+        <div class="col-10">
+            {% crispy search_form %}
+        </div>
+        <div class="col-1">
             <a class="box-nav-btn" href="{% url 'daily_info_create' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Record' %}">
                 <i class="fas fa-exchange-alt"></i>
             </a>
         </div>
-        <div class="col">
-            <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}" target="_blank">
-                <i class="fas fa-cog"></i>
-            </a>
+    </div>
+    <div class="row">
+        <input type="button" class="btn btn-light" style="width: 100%; height:2px;" id="btnCondition" />
+    </div>
+    <div class="row">
+        <div style="width:90%;">
+            <canvas id="canvas"></canvas>
         </div>
-    </div>
-    <div class="pr-3">
-        {% include 'bases/lang.html' %}
-    </div>
-    <div class="ml-md-auto">
-        <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>
-    </div>
-</div>
-<div class="row p-3">
-    <input type="button" class="btn btn-light" style="width: 100%; height:2px;" id="btnCondition" />
-</div>
-<div class="row">
-    <div style="width:75%;">
-        <canvas id="canvas"></canvas>
     </div>
 </div>
 {% endblock %}

@@ -20,19 +20,18 @@
 Daily Production Information
 {% endblock title %}
 {% block content %}
-    <div class="row">
-        <div class="col-1"></div>
-        <div class="col-10">
-            <form action="" method="POST" onSubmit="return validation()" id="record_form">
-                {% csrf_token %}
-                {% crispy form %}
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col-8" style="text-align: center">
-                        <input class="btn btn-info" style="width:150px;height: 50px;" type="submit" value="{% trans "save" %}" />
-                    </div>
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <form action="" method="POST" onSubmit="return validation()" id="record_form">
+            {% csrf_token %}
+            {% crispy form %}
+            <div class="row" style="padding-top: 20px;">
+                <div class="col-12" style="text-align: center">
+                    <input class="btn btn-info" style="width:150px;height: 50px;" type="submit" value="{% trans "save" %}" />
                 </div>
-            </form>
-        </div>
-        <div class="col-1"></div>
+            </div>
+        </form>
     </div>
+</div>
 {% endblock content %}

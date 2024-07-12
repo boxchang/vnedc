@@ -69,106 +69,93 @@ function validate(evt) {
 {% block container %}
 <div class="card-header">
     {% if user.is_authenticated %}
-    <div class="row">
-        <div class="col">
-            <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-3">
-                        <div id="div_id_plant" class="form-group">
-                            <label for="id_plant" class=" requiredField">
-                                工廠<span class="asteriskField">*</span>
-                            </label>
-                            <div>
-                                <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
-                                    <option value="">---------</option>
-                                    {% for plant in plants %}
-                                    <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div id="div_id_mach" class="form-group">
-                            <label for="id_mach" class=" requiredField">
-                                    機台<span class="asteriskField">*</span>
-                            </label>
-                            <div>
-                                <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
-                                    <option value="">---------</option>
-                                    {% for mach in machs %}
-                                    <option value="{{ mach.mach_code }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach.mach_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="data_date">作業時間*</label>
-                        <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
+    <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">
+                <div id="div_id_plant" class="form-group">
+                    <label for="id_plant" class=" requiredField">
+                        工廠<span class="asteriskField">*</span>
+                    </label>
+                    <div>
+                        <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
+                            <option value="">---------</option>
+                            {% for plant in plants %}
+                            <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
-            </form>
-        </div>
-        <div class="row pr-3">
-            <div class="col">
+            </div>
+            <div class="col-md-3">
+                <div id="div_id_mach" class="form-group">
+                    <label for="id_mach" class=" requiredField">
+                            機台<span class="asteriskField">*</span>
+                    </label>
+                    <div>
+                        <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
+                            <option value="">---------</option>
+                            {% for mach in machs %}
+                            <option value="{{ mach.mach_code }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach.mach_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="data_date">作業時間*</label>
+                <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
+            </div>
+            <div class="col-md-3">
+                <label for="data_date"></label>
                 {% if user.is_superuser %}
                 <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
                     <i class="fas fa-chart-line"></i>
                 </a>
                 {% endif %}
             </div>
-            <div class="col">
-                <a class="box-nav-btn" href="{% url 'user_info' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Personal Setting' %}">
-                    <i class="fas fa-cog"></i>
-                </a>
-            </div>
         </div>
-        <div class="pr-3">
-            {% include 'bases/lang.html' %}
-        </div>
-        <div class="ml-md-auto">
-            <a class="btn btn-info" href="{% url 'logout' %}" role="button"><i class="fas fa-sign-out-alt"></i>{% trans "logout" %} ({{ user.username }})</a>
-        </div>
-    </div>
+    </form>
     {% endif %}
 </div>
-<div class="row justify-content-center pt-3" style="height:500px">
-    <div class="col-1">
-    {% if info %}
-        {% if request.session.plant %}
-        <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:180px;">
+<div class="content">
+    <div class="row m-3" style="height:500px">
+        <div class="col-10">
+           {% block content %}
+           {% endblock content %}
+        </div>
+        <div class="col-1">
+        {% if info %}
+            {% if request.session.plant %}
+            <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:180px;">
 
-            {% if lang == "zh-hant" %}
-                生產資料
-            {% elif lang == "vi" %}
-                phương tiện sản xuất
-            {% elif lang == "zh-hans" %}
-                生产资料
-            {% else %}
-                Production Data
+                {% if lang == "zh-hant" %}
+                    生產資料
+                {% elif lang == "vi" %}
+                    phương tiện sản xuất
+                {% elif lang == "zh-hans" %}
+                    生产资料
+                {% else %}
+                    Production Data
+                {% endif %}
+            </a>
             {% endif %}
-        </a>
+            {% for process in processes %}
+            <a href="{% url 'record' process.process_code %}" class="btn btn-info" style="width:180px;margin-top: 5px">
+                {% if lang == "zh-hant" %}
+                    {{ process.process_tw }}
+                {% elif lang == "vi" %}
+                    {{ process.process_vn }}
+                {% elif lang == "zh-hans" %}
+                    {{ process.process_cn }}
+                {% else %}
+                    {{ process.process_name }}
+                {% endif %}
+            </a>
+            {% endfor %}
         {% endif %}
-        {% for process in processes %}
-        <a href="{% url 'record' process.process_code %}" class="btn btn-info" style="width:180px;margin-top: 5px">
-            {% if lang == "zh-hant" %}
-                {{ process.process_tw }}
-            {% elif lang == "vi" %}
-                {{ process.process_vn }}
-            {% elif lang == "zh-hans" %}
-                {{ process.process_cn }}
-            {% else %}
-                {{ process.process_name }}
-            {% endif %}
-        </a>
-        {% endfor %}
-    {% endif %}
-    </div>
-    <div class="col-11 p-3">
-       {% block content %}
-       {% endblock content %}
+        </div>
     </div>
 </div>
+
 {% endblock %}
