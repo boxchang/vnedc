@@ -14,7 +14,7 @@ class TGM2MES(object):
     last_time_file = os.path.join(path, "last_time.config")
 
     def execute(self):
-        self.last_time = self.get_last_time()
+        self.last_time = self.get_last_time() - timedelta(minutes=2)  # 程式的最後的執行時間再往前兩分鐘
         self.save_exec_time()
 
         records = self.get_measure_files()
