@@ -27,6 +27,7 @@ urlpatterns = [
     url('admin/', admin.site.urls),
     url(r'^users/', include('users.urls')),
     url(r'^filelist/', include('filelist.urls')),
+    url(r'^mes/', include('mes.urls')),
     url(r'^collection/', include('collection.urls')),
     url(r'^chart/', include('chart.urls')),
     url(r'^home', include('bases.urls')),

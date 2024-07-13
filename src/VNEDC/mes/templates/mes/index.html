@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Work Orders</title>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+        .center-align {
+            text-align: center;
+        }
+        .left-align {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="jsGrid"></div>
+
+    <script type="text/javascript">
+        $(function() {
+            $("#jsGrid").jsGrid({
+                width: "100%",
+                height: "650px",
+
+                inserting: false,
+                editing: false,
+                sorting: true,
+                paging: true,
+                filtering: true,
+
+                autoload: true,
+                pageSize: 50,
+                pageButtonCount: 5,
+
+                deleteConfirm: "Do you really want to delete the client?",
+
+                controller: {
+                    loadData: function(filter) {
+                        return $.ajax({
+                            type: "GET",
+                            url: "{% url 'work_order_list' %}",
+                            data: filter,
+                            dataType: "json"
+                        }).then(function(data) {
+                            if (filter.RunCardId) {
+                                data = $.grep(data, function(item) {
+                                    return item.RunCardId.toLowerCase().indexOf(filter.RunCardId.toLowerCase()) !== -1;
+                                });
+                            }
+                            if (filter.InspectionDate) {
+                                data = $.grep(data, function(item) {
+                                    return item.InspectionDate.toLowerCase().indexOf(filter.InspectionDate.toLowerCase()) !== -1;
+                                });
+                            }
+                            if (filter.Period) {
+                                data = $.grep(data, function(item) {
+                                    return item.Period.toLowerCase().indexOf(filter.Period.toLowerCase()) !== -1;
+                                });
+                            }
+                            return data;
+                        });
+                    }
+                },
+
+
+                fields: [
+                    { name: "InspectionDate", type: "text", width: 50, title: "InspectionDate", autosearch: true, css: "center-align" },
+                    { name: "WorkOrderId", type: "text", width: 70, title: "WorkOrderId", autosearch: true, css: "center-align" },
+                    { name: "Period", type: "text", width: 30, title: "Period", autosearch: true, css: "center-align" },
+                    { name: "RunCardId", type: "text", width: 60, title: "RunCard", autosearch: true, css: "center-align" },
+                    { name: "WorkCenterTypeName", type: "text", width: 30, title: "Plant", autosearch: true, css: "center-align" },
+                    { name: "MachineName", type: "text", width: 60, title: "MachineName", autosearch: true },
+                    { name: "LineName", type: "text", width: 40, title: "LineName", autosearch: true, css: "center-align" },
+                    { name: "Roll", type: "text", width: 30, title: "Roll", autosearch: true },
+                    { name: "measure_5", type: "text", width: 30, title: "M5", autosearch: true },
+                    { name: "Cuff", type: "text", width: 30, title: "Cuff", autosearch: true },
+                    { name: "measure_4", type: "text", width: 30, title: "M4", autosearch: true },
+                    { name: "Palm", type: "text", width: 30, title: "Palm", autosearch: true },
+                    { name: "measure_3", type: "text", width: 30, title: "M3", autosearch: true },
+                    { name: "Finger", type: "text", width: 30, title: "Finger", autosearch: true },
+                    { name: "measure_2", type: "text", width: 30, title: "M2", autosearch: true },
+                    { name: "FingerTip", type: "text", width: 30, title: "FingerTip", autosearch: true },
+                    { name: "measure_1", type: "text", width: 30, title: "M1", autosearch: true },
+                ]
+
+            });
+
+        });
+    </script>
+</body>
+</html>
