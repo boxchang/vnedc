@@ -41,32 +41,34 @@ class RecordForm(forms.Form):
 
 
 class DailyInfoForm(forms.ModelForm):
-    CHOICES = [('無氯', '無氯'), ('無二次料', '無二次料'), ('碱槽測PH值', '碱槽測PH值'),]
+    CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')),]
+    SIZE_OPTION = [('', '---'), ('XXS', 'XXS'), ('XS', 'XS'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('XL', 'XL'), ('XXL', 'XXL'),]
     hour = [(str(hh).zfill(2), str(hh).zfill(2)) for hh in range(0, 24)]
     min = [(str(mm).zfill(2), str(mm).zfill(2)) for mm in range(0, 60)]
-    prod_name_a1 = forms.CharField(required=False, label='A1品項')
-    prod_size_a1 = forms.CharField(required=False, label='A1尺寸')
-    prod_name_a2 = forms.CharField(required=False, label='A2品項')
-    prod_size_a2 = forms.CharField(required=False, label='A2尺寸')
-    prod_name_b1 = forms.CharField(required=False, label='B1品項')
-    prod_size_b1 = forms.CharField(required=False, label='B1尺寸')
-    prod_name_b2 = forms.CharField(required=False, label='B2品項')
-    prod_size_b2 = forms.CharField(required=False, label='B2尺寸')
-    remark = forms.MultipleChoiceField(label="備註", widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
-    coagulant_time_hour = forms.ChoiceField(required=False, label='換凝固劑時間(Hour)', choices=hour)
-    coagulant_time_min = forms.ChoiceField(required=False, label='換凝固劑時間(Minute)', choices=min)
-    latex_time_hour = forms.ChoiceField(required=False, label='換乳膠時間(Hour)', choices=hour)
-    latex_time_min = forms.ChoiceField(required=False, label='換乳膠時間(Minute)', choices=min)
-    tooling_time_hour = forms.ChoiceField(required=False, label='換模時間(Hour)', choices=hour)
-    tooling_time_min = forms.ChoiceField(required=False, label='換模時間(Minute)', choices=min)
-    plant = forms.ModelChoiceField(required=False, label='廠別', queryset=Plant.objects.all())
+    prod_name_a1 = forms.CharField(required=False, label=_('A1 Production'))
+    prod_size_a1 = forms.ChoiceField(required=False, label=_('A1 Size'), choices=SIZE_OPTION)
+    prod_name_a2 = forms.CharField(required=False, label=_('A2 Production'))
+    prod_size_a2 = forms.ChoiceField(required=False, label=_('A2 Size'), choices=SIZE_OPTION)
+    prod_name_b1 = forms.CharField(required=False, label=_('B1 Production'))
+    prod_size_b1 = forms.ChoiceField(required=False, label=_('B1 Size'), choices=SIZE_OPTION)
+    prod_name_b2 = forms.CharField(required=False, label=_('B2 Production'))
+    prod_size_b2 = forms.ChoiceField(required=False, label=_('B2 Size'), choices=SIZE_OPTION)
+    remark = forms.MultipleChoiceField(required=False, label=_('Remark'), widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
+    remark2 = forms.CharField(required=False, label='', widget=forms.Textarea(attrs={'rows': 4, 'cols': 40}))
+    coagulant_time_hour = forms.ChoiceField(required=False, label=_('Change Coagulant Time(Hour)'), choices=hour)
+    coagulant_time_min = forms.ChoiceField(required=False, label=_('Change Coagulant Time(Minute)'), choices=min)
+    latex_time_hour = forms.ChoiceField(required=False, label=_('Change Latex Time(Hour)'), choices=hour)
+    latex_time_min = forms.ChoiceField(required=False, label=_('Change Latex Time(Minute)'), choices=min)
+    tooling_time_hour = forms.ChoiceField(required=False, label=_('Change Tooling Time(Hour)'), choices=hour)
+    tooling_time_min = forms.ChoiceField(required=False, label=_('Change Tooling Time(Minute)'), choices=min)
+    plant = forms.ModelChoiceField(required=False, label=_('Plant'), queryset=Plant.objects.all())
 
     class Meta:
         model = Daily_Prod_Info
         fields = ('prod_name_a1', 'prod_size_a1',
                   'prod_name_a2', 'prod_size_a2', 'prod_name_b1', 'prod_size_b1',
                   'prod_name_b2', 'prod_size_b2', 'remark', 'coagulant_time_hour', 'coagulant_time_min',
-                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min')
+                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2')
 
 
     def __init__(self, *args, submit_title='Submit', **kwargs):
@@ -91,7 +93,12 @@ class DailyInfoForm(forms.ModelForm):
                 css_class='row'),
             Div(
                 Div(
-                    Div('remark', css_class='col daily_info_remark')
+                    Div(
+                        Div('remark', css_class='col daily_info_remark'),
+                        css_class='row'),
+                    Div(
+                        Div('remark2', css_class='col'),
+                        css_class='row')
                 , css_class='col-md-6'),
                 Div(
                     Div(

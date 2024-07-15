@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-07 14:28+0800\n"
-"PO-Revision-Date: 2023-11-07 14:30+0800\n"
+"POT-Creation-Date: 2024-07-15 08:07+0700\n"
+"PO-Revision-Date: 2024-07-15 08:29+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -16,57 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
-#: .\assets\templates\assets\chart.html:64
-#: .\assets\templates\assets\detail.html:97
-#: .\assets\templates\assets\edit.html:86
-#: .\assets\templates\assets\import.html:56
-#: .\assets\templates\assets\index.html:19
-#: .\assets\templates\assets\label.html:61
-#: .\assets\templates\assets\main.html:42
-#: .\assets\templates\assets\search.html:27
-#: .\bases\templates\bases\index.html:23
-#: .\bases\templates\bases\menu_base.html:30
-#: .\helpdesk\templates\helpdesk\helpdesk_base.html:13
-#: .\helpdesk\templates\helpdesk\search.html:21
-#: .\inventory\templates\inventory\base.html:33
-#: .\monitor\templates\monitor\base.html:24
-#: .\production\templates\production\base.html:36
-msgid "logout"
-msgstr "Đăng xuất"
-
-#: .\assets\templates\assets\detail.html:215
-#: .\assets\templates\assets\edit.html:111
 #: .\bases\templates\bases\attach_form.html:9
-#: .\bugs\templates\bugs\bug_detail.html:76
-#: .\helpdesk\templates\helpdesk\helpdesk_base.html:52
-#: .\problems\templates\problems\problem_base.html:53
-#: .\requests\templates\requests\request_base.html:107
 msgid "attachment"
-msgstr ""
-
-#: .\assets\templates\assets\detail.html:218
-#: .\assets\templates\assets\edit.html:108
-#: .\assets\templates\assets\edit.html:158
-#: .\assets\templates\assets\edit.html:169
-#: .\bases\templates\bases\attach_form.html:17
-#: .\bases\templates\bases\attach_form.html:27
-#: .\bugs\templates\bugs\bug_detail.html:73
-#: .\helpdesk\templates\helpdesk\helpdesk_base.html:49 .\problems\forms.py:20
-#: .\problems\templates\problems\problem_base.html:50 .\projects\forms.py:22
-#: .\projects\templates\projects\homepage.html:267 .\requests\forms.py:138
-#: .\requests\templates\requests\request_base.html:104 .\tests\forms.py:16
-msgid "desc"
-msgstr ""
-
-#: .\assets\templates\assets\edit.html:114
-#: .\bugs\templates\bugs\bug_detail.html:79
-#: .\helpdesk\templates\helpdesk\helpdesk_base.html:55
-#: .\problems\templates\problems\problem_base.html:56
-#: .\requests\templates\requests\request_base.html:110
-#: .\venv\Lib\site-packages\django\forms\formsets.py:391
-msgid "Delete"
 msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:12
@@ -74,629 +27,193 @@ msgstr ""
 msgid "file"
 msgstr ""
 
+#: .\bases\templates\bases\attach_form.html:17
+#: .\bases\templates\bases\attach_form.html:27
+msgid "desc"
+msgstr ""
+
 #: .\bases\templates\bases\attach_form.html:33
-#: .\bases\templates\bases\form.html:10 .\production\forms.py:176
-#: .\requests\templates\requests\request_receive.html:25 .\users\forms.py:61
+#: .\collection\templates\collection\daily_info_create.html:31
+#: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 msgid "save"
 msgstr "lưu trữ"
 
-#: .\bases\templates\bases\base.html:120
-msgid "Project Management System"
-msgstr "Hệ thống quản lý dự án"
+#: .\bases\templates\bases\base.html:52
+msgid "Key Parameter"
+msgstr "Thông số chính"
 
-#: .\bases\templates\bases\base.html:125
-msgid "Asset Management System"
-msgstr "Hệ thống quản lý tài sản"
+#: .\bases\templates\bases\base.html:54
+#: .\collection\templates\collection\test.html:150
+msgid "Contact"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:129
-msgid "IT Equipment Borrow Application"
-msgstr "Ứng dụng mượn thiết bị CNTT"
+#: .\bases\templates\bases\base.html:55
+#: .\collection\templates\collection\test.html:151
+msgid "About"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:132
-msgid "General Supply Application"
-msgstr "Ứng dụng cung cấp chung"
-
-#: .\bases\templates\bases\base.html:146
-msgid "Production Record"
-msgstr "Kỷ lục sản xuất"
-
-#: .\bases\templates\bases\base.html:150
+#: .\bases\templates\bases\base.html:64 .\users\templates\users\base.html:26
 msgid "Personal Setting"
 msgstr "Cài đặt cá nhân"
 
-#: .\bases\templates\bases\base.html:154
-msgid "Authority Management"
-msgstr "Quản lý cơ quan"
+#: .\bases\templates\bases\base.html:65 .\users\templates\users\base.html:35
+msgid "logout"
+msgstr "Đăng xuất"
 
-#: .\bases\templates\bases\menu_base.html:32
-msgid "login"
-msgstr "đăng nhập"
-
-#: .\bases\utils.py:113 .\bases\utils.py:139
+#: .\bases\utils.py:61
 msgid "Update Status"
 msgstr ""
 
-#: .\bugs\forms.py:17 .\bugs\templates\bugs\bug_detail.html:162
-#: .\bugs\templates\bugs\bug_page.html:42 .\problems\forms.py:19
-#: .\problems\templates\problems\problem_page.html:43
-#: .\projects\templates\projects\homepage.html:261
-#: .\projects\templates\projects\homepage.html:329
-#: .\projects\templates\projects\project_manage.html:82
-#: .\projects\templates\projects\project_manage.html:112
-#: .\projects\templates\projects\project_manage.html:139
-#: .\requests\forms.py:137 .\requests\templates\requests\request_base.html:230
-#: .\requests\templates\requests\request_base.html:259
-#: .\requests\templates\requests\request_page.html:46
-msgid "title"
-msgstr ""
-
-#: .\bugs\forms.py:19 .\bugs\templates\bugs\bug_page.html:44
-#: .\projects\templates\projects\project_manage.html:84
-#: .\projects\templates\projects\project_manage.html:141
-#: .\requests\forms.py:136 .\requests\templates\requests\request_base.html:76
-#: .\requests\templates\requests\request_base.html:261
-#: .\requests\templates\requests\request_page.html:48
-msgid "level"
-msgstr ""
-
-#: .\bugs\forms.py:21 .\bugs\templates\bugs\bug_page.html:46
-#: .\problems\forms.py:58 .\problems\forms.py:103
-#: .\projects\templates\projects\homepage.html:264
-#: .\projects\templates\projects\project_manage.html:86
-#: .\projects\templates\projects\project_manage.html:143 .\requests\forms.py:18
-#: .\requests\forms.py:139 .\requests\templates\requests\request_base.html:263
-#: .\requests\templates\requests\request_page.html:50
-msgid "status"
-msgstr ""
-
-#: .\bugs\forms.py:23 .\bugs\templates\bugs\bug_detail.html:45
-#: .\bugs\templates\bugs\bug_page.html:48
-#: .\problems\templates\problems\problem_base.html:34
-#: .\projects\templates\projects\homepage.html:270
-#: .\projects\templates\projects\project_manage.html:88
-#: .\projects\templates\projects\project_manage.html:145
-#: .\requests\forms.py:140 .\requests\templates\requests\request_base.html:78
-#: .\requests\templates\requests\request_base.html:265
-#: .\requests\templates\requests\request_page.html:52
-msgid "owner"
-msgstr ""
-
-#: .\bugs\forms.py:25
-msgid "belong_to"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:9
-msgid "bug_index"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:29
-#: .\bugs\templates\bugs\bug_edit.html:5 .\bugs\templates\bugs\bug_edit.html:15
-#: .\bugs\templates\bugs\bug_edit.html:28
-msgid "bug_edit"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:30
-msgid "bug_delete"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:41
-#: .\projects\templates\projects\homepage.html:258
-#: .\projects\templates\projects\homepage.html:326
-msgid "belong_project"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:53
-#: .\bugs\templates\bugs\bug_detail.html:166
-#: .\bugs\templates\bugs\bug_page.html:50
-#: .\problems\templates\problems\problem_page.html:47
-#: .\projects\templates\projects\homepage.html:203
-#: .\projects\templates\projects\homepage.html:273
-#: .\projects\templates\projects\homepage.html:335
-#: .\projects\templates\projects\project_manage.html:116
-#: .\projects\templates\projects\project_manage.html:147
-#: .\requests\templates\requests\request_base.html:234
-msgid "create_by"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:57
-#: .\bugs\templates\bugs\bug_detail.html:168
-#: .\bugs\templates\bugs\bug_page.html:52
-#: .\problems\templates\problems\problem_base.html:36
-#: .\problems\templates\problems\problem_page.html:49
-#: .\projects\templates\projects\homepage.html:206
-#: .\projects\templates\projects\homepage.html:276
-#: .\projects\templates\projects\homepage.html:338
-#: .\projects\templates\projects\project_manage.html:118
-#: .\projects\templates\projects\project_manage.html:149
-#: .\requests\templates\requests\request_base.html:236
-msgid "create_at"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:59
-#: .\bugs\templates\bugs\bug_detail.html:172
-#: .\problems\templates\problems\problem_base.html:38
-#: .\problems\templates\problems\problem_page.html:53
-#: .\projects\templates\projects\homepage.html:344
-#: .\projects\templates\projects\project_manage.html:122
-#: .\requests\templates\requests\request_base.html:240
-msgid "update_at"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:120
-#: .\projects\templates\projects\project_manage.html:25
-msgid "problem"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:123
-#: .\problems\templates\problems\problem_edit.html:7
-#: .\problems\templates\problems\problem_edit.html:17
-#: .\problems\templates\problems\problem_edit.html:30
-#: .\problems\templates\problems\problem_page.html:14
-#: .\projects\templates\projects\project_manage.html:31
-msgid "problem_create"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:160
-#: .\problems\templates\problems\problem_page.html:41
-#: .\projects\templates\projects\project_manage.html:110
-#: .\requests\templates\requests\request_base.html:228
-msgid "problem_no"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:164
-#: .\projects\templates\projects\homepage.html:332
-#: .\requests\templates\requests\request_base.html:232
-msgid "replies"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_detail.html:170
-#: .\problems\templates\problems\problem_page.html:51
-#: .\projects\templates\projects\homepage.html:341
-#: .\projects\templates\projects\project_manage.html:120
-#: .\requests\templates\requests\request_base.html:238
-msgid "update_by"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_edit.html:7 .\bugs\templates\bugs\bug_edit.html:17
-#: .\bugs\templates\bugs\bug_edit.html:30
-#: .\bugs\templates\bugs\bug_page.html:14
-#: .\projects\templates\projects\project_manage.html:30
-msgid "bug_create"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_page.html:5
-#: .\problems\templates\problems\problem_chart.html:5
-#: .\problems\templates\problems\problem_history.html:5
-#: .\problems\templates\problems\problem_page.html:5
-#: .\projects\templates\projects\project_manage.html:5
-#: .\requests\templates\requests\request_history.html:5
-#: .\requests\templates\requests\request_page.html:5
-msgid "project_manage"
-msgstr ""
-
-#: .\bugs\templates\bugs\bug_page.html:40
-#: .\projects\templates\projects\project_manage.html:137
-msgid "bug_no"
-msgstr ""
-
-#: .\problems\templates\problems\problem_base.html:16
-#: .\problems\templates\problems\problem_edit.html:5
-#: .\problems\templates\problems\problem_edit.html:15
-#: .\problems\templates\problems\problem_edit.html:28
-msgid "problem_edit"
-msgstr ""
-
-#: .\problems\templates\problems\problem_base.html:17
-msgid "problem_delete"
-msgstr ""
-
-#: .\problems\templates\problems\problem_base.html:26
-#: .\requests\templates\requests\request_base.html:74
-msgid "project_belong"
-msgstr ""
-
-#: .\problems\templates\problems\problem_detail.html:8
-msgid "problem_index"
-msgstr ""
-
-#: .\problems\templates\problems\problem_page.html:45
-#: .\projects\templates\projects\project_manage.html:114
-msgid "reply_num"
-msgstr ""
-
-#: .\production\forms.py:15 .\production\forms.py:69 .\production\forms.py:103
-#: .\production\forms.py:201 .\production\views.py:348
-msgid "record_date"
-msgstr "ngày làm việc"
-
-#: .\production\forms.py:26 .\production\forms.py:246
-msgid "export"
-msgstr "xuất khẩu"
-
-#: .\production\forms.py:47 .\production\forms.py:106 .\production\views.py:269
-msgid "prod_order"
-msgstr "trình tự công việc"
-
-#: .\production\forms.py:58 .\production\forms.py:81 .\production\forms.py:212
-msgid "search"
-msgstr "Hỏi thăm"
-
-#: .\production\forms.py:68 .\production\forms.py:111 .\users\forms.py:51
-#: .\users\models.py:80
-msgid "sap_emp_no"
-msgstr "SAP Mã hiệu công nhân"
-
-#: .\production\forms.py:104
-msgid "worked_labor_time"
-msgstr "Số giờ làm việc tích lũy"
-
-#: .\production\forms.py:105
+#: .\chart\forms.py:15 .\collection\forms.py:12
 msgid "plant"
-msgstr "địa điểm"
+msgstr "Thực vật"
 
-#: .\production\forms.py:107 .\production\views.py:271
-msgid "item_no"
-msgstr "Phần Không"
-
-#: .\production\forms.py:108 .\production\views.py:271
-msgid "spec"
-msgstr "mô tả vật liệu"
-
-#: .\production\forms.py:109 .\users\forms.py:50 .\users\models.py:79
-#: .\users\templates\users\login.html:168
-msgid "emp_no"
-msgstr "Mã hiệu công nhân"
-
-#: .\production\forms.py:110 .\projects\forms.py:19 .\users\forms.py:52
-msgid "name"
-msgstr "Tên"
-
-#: .\production\forms.py:112
-msgid "confirm_code"
-msgstr "mã xác nhận"
-
-#: .\production\forms.py:113
-msgid "control_code"
-msgstr "mã kiểm soát"
-
-#: .\production\forms.py:114 .\production\views.py:269
-msgid "step_code"
-msgstr "mã trang web"
-
-#: .\production\forms.py:115 .\production\views.py:269
-msgid "step_name"
-msgstr "Tên trang web"
-
-#: .\production\forms.py:116 .\production\views.py:270
-msgid "labor_time"
-msgstr "giờ làm việc"
-
-#: .\production\forms.py:117 .\production\views.py:270
-msgid "mach_time"
-msgstr "giờ máy"
-
-#: .\production\forms.py:118 .\production\views.py:270
-msgid "good_qty"
-msgstr "Sản phẩm tốt"
-
-#: .\production\forms.py:119
-msgid "ng_qty"
-msgstr "sản phẩm xấu"
-
-#: .\production\forms.py:120 .\production\views.py:336
-msgid "comment"
-msgstr "bình luận"
-
-#: .\production\forms.py:123
+#: .\chart\forms.py:16 .\collection\forms.py:13
 msgid "mach_name"
 msgstr "Tên may moc"
 
-#: .\production\templates\production\base.html:19
-msgid "Record Add"
-msgstr "Bản ghi Thêm"
+#: .\chart\forms.py:17
+msgid "process_type"
+msgstr "Loại quy trình"
 
-#: .\production\templates\production\base.html:20
-msgid "Record Search"
-msgstr "Tìm kiếm hồ sơ"
+#: .\chart\forms.py:18
+msgid "param_define"
+msgstr "Xác định tham số"
 
-#: .\production\templates\production\record.html:53
-msgid "SAP employee number is not correct or no data"
-msgstr "Mã số nhân viên SAP không chính xác hoặc không có dữ liệu"
+#: .\chart\forms.py:19
+msgid "control_high"
+msgstr "Kiểm soát cao"
 
-#: .\production\templates\production\record.html:90
-msgid "The first step has been not finished yet"
-msgstr "Bước đầu tiên vẫn chưa kết thúc"
+#: .\chart\forms.py:20
+msgid "control_low"
+msgstr "Kiểm soát mức thấp"
 
-#: .\production\templates\production\record.html:96
-#: .\production\templates\production\record.html:155
-msgid "There is no this confirmation code information."
-msgstr "Không có thông tin mã xác nhận này"
+#: .\chart\templates\chart\param_value.html:223
+msgid "Record"
+msgstr "Ghi"
 
-#: .\production\templates\production\record.html:161
-msgid "Please select the working machine."
-msgstr "vui lòng chọn máy làm việc"
+#: .\collection\forms.py:11
+msgid "record_date"
+msgstr "Ngày ghi"
 
-#: .\production\templates\production\record.html:170
-msgid "The operation quantity cannot over the production order quantity."
-msgstr "Số lượng hoạt động không thể vượt quá số lượng đặt hàng sản xuất."
+#: .\collection\forms.py:44
+msgid "Chlorine Free"
+msgstr "Không chứa clo"
 
-#: .\production\templates\production\record.html:178
-#, python-format, python-brace-format
-msgid ""
-"Remind that total recorded time {labor_time} already over 10%% of the "
-"standard time({standard_time})."
-msgstr ""
-"Nhắc rằng tổng thời gian ghi lại {labor_time} đã vượt quá 10%% so với thời "
-"gian tiêu chuẩn({standard_time})."
+#: .\collection\forms.py:44
+msgid "Polymer Free"
+msgstr "Polymer miễn phí"
 
-#: .\production\views.py:93
-msgid "This record is existed"
-msgstr "dữ liệu đã tồn tại"
+#: .\collection\forms.py:44
+msgid "Alkaline Tank pH Test"
+msgstr "Kiểm tra pH bể kiềm"
 
-#: .\production\views.py:341
-#: .\requests\templates\requests\request_base.html:172
-#: .\requests\templates\requests\request_base.html:193
-msgid "New"
-msgstr "Thêm vào"
+#: .\collection\forms.py:48
+msgid "A1 Production"
+msgstr "A1 Sản xuất"
 
-#: .\production\views.py:346
-msgid "total_labor_time"
-msgstr "tổng thời gian làm việc"
+#: .\collection\forms.py:49
+msgid "A1 Size"
+msgstr "A1 Kích cỡ"
 
-#: .\production\views.py:346
-msgid "remain_labor_time"
-msgstr "thời gian chưa hoàn thành"
+#: .\collection\forms.py:50
+msgid "A2 Production"
+msgstr "A2 Sản xuất"
 
-#: .\projects\forms.py:16
-msgid "alphanumeric"
-msgstr ""
+#: .\collection\forms.py:51
+msgid "A2 Size"
+msgstr "A2 Kích cỡ"
 
-#: .\projects\forms.py:19
-msgid "help_name"
-msgstr ""
+#: .\collection\forms.py:52
+msgid "B1 Production"
+msgstr "B1 Sản xuất"
 
-#: .\projects\forms.py:20
-msgid "short_name"
-msgstr ""
+#: .\collection\forms.py:53
+msgid "B1 Size"
+msgstr "B1 Kích cỡ"
 
-#: .\projects\forms.py:20
-msgid "help_short"
-msgstr ""
+#: .\collection\forms.py:54
+msgid "B2 Production"
+msgstr "B2 Sản xuất"
 
-#: .\projects\forms.py:23
-msgid "help_desc"
-msgstr ""
+#: .\collection\forms.py:55
+msgid "B2 Size"
+msgstr "B2 Kích cỡ"
 
-#: .\projects\templates\projects\homepage.html:40
-msgid "home"
-msgstr ""
+#: .\collection\forms.py:56
+msgid "Remark"
+msgstr "Nhận xét"
 
-#: .\projects\templates\projects\homepage.html:58
-msgid "waiting"
-msgstr ""
+#: .\collection\forms.py:58
+msgid "Change Coagulant Time(Hour)"
+msgstr "Thay đổi thời gian đông tụ (Giờ)"
 
-#: .\projects\templates\projects\homepage.html:89
-msgid "on_going"
-msgstr ""
+#: .\collection\forms.py:59
+msgid "Change Coagulant Time(Minute)"
+msgstr "Thay đổi thời gian đông tụ (Phút)"
 
-#: .\projects\templates\projects\homepage.html:119
-msgid "finished"
-msgstr ""
+#: .\collection\forms.py:60
+msgid "Change Latex Time(Hour)"
+msgstr "Thay đổi thời gian mủ cao su (giờ)"
 
-#: .\projects\templates\projects\homepage.html:150
-msgid "pending"
-msgstr ""
+#: .\collection\forms.py:61
+msgid "Change Latex Time(Minute)"
+msgstr "Thay đổi thời gian mủ cao su (Phút)"
 
-#: .\projects\templates\projects\homepage.html:194
-msgid "project_name"
-msgstr ""
+#: .\collection\forms.py:62
+msgid "Change Tooling Time(Hour)"
+msgstr "Thay đổi thời dụng cụ (giờ)"
 
-#: .\projects\templates\projects\homepage.html:197
-msgid "project_code"
-msgstr ""
+#: .\collection\forms.py:63
+msgid "Change Tooling Time(Minute)"
+msgstr "Thay đổi thời dụng cụ (Phút)"
 
-#: .\projects\templates\projects\homepage.html:200
-msgid "project_desc"
-msgstr ""
+#: .\collection\forms.py:64 .\collection\templates\collection\base.html:78
+msgid "Plant"
+msgstr "Thực vật"
 
-#: .\projects\templates\projects\project_edit.html:8
-#: .\projects\templates\projects\project_edit.html:17
-#: .\projects\templates\projects\project_edit.html:29
-msgid "project_edit"
-msgstr ""
+#: .\collection\templates\collection\base.html:93
+msgid "Machine"
+msgstr "Máy móc"
 
-#: .\projects\templates\projects\project_edit.html:10
-#: .\projects\templates\projects\project_edit.html:19
-#: .\projects\templates\projects\project_edit.html:31
-msgid "project_create"
+#: .\collection\templates\collection\base.html:106
+msgid "Record Date"
+msgstr "Ngày ghi"
+
+#: .\collection\templates\collection\base.html:112
+#: .\users\templates\users\base.html:21
+msgid "Chart"
+msgstr "Đồ thị"
+
+#: .\collection\templates\collection\test.html:148
+msgid "Home"
 msgstr ""
 
-#: .\projects\templates\projects\project_manage.html:19
-msgid "request"
+#: .\collection\templates\collection\test.html:149
+msgid "Services"
 msgstr ""
 
-#: .\projects\templates\projects\project_manage.html:28
-#: .\requests\templates\requests\request_edit.html:15
-#: .\requests\templates\requests\request_edit.html:27
-#: .\requests\templates\requests\request_page.html:14
-msgid "request_create"
+#: .\collection\templates\collection\test.html:156 .\users\forms.py:141
+msgid "Change Password"
+msgstr "Đổi mật khẩu"
+
+#: .\collection\templates\collection\test.html:157
+msgid "Logout"
+msgstr "Đăng xuất"
+
+#: .\collection\views.py:102 .\collection\views.py:168
+msgid "Update Done"
 msgstr ""
 
-#: .\projects\templates\projects\project_manage.html:80
-#: .\requests\templates\requests\request_base.html:257
-#: .\requests\templates\requests\request_page.html:44
-msgid "request_no"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:90
-#: .\requests\templates\requests\request_base.html:267
-#: .\requests\templates\requests\request_page.html:54
-msgid "Start"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:90 .\requests\forms.py:65
-#: .\requests\forms.py:142 .\requests\templates\requests\request_base.html:82
-#: .\requests\templates\requests\request_base.html:267
-#: .\requests\templates\requests\request_page.html:54
-msgid "starttime"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:92
-#: .\requests\templates\requests\request_base.html:269
-#: .\requests\templates\requests\request_page.html:56
-msgid "Finish"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:92 .\requests\forms.py:66
-#: .\requests\forms.py:143 .\requests\templates\requests\request_base.html:88
-#: .\requests\templates\requests\request_base.html:269
-#: .\requests\templates\requests\request_page.html:56
-msgid "finishtime"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:94
-#: .\requests\templates\requests\request_base.html:271
-#: .\requests\templates\requests\request_page.html:58
-msgid "Rate"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:94
-#: .\requests\templates\requests\request_base.html:84
-#: .\requests\templates\requests\request_base.html:271
-#: .\requests\templates\requests\request_page.html:58
-msgid "rate"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:96
-#: .\requests\templates\requests\request_base.html:273
-#: .\requests\templates\requests\request_page.html:60
-msgid "Sub"
-msgstr ""
-
-#: .\projects\templates\projects\project_manage.html:96
-#: .\requests\templates\requests\request_base.html:273
-#: .\requests\templates\requests\request_page.html:60
-msgid "subrequire"
-msgstr ""
-
-#: .\projects\templates\projects\project_setting.html:7
-#: .\projects\templates\projects\project_setting.html:15
-msgid "project_setting"
-msgstr ""
-
-#: .\projects\templates\projects\project_setting.html:18
-msgid "project_setting_desc"
-msgstr ""
-
-#: .\projects\templates\projects\project_setting.html:24
-msgid "upload_selfie"
-msgstr ""
-
-#: .\projects\templates\projects\search.html:8
-#, python-format
-msgid "There_are_%(results_count)s_results."
-msgstr ""
-
-#: .\requests\forms.py:63 .\requests\forms.py:141
-#: .\requests\templates\requests\request_base.html:90
-msgid "estimate_time"
-msgstr ""
-
-#: .\requests\forms.py:144
-msgid "actualtime"
-msgstr ""
-
-#: .\requests\templates\requests\reply_edit.html:20
-msgid "Save"
-msgstr "lưu trữ"
-
-#: .\requests\templates\requests\request_base.html:15
-#: .\requests\templates\requests\request_edit.html:13
-#: .\requests\templates\requests\request_edit.html:25
-msgid "request_edit"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:16
-msgid "request_delete"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:47
-#: .\requests\templates\requests\request_receive.html:8
-#: .\requests\templates\requests\request_receive.html:14
-#: .\requests\templates\requests\request_receive.html:19
-msgid "Receive Request"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:53
-msgid "Edit Test Form"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:54
-msgid "Test Form"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:55
-msgid "Test Result"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:56
-msgid "Test Delete"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:58
-msgid "Create Test Form"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:67
-msgid "Share:"
-msgstr ""
-
-#: .\requests\templates\requests\request_base.html:189
-msgid "subrequest"
-msgstr ""
-
-#: .\tests\templates\tests\test_edit.html:8
-#: .\tests\templates\tests\test_edit.html:18
-#: .\tests\templates\tests\test_edit.html:32
-msgid "test_edit"
-msgstr ""
-
-#: .\tests\templates\tests\test_edit.html:10
-#: .\tests\templates\tests\test_edit.html:22
-#: .\tests\templates\tests\test_edit.html:34
-msgid "test_create"
-msgstr ""
-
-#: .\tests\templates\tests\test_form.html:7
-#: .\tests\templates\tests\test_form.html:13
-#: .\tests\templates\tests\test_form.html:21
-#: .\tests\templates\tests\test_form_guest.html:24
-msgid "test form"
-msgstr ""
-
-#: .\tests\templates\tests\test_result.html:7
-#: .\tests\templates\tests\test_result.html:13
-#: .\tests\templates\tests\test_result.html:21
-msgid "test result"
-msgstr ""
-
-#: .\tests\views.py:109
-msgid "result"
-msgstr ""
-
-#: .\tests\views.py:162
-msgid "You have finished the test data successfully!"
-msgstr ""
-
-#: .\users\admin.py:23
+#: .\users\admin.py:28
 msgid "Personal info"
-msgstr ""
+msgstr "Thông tin cá nhân"
 
-#: .\users\admin.py:25
+#: .\users\admin.py:30
 msgid "Permissions"
 msgstr ""
 
-#: .\users\admin.py:27
+#: .\users\admin.py:32
 msgid "Important dates"
 msgstr ""
 
@@ -723,6 +240,19 @@ msgstr "Xác nhận mật khẩu"
 #: .\users\forms.py:49
 msgid "Please type the login password again"
 msgstr "Vui lòng nhập lại mật khẩu đăng nhập"
+
+#: .\users\forms.py:50 .\users\models.py:79
+#: .\users\templates\users\login.html:168
+msgid "emp_no"
+msgstr "Mã hiệu công nhân"
+
+#: .\users\forms.py:51 .\users\models.py:80
+msgid "sap_emp_no"
+msgstr "SAP Mã hiệu công nhân"
+
+#: .\users\forms.py:52
+msgid "name"
+msgstr "Tên"
 
 #: .\users\forms.py:53
 msgid "dept"
@@ -759,10 +289,6 @@ msgstr "Vui lòng nhập mật khẩu xác nhận"
 #: .\users\forms.py:130
 msgid "base_information"
 msgstr "thông tin cơ sở"
-
-#: .\users\forms.py:141
-msgid "Change Password"
-msgstr "Đổi mật khẩu"
 
 #: .\users\forms.py:169
 msgid "The password is not correct"
@@ -832,7 +358,7 @@ msgstr ""
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:130
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:140
-#: .\venv\Lib\site-packages\django\forms\fields.py:53
+#: .\venv\Lib\site-packages\django\forms\fields.py:54
 msgid "This field is required."
 msgstr ""
 
@@ -845,7 +371,7 @@ msgid "i18n legend"
 msgstr ""
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_layout_objects.py:143
-#: .\venv\Lib\site-packages\django\core\validators.py:32
+#: .\venv\Lib\site-packages\django\core\validators.py:22
 msgid "Enter a valid value."
 msgstr ""
 
@@ -853,7 +379,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\contrib\sitemaps\apps.py:7
+#: .\venv\Lib\site-packages\django\contrib\sitemaps\apps.py:8
 msgid "Site Maps"
 msgstr ""
 
@@ -865,78 +391,85 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\paginator.py:45
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+#: .\venv\Lib\site-packages\django\core\paginator.py:30
+msgid "…"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\paginator.py:51
 msgid "That page number is not an integer"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\paginator.py:47
+#: .\venv\Lib\site-packages\django\core\paginator.py:53
 msgid "That page number is less than 1"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\paginator.py:52
+#: .\venv\Lib\site-packages\django\core\paginator.py:58
 msgid "That page contains no results"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:103
-#: .\venv\Lib\site-packages\django\forms\fields.py:659
+#: .\venv\Lib\site-packages\django\core\validators.py:93
+#: .\venv\Lib\site-packages\django\forms\fields.py:678
 msgid "Enter a valid URL."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:155
+#: .\venv\Lib\site-packages\django\core\validators.py:151
 msgid "Enter a valid integer."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:166
+#: .\venv\Lib\site-packages\django\core\validators.py:162
 msgid "Enter a valid email address."
 msgstr ""
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
-#: .\venv\Lib\site-packages\django\core\validators.py:240
+#: .\venv\Lib\site-packages\django\core\validators.py:265
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:247
+#: .\venv\Lib\site-packages\django\core\validators.py:272
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:256
-#: .\venv\Lib\site-packages\django\core\validators.py:276
+#: .\venv\Lib\site-packages\django\core\validators.py:281
+#: .\venv\Lib\site-packages\django\core\validators.py:291
+#: .\venv\Lib\site-packages\django\core\validators.py:314
 msgid "Enter a valid IPv4 address."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:261
-#: .\venv\Lib\site-packages\django\core\validators.py:277
+#: .\venv\Lib\site-packages\django\core\validators.py:299
+#: .\venv\Lib\site-packages\django\core\validators.py:315
 msgid "Enter a valid IPv6 address."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:271
-#: .\venv\Lib\site-packages\django\core\validators.py:275
+#: .\venv\Lib\site-packages\django\core\validators.py:309
+#: .\venv\Lib\site-packages\django\core\validators.py:313
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:305
+#: .\venv\Lib\site-packages\django\core\validators.py:343
 msgid "Enter only digits separated by commas."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:311
+#: .\venv\Lib\site-packages\django\core\validators.py:349
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:343
+#: .\venv\Lib\site-packages\django\core\validators.py:382
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:352
+#: .\venv\Lib\site-packages\django\core\validators.py:391
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:362
+#: .\venv\Lib\site-packages\django\core\validators.py:401
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -946,7 +479,7 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:377
+#: .\venv\Lib\site-packages\django\core\validators.py:416
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -956,25 +489,25 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:396
-#: .\venv\Lib\site-packages\django\forms\fields.py:291
-#: .\venv\Lib\site-packages\django\forms\fields.py:326
+#: .\venv\Lib\site-packages\django\core\validators.py:435
+#: .\venv\Lib\site-packages\django\forms\fields.py:292
+#: .\venv\Lib\site-packages\django\forms\fields.py:327
 msgid "Enter a number."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:398
+#: .\venv\Lib\site-packages\django\core\validators.py:437
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:403
+#: .\venv\Lib\site-packages\django\core\validators.py:442
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:408
+#: .\venv\Lib\site-packages\django\core\validators.py:447
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
@@ -982,513 +515,537 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:470
+#: .\venv\Lib\site-packages\django\core\validators.py:509
 #, python-format
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\core\validators.py:522
+#: .\venv\Lib\site-packages\django\core\validators.py:562
 msgid "Null characters are not allowed."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\base.py:1180
-#: .\venv\Lib\site-packages\django\forms\models.py:759
+#: .\venv\Lib\site-packages\django\db\models\base.py:1210
+#: .\venv\Lib\site-packages\django\forms\models.py:768
 msgid "and"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\base.py:1182
+#: .\venv\Lib\site-packages\django\db\models\base.py:1212
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:104
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:100
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:105
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:101
 msgid "This field cannot be null."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:106
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:102
 msgid "This field cannot be blank."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:107
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:103
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:111
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:107
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:130
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:126
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:933
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:958
 #, python-format
 msgid "“%(value)s” value must be either True or False."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:934
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:959
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:936
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:961
 msgid "Boolean (Either True or False)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:977
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1002
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1041
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1096
 msgid "Comma-separated integers"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1090
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1145
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1092
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1235
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1147
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1290
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1095
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1150
 msgid "Date (without time)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1233
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1288
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1237
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1292
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1241
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1296
 msgid "Date (with time)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1389
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1444
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1391
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1446
 msgid "Decimal number"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1530
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1585
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1533
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1588
 msgid "Duration"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1583
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1638
 msgid "Email address"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1606
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1661
 msgid "File path"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1672
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1727
 #, python-format
 msgid "“%(value)s” value must be a float."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1674
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1729
 msgid "Floating point number"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1712
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1767
 #, python-format
 msgid "“%(value)s” value must be an integer."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1714
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1769
 msgid "Integer"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1797
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1852
 msgid "Big (8 byte) integer"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1813
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1867
+msgid "Small integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1875
 msgid "IPv4 address"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1844
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1906
 msgid "IP address"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1924
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1925
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1986
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1987
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1927
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1989
 msgid "Boolean (Either True, False or None)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1962
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2043
+msgid "Positive big integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2056
 msgid "Positive integer"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1975
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2069
 msgid "Positive small integer"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1989
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2083
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2021
-msgid "Small integer"
-msgstr ""
-
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2028
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2115
 msgid "Text"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2056
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2181
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2058
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2183
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2061
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2186
 msgid "Time"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2187
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2312
 msgid "URL"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2209
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2334
 msgid "Raw binary data"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2274
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2399
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2276
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2401
 msgid "Universally unique identifier"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\files.py:221
+#: .\venv\Lib\site-packages\django\db\models\fields\files.py:226
 msgid "File"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\files.py:360
+#: .\venv\Lib\site-packages\django\db\models\fields\files.py:375
 msgid "Image"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:778
+#: .\venv\Lib\site-packages\django\db\models\fields\json.py:18
+msgid "A JSON object"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\json.py:20
+msgid "Value must be valid JSON."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:790
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:780
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:792
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1012
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1045
 msgid "One-to-one relationship"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1066
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1099
 #, python-format
 msgid "%(from)s-%(to)s relationship"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1067
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1100
 #, python-format
 msgid "%(from)s-%(to)s relationships"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1109
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1142
 msgid "Many-to-many relationship"
 msgstr ""
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the label
-#: .\venv\Lib\site-packages\django\forms\boundfield.py:149
+#: .\venv\Lib\site-packages\django\forms\boundfield.py:150
 msgid ":?.!"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:246
+#: .\venv\Lib\site-packages\django\forms\fields.py:247
 msgid "Enter a whole number."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:397
-#: .\venv\Lib\site-packages\django\forms\fields.py:1127
+#: .\venv\Lib\site-packages\django\forms\fields.py:402
+#: .\venv\Lib\site-packages\django\forms\fields.py:1146
 msgid "Enter a valid date."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:421
-#: .\venv\Lib\site-packages\django\forms\fields.py:1128
+#: .\venv\Lib\site-packages\django\forms\fields.py:426
+#: .\venv\Lib\site-packages\django\forms\fields.py:1147
 msgid "Enter a valid time."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:443
+#: .\venv\Lib\site-packages\django\forms\fields.py:454
 msgid "Enter a valid date/time."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:472
+#: .\venv\Lib\site-packages\django\forms\fields.py:488
 msgid "Enter a valid duration."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:473
+#: .\venv\Lib\site-packages\django\forms\fields.py:489
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:533
+#: .\venv\Lib\site-packages\django\forms\fields.py:552
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:534
+#: .\venv\Lib\site-packages\django\forms\fields.py:553
 msgid "No file was submitted."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:535
+#: .\venv\Lib\site-packages\django\forms\fields.py:554
 msgid "The submitted file is empty."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:537
+#: .\venv\Lib\site-packages\django\forms\fields.py:556
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:540
+#: .\venv\Lib\site-packages\django\forms\fields.py:559
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:601
+#: .\venv\Lib\site-packages\django\forms\fields.py:620
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:763
-#: .\venv\Lib\site-packages\django\forms\fields.py:853
-#: .\venv\Lib\site-packages\django\forms\models.py:1275
+#: .\venv\Lib\site-packages\django\forms\fields.py:782
+#: .\venv\Lib\site-packages\django\forms\fields.py:872
+#: .\venv\Lib\site-packages\django\forms\models.py:1309
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:854
-#: .\venv\Lib\site-packages\django\forms\fields.py:969
-#: .\venv\Lib\site-packages\django\forms\models.py:1274
+#: .\venv\Lib\site-packages\django\forms\fields.py:873
+#: .\venv\Lib\site-packages\django\forms\fields.py:988
+#: .\venv\Lib\site-packages\django\forms\models.py:1308
 msgid "Enter a list of values."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:970
+#: .\venv\Lib\site-packages\django\forms\fields.py:989
 msgid "Enter a complete value."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\fields.py:1186
+#: .\venv\Lib\site-packages\django\forms\fields.py:1205
 msgid "Enter a valid UUID."
 msgstr ""
 
+#: .\venv\Lib\site-packages\django\forms\fields.py:1235
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
-#: .\venv\Lib\site-packages\django\forms\forms.py:81
+#: .\venv\Lib\site-packages\django\forms\forms.py:76
 msgid ":"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\forms.py:207
+#: .\venv\Lib\site-packages\django\forms\forms.py:203
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\formsets.py:93
-msgid "ManagementForm data is missing or has been tampered with"
+#: .\venv\Lib\site-packages\django\forms\formsets.py:61
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\formsets.py:345
+#: .\venv\Lib\site-packages\django\forms\formsets.py:370
 #, python-format
-msgid "Please submit %d or fewer forms."
-msgid_plural "Please submit %d or fewer forms."
+msgid "Please submit at most %d form."
+msgid_plural "Please submit at most %d forms."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\forms\formsets.py:352
+#: .\venv\Lib\site-packages\django\forms\formsets.py:377
 #, python-format
-msgid "Please submit %d or more forms."
-msgid_plural "Please submit %d or more forms."
+msgid "Please submit at least %d form."
+msgid_plural "Please submit at least %d forms."
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\forms\formsets.py:379
-#: .\venv\Lib\site-packages\django\forms\formsets.py:386
+#: .\venv\Lib\site-packages\django\forms\formsets.py:405
+#: .\venv\Lib\site-packages\django\forms\formsets.py:412
 msgid "Order"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:754
+#: .\venv\Lib\site-packages\django\forms\formsets.py:417
+msgid "Delete"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:763
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:758
+#: .\venv\Lib\site-packages\django\forms\models.py:767
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:764
+#: .\venv\Lib\site-packages\django\forms\models.py:773
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:773
+#: .\venv\Lib\site-packages\django\forms\models.py:782
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:1094
+#: .\venv\Lib\site-packages\django\forms\models.py:1109
 msgid "The inline value did not match the parent instance."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:1161
+#: .\venv\Lib\site-packages\django\forms\models.py:1193
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\models.py:1277
+#: .\venv\Lib\site-packages\django\forms\models.py:1311
 #, python-format
 msgid "“%(pk)s” is not a valid value."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\utils.py:162
+#: .\venv\Lib\site-packages\django\forms\utils.py:172
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:395
+#: .\venv\Lib\site-packages\django\forms\widgets.py:427
 msgid "Clear"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:396
+#: .\venv\Lib\site-packages\django\forms\widgets.py:428
 msgid "Currently"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:397
+#: .\venv\Lib\site-packages\django\forms\widgets.py:429
 msgid "Change"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:711
+#: .\venv\Lib\site-packages\django\forms\widgets.py:738
 msgid "Unknown"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:712
+#: .\venv\Lib\site-packages\django\forms\widgets.py:739
 msgid "Yes"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\forms\widgets.py:713
+#: .\venv\Lib\site-packages\django\forms\widgets.py:740
 msgid "No"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:788
+#. Translators: Please do not add spaces around commas.
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:817
 msgid "yes,no,maybe"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:817
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:834
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:846
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:863
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:836
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:865
 #, python-format
 msgid "%s KB"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:838
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:867
 #, python-format
 msgid "%s MB"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:840
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:869
 #, python-format
 msgid "%s GB"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:842
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:871
 #, python-format
 msgid "%s TB"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\template\defaultfilters.py:844
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:873
 #, python-format
 msgid "%s PB"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:62
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:66
 msgid "p.m."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:63
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:67
 msgid "a.m."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:68
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:72
 msgid "PM"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:69
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:73
 msgid "AM"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:150
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:146
 msgid "midnight"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\dateformat.py:152
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:148
 msgid "noon"
 msgstr ""
 
@@ -1768,19 +1325,19 @@ msgstr ""
 msgid "This is not a valid IPv6 address."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\text.py:69
+#: .\venv\Lib\site-packages\django\utils\text.py:131
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\utils\text.py:235
+#: .\venv\Lib\site-packages\django\utils\text.py:309
 msgid "or"
 msgstr ""
 
 #. Translators: This string is used as a separator between list elements
-#: .\venv\Lib\site-packages\django\utils\text.py:254
-#: .\venv\Lib\site-packages\django\utils\timesince.py:83
+#: .\venv\Lib\site-packages\django\utils\text.py:328
+#: .\venv\Lib\site-packages\django\utils\timesince.py:94
 msgid ", "
 msgstr ""
 
@@ -1819,10 +1376,6 @@ msgstr[0] ""
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
-
-#: .\venv\Lib\site-packages\django\utils\timesince.py:72
-msgid "0 minutes"
-msgstr ""
 
 #: .\venv\Lib\site-packages\django\views\csrf.py:110
 msgid "Forbidden"
@@ -1901,14 +1454,14 @@ msgstr ""
 msgid "No %(verbose_name_plural)s available"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\generic\dates.py:589
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:594
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\generic\dates.py:623
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:628
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
@@ -1947,21 +1500,18 @@ msgid "Index of %(directory)s"
 msgstr ""
 
 #: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:7
-msgid "Django: the Web framework for perfectionists with deadlines."
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:221
+msgid "The install worked successfully! Congratulations!"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:346
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:207
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:368
-msgid "The install worked successfully! Congratulations!"
-msgstr ""
-
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:369
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:222
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
@@ -1970,27 +1520,27 @@ msgid ""
 "configured any URLs."
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:384
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:230
 msgid "Django Documentation"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:385
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:231
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:396
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:239
 msgid "Tutorial: A Polling App"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:397
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:240
 msgid "Get started with Django"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:408
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:248
 msgid "Django Community"
 msgstr ""
 
-#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:409
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:249
 msgid "Connect, get help, or contribute"
 msgstr ""
 
@@ -2141,3 +1691,104 @@ msgstr ""
 #, python-format
 msgid "%s: error: %s\n"
 msgstr ""
+
+#~ msgid "Project Management System"
+#~ msgstr "Hệ thống quản lý dự án"
+
+#~ msgid "Asset Management System"
+#~ msgstr "Hệ thống quản lý tài sản"
+
+#~ msgid "IT Equipment Borrow Application"
+#~ msgstr "Ứng dụng mượn thiết bị CNTT"
+
+#~ msgid "General Supply Application"
+#~ msgstr "Ứng dụng cung cấp chung"
+
+#~ msgid "Authority Management"
+#~ msgstr "Quản lý cơ quan"
+
+#~ msgid "login"
+#~ msgstr "đăng nhập"
+
+#~ msgid "export"
+#~ msgstr "xuất khẩu"
+
+#~ msgid "prod_order"
+#~ msgstr "trình tự công việc"
+
+#~ msgid "search"
+#~ msgstr "Hỏi thăm"
+
+#~ msgid "worked_labor_time"
+#~ msgstr "Số giờ làm việc tích lũy"
+
+#~ msgid "item_no"
+#~ msgstr "Phần Không"
+
+#~ msgid "spec"
+#~ msgstr "mô tả vật liệu"
+
+#~ msgid "confirm_code"
+#~ msgstr "mã xác nhận"
+
+#~ msgid "step_code"
+#~ msgstr "mã trang web"
+
+#~ msgid "step_name"
+#~ msgstr "Tên trang web"
+
+#~ msgid "labor_time"
+#~ msgstr "giờ làm việc"
+
+#~ msgid "mach_time"
+#~ msgstr "giờ máy"
+
+#~ msgid "good_qty"
+#~ msgstr "Sản phẩm tốt"
+
+#~ msgid "ng_qty"
+#~ msgstr "sản phẩm xấu"
+
+#~ msgid "comment"
+#~ msgstr "bình luận"
+
+#~ msgid "Record Search"
+#~ msgstr "Tìm kiếm hồ sơ"
+
+#~ msgid "SAP employee number is not correct or no data"
+#~ msgstr "Mã số nhân viên SAP không chính xác hoặc không có dữ liệu"
+
+#~ msgid "The first step has been not finished yet"
+#~ msgstr "Bước đầu tiên vẫn chưa kết thúc"
+
+#~ msgid "There is no this confirmation code information."
+#~ msgstr "Không có thông tin mã xác nhận này"
+
+#~ msgid "Please select the working machine."
+#~ msgstr "vui lòng chọn máy làm việc"
+
+#~ msgid "The operation quantity cannot over the production order quantity."
+#~ msgstr "Số lượng hoạt động không thể vượt quá số lượng đặt hàng sản xuất."
+
+#, python-format, python-brace-format
+#~ msgid ""
+#~ "Remind that total recorded time {labor_time} already over 10%% of the "
+#~ "standard time({standard_time})."
+#~ msgstr ""
+#~ "Nhắc rằng tổng thời gian ghi lại {labor_time} đã vượt quá 10%% so với "
+#~ "thời gian tiêu chuẩn({standard_time})."
+
+#~ msgid "This record is existed"
+#~ msgstr "dữ liệu đã tồn tại"
+
+#~ msgid "New"
+#~ msgstr "Thêm vào"
+
+#~ msgid "total_labor_time"
+#~ msgstr "tổng thời gian làm việc"
+
+#~ msgid "remain_labor_time"
+#~ msgstr "thời gian chưa hoàn thành"
+
+#~ msgid "Save"
+#~ msgstr "lưu trữ"

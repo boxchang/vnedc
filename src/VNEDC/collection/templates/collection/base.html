@@ -75,7 +75,7 @@ function validate(evt) {
             <div class="col-md-3">
                 <div id="div_id_plant" class="form-group">
                     <label for="id_plant" class=" requiredField">
-                        工廠<span class="asteriskField">*</span>
+                        {% trans "Plant" %}<span class="asteriskField">*</span>
                     </label>
                     <div>
                         <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
@@ -90,7 +90,7 @@ function validate(evt) {
             <div class="col-md-3">
                 <div id="div_id_mach" class="form-group">
                     <label for="id_mach" class=" requiredField">
-                            機台<span class="asteriskField">*</span>
+                            {% trans "Machine" %}<span class="asteriskField">*</span>
                     </label>
                     <div>
                         <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
@@ -103,7 +103,7 @@ function validate(evt) {
                 </div>
             </div>
             <div class="col-md-3">
-                <label for="data_date">作業時間*</label>
+                <label for="data_date">{% trans "Record Date" %}*</label>
                 <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
             </div>
             <div class="col-md-3">
