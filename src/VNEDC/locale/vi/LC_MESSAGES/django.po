@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-15 08:07+0700\n"
-"PO-Revision-Date: 2024-07-15 08:29+0700\n"
+"POT-Creation-Date: 2024-07-16 14:10+0700\n"
+"PO-Revision-Date: 2024-07-16 14:11+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -56,8 +56,9 @@ msgstr ""
 msgid "Personal Setting"
 msgstr "Cài đặt cá nhân"
 
-#: .\bases\templates\bases\base.html:65 .\users\templates\users\base.html:35
-msgid "logout"
+#: .\bases\templates\bases\base.html:65
+#: .\collection\templates\collection\test.html:157
+msgid "Logout"
 msgstr "Đăng xuất"
 
 #: .\bases\utils.py:61
@@ -170,7 +171,7 @@ msgstr "Thay đổi thời dụng cụ (Phút)"
 
 #: .\collection\forms.py:64 .\collection\templates\collection\base.html:78
 msgid "Plant"
-msgstr "Thực vật"
+msgstr "Xưởng"
 
 #: .\collection\templates\collection\base.html:93
 msgid "Machine"
@@ -185,6 +186,10 @@ msgstr "Ngày ghi"
 msgid "Chart"
 msgstr "Đồ thị"
 
+#: .\collection\templates\collection\base.html:131
+msgid "Production Data"
+msgstr "Dữ liệu sản xuất"
+
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
 msgstr ""
@@ -193,27 +198,23 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-#: .\collection\templates\collection\test.html:156 .\users\forms.py:141
+#: .\collection\templates\collection\test.html:156 .\users\forms.py:154
 msgid "Change Password"
 msgstr "Đổi mật khẩu"
-
-#: .\collection\templates\collection\test.html:157
-msgid "Logout"
-msgstr "Đăng xuất"
 
 #: .\collection\views.py:102 .\collection\views.py:168
 msgid "Update Done"
 msgstr ""
 
-#: .\users\admin.py:28
+#: .\users\admin.py:29
 msgid "Personal info"
 msgstr "Thông tin cá nhân"
 
-#: .\users\admin.py:30
+#: .\users\admin.py:31
 msgid "Permissions"
 msgstr ""
 
-#: .\users\admin.py:32
+#: .\users\admin.py:33
 msgid "Important dates"
 msgstr ""
 
@@ -221,7 +222,7 @@ msgstr ""
 msgid "user_type"
 msgstr "loại người dùng"
 
-#: .\users\forms.py:47 .\users\models.py:97
+#: .\users\forms.py:47 .\users\models.py:107
 msgid "active"
 msgstr "Cho dù để kích hoạt"
 
@@ -241,12 +242,12 @@ msgstr "Xác nhận mật khẩu"
 msgid "Please type the login password again"
 msgstr "Vui lòng nhập lại mật khẩu đăng nhập"
 
-#: .\users\forms.py:50 .\users\models.py:79
+#: .\users\forms.py:50 .\users\models.py:89
 #: .\users\templates\users\login.html:168
 msgid "emp_no"
 msgstr "Mã hiệu công nhân"
 
-#: .\users\forms.py:51 .\users\models.py:80
+#: .\users\forms.py:51 .\users\models.py:90
 msgid "sap_emp_no"
 msgstr "SAP Mã hiệu công nhân"
 
@@ -258,7 +259,7 @@ msgstr "Tên"
 msgid "dept"
 msgstr "phòng"
 
-#: .\users\forms.py:105 .\users\forms.py:164
+#: .\users\forms.py:105 .\users\forms.py:177
 msgid "The password is not same with the confirm password"
 msgstr "Mật khẩu không giống với mật khẩu xác nhận"
 
@@ -286,71 +287,75 @@ msgstr "Vui lòng nhập mật khẩu mới"
 msgid "Please type the confirm password"
 msgstr "Vui lòng nhập mật khẩu xác nhận"
 
-#: .\users\forms.py:130
+#: .\users\forms.py:139
 msgid "base_information"
 msgstr "thông tin cơ sở"
 
-#: .\users\forms.py:169
+#: .\users\forms.py:182
 msgid "The password is not correct"
 msgstr "Mật khẩu không chính xác"
 
-#: .\users\models.py:31
+#: .\users\models.py:41
 msgid "類別"
 msgstr ""
 
-#: .\users\models.py:81
+#: .\users\models.py:91
 msgid "username"
 msgstr "tên tài khoản"
 
-#: .\users\models.py:82
+#: .\users\models.py:92
 msgid "email address"
 msgstr "địa chỉ email"
 
-#: .\users\models.py:84
+#: .\users\models.py:94
 msgid "first name"
 msgstr "tên đầu tiên"
 
-#: .\users\models.py:85
+#: .\users\models.py:95
 msgid "last name"
 msgstr "họ"
 
-#: .\users\models.py:87
+#: .\users\models.py:97
 msgid "mobile number"
 msgstr "Số điện thoại"
 
-#: .\users\models.py:89
+#: .\users\models.py:99
 msgid "Required. digits and +-() only."
 msgstr ""
 
-#: .\users\models.py:91
+#: .\users\models.py:101
 msgid "Enter a valid mobile number."
 msgstr ""
 
-#: .\users\models.py:94
+#: .\users\models.py:104
 msgid "staff status"
 msgstr ""
 
-#: .\users\models.py:95
+#: .\users\models.py:105
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
-#: .\users\models.py:98
+#: .\users\models.py:108
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 
-#: .\users\models.py:100
+#: .\users\models.py:110
 msgid "date joined"
 msgstr ""
 
-#: .\users\models.py:110
+#: .\users\models.py:121
 msgid "user"
 msgstr ""
 
-#: .\users\models.py:111
+#: .\users\models.py:122
 msgid "users"
 msgstr ""
+
+#: .\users\templates\users\base.html:35
+msgid "logout"
+msgstr "Đăng xuất"
 
 #: .\users\templates\users\login.html:193
 msgid "Submit"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-15 08:30+0700\n"
-"PO-Revision-Date: 2024-07-16 09:44+0700\n"
+"POT-Creation-Date: 2024-07-16 14:10+0700\n"
+"PO-Revision-Date: 2024-07-16 14:36+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -40,7 +40,7 @@ msgstr "儲存"
 
 #: .\bases\templates\bases\base.html:52
 msgid "Key Parameter"
-msgstr ""
+msgstr "關鍵參數"
 
 #: .\bases\templates\bases\base.html:54
 #: .\collection\templates\collection\test.html:150
@@ -186,6 +186,10 @@ msgstr "作業日期"
 msgid "Chart"
 msgstr "圖表"
 
+#: .\collection\templates\collection\base.html:131
+msgid "Production Data"
+msgstr "生產資料"
+
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
 msgstr ""
@@ -194,7 +198,7 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-#: .\collection\templates\collection\test.html:156 .\users\forms.py:141
+#: .\collection\templates\collection\test.html:156 .\users\forms.py:154
 msgid "Change Password"
 msgstr "變更密碼"
 
@@ -202,15 +206,15 @@ msgstr "變更密碼"
 msgid "Update Done"
 msgstr "更新完成"
 
-#: .\users\admin.py:28
+#: .\users\admin.py:29
 msgid "Personal info"
 msgstr "個人資訊"
 
-#: .\users\admin.py:30
+#: .\users\admin.py:31
 msgid "Permissions"
 msgstr "權限"
 
-#: .\users\admin.py:32
+#: .\users\admin.py:33
 msgid "Important dates"
 msgstr "重要日期"
 
@@ -218,7 +222,7 @@ msgstr "重要日期"
 msgid "user_type"
 msgstr "使用者類型"
 
-#: .\users\forms.py:47 .\users\models.py:97
+#: .\users\forms.py:47 .\users\models.py:107
 msgid "active"
 msgstr "是否啟用"
 
@@ -238,12 +242,12 @@ msgstr "確認密碼"
 msgid "Please type the login password again"
 msgstr "請再次輸入密碼"
 
-#: .\users\forms.py:50 .\users\models.py:79
+#: .\users\forms.py:50 .\users\models.py:89
 #: .\users\templates\users\login.html:168
 msgid "emp_no"
 msgstr "員工編號"
 
-#: .\users\forms.py:51 .\users\models.py:80
+#: .\users\forms.py:51 .\users\models.py:90
 msgid "sap_emp_no"
 msgstr "SAP員工編號"
 
@@ -255,7 +259,7 @@ msgstr "名稱"
 msgid "dept"
 msgstr "部門"
 
-#: .\users\forms.py:105 .\users\forms.py:164
+#: .\users\forms.py:105 .\users\forms.py:177
 msgid "The password is not same with the confirm password"
 msgstr "密碼與確認密碼不相符"
 
@@ -283,55 +287,55 @@ msgstr "請輸入新密碼"
 msgid "Please type the confirm password"
 msgstr "請再次輸入密碼"
 
-#: .\users\forms.py:130
+#: .\users\forms.py:139
 msgid "base_information"
 msgstr "基本資訊"
 
-#: .\users\forms.py:169
+#: .\users\forms.py:182
 msgid "The password is not correct"
 msgstr "密碼不正確"
 
-#: .\users\models.py:31
+#: .\users\models.py:41
 msgid "類別"
 msgstr ""
 
-#: .\users\models.py:81
+#: .\users\models.py:91
 msgid "username"
 msgstr "用戶名"
 
-#: .\users\models.py:82
+#: .\users\models.py:92
 msgid "email address"
 msgstr "email address"
 
-#: .\users\models.py:84
+#: .\users\models.py:94
 msgid "first name"
 msgstr "名"
 
-#: .\users\models.py:85
+#: .\users\models.py:95
 msgid "last name"
 msgstr "姓"
 
-#: .\users\models.py:87
+#: .\users\models.py:97
 msgid "mobile number"
 msgstr "手機號碼"
 
-#: .\users\models.py:89
+#: .\users\models.py:99
 msgid "Required. digits and +-() only."
 msgstr "請使用數字及+-()"
 
-#: .\users\models.py:91
+#: .\users\models.py:101
 msgid "Enter a valid mobile number."
 msgstr "請輸入有效號碼"
 
-#: .\users\models.py:94
+#: .\users\models.py:104
 msgid "staff status"
 msgstr "員工狀態"
 
-#: .\users\models.py:95
+#: .\users\models.py:105
 msgid "Designates whether the user can log into this admin site."
 msgstr "Designates whether the user can log into this admin site."
 
-#: .\users\models.py:98
+#: .\users\models.py:108
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -339,15 +343,15 @@ msgstr ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 
-#: .\users\models.py:100
+#: .\users\models.py:110
 msgid "date joined"
 msgstr "加入日期"
 
-#: .\users\models.py:110
+#: .\users\models.py:121
 msgid "user"
 msgstr "用戶名"
 
-#: .\users\models.py:111
+#: .\users\models.py:122
 msgid "users"
 msgstr "users"
 
