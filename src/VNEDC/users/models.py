@@ -8,6 +8,16 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core import validators
 from django.contrib.auth.models import BaseUserManager
 from django.conf import settings
+from django.contrib.auth.models import User, Group
+
+
+class HomePageOption(models.Model):
+    name = models.CharField(max_length=100)
+    url_name = models.CharField(max_length=200)
+    roles = models.ManyToManyField(Group, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Unit(models.Model):
@@ -100,6 +110,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     unit = models.ForeignKey(Unit, related_name='users_unit', on_delete=models.DO_NOTHING, null=True, blank=True)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name='user_manager', null=True, blank=True)
+    default_homepage = models.ForeignKey(HomePageOption, related_name='user_default_homepage', null=True, blank=True, on_delete=models.DO_NOTHING)
 
     objects = CustomUserManager()
 

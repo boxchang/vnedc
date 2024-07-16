@@ -90,7 +90,10 @@ def login(request):
 
             # messages.success(request, '登入成功')
 
-            return response
+            if request.user.default_homepage:
+                return redirect(reverse(request.user.default_homepage.url_name))
+            else:
+                return response
 
 
 def logout(request):
@@ -189,7 +192,7 @@ def user_info(request):
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
 
-        form = UserInfoForm(request.POST, instance=member)
+        form = UserInfoForm(request.POST, instance=member, user=request.user)
 
         if form.is_valid():
             user = form.save(commit=False)
@@ -198,8 +201,13 @@ def user_info(request):
                 user.set_password(password1)
             user.save()
             messages.info(request, '修改成功!')
+
+            if request.user.default_homepage:
+                return redirect(reverse(request.user.default_homepage.url_name))
+            else:
+                return redirect('index')
     else:
-        form = UserInfoForm(instance=member)
+        form = UserInfoForm(instance=member, user=request.user)
     return render(request, template, locals())
 
 
@@ -299,114 +307,6 @@ def unit_list(request):
     template = 'users/unit_list.html'
     units = Unit.objects.all()
     return render(request, template, locals())
-
-
-@login_required
-def unit_sync(request):
-    template = 'users/unit_list.html'
-
-    if request.method == 'POST':
-        sql = """SELECT OrganizationUnit.id AS unitId
-                    ,Organization.id AS orgId
-                    ,OrganizationUnit.organizationUnitName AS unitName
-                    ,OrganizationUnit.organizationUnitType AS organizationUnitType
-                    ,OrganizationUnitLevel.organizationUnitLevelName AS levelName
-                    ,OrganizationUnit.validType AS isValid
-                    ,Manager.id managerId
-                    ,Manager.userName manager
-                FROM OrganizationUnit
-                INNER JOIN Organization ON OrganizationUnit.organizationOID = Organization.OID
-                LEFT JOIN OrganizationUnitLevel ON OrganizationUnit.levelOID = OrganizationUnitLevel.OID
-                LEFT JOIN Users Manager ON OrganizationUnit.managerOID = Manager.OID
-                where OrganizationUnit.validType = 1
-                ORDER BY unitId"""
-        db = bpm_database()
-        rows = db.select_sql_dict(sql)
-
-        for row in rows:
-            try:  # 更新
-                if CustomUser.objects.filter(emp_no=row['managerId']).exists():
-                    unit = Unit.objects.get(unitId=row['unitId'])
-                    unit.unitName = row['unitName']
-                    unit.manager = CustomUser.objects.get(emp_no=row['managerId'])
-                    unit.isValid = row['isValid']
-                    unit.update_by = request.user
-                    unit.save()
-                else:
-                    print("{unitName} BPM尚未設定部門主管".format(unitName=row['unitName']))
-            except:  # 新增
-                unit = Unit(orgId=row['orgId'], unitId=row['unitId'], unitName=row['unitName'], isValid=row['isValid'])
-                unit.manager = CustomUser.objects.get(emp_no=row['managerId'])
-                unit.create_by = request.user
-                unit.update_by = request.user
-                unit.save()
-        return redirect('unit_list')
-
-
-@login_required
-def user_sync(request):
-    template = 'users/user_list.html'
-    if request.method == 'POST':
-        sql = """SELECT userId,main.userName,main.leaveDate,main.mailAddress,unitId,orgId,functionName,isMain,isnull(main.managerId,boss.id) managerId,levelName from (
-                    SELECT Occupant.id AS userId
-                                        ,Occupant.userName AS userName
-                                        ,Occupant.leaveDate AS leaveDate
-                                        ,Occupant.mailAddress
-                                        ,OrganizationUnit.id AS unitId
-                                        ,Organization.id AS orgId
-                                        ,FunctionDefinition.functionDefinitionName AS functionName
-                                        ,Functions.isMain AS isMain
-                                        ,Manager.id AS managerId
-                                        ,FunctionLevel.functionLevelName AS levelName
-                                    FROM Functions
-                                    INNER JOIN Users Occupant ON Functions.occupantOID = Occupant.OID
-                                    INNER JOIN OrganizationUnit
-                                    INNER JOIN Organization ON OrganizationUnit.organizationOID = Organization.OID ON Functions.organizationUnitOID = OrganizationUnit.OID INNER JOIN FunctionDefinition ON Functions.definitionOID = FunctionDefinition.OID LEFT JOIN FunctionLevel ON Functions.approvalLevelOID = FunctionLevel.OID LEFT JOIN Users Manager ON Functions.specifiedManagerOID = Manager.OID
-                                    where isMain = 1 and OrganizationUnit.validType=1) main, OrganizationUnit unit, Users boss
-                                    where main.unitId = unit.id and unit.managerOID = boss.OID
-                                    order by userId"""
-        db = bpm_database()
-        rows = db.select_sql_dict(sql)
-
-        for row in rows:
-            try:
-                # Noah有存在人員就更新資料
-                if CustomUser.objects.filter(emp_no=row['userId']).exists():
-                    user = CustomUser.objects.get(emp_no=row['userId'])
-                    if row['leaveDate']:
-                        user.is_active = False
-                        user.save()
-                    else:
-                        user.unit = Unit.objects.get(unitId=row['unitId'])
-                        if CustomUser.objects.filter(emp_no=row['managerId']).exists():
-                            user.manager = CustomUser.objects.get(emp_no=row['managerId'])
-                        user.update_by = request.user
-                        user.email = row['mailAddress']
-                        user.save()
-                else:  # 不存在就新增
-                    if not row['leaveDate']:
-                        user = CustomUser(is_staff=1, is_active=1, user_type_id=2)
-                        user.username = row['userName']
-                        user.email = row['mailAddress']
-                        user.emp_no = row['userId']
-                        user.unit = Unit.objects.get(unitId=row['unitId'])
-                        if CustomUser.objects.filter(emp_no=row['managerId']).exists():
-                            user.manager = CustomUser.objects.get(emp_no=row['managerId'])
-                        user.set_password(row['userId'])
-                        user.create_by = request.user
-                        user.update_by = request.user
-                        user.save()
-            except Exception as e:
-                print(e)
-
-        users = CustomUser.objects.filter(manager_id__isnull=True)
-        for user in users:
-            unit = Unit.objects.get(unitId=user.unit.unitId)
-            user.manager = unit.manager
-            user.create_by = request.user
-            user.update_by = request.user
-            user.save()
-    return redirect('user_list')
 
 
 def get_deptuser_api(request):

@@ -3,9 +3,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import CustomUser, Unit, UserType
+from .models import CustomUser, Unit, UserType, HomePageOption
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 
+admin.site.register(HomePageOption)
 
 @admin.register(Unit)
 class UserTypeAdmin(admin.ModelAdmin):

@@ -114,17 +114,26 @@ class UserInfoForm(forms.ModelForm):
                                 widget=forms.PasswordInput(attrs={'placeholder': _('Please type the new password')}))
     password2 = forms.CharField(label=_('confirm_password'), required=False,
                                 widget=forms.PasswordInput(attrs={'placeholder': _('Please type the confirm password')}))
+    default_homepage = forms.ModelChoiceField(queryset=HomePageOption.objects.all(), required=False)
 
     class Meta:
         model = CustomUser
-        fields = ('emp_no', 'email', 'password0', 'password1', 'password2')
+        fields = ('emp_no', 'email', 'password0', 'password1', 'password2', 'default_homepage')
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        user = kwargs.pop('user')
+        super(UserInfoForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.form_show_errors = True
+
+        if user.is_superuser:
+            self.fields['default_homepage'].queryset = HomePageOption.objects.all()
+        else:
+            user_roles = user.groups.all()
+            self.fields['default_homepage'].queryset = HomePageOption.objects.filter(roles__in=user_roles).distinct()
+
 
         self.helper.layout = Layout(
             Fieldset(_('base_information'),
@@ -134,6 +143,10 @@ class UserInfoForm(forms.ModelForm):
                  ),
                  Div(
                      Div('email', css_class="col-sm-4"),
+                     css_class='row'
+                 ),
+                 Div(
+                     Div('default_homepage', css_class="col-sm-4"),
                      css_class='row'
                  ),
             ),
