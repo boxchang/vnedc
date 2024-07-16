@@ -25,8 +25,8 @@ class SGADA2EDC(object):
 
 
 plants = [GDNBR]
-# start_date = "2024-07-01"
-# end_date = "2024-07-10"
+# start_date = "2024-07-12"
+# end_date = "2024-07-17"
 start_date = datetime.today().strftime('%Y-%m-%d')
 end_date = datetime.today().strftime('%Y-%m-%d')
 sgada = SGADA2EDC(start_date, end_date, plants)
