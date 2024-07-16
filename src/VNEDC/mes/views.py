@@ -45,9 +45,11 @@ def work_order_list(request):
         params.append(f"%{request.GET['LineName']}%")
 
     sql = """
-    select InspectionDate,r.WorkOrderId,Period,r.Id,WorkCenterTypeName,MachineName,LineName,ProductItem,CustomerCode,CustomerName,CustomerPartNo,AQL,w.PlanQty
+    select InspectionDate,r.WorkOrderId,Period,r.Id,WorkCenterTypeName,MachineName,LineName,ProductItem,CustomerCode,
+    CustomerName,CustomerPartNo,AQL,w.PlanQty,u.NormalizedUserName,FORMAT(u.CreationTime, 'yyyy/MM/dd HH:mm:ss') as CreationTime
     from [PMGMES].[dbo].[PMG_MES_RunCard] r
     LEFT JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] w on r.WorkOrderId = w.id
+	LEFT JOIN [PMGMES].[dbo].[AbpUsers] u on r.CreatorUserId = u.Id
     """
     if filters:
         sql += " Where " + " AND ".join(filters)
