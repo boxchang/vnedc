@@ -46,7 +46,7 @@ def work_order_list(request):
 
     sql = """
     select InspectionDate,r.WorkOrderId,Period,r.Id,WorkCenterTypeName,MachineName,LineName,ProductItem,CustomerCode,
-    CustomerName,CustomerPartNo,AQL,w.PlanQty,u.NormalizedUserName,FORMAT(u.CreationTime, 'yyyy/MM/dd HH:mm:ss') as CreationTime
+    CustomerName,CustomerPartNo,AQL,w.PlanQty,u.NormalizedUserName,FORMAT(r.CreationTime, 'yyyy/MM/dd HH:mm:ss') as CreationTime
     from [PMGMES].[dbo].[PMG_MES_RunCard] r
     LEFT JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] w on r.WorkOrderId = w.id
 	LEFT JOIN [PMGMES].[dbo].[AbpUsers] u on r.CreatorUserId = u.Id
