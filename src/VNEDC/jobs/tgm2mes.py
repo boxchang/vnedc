@@ -6,12 +6,20 @@ sys.path.append(rootPath)
 
 import socket
 from datetime import datetime, timedelta
-from jobs.database import sgada_database, tgm_database
+from jobs.database import sgada_database, tgm_database, tgm_gdnbr_database, tgm_gdpvc_database
 
 
 class TGM2MES(object):
     path = os.path.dirname(os.path.abspath(__file__))
     last_time_file = os.path.join(path, "last_time.config")
+    tgmdb = None
+
+    def __init__(self, plant):
+        self.plant = plant
+        if plant == 'VN_GD_NBR':
+            self.tgmdb = tgm_gdnbr_database()
+        if plant == 'VN_GD_PVC':
+            self.tgmdb = tgm_gdpvc_database()
 
     def execute(self):
         self.last_time = self.get_last_time() - timedelta(minutes=2)  # 程式的最後的執行時間再往前兩分鐘
@@ -32,15 +40,13 @@ class TGM2MES(object):
         self.clean_data()
 
     def get_measure_files(self):
-        db = tgm_database()
         sql = """select * from MEASURE_FILE"""
-        records = db.select_sql_dict(sql)
+        records = self.tgmdb.select_sql_dict(sql)
         return records
 
     def get_measure_data(self, LOT_NUMBER):
         cuff_count = 0
         finger_count = 0
-        db = tgm_database()
 
         if self.last_time != "":
             sql_condition = "and data_datetime > '{last_time}'".format(last_time=self.last_time)
@@ -48,11 +54,11 @@ class TGM2MES(object):
             sql_condition = ""
 
         sql = """SELECT file_name, item_name, data_val
-                 FROM [TGM].[dbo].[MEASURE_DATA] d, [TGM].[dbo].[MEASURE_ITEM] i
+                 FROM [MEASURE_DATA] d, [MEASURE_ITEM] i
                  where i.ITEM_ID = d.ITEM_ID and file_name = '{LOT_NUMBER}' {sql_condition}
                  order by data_datetime desc, DATA_ID desc """\
             .format(LOT_NUMBER=LOT_NUMBER, last_time=self.last_time, sql_condition=sql_condition)
-        records = db.select_sql_dict(sql)
+        records = self.tgmdb.select_sql_dict(sql)
 
         # Cuff的量測位置有4個數值，Finger有1個數值，滿足才回傳
         for record in records:
@@ -138,42 +144,60 @@ class TGM2MES(object):
 
     # Runcard主檔的資料超過一天就刪除，假定Runcard產生出來一天內會做完
     def clean_data(self):
-        db = tgm_database()
         sql = """
             SELECT file_name, count(*) number
-            FROM [TGM].[dbo].[MEASURE_FILE] a, [TGM].[dbo].[MEASURE_DATA] b 
+            FROM [MEASURE_FILE] a, [TGM].[dbo].[MEASURE_DATA] b 
             where a.FILE_NAME = b.LOT_NUMBER and data_datetime < getdate()-1
             group by FILE_NAME having count(*) > 4
         """
-        records = db.select_sql_dict(sql)
+        records = self.tgmdb.select_sql_dict(sql)
 
         for record in records:
             lot_number = record["file_name"]
 
-            self.delete_measure_item(db, lot_number)
-            self.delete_file_info(db, lot_number)
-            self.delete_measure_data(db, lot_number)
-            self.delete_measure_file(db, lot_number)
+            self.delete_measure_item(lot_number)
+            self.delete_file_info(lot_number)
+            self.delete_measure_data(lot_number)
+            self.delete_measure_file(lot_number)
 
 
-    def delete_measure_file(self, db, file_name):
+    def delete_measure_file(self, file_name):
         sql = "delete from measure_file where file_name = '{file_name}'".format(file_name=file_name)
-        db.execute_sql(sql)
+        self.tgmdb.execute_sql(sql)
 
     def delete_measure_item(self, db, file_name):
         sql = "delete from measure_item where file_name='{file_name}'".format(file_name=file_name)
-        db.execute_sql(sql)
+        self.tgmdb.execute_sql(sql)
 
     def delete_file_info(self, db, file_name):
         sql = "delete from file_info where file_info_val = '{file_name}'".format(file_name=file_name)
-        db.execute_sql(sql)
+        self.tgmdb.execute_sql(sql)
 
     def delete_measure_data(self, db, file_name):
         sql = """
             delete FROM [TGM].[dbo].[MEASURE_DATA] 
             where DATA_DATETIME < getdate()-90 and LOT_NUMBER = '{LOT_NUMBER}'
         """
-        db.execute_sql(sql)
+        self.tgmdb.execute_sql(sql)
 
-tgm2mes = TGM2MES()
-tgm2mes.execute()
+def main():
+    LIST = ['VN_GD_NBR', 'VN_GD_PVC']
+
+    # 检查参数数量
+    if len(sys.argv) < 2:
+        print("Usage: python prog.py <VN_GD_NBR/VN_GD_PVC>")
+        sys.exit(1)
+
+    # 获取参数
+    param1 = sys.argv[1]
+
+    if param1 not in LIST:
+        print("Parameter1 should be VN_GD_NBR/VN_GD_PVC")
+        sys.exit(1)
+
+    tgm2mes = TGM2MES(param1)
+    tgm2mes.execute()
+
+
+if __name__ == "__main__":
+    main()
