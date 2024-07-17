@@ -10,8 +10,8 @@ from datetime import datetime, date, timedelta
 class SearchForm(forms.Form):
     day7_ago = date.today() - timedelta(days=7)
     today = date.today()
-    data_date_start = forms.DateField(initial=day7_ago, label="Start Date", widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
-    data_date_end = forms.DateField(initial=today, label="End Date", widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    data_date_start = forms.DateField(initial=day7_ago, label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    data_date_end = forms.DateField(initial=today, label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
     mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.all())
     process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all())

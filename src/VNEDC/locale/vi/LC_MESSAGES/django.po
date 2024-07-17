@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-16 14:10+0700\n"
-"PO-Revision-Date: 2024-07-16 16:57+0700\n"
+"POT-Creation-Date: 2024-07-17 17:41+0700\n"
+"PO-Revision-Date: 2024-07-17 17:42+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -65,6 +65,14 @@ msgstr "Đăng xuất"
 msgid "Update Status"
 msgstr ""
 
+#: .\chart\forms.py:13
+msgid "Start Date"
+msgstr "Ngày bắt đầu"
+
+#: .\chart\forms.py:14
+msgid "End Date"
+msgstr "Ngày cuối"
+
 #: .\chart\forms.py:15 .\collection\forms.py:12
 msgid "plant"
 msgstr "Thực vật"
@@ -89,7 +97,11 @@ msgstr "Kiểm soát cao"
 msgid "control_low"
 msgstr "Kiểm soát mức thấp"
 
-#: .\chart\templates\chart\param_value.html:223
+#: .\chart\forms.py:73 .\users\templates\users\login.html:193
+msgid "Submit"
+msgstr ""
+
+#: .\chart\templates\chart\param_value.html:231
 msgid "Record"
 msgstr "Ghi"
 
@@ -356,10 +368,6 @@ msgstr ""
 #: .\users\templates\users\base.html:35
 msgid "logout"
 msgstr "Đăng xuất"
-
-#: .\users\templates\users\login.html:193
-msgid "Submit"
-msgstr ""
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:130
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:140

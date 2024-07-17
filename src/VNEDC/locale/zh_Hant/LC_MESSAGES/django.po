@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-16 14:10+0700\n"
-"PO-Revision-Date: 2024-07-16 14:36+0700\n"
+"POT-Creation-Date: 2024-07-17 17:41+0700\n"
+"PO-Revision-Date: 2024-07-17 17:43+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -65,6 +65,14 @@ msgstr "登出"
 msgid "Update Status"
 msgstr "更新狀態"
 
+#: .\chart\forms.py:13
+msgid "Start Date"
+msgstr "開始日期"
+
+#: .\chart\forms.py:14
+msgid "End Date"
+msgstr "結束日期"
+
 #: .\chart\forms.py:15 .\collection\forms.py:12
 msgid "plant"
 msgstr "工廠"
@@ -89,7 +97,11 @@ msgstr "控制上限"
 msgid "control_low"
 msgstr "控制下限"
 
-#: .\chart\templates\chart\param_value.html:223
+#: .\chart\forms.py:73 .\users\templates\users\login.html:193
+msgid "Submit"
+msgstr "確定"
+
+#: .\chart\templates\chart\param_value.html:231
 msgid "Record"
 msgstr "報工新增"
 
@@ -358,10 +370,6 @@ msgstr "users"
 #: .\users\templates\users\base.html:35
 msgid "logout"
 msgstr "登出"
-
-#: .\users\templates\users\login.html:193
-msgid "Submit"
-msgstr "確定"
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:130
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:140
@@ -2055,9 +2063,6 @@ msgstr ""
 
 #~ msgid "request_no"
 #~ msgstr "需求編號"
-
-#~ msgid "Start"
-#~ msgstr "預計起始"
 
 #~ msgid "starttime"
 #~ msgstr "預計起始時間"
