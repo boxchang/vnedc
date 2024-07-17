@@ -66,23 +66,17 @@ $(document).ready(function () {
     //chart.update();
 
 
-    $('input[name="plant"]').on('change', function () {
-        Render();
-    });
+    //$("#id_plant").on('change', function () {
+    //    Render();
+    //});
 
-    $('input[name="mach"]').on('change', function () {
-        Render();
-    });
+    //$("#id_mach").on('change', function () {
+    //    Render();
+    //});
 
     $("#id_process_type").on('change', function () {
-        //var plant = $("#id_plant").val();
-        const plant = $('input[name="plant"]:checked').map(function () {
-            return $(this).val();
-        }).get();
-        //var mach = $("#id_mach").val();
-        const mach = $('input[name="mach"]:checked').map(function () {
-            return $(this).val();
-        }).get();
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
         var process_type = $("#id_process_type").val();
         if(plant != "" && mach != "" && process_type != "") {
             process_type_change(plant, mach, process_type);
@@ -92,25 +86,35 @@ $(document).ready(function () {
         }
     });
 
-    $('#id_data_date_start').change(function() {
-        Render();
-    })
+    //$('#id_data_date_start').change(function() {
+    //    Render();
+    //})
 
-    $('#id_data_date_end').change(function() {
-        Render();
-    })
+    //$('#id_data_date_end').change(function() {
+    //    Render();
+    //})
 
-    $('#id_param_define').change(function() {
+    //$('#id_param_define').change(function() {
         //Init control value
-        Init();
-        Render();
-    })
+    //    Init();
+    //    Render();
+    //})
 
     $('#id_control_high').change(function() {
         Render();
     })
 
     $('#id_control_low').change(function() {
+        Render();
+    })
+
+    $('#button-id-submit').click(function btn_submit() {
+        var process_define = $("#id_process_define").val();
+        if(process_define == "") {
+            alert("參數定義尚未選擇");
+            return false;
+        }
+        Init();
         Render();
     })
 
@@ -123,14 +127,8 @@ $(document).ready(function () {
     function Render() {
         var data_date_start = $("#id_data_date_start").val();
         var data_date_end = $("#id_data_date_end").val();
-        //var plant = $("#id_plant").val();
-        const plant = $('input[name="plant"]:checked').map(function () {
-            return $(this).val();
-        }).get();
-        //var mach = $("#id_mach").val();
-        const mach = $('input[name="mach"]:checked').map(function () {
-            return $(this).val();
-        }).get();
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
         var process_type = $("#id_process_type").val();
         var param_define = $("#id_param_define").val();
         var control_high = $("#id_control_high").val();
@@ -203,9 +201,12 @@ $(document).ready(function () {
     });
 });
 
-
-
 </script>
+<style>
+    .btn-search {
+        margin-top: 118px;
+    }
+</style>
 {% endblock %}
 
 {% block ready %}
