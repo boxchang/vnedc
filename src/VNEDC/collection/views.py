@@ -7,6 +7,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from collection.forms import DailyInfoForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue
+from jobs.database import mes_database
 
 
 @login_required
@@ -166,6 +167,18 @@ def daily_info_create(request):
                 tmp_form.remark = ','.join(selected_options)
                 tmp_form.save()
         msg = _("Update Done")
+
+    sql = f"""
+    SELECT distinct ProductItem
+    FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate='{sData_date}' order by ProductItem
+    """
+    mes_db = mes_database()
+    rows = mes_db.select_sql_dict(sql)
+    choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
+    form.fields['prod_name_a1'].choices = choices
+    form.fields['prod_name_a2'].choices = choices
+    form.fields['prod_name_b1'].choices = choices
+    form.fields['prod_name_b2'].choices = choices
 
     return render(request, 'collection/daily_info_create.html', locals())
 

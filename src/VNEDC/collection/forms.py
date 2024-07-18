@@ -45,13 +45,13 @@ class DailyInfoForm(forms.ModelForm):
     SIZE_OPTION = [('', '---'), ('XXS', 'XXS'), ('XS', 'XS'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('XL', 'XL'), ('XXL', 'XXL'),]
     hour = [(str(hh).zfill(2), str(hh).zfill(2)) for hh in range(0, 24)]
     min = [(str(mm).zfill(2), str(mm).zfill(2)) for mm in range(0, 60)]
-    prod_name_a1 = forms.CharField(required=False, label=_('A1 Production'))
+    prod_name_a1 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('A1 Production'), widget=forms.Select(attrs={'class': 'select2'}))
     prod_size_a1 = forms.ChoiceField(required=False, label=_('A1 Size'), choices=SIZE_OPTION)
-    prod_name_a2 = forms.CharField(required=False, label=_('A2 Production'))
+    prod_name_a2 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('A2 Production'), widget=forms.Select(attrs={'class': 'select2'}))
     prod_size_a2 = forms.ChoiceField(required=False, label=_('A2 Size'), choices=SIZE_OPTION)
-    prod_name_b1 = forms.CharField(required=False, label=_('B1 Production'))
+    prod_name_b1 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('B1 Production'), widget=forms.Select(attrs={'class': 'select2'}))
     prod_size_b1 = forms.ChoiceField(required=False, label=_('B1 Size'), choices=SIZE_OPTION)
-    prod_name_b2 = forms.CharField(required=False, label=_('B2 Production'))
+    prod_name_b2 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('B2 Production'), widget=forms.Select(attrs={'class': 'select2'}))
     prod_size_b2 = forms.ChoiceField(required=False, label=_('B2 Size'), choices=SIZE_OPTION)
     remark = forms.MultipleChoiceField(required=False, label=_('Remark'), widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
     remark2 = forms.CharField(required=False, label='', widget=forms.Textarea(attrs={'rows': 4, 'cols': 40}))
