@@ -114,7 +114,7 @@ class UserInfoForm(forms.ModelForm):
                                 widget=forms.PasswordInput(attrs={'placeholder': _('Please type the new password')}))
     password2 = forms.CharField(label=_('confirm_password'), required=False,
                                 widget=forms.PasswordInput(attrs={'placeholder': _('Please type the confirm password')}))
-    default_homepage = forms.ModelChoiceField(queryset=HomePageOption.objects.all(), required=False)
+    default_homepage = forms.ModelChoiceField(queryset=HomePageOption.objects.all(), label=_('Default Homepage'))
 
     class Meta:
         model = CustomUser
@@ -133,7 +133,6 @@ class UserInfoForm(forms.ModelForm):
         else:
             user_roles = user.groups.all()
             self.fields['default_homepage'].queryset = HomePageOption.objects.filter(roles__in=user_roles).distinct()
-
 
         self.helper.layout = Layout(
             Fieldset(_('base_information'),

@@ -2,7 +2,7 @@ import os
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core import validators
@@ -13,11 +13,22 @@ from django.contrib.auth.models import User, Group
 
 class HomePageOption(models.Model):
     name = models.CharField(max_length=100)
+    name_tw = models.CharField(max_length=100)
+    name_cn = models.CharField(max_length=100)
+    name_vn = models.CharField(max_length=100)
     url_name = models.CharField(max_length=200)
     roles = models.ManyToManyField(Group, blank=True)
 
     def __str__(self):
-        return self.name
+        language = get_language()
+        field_name = self.name
+        if language == 'zh-hant':
+            field_name = self.name_tw
+        elif language == 'zh-hans':
+            field_name = self.name_cn
+        elif language == 'vi':
+            field_name = self.name_vn
+        return field_name
 
 
 class Unit(models.Model):

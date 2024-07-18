@@ -10,6 +10,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.urls import reverse
 from django.db.models import Q
+from django.utils.translation import get_language
+
 from bases.views import index
 from users.forms import CurrentCustomUserForm, CustomUser, UserInfoForm, Unit
 from users.models import UserType
@@ -208,6 +210,7 @@ def user_info(request):
                 return redirect('index')
     else:
         form = UserInfoForm(instance=member, user=request.user)
+
     return render(request, template, locals())
 
 

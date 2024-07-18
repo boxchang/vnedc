@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-17 17:41+0700\n"
-"PO-Revision-Date: 2024-07-17 17:43+0700\n"
+"POT-Creation-Date: 2024-07-18 09:40+0700\n"
+"PO-Revision-Date: 2024-07-18 09:47+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -36,6 +36,7 @@ msgstr ""
 #: .\bases\templates\bases\attach_form.html:33
 #: .\collection\templates\collection\daily_info_create.html:31
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
+#: .\users\templates\users\info.html:17
 msgid "save"
 msgstr "储存"
 
@@ -211,7 +212,7 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-#: .\collection\templates\collection\test.html:156 .\users\forms.py:154
+#: .\collection\templates\collection\test.html:156 .\users\forms.py:153
 msgid "Change Password"
 msgstr "变更密码"
 
@@ -235,7 +236,7 @@ msgstr ""
 msgid "user_type"
 msgstr ""
 
-#: .\users\forms.py:47 .\users\models.py:107
+#: .\users\forms.py:47 .\users\models.py:118
 msgid "active"
 msgstr ""
 
@@ -255,12 +256,12 @@ msgstr ""
 msgid "Please type the login password again"
 msgstr ""
 
-#: .\users\forms.py:50 .\users\models.py:89
+#: .\users\forms.py:50 .\users\models.py:100
 #: .\users\templates\users\login.html:168
 msgid "emp_no"
 msgstr ""
 
-#: .\users\forms.py:51 .\users\models.py:90
+#: .\users\forms.py:51 .\users\models.py:101
 msgid "sap_emp_no"
 msgstr ""
 
@@ -272,7 +273,7 @@ msgstr ""
 msgid "dept"
 msgstr ""
 
-#: .\users\forms.py:105 .\users\forms.py:177
+#: .\users\forms.py:105 .\users\forms.py:176
 msgid "The password is not same with the confirm password"
 msgstr ""
 
@@ -300,75 +301,91 @@ msgstr ""
 msgid "Please type the confirm password"
 msgstr ""
 
-#: .\users\forms.py:139
+#: .\users\forms.py:117
+msgid "Default Homepage"
+msgstr ""
+
+#: .\users\forms.py:138
 msgid "base_information"
 msgstr ""
 
-#: .\users\forms.py:182
+#: .\users\forms.py:181
 msgid "The password is not correct"
 msgstr ""
 
-#: .\users\models.py:41
+#: .\users\models.py:52
 msgid "類別"
 msgstr ""
 
-#: .\users\models.py:91
+#: .\users\models.py:102
 msgid "username"
 msgstr ""
 
-#: .\users\models.py:92
+#: .\users\models.py:103
 msgid "email address"
 msgstr ""
 
-#: .\users\models.py:94
+#: .\users\models.py:105
 msgid "first name"
 msgstr ""
 
-#: .\users\models.py:95
+#: .\users\models.py:106
 msgid "last name"
 msgstr ""
 
-#: .\users\models.py:97
+#: .\users\models.py:108
 msgid "mobile number"
 msgstr ""
 
-#: .\users\models.py:99
+#: .\users\models.py:110
 msgid "Required. digits and +-() only."
 msgstr ""
 
-#: .\users\models.py:101
+#: .\users\models.py:112
 msgid "Enter a valid mobile number."
 msgstr ""
 
-#: .\users\models.py:104
+#: .\users\models.py:115
 msgid "staff status"
 msgstr ""
 
-#: .\users\models.py:105
+#: .\users\models.py:116
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
-#: .\users\models.py:108
+#: .\users\models.py:119
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 
-#: .\users\models.py:110
+#: .\users\models.py:121
 msgid "date joined"
 msgstr ""
 
-#: .\users\models.py:121
+#: .\users\models.py:132
 msgid "user"
 msgstr ""
 
-#: .\users\models.py:122
+#: .\users\models.py:133
 msgid "users"
 msgstr ""
 
+#: .\users\templates\users\base.html:15
+msgid "Add User"
+msgstr "新增使用者"
+
+#: .\users\templates\users\base.html:16
+msgid "User List"
+msgstr "使用者列表"
+
 #: .\users\templates\users\base.html:35
 msgid "logout"
-msgstr ""
+msgstr "登出"
+
+#: .\users\templates\users\info.html:5
+msgid "User Information"
+msgstr "使用者资讯"
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:130
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:140
