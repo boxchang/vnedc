@@ -122,9 +122,13 @@ def record(request, process_code):
 
 
 def get_production_choices(workOrderDate):
+    date_obj = datetime.strptime(workOrderDate, "%Y-%m-%d")
+    date_obj_minus_one = date_obj - timedelta(days=1)
+    yesterday = date_obj_minus_one.strftime("%Y-%m-%d")
+
     sql = f"""
         SELECT distinct ProductItem
-        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate='{workOrderDate}' order by ProductItem
+        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate in ('{workOrderDate}','{yesterday}') order by ProductItem
         """
     mes_db = mes_database()
     rows = mes_db.select_sql_dict(sql)
