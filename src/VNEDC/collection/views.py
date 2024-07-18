@@ -121,6 +121,17 @@ def record(request, process_code):
     return render(request, 'collection/record.html', locals())
 
 
+def get_production_choices(workOrderDate):
+    sql = f"""
+        SELECT distinct ProductItem
+        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate='{workOrderDate}' order by ProductItem
+        """
+    mes_db = mes_database()
+    rows = mes_db.select_sql_dict(sql)
+    choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
+    return choices
+
+
 @login_required
 def daily_info_create(request):
     sPlant, sMach, sData_date, lang = page_init(request)
@@ -145,6 +156,13 @@ def daily_info_create(request):
     if request.method == 'POST':
         if not info:  # 新增
             form = DailyInfoForm(request.POST)
+
+            choices = get_production_choices(sData_date)
+            form.fields['prod_name_a1'].choices = choices
+            form.fields['prod_name_a2'].choices = choices
+            form.fields['prod_name_b1'].choices = choices
+            form.fields['prod_name_b2'].choices = choices
+
             if form.is_valid():
                 tmp_form = form.save(commit=False)
                 tmp_form.plant = Plant.objects.get(plant_code=sPlant)
@@ -160,6 +178,13 @@ def daily_info_create(request):
                 info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
         else:  # 更新
             form = DailyInfoForm(request.POST, instance=info)
+
+            choices = get_production_choices(sData_date)
+            form.fields['prod_name_a1'].choices = choices
+            form.fields['prod_name_a2'].choices = choices
+            form.fields['prod_name_b1'].choices = choices
+            form.fields['prod_name_b2'].choices = choices
+
             if form.is_valid():
                 tmp_form = form.save(commit=False)
                 tmp_form.update_by = request.user
@@ -168,13 +193,7 @@ def daily_info_create(request):
                 tmp_form.save()
         msg = _("Update Done")
 
-    sql = f"""
-    SELECT distinct ProductItem
-    FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate='{sData_date}' order by ProductItem
-    """
-    mes_db = mes_database()
-    rows = mes_db.select_sql_dict(sql)
-    choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
+    choices = get_production_choices(sData_date)
     form.fields['prod_name_a1'].choices = choices
     form.fields['prod_name_a2'].choices = choices
     form.fields['prod_name_b1'].choices = choices
