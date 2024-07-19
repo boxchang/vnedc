@@ -1,5 +1,5 @@
 from django import forms
-from collection.models import Plant, Machine, Daily_Prod_Info, Process_Type, ParameterDefine
+from collection.models import Plant, Machine, Daily_Prod_Info, Process_Type, ParameterDefine, Parameter_Type
 from django.utils.translation import gettext_lazy as _
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 from crispy_forms.helper import FormHelper
@@ -65,6 +65,58 @@ class SearchForm(forms.Form):
                     ),
                     Div(
                         Div('param_define', css_class='col'),
+                        css_class='row'),
+                    css_class='col-md-2'
+                ),
+                Div(
+                    Div(
+                        Div(Button('submit', _('Submit'), css_class='btn btn-info btn-search'), css_class='col'),
+                        css_class='row'),
+                    css_class='col-md-2'
+                ),
+                css_class='row'),
+        )
+
+class ProductionSearchForm(forms.Form):
+    day7_ago = date.today() - timedelta(days=7)
+    today = date.today()
+    data_date_start = forms.DateField(initial=day7_ago, label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    data_date_end = forms.DateField(initial=today, label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    product = forms.ChoiceField(required=True, label=_('Product'), widget=forms.Select(attrs={'class': 'select2'}))
+    process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all())
+    param_code = forms.ModelChoiceField(required=True, label=_('param_code'), queryset=Parameter_Type.objects.none())
+
+    def __init__(self, *args, submit_title='Submit', **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    Div(
+                        Div('product', css_class='col'),
+                        css_class='row'),
+                    Div(
+                        Div('data_date_start', css_class='col'),
+                        css_class='row'
+                    ),
+                    css_class='col-md-2'
+                ),
+                Div(
+                    Div(
+                        Div('process_type', css_class='col'),
+                        css_class='row'),
+                    Div(
+                        Div('data_date_end', css_class='col'),
+                        css_class='row'
+                    ),
+                ),
+                Div(
+                    Div(
+                        Div('param_code', css_class='col'),
                         css_class='row'),
                     css_class='col-md-2'
                 ),

@@ -52,12 +52,13 @@ class Process_Type(models.Model):
 class Parameter_Type(models.Model):
     process_type = models.ForeignKey(Process_Type, related_name='param_type_process_type', on_delete=models.CASCADE, null=True, blank=True)
     param_code = models.CharField(max_length=50)
+    param_name = models.CharField(max_length=50, null=True, blank=True)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_type_update_at')
 
     def __str__(self):
-        return self.process_type + "_" +self.param_code
+        return str(self.process_type.process_code) + "_" + str(self.param_code)
 
 class ParameterDefine(models.Model):
     plant = models.ForeignKey(Plant, related_name='param_plant', on_delete=models.CASCADE)

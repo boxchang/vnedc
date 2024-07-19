@@ -13,6 +13,18 @@ Index
 {% endblock %}
 
 {% block base_js %}
+<style>
+.box-nav-container {
+    display: flex;
+    gap: 10px; /* 调整间距，根据需要设置 */
+}
+
+.box-nav-btn {
+    display: inline-flex; /* 确保按钮内部的图标和文本也在同一行显示 */
+    align-items: center; /* 垂直居中 */
+    padding: 5px; /* 调整按钮内边距，根据需要设置 */
+}
+</style>
 <script>
 function set_session() {
     var plant = $("#id_plant").val();
@@ -56,7 +68,7 @@ function validate(evt) {
     if(theEvent.preventDefault) theEvent.preventDefault();
   }
 }
-</script>
+</style>
 {% endblock %}
 
 {% block ready %}
@@ -109,9 +121,14 @@ function validate(evt) {
             <div class="col-md-3">
                 <label for="data_date"></label>
                 {% if user.is_superuser %}
-                <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
-                    <i class="fas fa-chart-line"></i>
-                </a>
+                <div class="box-nav-container">
+                    <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
+                        <i class="fas fa-chart-line"></i>
+                    </a>
+                    <a class="box-nav-btn" href="{% url 'param_value_product' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
+                        <i class="fas fa-chart-bar"></i>
+                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>

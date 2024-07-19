@@ -1,0 +1,252 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block head %}
+
+{% endblock %}
+{% block title %}
+Index
+{% endblock title %}
+{% block breadcrumb %}
+
+{% endblock %}
+
+{% block base_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+// Register the plugin to all charts:
+//Chart.register(ChartDataLabels);
+
+var chartData = {
+    datasets: []
+};
+
+var config = {
+    type: 'line',
+    data: chartData,
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: ''
+            },
+            datalabels: {
+                backgroundColor: function (context) {
+                    return context.dataset.backgroundColor;
+                },
+                borderRadius: 4,
+                color: 'white',
+                font: {
+                    weight: 'bold'
+                },
+                formatter: Math.round,
+                padding: 6,
+                display: function (context) {
+                    if(context.dataset.label=='CONTROL RANGE LOW' || context.dataset.label=='CONTROL RANGE HIGH'){
+                        //return context.dataIndex === 0;
+                        return false;
+                    }
+                },
+            },
+        },
+    }
+};
+
+
+$(document).ready(function () {
+    $('.select2').select2({
+        placeholder: '---',
+        allowClear: true
+    });
+
+    var ctx = document.getElementById('canvas').getContext('2d');
+    const chart = new Chart(ctx, config);
+    //chart.update();
+
+
+    //$("#id_plant").on('change', function () {
+    //    Render();
+    //});
+
+    //$("#id_mach").on('change', function () {
+    //    Render();
+    //});
+
+    $("#id_process_type").on('change', function () {
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
+        var process_type = $("#id_process_type").val();
+        if(process_type != "") {
+            process_type_change(plant, mach, process_type);
+        }else{
+            alert("製程類型尚未選擇");
+             $('#id_process_type').prop('selectedIndex',0);
+        }
+    });
+
+    //$('#id_data_date_start').change(function() {
+    //    Render();
+    //})
+
+    //$('#id_data_date_end').change(function() {
+    //    Render();
+    //})
+
+    //$('#id_param_define').change(function() {
+        //Init control value
+    //    Init();
+    //    Render();
+    //})
+
+    $('#id_control_high').change(function() {
+        Render();
+    })
+
+    $('#id_control_low').change(function() {
+        Render();
+    })
+
+    $('#button-id-submit').click(function btn_submit() {
+        var process_define = $("#id_process_define").val();
+        if(process_define == "") {
+            alert("參數定義尚未選擇");
+            return false;
+        }
+        Init();
+        Render();
+    })
+
+    function Init() {
+        //Init control value
+        $("#id_control_high").val('');
+        $("#id_control_low").val('');
+    }
+
+    function Render() {
+        var data_date_start = $("#id_data_date_start").val();
+        var data_date_end = $("#id_data_date_end").val();
+        var process_type = $("#id_process_type").val();
+        var param_code = $("#id_param_code").val();
+        var product = $("#id_product").val();
+
+        if(data_date_start != "" && data_date_end != "" && process_type != "" && param_code != "" && product != "") {
+            $("body").loading();
+            ajax_chart(data_date_start, data_date_end, process_type, param_code, product);
+        }
+    }
+
+    function ajax_chart(data_date_start, data_date_end, process_type, param_code, product) {
+        var json_url = "{% url 'param_value_product_api' %}";
+        jQuery.support.cors = true;
+        $.ajax({
+            url: json_url,
+            type: "POST",
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", data_date_start: data_date_start, data_date_end: data_date_end, process_type: process_type, param_code: param_code, product: product},
+            timeout: 30000,
+            dataType: "json", // "xml", "json"
+            success: function(data) {
+                chartData.datasets = [];
+                if (data.datasets !== undefined && data.datasets !== null) {
+                    for (var i = 0; i < data.datasets.length; i++) {
+                        chartData.datasets.push(data.datasets[i])
+                    }
+
+                    config.options.plugins.title["text"] = data.title;
+                    chartData.labels = data.labels;
+                    chart.update();
+                }
+                $("body").loading("stop");  //Loading Hide
+                $("#id_control_high").val(data.control_high);
+                $("#id_control_low").val(data.control_low);
+                //$("#btnCondition").click(); //Menu Shrink
+
+            },
+            error: function(jqXHR, textStatus, ex) {
+                alert(textStatus + "," + ex + "," + jqXHR.responseText);
+            }
+        });
+    }
+
+    function process_type_change(plant, mach, process_type) {
+        var lang = "{{ request.LANGUAGE_CODE }}";
+        $.ajax({
+            url: '{% url 'get_param_code_api' %}', type: 'post',
+            dataType: 'json',
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "process_type": process_type, "lang": lang},
+            success: function(data) {
+                //Update select Options
+                $("#id_param_code").html(data);
+
+                //Init control value
+                Init();
+            }
+        });
+    }
+
+    $("#btnCondition").click(function() {
+        var tmp = $("#hidCondition").val();
+        if(tmp == "Hide") {
+            $("#search_condition").hide("slow", function() {
+                $("#hidCondition").val('Show');
+            });
+        } else {
+            $("#search_condition").show("slow", function() {
+                $("#hidCondition").val('Hide');
+            });
+        }
+    });
+});
+
+</script>
+<style>
+    .btn-search {
+        margin-top: 118px;
+    }
+
+    .daily_info_remark {
+        font-size: 18pt;
+    }
+
+    .select2-container {
+        width: 170px !important; /* 设置Select2的宽度 */
+        height: 38px;
+    }
+</style>
+{% endblock %}
+
+{% block ready %}
+
+{% endblock ready %}
+
+{% block container %}
+<div class="container-fluid">
+    <input type="hidden" id="hidCondition" value="Hide" />
+    <div class="row pl-3" id="search_condition">
+        <div class="col-10">
+            {% crispy search_form %}
+        </div>
+        <div class="col-1">
+            <a class="box-nav-btn" href="{% url 'daily_info_create' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Record' %}">
+                <i class="fas fa-exchange-alt"></i>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <input type="button" class="btn btn-light" style="width: 100%; height:2px;" id="btnCondition" />
+    </div>
+    <div class="row">
+        <div style="width:90%;">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}

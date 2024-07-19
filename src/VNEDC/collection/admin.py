@@ -1,7 +1,10 @@
 from django.contrib import admin
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Parameter_Type
 
-admin.site.register(Parameter_Type)
+@admin.register(Parameter_Type)
+class Parameter_TypeAdmin(admin.ModelAdmin):
+    list_display = ('param_code', 'param_name', 'update_at', 'update_by')
+
 
 @admin.register(Plant)
 class PlantAdmin(admin.ModelAdmin):
