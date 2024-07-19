@@ -1,6 +1,7 @@
 from django.contrib import admin
-from collection.models import ParameterDefine, Process_Type, Plant, Machine
+from collection.models import ParameterDefine, Process_Type, Plant, Machine, Parameter_Type
 
+admin.site.register(Parameter_Type)
 
 @admin.register(Plant)
 class PlantAdmin(admin.ModelAdmin):

@@ -95,7 +95,7 @@ def record(request, process_code):
 
                             ParameterValue.objects.update_or_create(plant=plant, mach=mach,
                                                                     data_date=sData_date,
-                                                                    process_type=process_type,
+                                                                    process_type=process_type.process_code,
                                                                     data_time=time, parameter_name=define.parameter_name,
                                                                     create_by=request.user,
                                                                     update_by=request.user,

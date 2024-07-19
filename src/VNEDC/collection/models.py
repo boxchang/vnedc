@@ -49,10 +49,22 @@ class Process_Type(models.Model):
         return self.process_name
 
 
+class Parameter_Type(models.Model):
+    process_type = models.ForeignKey(Process_Type, related_name='param_type_process_type', on_delete=models.CASCADE, null=True, blank=True)
+    param_code = models.CharField(max_length=50)
+    update_at = models.DateTimeField(default=timezone.now)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='param_type_update_at')
+
+    def __str__(self):
+        return self.process_type + "_" +self.param_code
+
 class ParameterDefine(models.Model):
     plant = models.ForeignKey(Plant, related_name='param_plant', on_delete=models.CASCADE)
     mach = models.ForeignKey(Machine, related_name='param_mach', on_delete=models.CASCADE)
     process_type = models.ForeignKey(Process_Type, related_name='param_process_type', on_delete=models.CASCADE)
+    param_type = models.ForeignKey(Parameter_Type, related_name='param_param_type', on_delete=models.CASCADE)
+    side = models.CharField(max_length=5, null=True, blank=True)
     parameter_name = models.CharField(max_length=50)  # 英文
     parameter_tw = models.CharField(max_length=50)  # 繁體中文
     parameter_cn = models.CharField(max_length=50)  # 簡體中文
