@@ -146,6 +146,8 @@ def param_value_product_api(request):
                 UNION ALL
                 SELECT * FROM ProdInfo
                 WHERE side = 'B' AND (prod_name_b1 = '{product}' OR prod_name_b2 = '{product}')
+                UNION ALL
+                SELECT * FROM ProdInfo WHERE side = ''
             )
             SELECT data_date, data_time, mach_id, process_type, parameter_name, parameter_tw, side, param_code, parameter_name, parameter_value
             FROM SelectedProdInfo;
