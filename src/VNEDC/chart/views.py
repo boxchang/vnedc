@@ -155,6 +155,13 @@ def param_value_product_api(request):
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
+            # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = set((record['mach_id'], record['side']) for record in records)
+            # 将集合转换为列表
+            chart_records = list(chart_records)
+            # 按照第一个值排序
+            chart_records = sorted(chart_records, key=lambda x: x[0])
+
             y_label = []
             datasets = []
             for record in records:
@@ -163,9 +170,11 @@ def param_value_product_api(request):
             y_label.sort()
 
             color_index = 1
-            for side in ['A', 'B', '']:
+            for chart_record in chart_records:
+                mach_id = chart_record[0]
+                side = chart_record[1]
                 dataset = {}
-                dataset['label'] = records[0]['mach_id'] + " " + side
+                dataset['label'] = mach_id + " " + side
                 dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
                 dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
                 dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
@@ -174,10 +183,12 @@ def param_value_product_api(request):
                 for date_time in y_label:
                     date = date_time.split(' ')[0]
                     time = date_time.split(' ')[1].replace(":00", "")
-                    tmp = [record for record in records if record['side'] == side and record['data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
-                    if tmp:
-                        data.append(tmp[0]['parameter_value'])
-                        color_index += 1
+                    time_filter = [record for record in records if record['mach_id'] == mach_id and record['side'] == side and record['data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
+                    if time_filter:
+                        data.append(time_filter[0]['parameter_value'])
+
+                color_index += 1
+
                 if data:
                     dataset['data'] = data
                     datasets.append(dataset)
