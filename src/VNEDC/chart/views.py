@@ -164,8 +164,13 @@ def param_value_product_api(request):
 
             y_label = []
             datasets = []
-            for record in records:
-                y_label.append("{data_date} {data_time}:00".format(data_date=record['data_date'], data_time=record['data_time']))
+
+            date_records = set((record['data_date'], record['data_time']) for record in records)
+            date_records = list(date_records)
+            date_records = sorted(date_records, key=lambda x: (x[0], x[1]))
+
+            for record in date_records:
+                y_label.append("{data_date} {data_time}:00".format(data_date=record[0], data_time=record[1]))
             y_label = list(set(y_label))
             y_label.sort()
 
@@ -186,6 +191,8 @@ def param_value_product_api(request):
                     time_filter = [record for record in records if record['mach_id'] == mach_id and record['side'] == side and record['data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
                     if time_filter:
                         data.append(time_filter[0]['parameter_value'])
+                    else:
+                        data.append('null')
 
                 color_index += 1
 
