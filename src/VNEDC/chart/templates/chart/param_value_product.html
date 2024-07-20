@@ -39,6 +39,10 @@ var config = {
                 display: true,
                 text: ''
             },
+            subtitle: {
+                display: true,
+                text: ''
+            },
             datalabels: {
                 backgroundColor: function (context) {
                     return context.dataset.backgroundColor;
@@ -159,8 +163,8 @@ $(document).ready(function () {
                     for (var i = 0; i < data.datasets.length; i++) {
                         chartData.datasets.push(data.datasets[i])
                     }
-
-                    config.options.plugins.title["text"] = data.title;
+                    config.options.plugins.title.text = data.title;
+                    config.options.plugins.subtitle.text = data.subtitle;
                     chartData.labels = data.labels;
                     chart.update();
                 }

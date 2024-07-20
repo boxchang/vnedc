@@ -210,7 +210,7 @@ def param_value_product_api(request):
             datasets.append({'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc', 'borderDash': [10, 2]})
             datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999', 'borderDash': [10,2]})
 
-            chart_data = {"labels": y_label, "datasets": datasets, "title": process_type+" "+param_code}
+            chart_data = {"labels": y_label, "datasets": datasets, "title": product+"  "+process_type+"  "+param_code, "subtitle": product}
         except Exception as e:
             print(e)
 
