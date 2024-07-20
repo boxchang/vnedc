@@ -198,7 +198,7 @@ def param_value_product_api(request):
             base_line_data = []
             control_low_data = []
 
-            param_type = Parameter_Type.objects.filter(param_code=param_code).first()
+            param_type = Parameter_Type.objects.filter(param_code=param_code, process_type=process_type).first()
             define = ParameterDefine.objects.filter(process_type=process_type, param_type=param_type).first()
             if define:
                 for date_time in y_label:
