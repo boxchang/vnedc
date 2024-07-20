@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-18 09:39+0700\n"
-"PO-Revision-Date: 2024-07-18 09:46+0700\n"
+"POT-Creation-Date: 2024-07-20 08:20+0700\n"
+"PO-Revision-Date: 2024-07-20 08:23+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:31
+#: .\collection\templates\collection\daily_info_create.html:43
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -53,7 +53,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: .\bases\templates\bases\base.html:64 .\users\templates\users\base.html:26
+#: .\bases\templates\bases\base.html:64
 msgid "Personal Setting"
 msgstr "Cài đặt cá nhân"
 
@@ -66,11 +66,11 @@ msgstr "Đăng xuất"
 msgid "Update Status"
 msgstr ""
 
-#: .\chart\forms.py:13
+#: .\chart\forms.py:13 .\chart\forms.py:83
 msgid "Start Date"
 msgstr "Ngày bắt đầu"
 
-#: .\chart\forms.py:14
+#: .\chart\forms.py:14 .\chart\forms.py:84
 msgid "End Date"
 msgstr "Ngày cuối"
 
@@ -82,7 +82,7 @@ msgstr "Thực vật"
 msgid "mach_name"
 msgstr "Tên may moc"
 
-#: .\chart\forms.py:17
+#: .\chart\forms.py:17 .\chart\forms.py:86
 msgid "process_type"
 msgstr "Loại quy trình"
 
@@ -98,11 +98,21 @@ msgstr "Kiểm soát cao"
 msgid "control_low"
 msgstr "Kiểm soát mức thấp"
 
-#: .\chart\forms.py:73 .\users\templates\users\login.html:193
+#: .\chart\forms.py:73 .\chart\forms.py:126
+#: .\users\templates\users\login.html:193
 msgid "Submit"
 msgstr ""
 
+#: .\chart\forms.py:85
+msgid "Product"
+msgstr "Sản xuất"
+
+#: .\chart\forms.py:87
+msgid "param_code"
+msgstr "Loại tham số"
+
 #: .\chart\templates\chart\param_value.html:231
+#: .\chart\templates\chart\param_value_product.html:238
 msgid "Record"
 msgstr "Ghi"
 
@@ -182,24 +192,24 @@ msgstr "Thay đổi thời dụng cụ (giờ)"
 msgid "Change Tooling Time(Minute)"
 msgstr "Thay đổi thời dụng cụ (Phút)"
 
-#: .\collection\forms.py:64 .\collection\templates\collection\base.html:78
+#: .\collection\forms.py:64 .\collection\templates\collection\base.html:90
 msgid "Plant"
 msgstr "Xưởng"
 
-#: .\collection\templates\collection\base.html:93
+#: .\collection\templates\collection\base.html:105
 msgid "Machine"
 msgstr "Máy móc"
 
-#: .\collection\templates\collection\base.html:106
+#: .\collection\templates\collection\base.html:118
 msgid "Record Date"
 msgstr "Ngày ghi"
 
-#: .\collection\templates\collection\base.html:112
-#: .\users\templates\users\base.html:21
+#: .\collection\templates\collection\base.html:125
+#: .\collection\templates\collection\base.html:128
 msgid "Chart"
 msgstr "Đồ thị"
 
-#: .\collection\templates\collection\base.html:131
+#: .\collection\templates\collection\base.html:148
 msgid "Production Data"
 msgstr "Dữ liệu sản xuất"
 
@@ -215,7 +225,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "Đổi mật khẩu"
 
-#: .\collection\views.py:102 .\collection\views.py:168
+#: .\collection\views.py:103 .\collection\views.py:198
 msgid "Update Done"
 msgstr ""
 
@@ -377,10 +387,6 @@ msgstr "Thêm người dùng mới"
 #: .\users\templates\users\base.html:16
 msgid "User List"
 msgstr "Danh sách người dùng"
-
-#: .\users\templates\users\base.html:35
-msgid "logout"
-msgstr "Đăng xuất"
 
 #: .\users\templates\users\info.html:5
 msgid "User Information"
@@ -1721,6 +1727,9 @@ msgstr ""
 #, python-format
 msgid "%s: error: %s\n"
 msgstr ""
+
+#~ msgid "logout"
+#~ msgstr "Đăng xuất"
 
 #~ msgid "Project Management System"
 #~ msgstr "Hệ thống quản lý dự án"

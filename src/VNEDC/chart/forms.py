@@ -103,7 +103,7 @@ class ProductionSearchForm(forms.Form):
                         Div('data_date_start', css_class='col'),
                         css_class='row'
                     ),
-                    css_class='col-md-2'
+                    css_class='col-md-3'
                 ),
                 Div(
                     Div(
@@ -113,18 +113,19 @@ class ProductionSearchForm(forms.Form):
                         Div('data_date_end', css_class='col'),
                         css_class='row'
                     ),
+                    css_class='col-md-3'
                 ),
                 Div(
                     Div(
                         Div('param_code', css_class='col'),
                         css_class='row'),
-                    css_class='col-md-2'
+                    css_class='col-md-3'
                 ),
                 Div(
                     Div(
                         Div(Button('submit', _('Submit'), css_class='btn btn-info btn-search'), css_class='col'),
                         css_class='row'),
-                    css_class='col-md-2'
+                    css_class='col-md-3'
                 ),
                 css_class='row'),
         )

@@ -22,9 +22,9 @@ def param_value(request):
     return render(request, 'chart/param_value.html', locals())
 
 def param_value_product(request):
-    day7_ago = (date.today() - timedelta(days=7)).strftime("%Y-%m-%d")
+    month_ago = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
     today = (date.today()).strftime("%Y-%m-%d")
-    choices = get_product_choices(day7_ago, today)
+    choices = get_product_choices(month_ago, today)
 
     search_form = ProductionSearchForm()
     search_form.fields['product'].choices = choices
@@ -206,9 +206,9 @@ def param_value_product_api(request):
                     base_line_data.append(define.base_line)
                     control_low_data.append(define.control_range_low)
 
-            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
-            datasets.append({'label': '控制線', 'data': base_line_data, 'backgroundColor': '#ffddbd', 'borderColor': '#ffddad', 'borderDash': [10, 2]})
-            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999', 'borderDash': [10,2]})
+            datasets.append({'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc', 'borderDash': [10, 2]})
+            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999', 'borderDash': [10,2]})
 
             chart_data = {"labels": y_label, "datasets": datasets, "title": process_type+" "+param_code}
         except Exception as e:

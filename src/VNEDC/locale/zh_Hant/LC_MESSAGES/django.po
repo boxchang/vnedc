@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-18 09:40+0700\n"
-"PO-Revision-Date: 2024-07-18 09:49+0700\n"
+"POT-Creation-Date: 2024-07-20 08:20+0700\n"
+"PO-Revision-Date: 2024-07-20 08:22+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr "描述"
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:31
+#: .\collection\templates\collection\daily_info_create.html:43
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -53,7 +53,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: .\bases\templates\bases\base.html:64 .\users\templates\users\base.html:26
+#: .\bases\templates\bases\base.html:64
 msgid "Personal Setting"
 msgstr "個人資訊"
 
@@ -66,11 +66,11 @@ msgstr "登出"
 msgid "Update Status"
 msgstr "更新狀態"
 
-#: .\chart\forms.py:13
+#: .\chart\forms.py:13 .\chart\forms.py:83
 msgid "Start Date"
 msgstr "開始日期"
 
-#: .\chart\forms.py:14
+#: .\chart\forms.py:14 .\chart\forms.py:84
 msgid "End Date"
 msgstr "結束日期"
 
@@ -82,7 +82,7 @@ msgstr "工廠"
 msgid "mach_name"
 msgstr "機台"
 
-#: .\chart\forms.py:17
+#: .\chart\forms.py:17 .\chart\forms.py:86
 msgid "process_type"
 msgstr "製程類型"
 
@@ -98,11 +98,21 @@ msgstr "控制上限"
 msgid "control_low"
 msgstr "控制下限"
 
-#: .\chart\forms.py:73 .\users\templates\users\login.html:193
+#: .\chart\forms.py:73 .\chart\forms.py:126
+#: .\users\templates\users\login.html:193
 msgid "Submit"
 msgstr "確定"
 
+#: .\chart\forms.py:85
+msgid "Product"
+msgstr "產品"
+
+#: .\chart\forms.py:87
+msgid "param_code"
+msgstr "參數類型"
+
 #: .\chart\templates\chart\param_value.html:231
+#: .\chart\templates\chart\param_value_product.html:238
 msgid "Record"
 msgstr "報工新增"
 
@@ -182,24 +192,24 @@ msgstr "換模時間(Hour)"
 msgid "Change Tooling Time(Minute)"
 msgstr "換模時間(Minute)"
 
-#: .\collection\forms.py:64 .\collection\templates\collection\base.html:78
+#: .\collection\forms.py:64 .\collection\templates\collection\base.html:90
 msgid "Plant"
 msgstr "廠別"
 
-#: .\collection\templates\collection\base.html:93
+#: .\collection\templates\collection\base.html:105
 msgid "Machine"
 msgstr "機台"
 
-#: .\collection\templates\collection\base.html:106
+#: .\collection\templates\collection\base.html:118
 msgid "Record Date"
 msgstr "作業日期"
 
-#: .\collection\templates\collection\base.html:112
-#: .\users\templates\users\base.html:21
+#: .\collection\templates\collection\base.html:125
+#: .\collection\templates\collection\base.html:128
 msgid "Chart"
 msgstr "圖表"
 
-#: .\collection\templates\collection\base.html:131
+#: .\collection\templates\collection\base.html:148
 msgid "Production Data"
 msgstr "生產資料"
 
@@ -215,7 +225,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "變更密碼"
 
-#: .\collection\views.py:102 .\collection\views.py:168
+#: .\collection\views.py:103 .\collection\views.py:198
 msgid "Update Done"
 msgstr "更新完成"
 
@@ -379,10 +389,6 @@ msgstr "新增使用者"
 #: .\users\templates\users\base.html:16
 msgid "User List"
 msgstr "使用者列表"
-
-#: .\users\templates\users\base.html:35
-msgid "logout"
-msgstr "登出"
 
 #: .\users\templates\users\info.html:5
 msgid "User Information"
@@ -1855,6 +1861,9 @@ msgstr ""
 #, python-format
 msgid "%s: error: %s\n"
 msgstr ""
+
+#~ msgid "logout"
+#~ msgstr "登出"
 
 #~ msgid "Project Management System"
 #~ msgstr "專案管理"
