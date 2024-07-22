@@ -78,16 +78,18 @@ class SearchForm(forms.Form):
         )
 
 class ProductionSearchForm(forms.Form):
-    day7_ago = date.today() - timedelta(days=7)
-    today = date.today()
-    data_date_start = forms.DateField(initial=day7_ago, label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
-    data_date_end = forms.DateField(initial=today, label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    data_date_start = forms.DateField(label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
+    data_date_end = forms.DateField(label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     product = forms.ChoiceField(required=True, label=_('Product'), widget=forms.Select(attrs={'class': 'select2'}))
     process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all())
     param_code = forms.ModelChoiceField(required=True, label=_('param_code'), queryset=Parameter_Type.objects.none())
 
     def __init__(self, *args, submit_title='Submit', **kwargs):
+        day7_ago = date.today() - timedelta(days=7)
+        today = date.today()
         super().__init__(*args, **kwargs)
+        self.fields['data_date_start'].initial = day7_ago
+        self.fields['data_date_end'].initial = today
 
         self.helper = FormHelper()
         self.helper.form_tag = False
