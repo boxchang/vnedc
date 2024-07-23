@@ -120,7 +120,6 @@ function validate(evt) {
             </div>
             <div class="col-md-3">
                 <label for="data_date"></label>
-                {% if user.is_superuser %}
                 <div class="box-nav-container">
                     <a class="box-nav-btn" href="{% url 'param_value' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Chart' %}">
                         <i class="fas fa-chart-line"></i>
@@ -129,7 +128,6 @@ function validate(evt) {
                         <i class="fas fa-chart-bar"></i>
                     </a>
                 </div>
-                {% endif %}
             </div>
         </div>
     </form>
