@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-20 08:20+0700\n"
-"PO-Revision-Date: 2024-07-20 08:22+0700\n"
+"POT-Creation-Date: 2024-07-24 10:48+0700\n"
+"PO-Revision-Date: 2024-07-24 10:56+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr "描述"
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:43
+#: .\collection\templates\collection\daily_info_create.html:61
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -66,11 +66,11 @@ msgstr "登出"
 msgid "Update Status"
 msgstr "更新狀態"
 
-#: .\chart\forms.py:13 .\chart\forms.py:83
+#: .\chart\forms.py:13 .\chart\forms.py:81
 msgid "Start Date"
 msgstr "開始日期"
 
-#: .\chart\forms.py:14 .\chart\forms.py:84
+#: .\chart\forms.py:14 .\chart\forms.py:82
 msgid "End Date"
 msgstr "結束日期"
 
@@ -82,7 +82,7 @@ msgstr "工廠"
 msgid "mach_name"
 msgstr "機台"
 
-#: .\chart\forms.py:17 .\chart\forms.py:86
+#: .\chart\forms.py:17 .\chart\forms.py:84
 msgid "process_type"
 msgstr "製程類型"
 
@@ -98,21 +98,22 @@ msgstr "控制上限"
 msgid "control_low"
 msgstr "控制下限"
 
-#: .\chart\forms.py:73 .\chart\forms.py:126
+#: .\chart\forms.py:73 .\chart\forms.py:128
 #: .\users\templates\users\login.html:193
 msgid "Submit"
 msgstr "確定"
 
-#: .\chart\forms.py:85
+#: .\chart\forms.py:83
+#: .\collection\templates\collection\daily_info_create.html:44
 msgid "Product"
 msgstr "產品"
 
-#: .\chart\forms.py:87
+#: .\chart\forms.py:85
 msgid "param_code"
 msgstr "參數類型"
 
 #: .\chart\templates\chart\param_value.html:231
-#: .\chart\templates\chart\param_value_product.html:238
+#: .\chart\templates\chart\param_value_product.html:242
 msgid "Record"
 msgstr "報工新增"
 
@@ -204,14 +205,31 @@ msgstr "機台"
 msgid "Record Date"
 msgstr "作業日期"
 
-#: .\collection\templates\collection\base.html:125
-#: .\collection\templates\collection\base.html:128
+#: .\collection\templates\collection\base.html:124
+#: .\collection\templates\collection\base.html:127
 msgid "Chart"
 msgstr "圖表"
 
-#: .\collection\templates\collection\base.html:148
+#: .\collection\templates\collection\base.html:146
 msgid "Production Data"
 msgstr "生產資料"
+
+#: .\collection\templates\collection\daily_info_create.html:43
+msgid "Line"
+msgstr "線別"
+
+#: .\collection\templates\collection\daily_info_create.html:45
+msgid "Size"
+msgstr "尺寸"
+
+#: .\collection\templates\collection\daily_info_create.html:46
+#: .\venv\Lib\site-packages\django\forms\formsets.py:417
+msgid "Delete"
+msgstr "刪除"
+
+#: .\collection\templates\collection\daily_info_create.html:54
+msgid "Are you sure?"
+msgstr "確定嗎？"
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -225,7 +243,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "變更密碼"
 
-#: .\collection\views.py:103 .\collection\views.py:198
+#: .\collection\views.py:104 .\collection\views.py:234
 msgid "Update Done"
 msgstr "更新完成"
 
@@ -1033,10 +1051,6 @@ msgstr[0] "Please submit %d or more forms."
 #: .\venv\Lib\site-packages\django\forms\formsets.py:412
 msgid "Order"
 msgstr "Order"
-
-#: .\venv\Lib\site-packages\django\forms\formsets.py:417
-msgid "Delete"
-msgstr "Delete"
 
 #: .\venv\Lib\site-packages\django\forms\models.py:763
 #, python-format

@@ -6,7 +6,8 @@ from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from collection.forms import DailyInfoForm
-from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue
+from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
+    Daily_Prod_Info_Head
 from jobs.database import mes_database
 
 
@@ -195,6 +196,41 @@ def daily_info_create(request):
                 selected_options = form.cleaned_data['remark']
                 tmp_form.remark = ','.join(selected_options)
                 tmp_form.save()
+
+            # =====================Start================================
+            a1_product = tmp_form.prod_name_a1
+            a1_size = tmp_form.prod_size_a1
+            if a1_product and a1_size:
+                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A1", product=a1_product,
+                                                           size=a1_size):
+                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A1", product=a1_product,
+                                                        size=a1_size, create_by=request.user)
+
+            a2_product = tmp_form.prod_name_a2
+            a2_size = tmp_form.prod_size_a2
+            if a2_product and a2_size:
+                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A2", product=a2_product,
+                                                           size=a2_size):
+                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A2", product=a2_product,
+                                                        size=a2_size, create_by=request.user)
+
+            b1_product = tmp_form.prod_name_b1
+            b1_size = tmp_form.prod_size_b1
+            if b1_product and b1_size:
+                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B1", product=b1_product,
+                                                           size=b1_size):
+                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B1", product=b1_product,
+                                                        size=b1_size, create_by=request.user)
+
+            b2_product = tmp_form.prod_name_b2
+            b2_size = tmp_form.prod_size_b2
+            if b2_product and b2_size:
+                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B2", product=b2_product,
+                                                           size=b2_size):
+                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B2", product=b2_product,
+                                                        size=b2_size, create_by=request.user)
+            # =====================End================================
+
         msg = _("Update Done")
 
     choices = get_production_choices(sData_date)
@@ -203,7 +239,16 @@ def daily_info_create(request):
     form.fields['prod_name_b1'].choices = choices
     form.fields['prod_name_b2'].choices = choices
 
+    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('line')
+
     return render(request, 'collection/daily_info_create.html', locals())
+
+
+def daily_info_head_delete(request, pk):
+    if request.method == 'GET':
+        head = Daily_Prod_Info_Head.objects.get(pk=pk)
+        head.delete()
+    return redirect(reverse('daily_info_create'))
 
 
 def raw_data_api(request, data_date_start, data_date_end, process_type):

@@ -116,13 +116,13 @@ class Daily_Prod_Info(models.Model):
     data_date = models.DateField()
     plant = models.ForeignKey(Plant, related_name='daily_info_plant', on_delete=models.CASCADE)
     mach = models.ForeignKey(Machine, related_name='daily_info_mach', on_delete=models.CASCADE)
-    prod_name_a1 = models.CharField(max_length=50, null=True, blank=True)
+    prod_name_a1 = models.CharField(max_length=100, null=True, blank=True)
     prod_size_a1 = models.CharField(max_length=50, null=True, blank=True)
-    prod_name_a2 = models.CharField(max_length=50, null=True, blank=True)
+    prod_name_a2 = models.CharField(max_length=100, null=True, blank=True)
     prod_size_a2 = models.CharField(max_length=50, null=True, blank=True)
-    prod_name_b1 = models.CharField(max_length=50, null=True, blank=True)
+    prod_name_b1 = models.CharField(max_length=100, null=True, blank=True)
     prod_size_b1 = models.CharField(max_length=50, null=True, blank=True)
-    prod_name_b2 = models.CharField(max_length=50, null=True, blank=True)
+    prod_name_b2 = models.CharField(max_length=100, null=True, blank=True)
     prod_size_b2 = models.CharField(max_length=50, null=True, blank=True)
     coagulant_time_hour = models.CharField(max_length=50, null=True, blank=True)
     coagulant_time_min = models.CharField(max_length=50, null=True, blank=True)
@@ -138,5 +138,15 @@ class Daily_Prod_Info(models.Model):
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='daily_info_update_at')
+
+
+class Daily_Prod_Info_Head(models.Model):
+    data_date = models.DateField()
+    line = models.CharField(max_length=50)
+    product = models.CharField(max_length=100)
+    size = models.CharField(max_length=50)
+    create_at = models.DateTimeField(default=timezone.now)
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='daily_info_head_create_at')
 
 

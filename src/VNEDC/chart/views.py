@@ -10,7 +10,10 @@ from collection.models import ParameterValue, ParameterDefine, Parameter_Type
 def get_product_choices(start_date, end_date):
     sql = f"""
         SELECT distinct ProductItem
-        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where workOrderDate between '{start_date}' and '{start_date}' order by ProductItem
+        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where 
+        workOrderDate between '{start_date}' and '{end_date}' 
+        AND SAP_FactoryDescr like '%NBR%'
+        order by ProductItem
         """
     mes_db = mes_database()
     rows = mes_db.select_sql_dict(sql)
@@ -110,6 +113,7 @@ def param_value_api(request):
 
     return JsonResponse(chart_data, safe=False)
 
+
 def param_value_product_api(request):
     chart_data = {}
     if request.method == 'POST':
@@ -129,51 +133,43 @@ def param_value_product_api(request):
                        "16": "#5dd95b", "17": "#beef44", "18": "#eeef44", "19": "#deea44", "20": "#ceeaaf"}
 
         try:
+            # Generate Y
+            times = ['00:00', '06:00', '12:00', '18:00']  # 定義每天的四個特定時間點
+            y_label = []  # 初始化空列表來存儲結果
+
+            # 迭代日期區間內的每一天
+            start_date = datetime.strptime(data_date_start, '%Y-%m-%d')
+            end_date = datetime.strptime(data_date_end, '%Y-%m-%d')
+            current_date = start_date
+            while current_date <= end_date:
+                for time in times:
+                    date_time_str = current_date.strftime('%Y-%m-%d') + ' ' + time  # 將日期和時間點結合並轉換為字符串格式
+                    y_label.append(date_time_str)
+                current_date += timedelta(days=1)  # 將日期增加一天
+
+            # 找出有幾條線
             sql = f"""
-            WITH ProdInfo AS (
-                SELECT i.data_date, v.data_time, i.mach_id, i.plant_id, d.parameter_name, d.parameter_tw, d.side, t.param_code, v.process_type, v.parameter_value, prod_name_a1 ,prod_name_a2, prod_name_b1, prod_name_b2
-                FROM [VNEDC].[dbo].[collection_daily_prod_info] i
-                JOIN [VNEDC].[dbo].[collection_parametervalue] v ON v.data_date = i.data_date AND v.mach_id = i.mach_id AND v.plant_id = i.plant_id
-                JOIN [VNEDC].[dbo].[collection_parameterdefine] d ON v.process_type = d.process_type_id AND v.mach_id = d.mach_id AND v.parameter_name = d.parameter_name
-                JOIN [VNEDC].[dbo].[collection_parameter_type] t ON d.param_type_id = t.id AND d.process_type_id = t.process_type_id
-                WHERE v.process_type = '{process_type}'
-                  AND t.param_code = '{param_code}'
-                  AND i.data_date between '{data_date_start}' and '{data_date_end}'
-            ),
-            SelectedProdInfo AS (
-                SELECT * FROM ProdInfo
-                WHERE side = 'A' AND (prod_name_a1 = '{product}' OR prod_name_a2 = '{product}')
-                UNION ALL
-                SELECT * FROM ProdInfo
-                WHERE side = 'B' AND (prod_name_b1 = '{product}' OR prod_name_b2 = '{product}')
-                UNION ALL
-                SELECT * FROM ProdInfo WHERE side = ''
-            )
-            SELECT data_date, data_time, mach_id, process_type, parameter_name, parameter_tw, side, param_code, parameter_name, parameter_value
-            FROM SelectedProdInfo;
+            WITH ProdInfoHead AS (
+                SELECT distinct head.data_date,mach_id,substring(line,1,1) side
+                  FROM [VNEDC].[dbo].[collection_daily_prod_info_head] head, [VNEDC].[dbo].[collection_daily_prod_info] info
+                  where head.data_date = info.data_date and product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
+                 )
+                
+                select v.data_date, data_time, v.mach_id, process_type, parameter_tw, d.side, param_code, v.parameter_name, parameter_value from [VNEDC].[dbo].[collection_parametervalue] v
+                join [VNEDC].[dbo].[collection_parameterdefine] d on v.process_type = d.process_type_id AND v.mach_id = d.mach_id AND v.parameter_name = d.parameter_name
+                join [VNEDC].[dbo].[collection_parameter_type] t on d.param_type_id = t.id AND d.process_type_id = t.process_type_id
+                join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND (d.side = i.side or d.side = '')
+                where process_type='{process_type}' and param_name = '{param_code}'
             """
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
-            # 使用集合去除重复的 (mach_id, side) 组合
-            chart_records = set((record['mach_id'], record['side']) for record in records)
-            # 将集合转换为列表
-            chart_records = list(chart_records)
-            # 按照第一个值排序
-            chart_records = sorted(chart_records, key=lambda x: x[0])
+            chart_records = set((record['mach_id'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = list(chart_records)  # 将集合转换为列表
+            chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
 
-            y_label = []
+            # Chart Data
             datasets = []
-
-            date_records = set((record['data_date'], record['data_time']) for record in records)
-            date_records = list(date_records)
-            date_records = sorted(date_records, key=lambda x: (x[0], x[1]))
-
-            for record in date_records:
-                y_label.append("{data_date} {data_time}:00".format(data_date=record[0], data_time=record[1]))
-            y_label = list(set(y_label))
-            y_label.sort()
-
             color_index = 1
             for chart_record in chart_records:
                 mach_id = chart_record[0]
@@ -188,7 +184,9 @@ def param_value_product_api(request):
                 for date_time in y_label:
                     date = date_time.split(' ')[0]
                     time = date_time.split(' ')[1].replace(":00", "")
-                    time_filter = [record for record in records if record['mach_id'] == mach_id and record['side'] == side and record['data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
+                    time_filter = [record for record in records if
+                                   record['mach_id'] == mach_id and record['side'] == side and record[
+                                       'data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
                     if time_filter:
                         data.append(time_filter[0]['parameter_value'])
                     else:
@@ -213,15 +211,25 @@ def param_value_product_api(request):
                     base_line_data.append(define.base_line)
                     control_low_data.append(define.control_range_low)
 
-            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999', 'borderDash': [10,2]})
-            datasets.append({'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc', 'borderDash': [10, 2]})
-            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999', 'borderDash': [10,2]})
+            datasets.append(
+                {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                 'borderDash': [10, 2]})
+            datasets.append(
+                {'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc',
+                 'borderDash': [10, 2]})
+            datasets.append(
+                {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                 'borderDash': [10, 2]})
 
-            chart_data = {"labels": y_label, "datasets": datasets, "title": product+"  "+process_type+"  "+param_code, "subtitle": product}
+            chart_data = {"labels": y_label, "datasets": datasets,
+                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product}
+
+
         except Exception as e:
             print(e)
 
     return JsonResponse(chart_data, safe=False)
+
 
 def get_param_define_api(request):
     html = ""
