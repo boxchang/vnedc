@@ -147,7 +147,7 @@ function validate(evt) {
             </a>
             {% endif %}
             {% for process in processes %}
-            <a href="{% url 'record' process.process_code %}" class="btn btn-info" style="width:180px;margin-top: 5px">
+            <a href="{% url 'record' process.process_code %}" class="btn {% if process.process_code == process_code %}btn-dark{% else %}btn-info{% endif %}" style="width:180px;margin-top: 5px">
                 {% if lang == "zh-hant" %}
                     {{ process.process_tw }}
                 {% elif lang == "vi" %}
