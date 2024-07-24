@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 10:48+0700\n"
+"POT-Creation-Date: 2024-07-24 11:44+0700\n"
 "PO-Revision-Date: 2024-07-24 10:56+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr "描述"
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:61
+#: .\collection\templates\collection\daily_info_create.html:77
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -104,7 +104,7 @@ msgid "Submit"
 msgstr "確定"
 
 #: .\chart\forms.py:83
-#: .\collection\templates\collection\daily_info_create.html:44
+#: .\collection\templates\collection\daily_info_create.html:58
 msgid "Product"
 msgstr "產品"
 
@@ -214,20 +214,24 @@ msgstr "圖表"
 msgid "Production Data"
 msgstr "生產資料"
 
-#: .\collection\templates\collection\daily_info_create.html:43
+#: .\collection\templates\collection\daily_info_create.html:57
 msgid "Line"
 msgstr "線別"
 
-#: .\collection\templates\collection\daily_info_create.html:45
+#: .\collection\templates\collection\daily_info_create.html:59
 msgid "Size"
 msgstr "尺寸"
 
-#: .\collection\templates\collection\daily_info_create.html:46
+#: .\collection\templates\collection\daily_info_create.html:60
+msgid "create_at"
+msgstr "建立時間"
+
+#: .\collection\templates\collection\daily_info_create.html:61
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
 msgid "Delete"
 msgstr "刪除"
 
-#: .\collection\templates\collection\daily_info_create.html:54
+#: .\collection\templates\collection\daily_info_create.html:70
 msgid "Are you sure?"
 msgstr "確定嗎？"
 
@@ -1566,8 +1570,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a "
-"rel=\"noreferrer\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 #: .\venv\Lib\site-packages\django\views\csrf.py:132
@@ -1696,9 +1700,9 @@ msgstr ""
 #| "work!"
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
-"configured any URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
 msgstr ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
@@ -1926,9 +1930,6 @@ msgstr ""
 
 #~ msgid "create_by"
 #~ msgstr "建立者"
-
-#~ msgid "create_at"
-#~ msgstr "建立時間"
 
 #~ msgid "update_at"
 #~ msgstr "最後回覆時間"

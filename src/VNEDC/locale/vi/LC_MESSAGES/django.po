@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 10:48+0700\n"
-"PO-Revision-Date: 2024-07-24 10:54+0700\n"
+"POT-Creation-Date: 2024-07-24 11:44+0700\n"
+"PO-Revision-Date: 2024-07-24 11:45+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:61
+#: .\collection\templates\collection\daily_info_create.html:77
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -104,7 +104,7 @@ msgid "Submit"
 msgstr ""
 
 #: .\chart\forms.py:83
-#: .\collection\templates\collection\daily_info_create.html:44
+#: .\collection\templates\collection\daily_info_create.html:58
 msgid "Product"
 msgstr "Sản xuất"
 
@@ -214,20 +214,24 @@ msgstr "Đồ thị"
 msgid "Production Data"
 msgstr "Dữ liệu sản xuất"
 
-#: .\collection\templates\collection\daily_info_create.html:43
+#: .\collection\templates\collection\daily_info_create.html:57
 msgid "Line"
 msgstr "Đường kẻ"
 
-#: .\collection\templates\collection\daily_info_create.html:45
+#: .\collection\templates\collection\daily_info_create.html:59
 msgid "Size"
 msgstr "Kích cỡ"
 
-#: .\collection\templates\collection\daily_info_create.html:46
+#: .\collection\templates\collection\daily_info_create.html:60
+msgid "create_at"
+msgstr "Ngày thành lập"
+
+#: .\collection\templates\collection\daily_info_create.html:61
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
 msgid "Delete"
 msgstr "Xóa bỏ"
 
-#: .\collection\templates\collection\daily_info_create.html:54
+#: .\collection\templates\collection\daily_info_create.html:70
 msgid "Are you sure?"
 msgstr "Bạn có chắc không?"
 

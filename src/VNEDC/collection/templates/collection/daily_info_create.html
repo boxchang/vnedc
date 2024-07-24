@@ -57,6 +57,7 @@ Daily Production Information
                     <th style="text-align: center">{% trans "Line" %}</th>
                     <th>{% trans "Product" %}</th>
                     <th style="text-align: center">{% trans "Size" %}</th>
+                    <th style="text-align: center">{% trans "create_at" %}</th>
                     <th style="text-align: center">{% trans "Delete" %}</th>
                 </tr>
                 {% for info in daily_prod_info_heads %}
@@ -64,6 +65,7 @@ Daily Production Information
                     <td style="text-align: center">{{ info.line }}</td>
                     <td>{{ info.product }}</td>
                     <td style="text-align: center">{{ info.size }}</td>
+                    <td style="text-align: center">{{ info.create_at|date:"d/m/Y H:i" }}</td>
                     <td style="text-align: center">
                         <a href="{% url 'daily_info_head_delete' info.pk %}" role="button" onclick="return confirm('{% trans "Are you sure?" %}')"><i class="fas fa-times"></i></a>
                     </td>
