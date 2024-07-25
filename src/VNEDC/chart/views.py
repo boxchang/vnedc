@@ -107,7 +107,11 @@ def param_value_api(request):
             datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
             datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
 
-            title = process_type + "__" + param_define
+            if define.scada_column:
+                title = process_type + "__" + param_define + "(" + define.scada_column + ")"
+            else:
+                title = process_type + "__" + param_define
+
             chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low}
         except Exception as e:
             print(e)
