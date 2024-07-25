@@ -140,7 +140,7 @@ function validate(evt) {
            {% endblock content %}
         </div>
         <div class="col-1">
-        {% if info %}
+        {% if daily_prod_info_heads %}
             {% if request.session.plant %}
             <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:180px;">
                 {% trans 'Production Data' %}

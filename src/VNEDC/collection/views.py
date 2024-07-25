@@ -119,6 +119,8 @@ def record(request, process_code):
                         value = item.parameter_value
                         setattr(define, "T"+time, value)
 
+    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('line')
+
     return render(request, 'collection/record.html', locals())
 
 
