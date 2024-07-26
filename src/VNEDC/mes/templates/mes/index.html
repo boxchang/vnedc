@@ -158,7 +158,14 @@
                             data: data,
                             rowClick: function(args) {
                                 const item = args.item;
-                                loadLogGrid(item.id, item.OptionName);
+                                var event = args.event;
+
+                                var $td = $(event.target).closest("td");
+                                var columnIndex = $td.index();
+                                var columnName = this.fields[columnIndex].name;
+                                if (columnName === "InspectionStatus") {
+                                    loadLogGrid(item.id, item.OptionName);
+                                }
                             },
                             fields: [
                                 { name: "id", type: "text", width: 50, title: "RunCard", css: "center-align" },
@@ -193,8 +200,15 @@
                             paging: true,
                             data: data,
                             rowClick: function(args) {
-                                const item = args.item;
-                                loadDetailGrid(item.id);
+                                var item = args.item;
+                                var event = args.event;
+
+                                var $td = $(event.target).closest("td");
+                                var columnIndex = $td.index();
+                                var columnName = this.fields[columnIndex].name;
+                                if (columnName === "CreationTime") {
+                                    loadDetailGrid(item.id);
+                                }
                             },
                             fields: [
                                 { name: "RunCardId", type: "text", width: 150, title: "RunCardId" },
