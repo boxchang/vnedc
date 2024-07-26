@@ -110,7 +110,7 @@ def record(request, process_code):
         defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
         for define in defines:
             values = ParameterValue.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date,
-                                                   process_type=process_type.process_code, parameter_name=define.parameter_name)
+                                                   process_type=process_type.process_code, parameter_name=define.parameter_name).order_by('-create_at')
 
             if values:
                 for time in data_times:
