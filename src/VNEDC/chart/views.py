@@ -254,7 +254,7 @@ def get_param_define_api(request):
                 elif lang == 'zh-hant':
                     name = record.parameter_tw
                 elif lang == 'vi':
-                    name = record.parameter_vi
+                    name = record.parameter_vn
                 else:
                     name = record.parameter_name
                 html += """<option value="{value}">{name}</option>""".format(value=record.parameter_name, name=name)
