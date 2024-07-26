@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-24 11:44+0700\n"
-"PO-Revision-Date: 2024-07-24 11:45+0700\n"
+"PO-Revision-Date: 2024-07-26 08:39+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -171,27 +171,27 @@ msgstr "Nhận xét"
 
 #: .\collection\forms.py:58
 msgid "Change Coagulant Time(Hour)"
-msgstr "Thay đổi thời gian đông tụ (Giờ)"
+msgstr "Thời gian thay đổi coagulant  (Số Giờ)"
 
 #: .\collection\forms.py:59
 msgid "Change Coagulant Time(Minute)"
-msgstr "Thay đổi thời gian đông tụ (Phút)"
+msgstr "Thời gian thay đổi coagulant  (Phút)"
 
 #: .\collection\forms.py:60
 msgid "Change Latex Time(Hour)"
-msgstr "Thay đổi thời gian mủ cao su (giờ)"
+msgstr "Thời gian thay đổi  Cao Su  (Số Giờ)"
 
 #: .\collection\forms.py:61
 msgid "Change Latex Time(Minute)"
-msgstr "Thay đổi thời gian mủ cao su (Phút)"
+msgstr "Thời gian thay đổi  Cao Su  (Phút)"
 
 #: .\collection\forms.py:62
 msgid "Change Tooling Time(Hour)"
-msgstr "Thay đổi thời dụng cụ (giờ)"
+msgstr "Thời gian thay đổi  khuôn tay  (Số Giờ)"
 
 #: .\collection\forms.py:63
 msgid "Change Tooling Time(Minute)"
-msgstr "Thay đổi thời dụng cụ (Phút)"
+msgstr "Thời gian thay đổi  khuôn tay  (Phút)"
 
 #: .\collection\forms.py:64 .\collection\templates\collection\base.html:90
 msgid "Plant"
