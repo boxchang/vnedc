@@ -98,9 +98,7 @@ def record(request, process_code):
                                                                     data_date=sData_date,
                                                                     process_type=process_type.process_code,
                                                                     data_time=time, parameter_name=define.parameter_name,
-                                                                    create_by=request.user,
-                                                                    update_by=request.user,
-                                                                    defaults={'parameter_value': value})
+                                                                    defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
                             msg = _("Update Done")
                     except Exception as e:
                         print(e)
