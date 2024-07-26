@@ -42,7 +42,7 @@ class vnedc_database:
 
         return None
 
-class sgada_database:
+class scada_database:
     def select_sql(self, sql):
         self.conn = self.create_sgada_connection()
         self.cur = self.conn.cursor()

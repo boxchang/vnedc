@@ -5,7 +5,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from datetime import datetime, timedelta
-from jobs.database import sgada_database, tgm_database, mes_database, tgm_gdnbr_database, tgm_gdpvc_database
+from jobs.database import scada_database, tgm_database, mes_database, tgm_gdnbr_database, tgm_gdpvc_database
 
 
 class MES2TGM(object):

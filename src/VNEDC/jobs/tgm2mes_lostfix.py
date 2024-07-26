@@ -6,7 +6,7 @@ sys.path.append(rootPath)
 
 import socket
 from datetime import datetime, timedelta
-from jobs.database import sgada_database, tgm_database
+from jobs.database import scada_database, tgm_database
 
 
 class TGM2MES(object):
@@ -34,13 +34,7 @@ class TGM2MES(object):
     def get_measure_files(self):
         db = tgm_database()
         sql = """select * from MEASURE_FILE where file_name in 
-                           ('GN2471204S',
-                            'GN2471204O',
-                            'GN24712034',
-                            'GN247110Q6',
-                            'GN247110S8',
-                            'GN2471200A',
-                            'GN2471204I')"""
+                           ('GP2471306T')"""
         records = db.select_sql_dict(sql)
         return records
 
@@ -97,7 +91,7 @@ class TGM2MES(object):
         local_ip = socket.gethostbyname(hostname)
 
 
-        db = sgada_database()
+        db = scada_database()
         conn = db.create_sgada_connection()
         cursor = conn.cursor()
         procedure_name = '[dbo].[SP_AddTnicknessData]'

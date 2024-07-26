@@ -6,7 +6,7 @@ sys.path.append(rootPath)
 
 import socket
 from datetime import datetime, timedelta
-from jobs.database import sgada_database, tgm_database, tgm_gdnbr_database, tgm_gdpvc_database
+from jobs.database import scada_database, tgm_database, tgm_gdnbr_database, tgm_gdpvc_database
 
 
 class TGM2MES(object):
@@ -90,7 +90,7 @@ class TGM2MES(object):
         local_ip = socket.gethostbyname(hostname)
 
 
-        db = sgada_database()
+        db = scada_database()
         conn = db.create_sgada_connection()
         cursor = conn.cursor()
         procedure_name = '[dbo].[SP_AddTnicknessData]'

@@ -1,4 +1,4 @@
-from jobs.database import vnedc_database, sgada_database
+from jobs.database import vnedc_database, scada_database
 import datetime
 
 class SgadaInterface:
@@ -369,7 +369,7 @@ class GDNBR:
 
 
     def convert_data(self, data_date, plant, line):
-        db = sgada_database()
+        db = scada_database()
         times = ["00", "06", "12", "18"]
         table = line["table"]
         columns = []

@@ -22,7 +22,7 @@ class database:
             return data
 
 
-class sgada_database:
+class scada_database:
     def select_sql(self, sql):
         with connections['SGADA'].cursor() as cur:
             cur.execute(sql)

@@ -1,4 +1,4 @@
-from jobs.database import vnedc_database, sgada_database
+from jobs.database import vnedc_database, scada_database
 from datetime import datetime, timedelta
 
 
@@ -26,7 +26,7 @@ class SGADA2EDC(object):
 
 
     def convert_data(self, data_date, defines):
-        db = sgada_database()
+        db = scada_database()
         if self.debug:
             times = ["00", "06", "12", "18"]
         else:
@@ -90,7 +90,7 @@ class SGADA2EDC(object):
         db.execute_sql(sql)
 
 
-debug = False
+debug = True
 start_date = datetime.today().strftime('%Y-%m-%d')
 end_date = datetime.today().strftime('%Y-%m-%d')
 # start_date = "2024-07-01"
