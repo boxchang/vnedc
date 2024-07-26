@@ -95,10 +95,10 @@ class SGADA2EDC(object):
         db.execute_sql(sql)
 
 
-debug = True
+debug = False
 start_date = datetime.today().strftime('%Y-%m-%d')
 end_date = datetime.today().strftime('%Y-%m-%d')
-# start_date = "2024-07-01"
-# end_date = "2024-07-17"
+# start_date = "2024-07-25"
+# end_date = "2024-07-26"
 sgada = SGADA2EDC(start_date, end_date, debug)
 sgada.execute()
