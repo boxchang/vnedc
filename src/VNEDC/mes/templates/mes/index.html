@@ -85,8 +85,15 @@
 
                 deleteConfirm: "Do you really want to delete the client?",
                 rowClick: function(args) {
-                    const item = args.item;
-                    loadDetailGrid(item.Id);
+                    var item = args.item;
+                    var event = args.event;
+
+                    var $td = $(event.target).closest("td");
+                    var columnIndex = $td.index();
+                    var columnName = this.fields[columnIndex].name;
+                    if (columnName === "CreationTime") {
+                        loadDetailGrid(item.Id);
+                    }
                 },
                 controller: {
                     loadData: function(filter) {
@@ -115,7 +122,6 @@
                         });
                     }
                 },
-
 
                 fields: [
                     { name: "InspectionDate", type: "text", width: 50, title: "InspectionDate", autosearch: true, css: "center-align" },
