@@ -54,7 +54,7 @@ class DailyInfoForm(forms.ModelForm):
     prod_name_b2 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('B2 Production'), widget=forms.Select(attrs={'class': 'select2'}))
     prod_size_b2 = forms.ChoiceField(required=False, label=_('B2 Size'), choices=SIZE_OPTION)
     remark = forms.MultipleChoiceField(required=False, label=_('Remark'), widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
-    remark2 = forms.CharField(required=False, label='', widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}), max_length=500)
+    remark2 = forms.CharField(required=False, label='', widget=forms.Textarea(attrs={'rows': 4, 'cols': 40}), max_length=500)
     coagulant_time_hour = forms.ChoiceField(required=False, label=_('Change Coagulant Time(Hour)'), choices=hour)
     coagulant_time_min = forms.ChoiceField(required=False, label=_('Change Coagulant Time(Minute)'), choices=min)
     latex_time_hour = forms.ChoiceField(required=False, label=_('Change Latex Time(Hour)'), choices=hour)
