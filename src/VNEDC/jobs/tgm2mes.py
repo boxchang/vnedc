@@ -146,7 +146,7 @@ class TGM2MES(object):
     def clean_data(self):
         sql = """
             SELECT file_name
-            FROM [TGM_GDPVC].[dbo].[MEASURE_FILE] 
+            FROM [MEASURE_FILE] 
             where FILE_BULID_DAY < getdate()-1 and file_name not in ('XX')
         """
         records = self.tgmdb.select_sql_dict(sql)
@@ -164,15 +164,15 @@ class TGM2MES(object):
         sql = "delete from measure_file where file_name = '{file_name}'".format(file_name=file_name)
         self.tgmdb.execute_sql(sql)
 
-    def delete_measure_item(self, db, file_name):
+    def delete_measure_item(self, file_name):
         sql = "delete from measure_item where file_name='{file_name}'".format(file_name=file_name)
         self.tgmdb.execute_sql(sql)
 
-    def delete_file_info(self, db, file_name):
+    def delete_file_info(self, file_name):
         sql = "delete from file_info where file_info_val = '{file_name}'".format(file_name=file_name)
         self.tgmdb.execute_sql(sql)
 
-    def delete_measure_data(self, db, file_name):
+    def delete_measure_data(self, file_name):
         sql = """
             delete FROM [TGM].[dbo].[MEASURE_DATA] 
             where DATA_DATETIME < getdate()-90 and LOT_NUMBER = '{LOT_NUMBER}'
