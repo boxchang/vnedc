@@ -145,10 +145,9 @@ class TGM2MES(object):
     # Runcard主檔的資料超過一天就刪除，假定Runcard產生出來一天內會做完
     def clean_data(self):
         sql = """
-            SELECT file_name, count(*) number
-            FROM [MEASURE_FILE] a, [TGM].[dbo].[MEASURE_DATA] b 
-            where a.FILE_NAME = b.LOT_NUMBER and data_datetime < getdate()-1
-            group by FILE_NAME having count(*) > 4
+            SELECT file_name
+            FROM [TGM_GDPVC].[dbo].[MEASURE_FILE] 
+            where FILE_BULID_DAY < getdate()-1 and file_name not in ('XX')
         """
         records = self.tgmdb.select_sql_dict(sql)
 
