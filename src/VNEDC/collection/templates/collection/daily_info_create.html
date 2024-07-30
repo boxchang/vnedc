@@ -55,6 +55,7 @@ Daily Production Information
             {% crispy form %}
             <table border="1" class='table table-bordered table-striped'>
                 <tr>
+                    <th style="text-align: center">{% trans "Machine" %}</th>
                     <th style="text-align: center">{% trans "Line" %}</th>
                     <th>{% trans "Product" %}</th>
                     <th style="text-align: center">{% trans "Size" %}</th>
@@ -63,6 +64,7 @@ Daily Production Information
                 </tr>
                 {% for info in daily_prod_info_heads %}
                 <tr>
+                    <td style="text-align: center">{{ info.mach_id }}</td>
                     <td style="text-align: center">{{ info.line }}</td>
                     <td>{{ info.product }}</td>
                     <td style="text-align: center">{{ info.size }}</td>
