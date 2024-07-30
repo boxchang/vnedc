@@ -148,6 +148,9 @@ def daily_info_create(request):
     else:
         machs = None
 
+    plant = Plant.objects.get(plant_code=sPlant)
+    mach = Machine.objects.get(mach_code=sMach)
+
     processes = Process_Type.objects.all().order_by('show_order')
 
     if not sPlant or not sMach or not sData_date:
@@ -170,8 +173,8 @@ def daily_info_create(request):
 
             if form.is_valid():
                 tmp_form = form.save(commit=False)
-                tmp_form.plant = Plant.objects.get(plant_code=sPlant)
-                tmp_form.mach = Machine.objects.get(mach_code=sMach)
+                tmp_form.plant = plant
+                tmp_form.mach = mach
                 tmp_form.data_date = sData_date
                 tmp_form.create_by = request.user
                 tmp_form.update_by = request.user
@@ -202,33 +205,33 @@ def daily_info_create(request):
             a1_size = tmp_form.prod_size_a1
             if a1_product and a1_size:
                 if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A1", product=a1_product,
-                                                           size=a1_size):
+                                                           size=a1_size, mach=mach, plant=plant):
                     Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A1", product=a1_product,
-                                                        size=a1_size, create_by=request.user)
+                                                        size=a1_size, create_by=request.user, mach=mach, plant=plant)
 
             a2_product = tmp_form.prod_name_a2
             a2_size = tmp_form.prod_size_a2
             if a2_product and a2_size:
                 if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A2", product=a2_product,
-                                                           size=a2_size):
+                                                           size=a2_size, mach=mach, plant=plant):
                     Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A2", product=a2_product,
-                                                        size=a2_size, create_by=request.user)
+                                                        size=a2_size, create_by=request.user, mach=mach, plant=plant)
 
             b1_product = tmp_form.prod_name_b1
             b1_size = tmp_form.prod_size_b1
             if b1_product and b1_size:
                 if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B1", product=b1_product,
-                                                           size=b1_size):
+                                                           size=b1_size, mach=mach, plant=plant):
                     Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B1", product=b1_product,
-                                                        size=b1_size, create_by=request.user)
+                                                        size=b1_size, create_by=request.user, mach=mach, plant=plant)
 
             b2_product = tmp_form.prod_name_b2
             b2_size = tmp_form.prod_size_b2
             if b2_product and b2_size:
                 if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B2", product=b2_product,
-                                                           size=b2_size):
+                                                           size=b2_size, mach=mach, plant=plant):
                     Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B2", product=b2_product,
-                                                        size=b2_size, create_by=request.user)
+                                                        size=b2_size, create_by=request.user, mach=mach, plant=plant)
             # =====================End================================
 
         msg = _("Update Done")
@@ -239,7 +242,7 @@ def daily_info_create(request):
     form.fields['prod_name_b1'].choices = choices
     form.fields['prod_name_b2'].choices = choices
 
-    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('line')
+    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=mach, plant=plant).order_by('line')
 
     return render(request, 'collection/daily_info_create.html', locals())
 

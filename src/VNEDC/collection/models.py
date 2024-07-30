@@ -144,6 +144,8 @@ class Daily_Prod_Info(models.Model):
 
 class Daily_Prod_Info_Head(models.Model):
     data_date = models.DateField()
+    plant = models.ForeignKey(Plant, related_name='daily_info_head_plant', on_delete=models.CASCADE, null=True, blank=True)
+    mach = models.ForeignKey(Machine, related_name='daily_info_head_mach', on_delete=models.CASCADE, null=True, blank=True)
     line = models.CharField(max_length=50)
     product = models.CharField(max_length=100)
     size = models.CharField(max_length=50)
