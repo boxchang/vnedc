@@ -142,12 +142,12 @@ class TGM2MES(object):
         with open(self.last_time_file, 'w') as file:
             file.write(current_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Runcard主檔的資料超過一天就刪除，假定Runcard產生出來一天內會做完
+    # Runcard主檔的資料超過二天就刪除，假定Runcard產生出來一天內會做完
     def clean_data(self):
         sql = """
             SELECT file_name
             FROM [MEASURE_FILE] 
-            where FILE_BULID_DAY < getdate()-1 and file_name not in ('XX')
+            where FILE_BULID_DAY < getdate()-3 and file_name not in ('XX')
         """
         records = self.tgmdb.select_sql_dict(sql)
 
