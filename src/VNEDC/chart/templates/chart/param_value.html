@@ -13,8 +13,8 @@ Index
 {% endblock %}
 
 {% block base_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="{% static "chart.js/js/chart.min.js" %}"></script>
+<script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
 <script>
 // Register the plugin to all charts:
 //Chart.register(ChartDataLabels);
