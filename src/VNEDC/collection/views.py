@@ -15,6 +15,14 @@ from jobs.database import mes_database
 def index(request):
     plants = Plant.objects.all()
     machs = Machine.objects.none()
+    if request.method == 'POST':
+        sData_date = request.POST.get('data_date')
+    else:
+        sData_date = datetime.today()
+        sData_date = sData_date.strftime("%Y-%m-%d")
+
+    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('mach_id', 'line')
+
     return render(request, 'collection/index.html', locals())
 
 
