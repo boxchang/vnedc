@@ -43,12 +43,12 @@
 
         $('#id_prod_size_a1').on('change', function() {
             var value = $(this).val();
-            if ($('#id_prod_size_a2').val() === '') {
-                $('#id_prod_size_a2').val(value).trigger('change');
+            if ($('#id_prod_size_b1').val() === '') {
+                $('#id_prod_size_b1').val(value).trigger('change');
             }
         });
 
-        $('#id_prod_size_b1').on('change', function() {
+        $('#id_prod_size_a2').on('change', function() {
             var value = $(this).val();
             if ($('#id_prod_size_b2').val() === '') {
                 $('#id_prod_size_b2').val(value).trigger('change');
