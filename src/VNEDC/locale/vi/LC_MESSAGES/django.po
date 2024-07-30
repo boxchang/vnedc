@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-24 11:44+0700\n"
-"PO-Revision-Date: 2024-07-26 08:39+0700\n"
+"PO-Revision-Date: 2024-07-30 10:45+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi_VN\n"
@@ -249,7 +249,7 @@ msgstr "Đổi mật khẩu"
 
 #: .\collection\views.py:104 .\collection\views.py:234
 msgid "Update Done"
-msgstr ""
+msgstr "hoàn thành cập nhật"
 
 #: .\users\admin.py:29
 msgid "Personal info"

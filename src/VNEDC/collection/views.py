@@ -200,39 +200,39 @@ def daily_info_create(request):
                 tmp_form.remark = ','.join(selected_options)
                 tmp_form.save()
 
-            # =====================Start================================
-            a1_product = tmp_form.prod_name_a1
-            a1_size = tmp_form.prod_size_a1
-            if a1_product and a1_size:
-                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A1", product=a1_product,
-                                                           size=a1_size, mach=mach, plant=plant):
-                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A1", product=a1_product,
-                                                        size=a1_size, create_by=request.user, mach=mach, plant=plant)
+        # =====================Start================================
+        a1_product = tmp_form.prod_name_a1
+        a1_size = tmp_form.prod_size_a1
+        if a1_product and a1_size:
+            if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A1", product=a1_product,
+                                                       size=a1_size, mach=mach, plant=plant):
+                Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A1", product=a1_product,
+                                                    size=a1_size, create_by=request.user, mach=mach, plant=plant)
 
-            a2_product = tmp_form.prod_name_a2
-            a2_size = tmp_form.prod_size_a2
-            if a2_product and a2_size:
-                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A2", product=a2_product,
-                                                           size=a2_size, mach=mach, plant=plant):
-                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A2", product=a2_product,
-                                                        size=a2_size, create_by=request.user, mach=mach, plant=plant)
+        a2_product = tmp_form.prod_name_a2
+        a2_size = tmp_form.prod_size_a2
+        if a2_product and a2_size:
+            if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="A2", product=a2_product,
+                                                       size=a2_size, mach=mach, plant=plant):
+                Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="A2", product=a2_product,
+                                                    size=a2_size, create_by=request.user, mach=mach, plant=plant)
 
-            b1_product = tmp_form.prod_name_b1
-            b1_size = tmp_form.prod_size_b1
-            if b1_product and b1_size:
-                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B1", product=b1_product,
-                                                           size=b1_size, mach=mach, plant=plant):
-                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B1", product=b1_product,
-                                                        size=b1_size, create_by=request.user, mach=mach, plant=plant)
+        b1_product = tmp_form.prod_name_b1
+        b1_size = tmp_form.prod_size_b1
+        if b1_product and b1_size:
+            if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B1", product=b1_product,
+                                                       size=b1_size, mach=mach, plant=plant):
+                Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B1", product=b1_product,
+                                                    size=b1_size, create_by=request.user, mach=mach, plant=plant)
 
-            b2_product = tmp_form.prod_name_b2
-            b2_size = tmp_form.prod_size_b2
-            if b2_product and b2_size:
-                if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B2", product=b2_product,
-                                                           size=b2_size, mach=mach, plant=plant):
-                    Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B2", product=b2_product,
-                                                        size=b2_size, create_by=request.user, mach=mach, plant=plant)
-            # =====================End================================
+        b2_product = tmp_form.prod_name_b2
+        b2_size = tmp_form.prod_size_b2
+        if b2_product and b2_size:
+            if not Daily_Prod_Info_Head.objects.filter(data_date=sData_date, line="B2", product=b2_product,
+                                                       size=b2_size, mach=mach, plant=plant):
+                Daily_Prod_Info_Head.objects.create(data_date=sData_date, line="B2", product=b2_product,
+                                                    size=b2_size, create_by=request.user, mach=mach, plant=plant)
+        # =====================End================================
 
         msg = _("Update Done")
 
