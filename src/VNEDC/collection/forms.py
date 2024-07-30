@@ -41,7 +41,7 @@ class RecordForm(forms.Form):
 
 
 class DailyInfoForm(forms.ModelForm):
-    CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')),]
+    CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')), (_('Machine Shutdown'), _('Machine Shutdown')),]
     SIZE_OPTION = [('', '---'), ('XXS', 'XXS'), ('XS', 'XS'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('XL', 'XL'), ('XXL', 'XXL'),]
     hour = [(str(hh).zfill(2), str(hh).zfill(2)) for hh in range(0, 24)]
     min = [(str(mm).zfill(2), str(mm).zfill(2)) for mm in range(0, 60)]

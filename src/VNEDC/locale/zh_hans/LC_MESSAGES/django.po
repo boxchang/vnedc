@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 11:44+0700\n"
-"PO-Revision-Date: 2024-07-24 11:46+0700\n"
+"POT-Creation-Date: 2024-07-30 16:41+0700\n"
+"PO-Revision-Date: 2024-07-30 16:46+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -34,7 +34,7 @@ msgid "desc"
 msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:77
+#: .\collection\templates\collection\daily_info_create.html:80
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -67,11 +67,11 @@ msgstr "登出"
 msgid "Update Status"
 msgstr "更新状态"
 
-#: .\chart\forms.py:13 .\chart\forms.py:81
+#: .\chart\forms.py:13 .\chart\forms.py:84
 msgid "Start Date"
 msgstr "开始日期"
 
-#: .\chart\forms.py:14 .\chart\forms.py:82
+#: .\chart\forms.py:14 .\chart\forms.py:85
 msgid "End Date"
 msgstr "结束日期"
 
@@ -83,7 +83,7 @@ msgstr "工厂"
 msgid "mach_name"
 msgstr "机台"
 
-#: .\chart\forms.py:17 .\chart\forms.py:84
+#: .\chart\forms.py:17 .\chart\forms.py:87
 msgid "process_type"
 msgstr "制程类型"
 
@@ -99,21 +99,22 @@ msgstr "控制上限"
 msgid "control_low"
 msgstr "控制下限"
 
-#: .\chart\forms.py:73 .\chart\forms.py:128
+#: .\chart\forms.py:76 .\chart\forms.py:131
 #: .\users\templates\users\login.html:193
 msgid "Submit"
 msgstr ""
 
-#: .\chart\forms.py:83
-#: .\collection\templates\collection\daily_info_create.html:58
+#: .\chart\forms.py:86
+#: .\collection\templates\collection\daily_info_create.html:60
+#: .\collection\templates\collection\index.html:22
 msgid "Product"
 msgstr "产品"
 
-#: .\chart\forms.py:85
+#: .\chart\forms.py:88
 msgid "param_code"
 msgstr "参数类型"
 
-#: .\chart\templates\chart\param_value.html:231
+#: .\chart\templates\chart\param_value.html:224
 #: .\chart\templates\chart\param_value_product.html:242
 msgid "Record"
 msgstr "报工新增"
@@ -133,6 +134,10 @@ msgstr "无二次料"
 #: .\collection\forms.py:44
 msgid "Alkaline Tank pH Test"
 msgstr "碱槽测pH值"
+
+#: .\collection\forms.py:44
+msgid "Machine Shutdown"
+msgstr "停机"
 
 #: .\collection\forms.py:48
 msgid "A1 Production"
@@ -199,6 +204,8 @@ msgid "Plant"
 msgstr "厂别"
 
 #: .\collection\templates\collection\base.html:105
+#: .\collection\templates\collection\daily_info_create.html:58
+#: .\collection\templates\collection\index.html:20
 msgid "Machine"
 msgstr "机台"
 
@@ -215,24 +222,27 @@ msgstr "圖表"
 msgid "Production Data"
 msgstr "生产资料"
 
-#: .\collection\templates\collection\daily_info_create.html:57
+#: .\collection\templates\collection\daily_info_create.html:59
+#: .\collection\templates\collection\index.html:21
 msgid "Line"
 msgstr "线别"
 
-#: .\collection\templates\collection\daily_info_create.html:59
+#: .\collection\templates\collection\daily_info_create.html:61
+#: .\collection\templates\collection\index.html:23
 msgid "Size"
 msgstr "尺寸"
 
-#: .\collection\templates\collection\daily_info_create.html:60
+#: .\collection\templates\collection\daily_info_create.html:62
+#: .\collection\templates\collection\index.html:24
 msgid "create_at"
 msgstr "建立时间"
 
-#: .\collection\templates\collection\daily_info_create.html:61
+#: .\collection\templates\collection\daily_info_create.html:63
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
 msgid "Delete"
 msgstr "删除"
 
-#: .\collection\templates\collection\daily_info_create.html:70
+#: .\collection\templates\collection\daily_info_create.html:73
 msgid "Are you sure?"
 msgstr "确定吗？"
 
@@ -248,7 +258,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "变更密码"
 
-#: .\collection\views.py:104 .\collection\views.py:234
+#: .\collection\views.py:110 .\collection\views.py:245
 msgid "Update Done"
 msgstr "更新完成"
 
