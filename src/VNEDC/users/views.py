@@ -204,8 +204,8 @@ def user_info(request):
             user.save()
             messages.info(request, '修改成功!')
 
-            if request.user.default_homepage:
-                return redirect(reverse(request.user.default_homepage.url_name))
+            if user.default_homepage:
+                return redirect(reverse(user.default_homepage.url_name))
             else:
                 return redirect('index')
     else:
