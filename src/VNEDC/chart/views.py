@@ -155,7 +155,7 @@ def param_value_product_api(request):
             # 找出有幾條線
             sql = f"""
             WITH ProdInfoHead AS (
-                SELECT distinct head.data_date,mach_id,substring(line,1,1) side
+                SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
                   FROM [VNEDC].[dbo].[collection_daily_prod_info_head] head, [VNEDC].[dbo].[collection_daily_prod_info] info
                   where head.data_date = info.data_date and product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
                  )
