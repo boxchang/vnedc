@@ -27,6 +27,7 @@
             allowClear: true
         });
 
+        {% if mach.mold_type == "DOUBLE" %}
         $('#id_prod_name_a1').on('change', function() {
             var value = $(this).val();
             if ($('#id_prod_name_a2').val() === '') {
@@ -40,6 +41,7 @@
                 $('#id_prod_name_b2').val(value).trigger('change');
             }
         });
+        {% endif %}
 
         $('#id_prod_size_a1').on('change', function() {
             var value = $(this).val();
@@ -54,6 +56,14 @@
                 $('#id_prod_size_b2').val(value).trigger('change');
             }
         });
+
+        {% if mach.mold_type == "SINGLE" %}
+        $('#id_prod_name_a2').prop('disabled', true);
+        $('#id_prod_name_b2').prop('disabled', true);
+        $('#id_prod_size_a2').prop('disabled', true);
+        $('#id_prod_size_b2').prop('disabled', true);
+        {% endif %}
+
     });
 </script>
 {% endblock js %}

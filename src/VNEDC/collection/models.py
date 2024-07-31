@@ -18,6 +18,7 @@ class Machine(models.Model):
     plant = models.ForeignKey(Plant, related_name='mach_plant', on_delete=models.CASCADE)
     mach_code = models.CharField(max_length=50, primary_key=True)
     mach_name = models.CharField(max_length=50)
+    mold_type = models.CharField(max_length=50, null=True, blank=True)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='mach_update_at')
