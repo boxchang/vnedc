@@ -83,6 +83,7 @@ def param_value_api(request):
 
             # 取上下限值
             control_high_data = []
+            base_line_data = []
             control_low_data = []
             define = None
             if control_high == "" and control_low == "":
@@ -90,6 +91,7 @@ def param_value_api(request):
                 if define:
                     for date_time in y_label:
                         control_high_data.append(define.control_range_high)
+                        base_line_data.append(define.base_line)
                         control_low_data.append(define.control_range_low)
                     form_control_range_high = define.control_range_high if define.control_range_high else ''
                     form_control_range_low = define.control_range_low if define.control_range_low else ''
@@ -105,6 +107,9 @@ def param_value_api(request):
                 form_control_range_low = control_low
 
             datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append(
+                {'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc',
+                 'borderDash': [10, 2]})
             datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
 
             if define.scada_column:
