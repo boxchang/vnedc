@@ -117,7 +117,9 @@ def param_value_api(request):
             else:
                 title = process_type + "__" + param_define
 
-            chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low}
+            y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+
+            chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": y_data}
         except Exception as e:
             print(e)
 
@@ -231,9 +233,10 @@ def param_value_product_api(request):
                 {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
                  'borderDash': [10, 2]})
 
-            chart_data = {"labels": y_label, "datasets": datasets,
-                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product}
+            y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
 
+            chart_data = {"labels": y_label, "datasets": datasets,
+                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product, "y_data": y_data}
 
         except Exception as e:
             print(e)
