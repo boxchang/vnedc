@@ -26,6 +26,25 @@ Index
 }
 </style>
 <script>
+//Press Enter to move next one
+document.addEventListener('DOMContentLoaded', function() {
+    const textboxes = document.querySelectorAll('input[type="text"]');
+    textboxes.forEach((textbox, index) => {
+        textbox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 防止表單提交
+                let nextIndex = index + 1;
+                while (nextIndex < textboxes.length && textboxes[nextIndex].hasAttribute('readonly')) {
+                    nextIndex++;
+                }
+                if (nextIndex < textboxes.length) {
+                    textboxes[nextIndex].focus();
+                }
+            }
+        });
+    });
+});
+
 function set_session() {
     var plant = $("#id_plant").val();
     var mach = $("#id_mach").val();
