@@ -101,12 +101,18 @@ def record(request, process_code):
                     value = request.POST.get(define.parameter_name+'_'+time)
                     try:
                         if value:
-
-                            ParameterValue.objects.update_or_create(plant=plant, mach=mach,
-                                                                    data_date=sData_date,
-                                                                    process_type=process_type.process_code,
-                                                                    data_time=time, parameter_name=define.parameter_name,
-                                                                    defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
+                            if float(value) == 0:
+                                param = ParameterValue.objects.get(plant=plant, mach=mach,
+                                                            data_date=sData_date,
+                                                            process_type=process_type.process_code,
+                                                            data_time=time, parameter_name=define.parameter_name)
+                                param.delete()
+                            else:
+                                ParameterValue.objects.update_or_create(plant=plant, mach=mach,
+                                                                        data_date=sData_date,
+                                                                        process_type=process_type.process_code,
+                                                                        data_time=time, parameter_name=define.parameter_name,
+                                                                        defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
                             msg = _("Update Done")
                     except Exception as e:
                         print(e)
