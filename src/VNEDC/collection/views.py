@@ -34,7 +34,7 @@ def index(request):
 
         for daily_prod_info_head in tmp_mach.daily_prod_info_heads:
             sql = f"""            
-            select distinct d.plant_id,d.mach_id,d.parameter_name,d.process_type_id from (SELECT *
+            select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
               FROM [VNEDC].[dbo].[collection_parameterdefine] 
               where plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}' and auto_value=0) d
               left outer join 
