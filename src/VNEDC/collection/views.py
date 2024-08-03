@@ -32,9 +32,6 @@ def index(request):
         daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
         tmp_mach.daily_prod_info_heads = daily_prod_info_heads
 
-        reach_count = 0
-        goal_count = 0
-
         for daily_prod_info_head in tmp_mach.daily_prod_info_heads:
             sql = f"""            
             select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
@@ -51,6 +48,8 @@ def index(request):
             results = db.select_sql_dict(sql)
 
             tmp_msg = ""
+            reach_count = 0
+            goal_count = 0
             for result in results:
                 if result["parameter_value"] != None and result["parameter_value"] > 0:
                     reach_count += 1
@@ -206,8 +205,15 @@ def daily_info_create(request):
     else:
         machs = None
 
-    plant = Plant.objects.get(plant_code=sPlant)
-    mach = Machine.objects.get(mach_code=sMach)
+    if not sPlant:
+        plant = Plant.objects.all()[0]
+    else:
+        plant = Plant.objects.get(plant_code=sPlant)
+
+    if not sMach:
+        mach = Machine.objects.all()[0]
+    else:
+        mach = Machine.objects.get(mach_code=sMach)
 
     processes = Process_Type.objects.all().order_by('show_order')
 
