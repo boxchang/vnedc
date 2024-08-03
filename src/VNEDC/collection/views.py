@@ -200,25 +200,16 @@ def daily_info_create(request):
     form = DailyInfoForm()
     plants = Plant.objects.all()
 
-    if sPlant:
-        machs = Machine.objects.filter(plant=sPlant)
-    else:
-        machs = None
-
-    if not sPlant:
-        plant = Plant.objects.all()[0]
-    else:
-        plant = Plant.objects.get(plant_code=sPlant)
-
-    if not sMach:
-        mach = Machine.objects.all()[0]
-    else:
-        mach = Machine.objects.get(mach_code=sMach)
-
     processes = Process_Type.objects.all().order_by('show_order')
 
-    if not sPlant or not sMach or not sData_date:
+    if not sPlant or not sMach:
         return redirect(reverse('collection_index'))
+
+    if sPlant:
+        machs = Machine.objects.filter(plant=sPlant)
+
+    plant = Plant.objects.get(plant_code=sPlant)
+    mach = Machine.objects.get(mach_code=sMach)
 
     info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
 
