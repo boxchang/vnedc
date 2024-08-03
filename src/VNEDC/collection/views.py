@@ -45,7 +45,7 @@ def index(request):
               where data_date = '{sData_date}' and plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}') v 
               on d.plant_id = v.plant_id and d.mach_id = v.mach_id and d.parameter_name = v.parameter_name 
               and d.process_type_id = v.process_type
-
+                order by process_type_id
             """
             db = vnedc_database()
             results = db.select_sql_dict(sql)
