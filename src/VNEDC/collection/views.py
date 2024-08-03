@@ -5,10 +5,16 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
+
+from VNEDC.database import vnedc_database
 from collection.forms import DailyInfoForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
     Daily_Prod_Info_Head
 from jobs.database import mes_database
+
+
+def create_vnedc_connection():
+    pass
 
 
 @login_required
@@ -21,7 +27,45 @@ def index(request):
         sData_date = datetime.today()
         sData_date = sData_date.strftime("%Y-%m-%d")
 
-    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('mach_id', 'line')
+    tmp_machs = Machine.objects.all()
+    for tmp_mach in tmp_machs:
+        daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
+        tmp_mach.daily_prod_info_heads = daily_prod_info_heads
+
+        reach_count = 0
+        goal_count = 0
+
+        for daily_prod_info_head in tmp_mach.daily_prod_info_heads:
+            sql = f"""            
+            select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
+              FROM [VNEDC].[dbo].[collection_parameterdefine] 
+              where plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}' and auto_value=0) d
+              left outer join 
+              (select * from [VNEDC].[dbo].[collection_parametervalue] 
+              where data_date = '{sData_date}' and plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}') v 
+              on d.plant_id = v.plant_id and d.mach_id = v.mach_id and d.parameter_name = v.parameter_name 
+              and d.process_type_id = v.process_type
+
+            """
+            db = vnedc_database()
+            results = db.select_sql_dict(sql)
+
+            tmp_msg = ""
+            for result in results:
+                if result["parameter_value"] != None and result["parameter_value"] > 0:
+                    reach_count += 1
+                else:
+
+                    tmp_msg += "{process_type} - {parameter_name}\r\n".format(process_type=result["process_type_id"], parameter_name=result["parameter_name"])
+                goal_count += 1
+        hit_rate_msg = f"{reach_count}/{goal_count}"
+
+        hit_rate = 0
+        if reach_count > 0:
+            hit_rate = int(round(reach_count/goal_count, 2) * 100)
+        tmp_mach.hit_rate_msg = hit_rate_msg
+        tmp_mach.hit_rate = hit_rate
+        tmp_mach.msg = tmp_msg
 
     return render(request, 'collection/index.html', locals())
 

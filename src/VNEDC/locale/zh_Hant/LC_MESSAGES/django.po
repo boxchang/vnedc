@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-30 16:41+0700\n"
-"PO-Revision-Date: 2024-07-30 16:45+0700\n"
+"POT-Creation-Date: 2024-08-03 15:33+0700\n"
+"PO-Revision-Date: 2024-08-03 15:35+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -33,7 +33,7 @@ msgid "desc"
 msgstr "描述"
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:80
+#: .\collection\templates\collection\daily_info_create.html:104
 #: .\collection\templates\collection\record.html:45 .\users\forms.py:61
 #: .\users\templates\users\info.html:17
 msgid "save"
@@ -104,8 +104,9 @@ msgid "Submit"
 msgstr "確定"
 
 #: .\chart\forms.py:86
-#: .\collection\templates\collection\daily_info_create.html:60
-#: .\collection\templates\collection\index.html:22
+#: .\collection\templates\collection\daily_info_create.html:84
+#: .\collection\templates\collection\index.html:30
+#: .\collection\templates\collection\index2.html:31
 msgid "Product"
 msgstr "產品"
 
@@ -113,8 +114,8 @@ msgstr "產品"
 msgid "param_code"
 msgstr "參數類型"
 
-#: .\chart\templates\chart\param_value.html:224
-#: .\chart\templates\chart\param_value_product.html:242
+#: .\chart\templates\chart\param_value.html:225
+#: .\chart\templates\chart\param_value_product.html:243
 msgid "Record"
 msgstr "報工新增"
 
@@ -198,52 +199,65 @@ msgstr "換模時間(Hour)"
 msgid "Change Tooling Time(Minute)"
 msgstr "換模時間(Minute)"
 
-#: .\collection\forms.py:64 .\collection\templates\collection\base.html:90
+#: .\collection\forms.py:64 .\collection\templates\collection\base.html:109
 msgid "Plant"
 msgstr "廠別"
 
-#: .\collection\templates\collection\base.html:105
-#: .\collection\templates\collection\daily_info_create.html:58
-#: .\collection\templates\collection\index.html:20
+#: .\collection\templates\collection\base.html:124
+#: .\collection\templates\collection\daily_info_create.html:82
+#: .\collection\templates\collection\index.html:19
+#: .\collection\templates\collection\index2.html:20
 msgid "Machine"
 msgstr "機台"
 
-#: .\collection\templates\collection\base.html:118
+#: .\collection\templates\collection\base.html:137
 msgid "Record Date"
 msgstr "作業日期"
 
-#: .\collection\templates\collection\base.html:124
-#: .\collection\templates\collection\base.html:127
+#: .\collection\templates\collection\base.html:143
+#: .\collection\templates\collection\base.html:146
 msgid "Chart"
 msgstr "圖表"
 
-#: .\collection\templates\collection\base.html:146
+#: .\collection\templates\collection\base.html:165
 msgid "Production Data"
 msgstr "生產資料"
 
-#: .\collection\templates\collection\daily_info_create.html:59
-#: .\collection\templates\collection\index.html:21
+#: .\collection\templates\collection\daily_info_create.html:83
+#: .\collection\templates\collection\index.html:29
+#: .\collection\templates\collection\index2.html:30
 msgid "Line"
 msgstr "線別"
 
-#: .\collection\templates\collection\daily_info_create.html:61
-#: .\collection\templates\collection\index.html:23
+#: .\collection\templates\collection\daily_info_create.html:85
+#: .\collection\templates\collection\index.html:31
+#: .\collection\templates\collection\index2.html:32
 msgid "Size"
 msgstr "尺寸"
 
-#: .\collection\templates\collection\daily_info_create.html:62
-#: .\collection\templates\collection\index.html:24
+#: .\collection\templates\collection\daily_info_create.html:86
+#: .\collection\templates\collection\index.html:32
+#: .\collection\templates\collection\index2.html:33
 msgid "create_at"
 msgstr "建立時間"
 
-#: .\collection\templates\collection\daily_info_create.html:63
+#: .\collection\templates\collection\daily_info_create.html:87
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
 msgid "Delete"
 msgstr "刪除"
 
-#: .\collection\templates\collection\daily_info_create.html:73
+#: .\collection\templates\collection\daily_info_create.html:97
 msgid "Are you sure?"
 msgstr "確定嗎？"
+
+#: .\collection\templates\collection\index.html:20
+msgid "Production Information"
+msgstr "生產資訊"
+
+#: .\collection\templates\collection\index.html:21
+#: .\collection\templates\collection\index2.html:22
+msgid "Completed Rate"
+msgstr "完成率"
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -257,7 +271,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "變更密碼"
 
-#: .\collection\views.py:110 .\collection\views.py:245
+#: .\collection\views.py:160 .\collection\views.py:295
 msgid "Update Done"
 msgstr "更新完成"
 

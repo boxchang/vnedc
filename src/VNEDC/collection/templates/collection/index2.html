@@ -13,11 +13,12 @@ $(document).ready(function() {
 {% endblock js %}
 {% block content %}
 <div class="row">
-    <div class="col">
+    <div class="col-1"></div>
+    <div class="col-10">
         <table border="1" class='table table-bordered'>
             <tr>
                 <th style="text-align: center">{% trans "Machine" %}</th>
-                <th style="text-align: center">{% trans "Production Information" %}</th>
+                <th></th>
                 <th style="text-align: center">{% trans "Completed Rate" %}</th>
             </tr>
             {% for mach in tmp_machs %}
@@ -26,10 +27,10 @@ $(document).ready(function() {
                 <td>
                     <table border="1" class='table table-bordered table-striped'>
                         <tr>
-                            <th style="text-align: center;width:20%;">{% trans "Line" %}</th>
-                            <th style="width:50%;">{% trans "Product" %}</th>
-                            <th style="text-align: center;width:10%;">{% trans "Size" %}</th>
-                            <th style="text-align: center;width:20%;">{% trans "create_at" %}</th>
+                            <th style="text-align: center">{% trans "Line" %}</th>
+                            <th>{% trans "Product" %}</th>
+                            <th style="text-align: center">{% trans "Size" %}</th>
+                            <th style="text-align: center">{% trans "create_at" %}</th>
                         </tr>
                         {% for info in mach.daily_prod_info_heads %}
                         <tr>
@@ -41,7 +42,7 @@ $(document).ready(function() {
                         {% endfor %}
                     </table>
                 </td>
-                <td style="text-align: center"><a title="{{ mach.msg | safe }}">{{ mach.hit_rate_msg }}({{ mach.hit_rate }}%)</a></td>
+                <td>{{ mach.hit_rate }}</td>
             </tr>
             {% endfor %}
 
