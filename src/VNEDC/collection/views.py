@@ -32,31 +32,36 @@ def index(request):
         daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
         tmp_mach.daily_prod_info_heads = daily_prod_info_heads
 
-        for daily_prod_info_head in tmp_mach.daily_prod_info_heads:
-            sql = f"""            
-            select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
-              FROM [VNEDC].[dbo].[collection_parameterdefine] 
-              where plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}' and auto_value=0) d
-              left outer join 
-              (select * from [VNEDC].[dbo].[collection_parametervalue] 
-              where data_date = '{sData_date}' and plant_id='{daily_prod_info_head.plant}' and mach_id='{daily_prod_info_head.mach.mach_code}') v 
-              on d.plant_id = v.plant_id and d.mach_id = v.mach_id and d.parameter_name = v.parameter_name 
-              and d.process_type_id = v.process_type
-                order by process_type_id
-            """
-            db = vnedc_database()
-            results = db.select_sql_dict(sql)
+        defines = ParameterDefine.objects.filter(mach=tmp_mach.mach_code, auto_value=0)
 
-            tmp_msg = ""
-            reach_count = 0
-            goal_count = 0
-            for result in results:
-                if result["parameter_value"] != None and result["parameter_value"] > 0:
-                    reach_count += 1
-                else:
+        goal_count = 0
+        for define in defines:
+            if define.sampling_frequency == "6H" or define.sampling_frequency == None:
+                goal_count += 4
+            elif define.sampling_frequency == "12H":
+                goal_count += 2
 
-                    tmp_msg += "{process_type} - {parameter_name}\r\n".format(process_type=result["process_type_id"], parameter_name=result["parameter_name"])
-                goal_count += 1
+        reach_count = 0
+
+        tmp_msg = ""
+
+        sql = f"""            
+        select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
+          FROM [VNEDC].[dbo].[collection_parameterdefine] 
+          where plant_id='{tmp_mach.plant}' and mach_id='{tmp_mach.mach_code}' and auto_value=0) d
+          join 
+          (select * from [VNEDC].[dbo].[collection_parametervalue] 
+          where data_date = '{sData_date}' and plant_id='{tmp_mach.plant}' and mach_id='{tmp_mach.mach_code}' and parameter_value>0) v 
+          on d.plant_id = v.plant_id and d.mach_id = v.mach_id and d.parameter_name = v.parameter_name 
+          and d.process_type_id = v.process_type
+            order by process_type_id
+        """
+        db = vnedc_database()
+        results = db.select_sql_dict(sql)
+        for result in results:
+            if result["parameter_value"] != None and result["parameter_value"] > 0:
+                reach_count += 1
+
         hit_rate_msg = f"{reach_count}/{goal_count}"
 
         hit_rate = 0
