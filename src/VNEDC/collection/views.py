@@ -28,6 +28,7 @@ def index(request):
         sData_date = sData_date.strftime("%Y-%m-%d")
 
     tmp_machs = Machine.objects.all()
+    parameter_list = []
     for tmp_mach in tmp_machs:
         daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
         tmp_mach.daily_prod_info_heads = daily_prod_info_heads
@@ -40,6 +41,11 @@ def index(request):
                 goal_count += 4
             elif define.sampling_frequency == "12H":
                 goal_count += 2
+
+            # Setup Define Parameter
+            #tmp_param = define.process_type.process_code + "_" + define.parameter_name
+            #if not tmp_param in parameter_list:
+            #    parameter_list.append(define.process_type.process_code + "_" + define.parameter_name)
 
         reach_count = 0
 
@@ -62,6 +68,11 @@ def index(request):
             if result["parameter_value"] != None and result["parameter_value"] > 0:
                 reach_count += 1
 
+                # Remove Completed Parameter
+                #tmp_param = result["process_type_id"] + "_" + result["parameter_name"]
+                #if tmp_param in parameter_list:
+                #    parameter_list.remove(tmp_param)
+
         hit_rate_msg = f"{reach_count}/{goal_count}"
 
         hit_rate = 0
@@ -69,6 +80,8 @@ def index(request):
             hit_rate = int(round(reach_count/goal_count, 2) * 100)
         tmp_mach.hit_rate_msg = hit_rate_msg
         tmp_mach.hit_rate = hit_rate
+
+        tmp_msg = "\r\n".join(parameter_list)
         tmp_mach.msg = tmp_msg
 
     return render(request, 'collection/index.html', locals())

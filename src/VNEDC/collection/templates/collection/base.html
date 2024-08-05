@@ -159,26 +159,24 @@ function validate(evt) {
            {% endblock content %}
         </div>
         <div class="col-1">
-        {% if info %}
-            {% if request.session.plant %}
-            <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:220px;">
-                {% trans 'Production Data' %}
-            </a>
-            {% endif %}
-            {% for process in processes %}
-            <a href="{% url 'record' process.process_code %}" class="btn {% if process.process_code == process_code %}btn-dark{% else %}btn-info{% endif %}" style="width:220px;margin-top: 5px">
-                {% if lang == "zh-hant" %}
-                    {{ process.process_tw }}
-                {% elif lang == "vi" %}
-                    {{ process.process_vn }}
-                {% elif lang == "zh-hans" %}
-                    {{ process.process_cn }}
-                {% else %}
-                    {{ process.process_name }}
-                {% endif %}
-            </a>
-            {% endfor %}
+        {% if request.session.plant %}
+        <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:220px;">
+            {% trans 'Production Data' %}
+        </a>
         {% endif %}
+        {% for process in processes %}
+        <a href="{% url 'record' process.process_code %}" class="btn {% if process.process_code == process_code %}btn-dark{% else %}btn-info{% endif %}" style="width:220px;margin-top: 5px">
+            {% if lang == "zh-hant" %}
+                {{ process.process_tw }}
+            {% elif lang == "vi" %}
+                {{ process.process_vn }}
+            {% elif lang == "zh-hans" %}
+                {{ process.process_cn }}
+            {% else %}
+                {{ process.process_name }}
+            {% endif %}
+        </a>
+        {% endfor %}
         </div>
     </div>
 </div>
