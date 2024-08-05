@@ -81,8 +81,8 @@ def index(request):
         tmp_mach.hit_rate_msg = hit_rate_msg
         tmp_mach.hit_rate = hit_rate
 
-        tmp_msg = "\r\n".join(parameter_list)
-        tmp_mach.msg = tmp_msg
+        #tmp_msg = "\r\n".join(parameter_list)
+        #tmp_mach.msg = tmp_msg
 
     return render(request, 'collection/index.html', locals())
 
