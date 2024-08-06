@@ -163,12 +163,6 @@ def record(request, process_code):
                     try:
                         if value:
                             if float(value) == 0:
-                                param = ParameterValue.objects.get(plant=plant, mach=mach,
-                                                            data_date=sData_date,
-                                                            process_type=process_type.process_code,
-                                                            data_time=time, parameter_name=define.parameter_name)
-                                param.delete()
-                            else:
                                 ParameterValue.objects.update_or_create(plant=plant, mach=mach,
                                                                         data_date=sData_date,
                                                                         process_type=process_type.process_code,
