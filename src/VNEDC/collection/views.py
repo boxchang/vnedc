@@ -162,12 +162,11 @@ def record(request, process_code):
                     value = request.POST.get(define.parameter_name+'_'+time)
                     try:
                         if value:
-                            if float(value) == 0:
-                                ParameterValue.objects.update_or_create(plant=plant, mach=mach,
-                                                                        data_date=sData_date,
-                                                                        process_type=process_type.process_code,
-                                                                        data_time=time, parameter_name=define.parameter_name,
-                                                                        defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
+                            ParameterValue.objects.update_or_create(plant=plant, mach=mach,
+                                                                    data_date=sData_date,
+                                                                    process_type=process_type.process_code,
+                                                                    data_time=time, parameter_name=define.parameter_name,
+                                                                    defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
                             msg = _("Update Done")
                     except Exception as e:
                         print(e)
