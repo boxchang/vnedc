@@ -360,3 +360,7 @@ def get_mach_api(request):
 def test(request):
     return render(request, 'collection/test.html', locals())
 
+
+def rd_report(request):
+    return render(request, 'collection/rd_report.html', locals())
+
