@@ -26,12 +26,10 @@ Electric Data Collection
                         {% endif %} {{ time }}:00
                         </label>
                         <div>
-                            {% if define.sampling_frequency == "12H" and time == '00' %}
-                            <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" readonly>
-                            {% elif define.sampling_frequency == "12H" and time == '12' %}
+                            {% if not time in define.input_time %}
                             <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" readonly>
                             {% else %}
-                            <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" onkeypress="validate(event)" {% if define.auto_value %}readonly{% endif %}>
+                            <input type="text" name="{{ define.parameter_name }}_{{ time }}" {% if define.text_color %}style="background-color: {{ define.text_color }}"{% endif %} class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" onkeypress="validate(event)" {% if define.auto_value %}readonly{% endif %}>
                             {% endif %}
                         </div>
                     </div>
