@@ -53,10 +53,10 @@ def index(request):
 
         sql = f"""            
         select d.plant_id,d.mach_id,d.parameter_name,v.parameter_value,d.process_type_id from (SELECT *
-          FROM [VNEDC].[dbo].[collection_parameterdefine] 
+          FROM [collection_parameterdefine] 
           where plant_id='{tmp_mach.plant}' and mach_id='{tmp_mach.mach_code}' and auto_value=0) d
           join 
-          (select * from [VNEDC].[dbo].[collection_parametervalue] 
+          (select * from [collection_parametervalue] 
           where data_date = '{sData_date}' and plant_id='{tmp_mach.plant}' and mach_id='{tmp_mach.mach_code}' and parameter_value>0) v 
           on d.plant_id = v.plant_id and d.mach_id = v.mach_id and d.parameter_name = v.parameter_name 
           and d.process_type_id = v.process_type
@@ -197,7 +197,7 @@ def get_production_choices(end_date):
 
     sql = f"""
         SELECT distinct ProductItem
-        FROM [PMGMES].[dbo].[PMG_MES_WorkOrder] where SAP_FactoryDescr like '%NBR%' and WorkOrderDate between '{start_date}' and '{end_date}'
+        FROM [PMG_MES_WorkOrder] where SAP_FactoryDescr like '%NBR%' and WorkOrderDate between '{start_date}' and '{end_date}'
 		order by ProductItem"""
     mes_db = mes_database()
     rows = mes_db.select_sql_dict(sql)
