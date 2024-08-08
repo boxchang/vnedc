@@ -3,7 +3,7 @@ from collection.models import ParameterDefine, Process_Type, Plant, Machine, Par
 
 @admin.register(Parameter_Type)
 class Parameter_TypeAdmin(admin.ModelAdmin):
-    list_display = ('param_code', 'param_name', 'update_at', 'update_by')
+    list_display = ('process_type', 'param_type_code', 'update_at', 'update_by')
 
 
 @admin.register(Plant)
