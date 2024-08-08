@@ -147,7 +147,7 @@ class TGM2MES(object):
         sql = """
             SELECT file_name
             FROM [MEASURE_FILE] 
-            where FILE_BULID_DAY < getdate()-3 and file_name not in ('XX')
+            where FILE_BULID_DAY < getdate()-2 and file_name not in ('XX')
         """
         records = self.tgmdb.select_sql_dict(sql)
 
