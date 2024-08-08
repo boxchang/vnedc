@@ -163,16 +163,17 @@ def param_value_product_api(request):
             sql = f"""
             WITH ProdInfoHead AS (
                 SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
-                  FROM [VNEDC].[dbo].[collection_daily_prod_info_head] head, [VNEDC].[dbo].[collection_daily_prod_info] info
+                  FROM collection_daily_prod_info_head head, collection_daily_prod_info info
                   where head.data_date = info.data_date and product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
                  )
                 
-                select v.data_date, data_time, v.mach_id, process_type, parameter_tw, d.side, param_code, v.parameter_name, parameter_value from [VNEDC].[dbo].[collection_parametervalue] v
-                join [VNEDC].[dbo].[collection_parameterdefine] d on v.process_type = d.process_type_id AND v.mach_id = d.mach_id AND v.parameter_name = d.parameter_name
-                join [VNEDC].[dbo].[collection_parameter_type] t on d.param_type_id = t.id AND d.process_type_id = t.process_type_id
-                join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND (d.side = i.side or d.side = '')
-                where process_type='{process_type}' and param_name = '{param_code}'
+            select * from collection_parametervalue v 
+            join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
+            and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
+            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
             """
+
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
@@ -215,25 +216,44 @@ def param_value_product_api(request):
             base_line_data = []
             control_low_data = []
 
-            param_type = Parameter_Type.objects.filter(param_code=param_code, process_type=process_type).first()
-            define = ParameterDefine.objects.filter(process_type=process_type, param_type=param_type).first()
-            if define:
-                for date_time in y_label:
-                    control_high_data.append(define.control_range_high)
-                    base_line_data.append(define.base_line)
-                    control_low_data.append(define.control_range_low)
+            param_type = Parameter_Type.objects.filter(param_type_code=param_code, process_type=process_type).first()
 
-            datasets.append(
-                {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
-                 'borderDash': [10, 2]})
-            datasets.append(
-                {'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc',
-                 'borderDash': [10, 2]})
-            datasets.append(
-                {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
-                 'borderDash': [10, 2]})
+            if param_type:
+                control_table = param_type.control_table
+                control_high_column = param_type.control_high_column
+                control_low_column = param_type.control_low_column
 
-            y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+            if control_table:
+                if 'MES' in control_table:
+                    sql = f"""
+                            select {control_high_column}, {control_low_column} from {control_table} where ProductItem = '{product}'
+                        """
+                    mew_db = mes_database()
+                    records = mew_db.select_sql_dict(sql)
+                else:
+                    dash_index = product.find('-')
+                    if dash_index != -1 and dash_index + 2 < len(product):
+                        product = product[dash_index + 1:dash_index + 3]
+                    sql = f"""
+                            select {control_high_column}, {control_low_column} from {control_table} where item_no = '{product}'
+                            and process_type = '{process_type}' and parameter_name = '{param_code}'
+                        """
+                    records = vnedc_db.select_sql_dict(sql)
+
+                if records:
+                    for date_time in y_label:
+                        control_high_data.append(float(records[0][control_high_column]))
+                        control_low_data.append(float(records[0][control_low_column]))
+
+                    datasets.append(
+                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                         'borderDash': [10, 2]})
+                    datasets.append(
+                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                         'borderDash': [10, 2]})
+                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+            else:
+                y_data = {"beginAtZero": "true"}
 
             chart_data = {"labels": y_label, "datasets": datasets,
                           "title": product + "  " + process_type + "  " + param_code, "subtitle": product, "y_data": y_data}
@@ -278,6 +298,6 @@ def get_param_code_api(request):
         html = """<option value="" selected>---------</option>"""
 
         for record in records:
-            html += """<option value="{value}">{name}</option>""".format(value=record.param_code, name=record.param_name)
+            html += """<option value="{value}">{name}</option>""".format(value=record.param_type_code, name=record.param_type_code)
 
     return JsonResponse(html, safe=False)
