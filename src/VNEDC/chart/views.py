@@ -251,7 +251,7 @@ def param_value_product_api(request):
                     datasets.append(
                         {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
                          'borderDash': [10, 2]})
-                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.7}
             else:
                 y_data = {"beginAtZero": "true"}
 
