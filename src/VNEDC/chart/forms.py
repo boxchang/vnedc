@@ -14,7 +14,7 @@ class SearchForm(forms.Form):
     data_date_end = forms.DateField(label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
     mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.all())
-    process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all())
+    process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all().order_by('show_order'))
     param_define = forms.ModelChoiceField(required=True, label=_('param_define'), queryset=ParameterDefine.objects.none())
     control_high = forms.CharField(required=False, label=_('control_high'))
     control_low = forms.CharField(required=False, label=_('control_low'))
@@ -84,7 +84,7 @@ class ProductionSearchForm(forms.Form):
     data_date_start = forms.DateField(label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     data_date_end = forms.DateField(label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     product = forms.ChoiceField(required=True, label=_('Product'), widget=forms.Select(attrs={'class': 'select2'}))
-    process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all())
+    process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all().order_by('show_order'))
     param_code = forms.ModelChoiceField(required=True, label=_('param_code'), queryset=Parameter_Type.objects.none())
 
     def __init__(self, *args, submit_title='Submit', **kwargs):

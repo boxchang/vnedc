@@ -253,7 +253,7 @@ def param_value_product_api(request):
                          'borderDash': [10, 2]})
                     y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.7}
             else:
-                y_data = {"beginAtZero": "true"}
+                y_data = {}
 
             chart_data = {"labels": y_label, "datasets": datasets,
                           "title": product + "  " + process_type + "  " + param_code, "subtitle": product, "y_data": y_data}
