@@ -1,11 +1,325 @@
-{% extends 'collection/base.html' %}
-{% load crispy_forms_tags %}
+{% load static %}
 {% load i18n %}
-{% block js %}
-<script>
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ever Global - {% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'jquery-ui/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-4.1.3/css/bootstrap.min.css' %}">
+    <script src="{% static 'jquery/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'bootstrap-4.1.3/js/bootstrap.min.js' %}"></script>
+    <link href="{% static 'jquery.loading/css/jquery.loading.min.css' %}" rel="stylesheet" />
+    <script src="{% static 'jquery.loading/js/jquery.loading.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'fontawesome-5.4.2/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
+    <script>
+        function downloadCSV() {
+            const table = document.getElementById('myTable');
+            const rows = table.querySelectorAll('tr');
+            let csvContent = '';
 
-</script>
-{% endblock js %}
-{% block content %}
+            const rowArray = [];
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowData = [];
 
-{% endblock content %}
+                cells.forEach(cell => {
+                    const id = cell.id;
+                    if (id) {
+                        const rowCol = id.split('-');
+                        const rowIndex = parseInt(rowCol[0], 10) - 1;
+                        const colIndex = parseInt(rowCol[1], 10) - 1;
+
+                        while (rowArray.length <= rowIndex) {
+                            rowArray.push([]);
+                        }
+
+                        while (rowArray[rowIndex].length <= colIndex) {
+                            rowArray[rowIndex].push('');
+                        }
+
+                        rowArray[rowIndex][colIndex] = cell.innerText;
+                    } else {
+                        rowData.push(cell.innerText);
+                    }
+                });
+
+                if (rowData.length > 0) {
+                    rowArray.push(rowData);
+                }
+            });
+
+            rowArray.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'data.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</head>
+<body>
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-btn" id="toggle-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="top-links">
+            <ul>
+                <li>
+                    {% include 'bases/lang.html' %}
+                </li>
+            </ul>
+        </div>
+        <ul>
+            <li><a href="{% url 'collection_index' %}"><i class="fas fa-cogs"></i> <span>{% trans "Key Parameter" %}</span></a></li>
+        </ul>
+        <div class="bottom-links">
+            <div class="user-info">
+                <ul>
+                    <li><i class="fas fa-user"></i> <span>{{ user.username }}</span></li>
+                </ul>
+            </div>
+            <ul>
+                <li><a href="{% url 'user_info' %}"><i class="fas fa-key"></i> <span>{% trans 'Personal Setting' %}</span></a></li>
+                <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> <span>{% trans "Logout" %}</span></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="content" id="content" style="position: relative;">
+        <div class="container-fluid" style="padding-left: 0px;padding-right: 0px">
+            <div class="card-header">
+                {% if user.is_authenticated %}
+                <form action="{% url 'rd_report' %}" method="POST" id="session_form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div id="div_id_plant" class="form-group">
+                                <label for="id_plant" class="requiredField">
+                                    {% trans "Plant" %}<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
+                                        <option value="">---------</option>
+                                        {% for plant in plants %}
+                                        <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div id="div_id_mach" class="form-group">
+                                <label for="id_mach" class="requiredField">
+                                    {% trans "Machine" %}<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
+                                        <option value="">---------</option>
+                                        {% for mach in machs %}
+                                        <option value="{{ mach.mach_code }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach.mach_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="data_date">{% trans "Record Date" %}*</label>
+                            <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <div class="content">
+                <div style="margin-left:84%">
+                    <button id="download-btn" class="btn btn-primary" onclick="downloadCSV()">Download Data</button>
+                </div>
+                <div class="row m-3" style="height:500px">
+                    <div class="col-12"  id="myTable">
+                        <div class="container">
+                            <table class="table table-bordered">
+                                <thead class="text-center">
+                                    <tr>
+                                        <th class="col-md-4 align-middle" rowspan="3" id="1-1">ITEM</th>
+                                        <th class="col-md-2 align-middle" rowspan="3" id="1-2">Parameters</th>
+                                        <th class="col-md-2 align-middle" rowspan="3" id="1-3">Spec.</th>
+                                        <th class="col-md-4" colspan="4"  id="1-4">Sample time</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="col-md-1" id="2-4">1</th>
+                                        <th class="col-md-1" id="2-5">2</th>
+                                        <th class="col-md-1" id="2-6">3</th>
+                                        <th class="col-md-1" id="2-7">4</th>
+                                    </tr>
+                                    <tr>
+                                        <td id="3-4">0h</td>
+                                        <td id="3-5">6h</td>
+                                        <td id="3-6">12h</td>
+                                        <td id="3-7">18h</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        <div class="container">
+                            <div class="row no-gutters">
+                                <div class="col-md-6" id="table-letf">
+                                    <table class="table table-bordered" id="myTable">
+                                        <tr>
+                                            <th class="col-md-8" style="padding-left: 1cm" id="5-1">Acid tank 1</th>
+                                            <td id="5-2">%</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8" style="padding-left: 1cm" id="6-1">Acid tank 2</th>
+                                            <td id="6-2">%</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8" style="padding-left: 1cm" id="7-1">Alkaline tank 1</th>
+                                            <td id="7-2">%</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8" style="padding-left: 1cm" id="8-1">Alkaline tank 2</th>
+                                            <td id="8-2">%</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="3" id="9-1">Coagulant A</th>
+                                            <td id="9-2">CN (%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="10-2">CPF (%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="11-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="3" id="12-1">Coagulant B</th>
+                                            <td id="12-2">CN (%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="13-2">CPF (%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="14-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="15-1">Latex SIDE A-1</th>
+                                            <td id="15-2">TSC %</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="16-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="17-1">Latex SIDE A-2</th>
+                                            <td id="17-2">TSC %</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="18-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="19-1">Latex SIDE B-1</th>
+                                            <td id="19-2">TSC %</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="20-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="21-1">Latex SIDE B-2</th>
+                                            <td id="21-2">TSC %</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="22-2">pH Value</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-md-8" style="padding-left: 1cm" id="23-1">Chlorination</th>
+                                            <td id="23-2">ppm</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6" id="table-right">
+                                    <table class="table table-bordered">
+                                        {% for define in defines %}
+                                            <tr>
+                                                <td class="col-md-4"></td>
+                                                {% for value in define.values %}
+{#                                                    <td id="{{ forloop.parentloop.counter|add:4 }}-{{ forloop.counter|add:3 }}">{{ value.parameter_value }}</td>#}
+                                                    <td id="{{ forloop.parentloop.counter|add:4 }}-{{ forloop.counter|add:3 }}">{{ value.data_time}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="container">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('toggle-btn').addEventListener('click', function () {
+            var sidebar = document.getElementById('sidebar');
+            var content = document.getElementById('content');
+            sidebar.classList.toggle('collapsed');
+            sidebar.classList.toggle('expanded');
+            content.classList.toggle('expanded');
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('table').each(function() {
+                var maxHeight = 0;
+                $(this).find('td').each(function() {
+                    var height = $(this).height();
+                    if (height > maxHeight) {
+                        maxHeight = height;
+                    }
+                });
+                $(this).find('td').height(maxHeight);
+            });
+        });
+    </script>
+    <script>
+        function set_session() {
+        var plant = $("#id_plant").val();
+        var mach = $("#id_mach").val();
+        var data_date = $("#id_data_date").val();
+        if(plant!="" && mach !="" && data_date != "") {
+
+        $("#session_form").submit();
+        }
+    }
+    function plant_change() {
+    $.ajax({
+        url: '{% url 'get_mach_api' %}', type: 'post',
+        dataType: 'json',
+        data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": $("#id_plant :selected").val()},
+        success: function(data) {
+            $("#id_mach").html(data);
+            }
+        });
+    }
+    </script>
+    <script>
+    $(document).ready(function() {
+        $('#id_data_date').on('change', function () {
+            $('#session_form').attr('action', '/collection/rd_report/');
+            $('#session_form').submit();
+        });
+    });
+    </script>
+</body>
+</html>

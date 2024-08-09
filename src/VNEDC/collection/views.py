@@ -362,5 +362,47 @@ def test(request):
 
 
 def rd_report(request):
+    if request.method == 'POST':
+        plant = request.POST.get('plant', '')
+        mach = request.POST.get('mach', '')
+        data_date = request.POST.get('data_date', '')
+
+        request.session['plant'] = plant
+        request.session['mach'] = mach
+        request.session['data_date'] = data_date
+    else:
+        plant = request.session.get('plant', '')
+        mach = request.session.get('mach', '')
+        data_date = request.session.get('data_date', '')
+
+    lang = get_language()
+    sPlant, sMach, sData_date, lang = plant, mach, data_date, lang
+
+    process_type = Process_Type.objects.filter().first() # process_code=process_code
+    plants = Plant.objects.all()
+    machs = Machine.objects.filter(plant=sPlant) if sPlant else None
+
+    TIMES = ["00", "06", "12", "18"]
+    defines = ParameterDefine.objects.filter(
+        plant=sPlant,
+        mach=sMach,
+        process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
+        parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
+                            'A_T1_PH',  'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
+                            'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
+                            'A_PH', 'A_CONCENTRATION', 'B_CPF',
+                            'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
+    )
+
+    for define in defines:
+        values = ParameterValue.objects.filter(
+            plant=sPlant,
+            mach=sMach,
+            data_date=sData_date,
+            process_type=define.process_type.process_code,
+            parameter_name=define.parameter_name
+        )
+        define.values = values
+
     return render(request, 'collection/rd_report.html', locals())
 
