@@ -20,12 +20,12 @@ class mes_daily_report(object):
     report_date1 = ""
     report_date2 = ""
 
-    # 定义样式
+    # Define Style
     percent_style = NamedStyle(name='percent_style', number_format='0.00%')
     right_align_style = NamedStyle(name='right_align_style', alignment=Alignment(horizontal='right'))
     center_align_style = NamedStyle(name='center_align_style', alignment=Alignment(horizontal='center'))
 
-    # 定义Header样式
+    # Define Header
     header_font = Font(bold=True)
     header_alignment = Alignment(horizontal='center')
     header_border = Border(bottom=Side(style='thin'))
@@ -36,22 +36,22 @@ class mes_daily_report(object):
 
 
     def send_email(self, excel_file, image_buffers, data_date):
-        # SMTP服务器的配置
+        # SMTP Sever config setting
         smtp_server = 'mail.egvnco.com'
         smtp_port = 587
         smtp_user = 'box.chang@egvnco.com'
         smtp_password = '1qazxsw2'
 
-        # 收件人列表
+        # Receiver
         to_emails = ['box.chang@egvnco.com', 'phil.wang@egvnco.com']
 
-        # 创建邮件对象
+        # Mail Info
         msg = MIMEMultipart()
         msg['From'] = smtp_user
         msg['To'] = ', '.join(to_emails)
         msg['Subject'] = f'江田廠產量日報表 {data_date}'
 
-        # 添加邮件正文
+        # Mail Content
         html = """\
         <html>
           <body>
@@ -66,13 +66,13 @@ class mes_daily_report(object):
 
         msg.attach(MIMEText(html, 'html'))
 
-        # 附加图片
+        # Attach Picture
         for i, buffer in enumerate(image_buffers):
             image = MIMEImage(buffer.read())
             image.add_header('Content-ID', f'<chart_image{i}>')
             msg.attach(image)
 
-        # 附加Excel文件
+        # Attach Excel
         with open(excel_file, 'rb') as attachment:
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(attachment.read())
@@ -80,16 +80,16 @@ class mes_daily_report(object):
             part.add_header('Content-Disposition', f"attachment; filename= {excel_file}")
             msg.attach(part)
 
-        # 发送邮件
+        # Send Email
         try:
             server = smtplib.SMTP(smtp_server, smtp_port)
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.sendmail(smtp_user, to_emails, msg.as_string())
             server.quit()
-            print("邮件发送成功！")
+            print("Sent Email Successfully")
         except Exception as e:
-            print(f"邮件发送失败: {e}")
+            print(f"Sent Email Fail: {e}")
         finally:
             attachment.close()
 
@@ -98,14 +98,14 @@ class mes_daily_report(object):
         report_date2 = self.report_date2
         db = mes_database()
 
-        # 指定保存文件夹路径：上一层目录的 media/daily_output/
+        # Save Path media/daily_output/
         save_path = os.path.join("..", "media", "daily_output")
 
-        # 如果文件夹不存在，则创建文件夹
+        # Check folder to create
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        # 创建 Excel 文件
+        # Create Excel file
         excel_file = f'MES_OUTPUT_DAILY_Report_{report_date1}.xlsx'
         excel_file = os.path.join(save_path, excel_file)
 
@@ -114,45 +114,45 @@ class mes_daily_report(object):
 
         with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
             for plant in ['NBR', 'PVC']:
-                # 取得df_main
+                # Get Work Order as df_main
                 df_main = self.get_df_main(db, report_date1, report_date2, plant)
 
-                # 取得df_detail
+                # Get Counting Machine as df_detail
                 df_detail = self.get_df_detail(db, report_date1, report_date2, plant)
 
-                # 點數機合并主数据
+                # Work Order data combine Counting Machine data
                 df_final = pd.merge(df_main, df_detail, on=['Name', 'Period', 'Line'], how='left')
 
-                # 取得df_optical
+                # Get Optical Machine as df_optical
                 df_optical = self.get_df_optical(db, report_date1, report_date2, plant)
 
-                # 光檢機合并主数据
+                # Work Order data combine Optical Machine data
                 if df_optical.empty:
-                    # 假设 df_optical 可能是空的
+                    # Assume df_optical maybe empty
                     df_optical = pd.DataFrame(columns=['Period', 'Name', 'Line', 'OKQty', 'NGQty', 'Ng_Ratio'])
                 df_final = pd.merge(df_final, df_optical, on=['Name', 'Period', 'Line'], how='left')
 
 
-                # 选择需要的列 'A' 和 'B'
+                # Choose needed rows
                 df_selected = df_final[['Date', 'Name', 'Line', 'Shift', 'WorkOrderId', 'PartNo', 'ProductItem', 'AQL', 'Period', 'max_speed', 'min_speed', 'avg_speed', 'sum_qty', 'Ng_Ratio']]
 
-                # 将数据按 'Name' 分组，并计算小计
+                # Data group by 'Name and then calculating
                 grouped = df_selected.groupby(['Name'])
 
-                # 创建一个新的 DataFrame 用于保存最终的结果
+                # Create new DataFrame to save final results
                 df_with_subtotals, df_chart = self.sorting_data(grouped)
 
-                # Excel資料
+                # Excel data
                 workbook = self.generate_excel(writer, df_with_subtotals, plant, grouped)
 
-                # 保存文件
+                # Save document
                 workbook.save(excel_file)
 
-                # 生成圖表
+                # Generate Chart
                 image_buffer = self.generate_chart(save_path, plant, report_date1, df_chart)
                 image_buffers.append(image_buffer)
 
-        # 發送Email
+        # Send Email
         self.send_email(excel_file, image_buffers, report_date1)
 
 
@@ -164,54 +164,54 @@ class mes_daily_report(object):
             return '晚班'
 
     def generate_chart(self, save_path, plant, report_date, df_chart):
-        # 创建图表
+        # Create Chart
         fig, ax1 = plt.subplots()
 
-        # 只取 Name 列的右边三位字符
+        # Only substring Name right 3 characters
         df_chart['Name_short'] = df_chart['Name'].apply(lambda x: x[-3:])
 
-        # 绘制柱状图
+        # Draw Bar Chart
         bars = ax1.bar(df_chart['Name_short'], df_chart['sum_qty'], color='blue', label='Quantity')
 
-        # 在每个条形上方显示数量
+        # Display quantity above each bar
         for bar in bars:
             yval = bar.get_height()  # 获取条形的高度，也就是数量
             ax1.text(bar.get_x() + bar.get_width() / 2, yval, f'{int(yval):,}',
                      ha='center', va='bottom')  # 显示数量并居中
 
-        # 创建第二个Y轴
+        # Create a second Y axis
         ax2 = ax1.twinx()
 
-        # 绘制折线图（车速）
+        # Draw Line Chart (speed)
         ax2.plot(df_chart['Name_short'], df_chart['avg_speed'], color='red', marker='o', label='Speed')
 
 
-        # 设置X轴标签和Y轴标签
+        # Set the X-axis label and the Y-axis label
         ax1.set_xlabel('Machine', rotation=45)
         ax1.set_ylabel('Output')
         ax2.set_ylabel('Speed', color='red')
         plt.title(f'{plant} Sum Quantity per Machine')
 
-        # 将柱状图和折线图的图例显示在一起
+        # Display the legend of the bar chart and line chart together
         fig.legend(loc="upper right", bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes)
 
-        # 保存图像到本地文件
+        # Save the image to a local file
         image_file = f'{plant}_bar_chart_{report_date}.png'
         image_file = os.path.join(save_path, image_file)
 
         plt.savefig(image_file)
 
-        # 将图像保存到 BytesIO 对象中
+        # Save the image to a BytesIO object
         image_stream = BytesIO()
         plt.savefig(image_stream, format='png')
-        image_stream.seek(0)  # 将指针移到文件开头
-        plt.close()  # 关闭图像以释放内存
+        image_stream.seek(0)  # Move the pointer to the beginning of the file
+        plt.close()  # Close the image to free up memory
 
         return image_stream
 
 
 
-    # 工單資料
+    # Work Order
     def get_df_main(self, db, report_date1, report_date2, plant):
         sql = f"""
                           SELECT w.MachineId,Name,wi.LineId Line,CAST(r.Period as INT) Period,wi.StartDate, wi.EndDate, wi.WorkOrderId,WorkOrderDate,CustomerName,PartNo,ProductItem,w.AQL,w.PlanQty,wi.Qty,w.Status
@@ -225,12 +225,12 @@ class mes_daily_report(object):
 
         df_main = pd.DataFrame(raws)
 
-        # 增加欄位班別
+        # Add Column Shift
         df_main['Shift'] = df_main['Period'].apply(self.shift)
 
         return df_main
 
-    # 點數機資料
+    # Counting Machine Data
     def get_df_detail(self, db, report_date1, report_date2, plant):
 
         sql = f"""
@@ -246,7 +246,7 @@ class mes_daily_report(object):
 
         return df_detail
 
-    # 光檢機
+    # Optical Machine Data
     def get_df_optical(self, db, report_date1, report_date2, plant):
 
         sql = f"""
@@ -266,17 +266,18 @@ class mes_daily_report(object):
 
         return df_optical
 
-    # 整理數據
+    # Sorting data
     def sorting_data(self, grouped):
         rows = []
         chart_rows = []
         for name, group in grouped:
-            # 按 Date 和 Period 排序
+            # Sort by Date and Period
             group_sorted = group.sort_values(by=['Date', 'Shift', 'Period'])
-            # 将排序后的 group 添加到 rows 列表中
+
+            # Add the sorted group to the rows list
             rows.append(group_sorted)
 
-            # 合并多值的字段，用 '/' 隔开
+            # Merge multi-value fields, separated by '/'
             def join_values(col):
                 return '/'.join(map(str, sorted(set(col))))
 
@@ -297,20 +298,20 @@ class mes_daily_report(object):
                 'Ng_Ratio': group['Ng_Ratio'].mean(),
             }
 
-            # 转换为DataFrame并排序
+            # Convert to DataFrame and sort
             subtotal_df = pd.DataFrame([subtotal])
             subtotal_df = subtotal_df.sort_values(by='Date')
 
-            # 平均車速四捨五入
+            # Average speed rounded
             subtotal_df['avg_speed'] = subtotal_df['avg_speed'].round(0)
 
             rows.append(subtotal_df)
             chart_rows.append(subtotal_df)
 
-        # 将分组后的数据组合成一个 DataFrame
+        # Combine the grouped data into a DataFrame
         df_with_subtotals = pd.concat(rows, ignore_index=True)
 
-        # 按指定顺序排列列
+        # Sort columns in a specified order
         column_order = [
             'Date', 'Name', 'WorkOrderId', 'PartNo', 'ProductItem', 'AQL',
             'Line', 'Shift', 'Period', 'max_speed', 'min_speed', 'avg_speed',
@@ -318,7 +319,7 @@ class mes_daily_report(object):
         ]
         df_with_subtotals = df_with_subtotals[column_order]
 
-        # 更改列名：将 'Name' 改为 '机台号'
+        # Change column name
         df_with_subtotals.rename(columns={'Date': '生產日期'}, inplace=True)
         df_with_subtotals.rename(columns={'Name': '機台號'}, inplace=True)
         df_with_subtotals.rename(columns={'WorkOrderId': '工單'}, inplace=True)
@@ -333,52 +334,52 @@ class mes_daily_report(object):
         df_with_subtotals.rename(columns={'sum_qty': '產量(加總)'}, inplace=True)
         df_with_subtotals.rename(columns={'Ng_Ratio': '光檢不良率'}, inplace=True)
 
-        # 將每個機台的總量組成一個 DataFrame
+        # Group the total quantity of each machine into a DataFrame
         df_chart = pd.concat(chart_rows, ignore_index=True)
 
         return df_with_subtotals, df_chart
 
     def generate_excel(self, writer, df_with_subtotals, plant, grouped):
 
-        # 创建加粗字体样式
+        # Create a bold font style
         bold_font = Font(bold=True)
 
-        # 创建上方加粗线条的边框样式
+        # Create a border style with a bold line above
         thick_border = Border(top=Side(style='thick'), bottom=Side(style='thick'))
 
         df_with_subtotals.to_excel(writer, sheet_name=f'{plant}', index=False)
 
-        # 读取已写入的Excel文件
+        # Read the written Excel file
         workbook = writer.book
         worksheet = writer.sheets[f'{plant}']
 
-        # 冻结第一行
+        # Freeze the first row
         worksheet.freeze_panes = worksheet['A2']
 
-        # 应用Header样式
-        for cell in worksheet[1]:  # 第一行，即Header
+        # Apply Header Style
+        for cell in worksheet[1]:  # First line is Header
             cell.font = self.header_font
             cell.alignment = self.header_alignment
             cell.border = self.header_border
 
-        # 设置百分比格式
-        for cell in worksheet['N'][1:]:  # 'N' 是 'Ng_Ratio' 列的字母列标
+        # Set the percentage format
+        for cell in worksheet['N'][1:]:  # 'N' is 'Ng_Ratio' Column
             cell.style = self.percent_style
 
-        # 添加分组（在 Excel 中实现点击展开/收起）
+        # Add grouping (click to expand/collapse in Excel)
         current_row = 2
         for i, (_, group) in enumerate(grouped):
             group_size = len(group)
             start_row = current_row
             end_row = start_row + group_size - 1
 
-            # 隐藏详细数据
+            # Hide detailed data
             worksheet.row_dimensions.group(start_row, end_row, hidden=True)
 
-            # 移到下一组的位置
+            # Move to the next group position
             current_row = end_row + 2  # +2 to account for the subtotal row
 
-        # 格式设置
+        # Formatting
         for col in worksheet.columns:
             max_length = max(len(str(cell.value)) for cell in col)
             col_letter = col[0].column_letter
@@ -388,14 +389,14 @@ class mes_daily_report(object):
             else:
                 worksheet.column_dimensions[col_letter].width = max_length + 5
 
-            # 设置对齐方式
+            # Set alignment
             for cell in col:
                 if col_letter in ['J', 'K', 'L', 'M', 'N']:  # 针对指定列应用右对齐
                     cell.alignment = self.right_align_style.alignment
                 else:
                     cell.alignment = self.center_align_style.alignment
 
-        # 遍历所有行，找到小计行并应用灰色填充、加粗字体和上方加粗线
+        # Search all lines, bold font and bold line above
         for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row):
             if row[6].value == 'Subtotal':  # 假设“Subtotal”在第7列 ('G')
                 for cell in row:
