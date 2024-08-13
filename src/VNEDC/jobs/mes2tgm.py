@@ -111,7 +111,7 @@ class MES2TGM(object):
         self.tgmdb.execute_sql(sql)
 
 def main():
-    COM = {'VN_GD_NBR': 9, 'VN_GD_PVC': 7}
+    COM = {'VN_GD_NBR': 9, 'VN_GD_PVC': 4}
 
     # 检查参数数量
     if len(sys.argv) < 2:
