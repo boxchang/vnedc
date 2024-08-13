@@ -1,7 +1,7 @@
 from django.urls import re_path as url
 
 from collection.views import record, daily_info_create, prod_info_save, prod_info_reset, index, raw_data_api, \
-    get_mach_api, test, daily_info_head_delete, rd_report
+    get_mach_api, test, daily_info_head_delete, rd_report, generate_excel_file
 
 urlpatterns = [
     url(r'^index/$', index, name='collection_index'),
@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^get_mach_api/', get_mach_api, name='get_mach_api'),
     url(r'^rd_report/', rd_report, name='rd_report'),
     url(r'^test/', test, name='test'),
+    url('download-excel/', generate_excel_file, name='download_excel'),
 ]

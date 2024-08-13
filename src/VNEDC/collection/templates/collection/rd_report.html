@@ -15,57 +15,6 @@
     <script src="{% static 'jquery.loading/js/jquery.loading.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'fontawesome-5.4.2/css/all.css' %}">
     <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
-    <script>
-        function downloadCSV() {
-            const table = document.getElementById('myTable');
-            const rows = table.querySelectorAll('tr');
-            let csvContent = '';
-
-            const rowArray = [];
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('th, td');
-                const rowData = [];
-
-                cells.forEach(cell => {
-                    const id = cell.id;
-                    if (id) {
-                        const rowCol = id.split('-');
-                        const rowIndex = parseInt(rowCol[0], 10) - 1;
-                        const colIndex = parseInt(rowCol[1], 10) - 1;
-
-                        while (rowArray.length <= rowIndex) {
-                            rowArray.push([]);
-                        }
-
-                        while (rowArray[rowIndex].length <= colIndex) {
-                            rowArray[rowIndex].push('');
-                        }
-
-                        rowArray[rowIndex][colIndex] = cell.innerText;
-                    } else {
-                        rowData.push(cell.innerText);
-                    }
-                });
-
-                if (rowData.length > 0) {
-                    rowArray.push(rowData);
-                }
-            });
-
-            rowArray.forEach(row => {
-                csvContent += row.join(',') + '\n';
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'data.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
 </head>
 <body>
     <div class="sidebar collapsed" id="sidebar">
@@ -135,13 +84,27 @@
                             <label for="data_date">{% trans "Record Date" %}*</label>
                             <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
                         </div>
+                        <div class="col-md-3">
+                        <label for="data_date"></label>
+                            <div class="box-nav-container row">
+                                <a class="box-nav-btn" style="margin-top:0.5cm;margin-left: 0.75cm;" href="/chart/param_value/" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="Chart">
+                                    <i class="fas fa-chart-line"></i>
+                                </a>
+
+                                <a class="box-nav-btn" style="margin-top:0.5cm;margin-left: 0.75cm;" href="/chart/param_value_product/" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="Chart">
+                                    <i class="fas fa-chart-bar"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </form>
                 {% endif %}
             </div>
             <div class="content">
                 <div style="margin-left:84%">
-                    <button id="download-btn" class="btn btn-primary" onclick="downloadCSV()">Download Data</button>
+                    <form action="{% url 'download_excel' %}" method="get">
+                            <button type="submit">Download Excel</button>
+                    </form>
                 </div>
                 <div class="row m-3" style="height:500px">
                     <div class="col-12"  id="myTable">
@@ -249,19 +212,46 @@
                                         {% for define in defines %}
                                             <tr>
                                                 <td class="col-md-4"></td>
-                                                {% for value in define.values %}
-{#                                                    <td id="{{ forloop.parentloop.counter|add:4 }}-{{ forloop.counter|add:3 }}">{{ value.parameter_value }}</td>#}
-                                                    <td id="{{ forloop.parentloop.counter|add:4 }}-{{ forloop.counter|add:3 }}">{{ value.data_time}}</td>
-                                                {% endfor %}
+                                                <!-- First Cell: data_time == "00" -->
+                                                <td id="{{ forloop.counter|add:4 }}-4">
+                                                    {% for value in define.values %}
+                                                        {% if value.data_time == "00" %}
+                                                            {{ value.parameter_value }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+
+                                                <!-- Second Cell: data_time == "06" -->
+                                                <td id="{{ forloop.counter|add:4 }}-5">
+                                                    {% for value in define.values %}
+                                                        {% if value.data_time == "06" %}
+                                                            {{ value.parameter_value }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+
+                                                <!-- Third Cell: data_time == "12" -->
+                                                <td id="{{ forloop.counter|add:4 }}-6">
+                                                    {% for value in define.values %}
+                                                        {% if value.data_time == "12" %}
+                                                            {{ value.parameter_value }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+
+                                                <!-- Fourth Cell: data_time == "18" -->
+                                                <td id="{{ forloop.counter|add:4 }}-7">
+                                                    {% for value in define.values %}
+                                                        {% if value.data_time == "18" %}
+                                                            {{ value.parameter_value }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </table>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="container">
-
                         </div>
                     </div>
                 </div>
@@ -288,38 +278,63 @@
                         maxHeight = height;
                     }
                 });
-                $(this).find('td').height(maxHeight);
+                $(this).find('td').height(25); //maxheight
             });
         });
     </script>
     <script>
         function set_session() {
-        var plant = $("#id_plant").val();
-        var mach = $("#id_mach").val();
-        var data_date = $("#id_data_date").val();
-        if(plant!="" && mach !="" && data_date != "") {
+            var plant = $("#id_plant").val();
+            var mach = $("#id_mach").val();
+            var data_date = $("#id_data_date").val();
+            if(plant!="" && mach !="" && data_date != "") {
 
-        $("#session_form").submit();
-        }
-    }
-    function plant_change() {
-    $.ajax({
-        url: '{% url 'get_mach_api' %}', type: 'post',
-        dataType: 'json',
-        data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": $("#id_plant :selected").val()},
-        success: function(data) {
-            $("#id_mach").html(data);
+            $("#session_form").submit();
             }
-        });
-    }
+        }
+
+        function plant_change() {
+            $.ajax({
+                url: '{% url 'get_mach_api' %}', type: 'post',
+                dataType: 'json',
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": $("#id_plant :selected").val()},
+                success: function(data) {
+                    $("#id_mach").html(data);
+                }
+            });
+        }
     </script>
     <script>
-    $(document).ready(function() {
-        $('#id_data_date').on('change', function () {
-            $('#session_form').attr('action', '/collection/rd_report/');
-            $('#session_form').submit();
+       $(document).ready(function() {
+            // Handle Plant change
+            $('#id_plant').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Machine change
+            $('#id_mach').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#id_data_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
         });
-    });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dateInput = document.getElementById('id_data_date');
+            if (!dateInput.value) {  // If no date is already set
+                var today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        });
+    </script>
+
 </body>
 </html>
+{#Xử lí hai giá trị cùng 1 data_time#}
