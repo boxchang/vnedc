@@ -1,3 +1,8 @@
+import sys
+import os
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -5,13 +10,8 @@ from email.mime.base import MIMEBase
 from email import encoders
 from email.mime.image import MIMEImage
 import pandas as pd
-import os
-import openpyxl
-from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.worksheet.table import Table, TableStyleInfo
 from jobs.database import mes_database
 from openpyxl.styles import Alignment, NamedStyle, Font, Border, Side
-from openpyxl.styles import PatternFill
 import matplotlib.pyplot as plt
 from io import BytesIO
 
