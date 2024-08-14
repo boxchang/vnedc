@@ -35,7 +35,7 @@ class mes_daily_report(object):
         self.report_date2 = report_date2
 
 
-    def send_email(self, excel_file, image_buffers, data_date):
+    def send_email(self, file_name, excel_file, image_buffers, data_date):
         # SMTP Sever config setting
         smtp_server = 'mail.egvnco.com'
         smtp_port = 587
@@ -43,7 +43,7 @@ class mes_daily_report(object):
         smtp_password = '1qazxsw2'
 
         # Receiver
-        to_emails = ['box.chang@egvnco.com', 'phil.wang@egvnco.com']
+        to_emails = ['box.chang@egvnco.com']
 
         # Mail Info
         msg = MIMEMultipart()
@@ -77,7 +77,7 @@ class mes_daily_report(object):
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(attachment.read())
             encoders.encode_base64(part)
-            part.add_header('Content-Disposition', f"attachment; filename= {excel_file}")
+            part.add_header('Content-Disposition', f"attachment; filename= {file_name}")
             msg.attach(part)
 
         # Send Email
@@ -106,8 +106,8 @@ class mes_daily_report(object):
             os.makedirs(save_path)
 
         # Create Excel file
-        excel_file = f'MES_OUTPUT_DAILY_Report_{report_date1}.xlsx'
-        excel_file = os.path.join(save_path, excel_file)
+        file_name = f'MES_OUTPUT_DAILY_Report_{report_date1}.xlsx'
+        excel_file = os.path.join(save_path, file_name)
 
         # Email Attachment
         image_buffers = []
@@ -153,7 +153,7 @@ class mes_daily_report(object):
                 image_buffers.append(image_buffer)
 
         # Send Email
-        self.send_email(excel_file, image_buffers, report_date1)
+        self.send_email(file_name, excel_file, image_buffers, report_date1)
 
 
 
@@ -187,7 +187,7 @@ class mes_daily_report(object):
 
 
         # Set the X-axis label and the Y-axis label
-        ax1.set_xlabel('Machine', rotation=45)
+        ax1.set_xlabel('Machine')
         ax1.set_ylabel('Output')
         ax2.set_ylabel('Speed', color='red')
         plt.title(f'{plant} Sum Quantity per Machine')

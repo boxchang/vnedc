@@ -30,7 +30,7 @@ class MES2TGM(object):
 
         db = mes_database()
         sql = """
-        select  distinct RunCardId, WorkCenterTypeName,{comport} comport
+        select  distinct RunCardId, WorkCenterTypeName,{comport} comport, InspectionDate
         from PMGMES.[dbo].[PMG_MES_RunCard_IPQCInspectIOptionMapping] t, [PMGMES].[dbo].[PMG_MES_RunCard] r
 		WITH(NOLOCK)
 		where GroupType='HAND' and t.RunCardId = r.Id
@@ -58,11 +58,12 @@ class MES2TGM(object):
         files = self.get_file_list(self.data_date)
         for runcard in runcards:
             lot_number = runcard['RunCardId']
+            inspectionDate = str(runcard['InspectionDate']).replace('-', '/')
             plant = runcard['WorkCenterTypeName']
             comport = runcard['comport']
             if lot_number not in files:  # 沒有資料才塞
                 # MEASURE_FILE
-                self.insert_measure_file(lot_number)
+                self.insert_measure_file(lot_number, inspectionDate)
 
                 # 取得MEASURE FILE主檔的File ID
                 file_id = self.get_file_id(lot_number)
@@ -77,11 +78,10 @@ class MES2TGM(object):
                     self.insert_file_info(file_id, 'Plant', plant)
 
     # 新增量測主檔
-    def insert_measure_file(self, LOT_NUMBER):
-        today = datetime.today().strftime('%Y/%m/%d')
+    def insert_measure_file(self, LOT_NUMBER, inspectionDate):
         sql = """insert into MEASURE_FILE(FILE_NAME, MEMO, FILE_BULID_DAY, CONV_TYPE, CONV_AUTO, DEFAULT_LOT) 
                  Values ('{LOT_NUMBER}', '', '{FILE_BULID_DAY}', 0, 0, '{LOT_NUMBER}')""" \
-            .format(LOT_NUMBER=LOT_NUMBER, FILE_BULID_DAY=today)
+            .format(LOT_NUMBER=LOT_NUMBER, FILE_BULID_DAY=inspectionDate)
         print(sql)
         self.tgmdb.execute_sql(sql)
 
