@@ -37,7 +37,7 @@ class TGM2MES(object):
                 print("Insert Data {LOT_NUMBER}".format(LOT_NUMBER=record['FILE_NAME']))
                 self.insert_mes(data)
 
-        self.clean_data()
+
 
     def get_measure_files(self):
         sql = """select * from MEASURE_FILE"""
@@ -142,42 +142,7 @@ class TGM2MES(object):
         with open(self.last_time_file, 'w') as file:
             file.write(current_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Runcard主檔的資料超過二天就刪除，假定Runcard產生出來一天內會做完
-    def clean_data(self):
-        sql = """
-            SELECT file_name
-            FROM [MEASURE_FILE] 
-            where FILE_BULID_DAY < getdate()-2 and file_name not in ('XX')
-        """
-        records = self.tgmdb.select_sql_dict(sql)
 
-        for record in records:
-            lot_number = record["file_name"]
-
-            self.delete_measure_item(lot_number)
-            self.delete_file_info(lot_number)
-            self.delete_measure_data(lot_number)
-            self.delete_measure_file(lot_number)
-
-
-    def delete_measure_file(self, file_name):
-        sql = "delete from measure_file where file_name = '{file_name}'".format(file_name=file_name)
-        self.tgmdb.execute_sql(sql)
-
-    def delete_measure_item(self, file_name):
-        sql = "delete from measure_item where file_name='{file_name}'".format(file_name=file_name)
-        self.tgmdb.execute_sql(sql)
-
-    def delete_file_info(self, file_name):
-        sql = "delete from file_info where file_info_val = '{file_name}'".format(file_name=file_name)
-        self.tgmdb.execute_sql(sql)
-
-    def delete_measure_data(self, file_name):
-        sql = """
-            delete FROM [TGM].[dbo].[MEASURE_DATA] 
-            where DATA_DATETIME < getdate()-90 and LOT_NUMBER = '{LOT_NUMBER}'
-        """
-        self.tgmdb.execute_sql(sql)
 
 def main():
     LIST = ['VN_GD_NBR', 'VN_GD_PVC']

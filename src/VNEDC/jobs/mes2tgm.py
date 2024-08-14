@@ -27,24 +27,28 @@ class MES2TGM(object):
     def get_runcard_list(self, data_date):
         start_date = data_date
         end_date = (datetime.strptime(data_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
+        comport = self.com_port
+        plant = self.plant
 
         db = mes_database()
-        sql = """
-        select  distinct RunCardId, WorkCenterTypeName,{comport} comport, InspectionDate
-        from PMGMES.[dbo].[PMG_MES_RunCard_IPQCInspectIOptionMapping] t, [PMGMES].[dbo].[PMG_MES_RunCard] r
-		WITH(NOLOCK)
-		where GroupType='HAND' and t.RunCardId = r.Id
-		and WorkCenterName like '{plant}%'
-		and  t.CreationTime between  '{start_date}' and '{end_date}'
-        """.format(start_date=start_date, end_date=end_date, comport=self.com_port, plant=self.plant)
+
+        sql = f"""
+        select m.RunCardId, WorkCenterTypeName,{comport} comport, InspectionDate from 
+        [PMGMES].[dbo].[PMG_MES_RunCard] r 
+        join PMGMES.[dbo].[PMG_MES_RunCard_IPQCInspectIOptionMapping] m on m.RunCardId = r.Id 
+        join [PMGMES].[dbo].[PMG_MES_IPQCItemDef] d on m.IPQCInspectOptionId = d.Id 
+        left outer join [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] i on i.RunCardId = m.RunCardId and i.OptionName = 'Roll'
+        where m.CreationTime between  '{start_date}' and '{end_date}'
+        and WorkCenterName like '{plant}%'
+        and d.IPQCItem = 'Roll' and i.Id is null
+        """
+
         records = db.select_sql_dict(sql)
         return records
 
     # 先撈一版資料，用來比對資料是否存在
     def get_file_list(self, data_date):
-        data_date = data_date.replace('-', '/')
-
-        sql = """select * from MEASURE_FILE where FILE_BULID_DAY='{FILE_BULID_DAY}'""".format(FILE_BULID_DAY=data_date)
+        sql = """select * from MEASURE_FILE"""
         records = self.tgmdb.select_sql_dict(sql)
         list = [record['FILE_NAME'] for record in records]
         return list
@@ -77,6 +81,8 @@ class MES2TGM(object):
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
                     self.insert_file_info(file_id, 'Plant', plant)
 
+        self.clean_data()
+
     # 新增量測主檔
     def insert_measure_file(self, LOT_NUMBER, inspectionDate):
         sql = """insert into MEASURE_FILE(FILE_NAME, MEMO, FILE_BULID_DAY, CONV_TYPE, CONV_AUTO, DEFAULT_LOT) 
@@ -108,6 +114,43 @@ class MES2TGM(object):
         sql = """insert into FILE_INFO(FILE_ID, FILE_INFO_NAME, FILE_INFO_VAL) 
                          Values ({FILE_ID}, '{FILE_INFO_NAME}', '{FILE_INFO_VALUE}')""" \
             .format(FILE_ID=FILE_ID, FILE_INFO_NAME=FILE_INFO_NAME, FILE_INFO_VALUE=FILE_INFO_VALUE)
+        self.tgmdb.execute_sql(sql)
+
+    # 只要MES有量測資料就刪除
+    def clean_data(self):
+        sql = """
+            SELECT distinct FILE_NAME file_name
+              FROM [MEASURE_FILE] f, [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] r
+              where f.FILE_NAME COLLATE Chinese_Taiwan_Stroke_CI_AS = r.RunCardId COLLATE Chinese_Taiwan_Stroke_CI_AS
+              and r.OptionName = 'Roll'
+        """
+        records = self.tgmdb.select_sql_dict(sql)
+
+        for record in records:
+            lot_number = record["file_name"]
+
+            self.delete_measure_item(lot_number)
+            self.delete_file_info(lot_number)
+            self.delete_measure_data(lot_number)
+            self.delete_measure_file(lot_number)
+
+    def delete_measure_file(self, file_name):
+        sql = "delete from measure_file where file_name = '{file_name}'".format(file_name=file_name)
+        self.tgmdb.execute_sql(sql)
+
+    def delete_measure_item(self, file_name):
+        sql = "delete from measure_item where file_name='{file_name}'".format(file_name=file_name)
+        self.tgmdb.execute_sql(sql)
+
+    def delete_file_info(self, file_name):
+        sql = "delete from file_info where file_info_val = '{file_name}'".format(file_name=file_name)
+        self.tgmdb.execute_sql(sql)
+
+    def delete_measure_data(self, file_name):
+        sql = """
+            delete FROM [TGM].[dbo].[MEASURE_DATA] 
+            where DATA_DATETIME < getdate()-90 and LOT_NUMBER = '{LOT_NUMBER}'
+        """
         self.tgmdb.execute_sql(sql)
 
 def main():
