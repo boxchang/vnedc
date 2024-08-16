@@ -32,15 +32,15 @@ class mes_daily_report(object):
         self.report_date2 = report_date2
 
 
-    def send_email(self, file_name, excel_file, image_buffers, data_date):
+    def send_email(self, file_list, data_date):
         # SMTP Sever config setting
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 465
-        smtp_user = 'driversystemalert@gmail.com'
-        smtp_password = 'cqvvjiccyxlwsdot'
+        smtp_server = 'mail.egvnco.com'
+        smtp_port = 587
+        smtp_user = 'box.chang@egvnco.com'
+        smtp_password = '1qazxsw2'
 
         # Receiver
-        to_emails = ['lelongcuong429@gmail.com']
+        to_emails = ['box.chang@egvnco.com']
 
         # Mail Info
         msg = MIMEMultipart()
@@ -52,30 +52,22 @@ class mes_daily_report(object):
         html = """\
         <html>
           <body>
-        """
-        for i in range(len(image_buffers)):
-            html += f'<img src="cid:chart_image{i}"><br>'
-
-        html += """\
           </body>
         </html>
         """
 
         msg.attach(MIMEText(html, 'html'))
 
-        # Attach Picture
-        for i, buffer in enumerate(image_buffers):
-            image = MIMEImage(buffer.read())
-            image.add_header('Content-ID', f'<chart_image{i}>')
-            msg.attach(image)
-
         # Attach Excel
-        with open(excel_file, 'rb') as attachment:
-            part = MIMEBase('application', 'octet-stream')
-            part.set_payload(attachment.read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', f"attachment; filename= {file_name}")
-            msg.attach(part)
+        for file in file_list:
+            excel_file = file['excel_file']
+            file_name = file['file_name']
+            with open(excel_file, 'rb') as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f"attachment; filename= {file_name}")
+                msg.attach(part)
 
         # Send Email
         try:
@@ -94,6 +86,8 @@ class mes_daily_report(object):
         report_date1 = self.report_date1
         report_date2 = self.report_date2
         db = mes_database()
+
+        file_list = []
 
         # Save Path media/daily_output/
         save_path = os.path.join("..", "media", "daily_output")
@@ -129,7 +123,10 @@ class mes_daily_report(object):
                     machine_df = machine_df.sort_values(by=['Date', 'Shift', 'Period'])
                     self.generate_excel(writer, machine_df, plant, machine_name)
 
+            file_list.append({'file_name': file_name, 'excel_file': excel_file})
 
+        # Send Email
+        self.send_email(file_list, report_date1)
 
 
     def shift(self, period):
