@@ -40,7 +40,7 @@ class mes_daily_report(object):
         smtp_password = '1qazxsw2'
 
         # Receiver
-        to_emails = ['box.chang@egvnco.com']
+        to_emails = ['box.chang@egvnco.com', 'phil.wang@egvnco.com']
 
         # Mail Info
         msg = MIMEMultipart()
