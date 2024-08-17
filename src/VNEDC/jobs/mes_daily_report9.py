@@ -11,7 +11,8 @@ from email import encoders
 from email.mime.image import MIMEImage
 import pandas as pd
 from jobs.database import mes_database
-from openpyxl.styles import Alignment, NamedStyle, Font, Border, Side
+from openpyxl.styles import Alignment, NamedStyle, Font, Border, Side, PatternFill
+
 
 class mes_daily_report(object):
     report_date1 = ""
@@ -246,12 +247,21 @@ class mes_daily_report(object):
         index_start = 2
         index_end = 2
         for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row):
+            if row[4].value != '':  # Line
+                for cell in row[4:]:
+                    cell.fill = PatternFill(start_color="FDE9D9", end_color="FDE9D9", fill_type="solid")
+
+
             if row[3].value != '':  # Shift
                 # Line
                 worksheet.row_dimensions.group(index_start, index_end-1, hidden=True, outline_level=2)
 
                 worksheet.row_dimensions.group(index_end, index_end, hidden=True, outline_level=1)
                 index_start = index_end + 1
+
+                for cell in row[3:]:
+                    cell.font = bold_font
+                    cell.border = Border(top=Side(style='thin'))
 
             elif row[0].value != '':  # Machine
                 # Hide detailed data
