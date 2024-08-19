@@ -37,8 +37,8 @@ class mes_daily_report(object):
         # SMTP Sever config setting
         smtp_server = 'mail.egvnco.com'
         smtp_port = 587
-        smtp_user = 'box.chang@egvnco.com'
-        smtp_password = '1qazxsw2'
+        smtp_user = 'vn_report@egvnco.com'
+        smtp_password = ''
 
         # Receiver
         to_emails = ['box.chang@egvnco.com', 'phil.wang@egvnco.com']
@@ -127,7 +127,7 @@ class mes_daily_report(object):
             file_list.append({'file_name': file_name, 'excel_file': excel_file})
 
         # Send Email
-        self.send_email(file_list, report_date1)
+        #self.send_email(file_list, report_date1)
 
 
     def shift(self, period):
@@ -282,8 +282,8 @@ class mes_daily_report(object):
             return '/'.join(map(str, sorted(set(col))))
 
         try:
-            # Drop the 'Period' column from each group
-            group_without_period = df.drop(columns=['Period'])
+            # Drop the 'Period' and 'Date' column from each group
+            group_without_period = df.drop(columns=['Period', 'Date'])
 
             # Data group by 'Name and then calculating
             mach_grouped = group_without_period.groupby(['Name'])
@@ -296,12 +296,15 @@ class mes_daily_report(object):
 
                 tmp_rows = []
                 for line_name, line_group in line_grouped:
-                    line_sum_df = line_group.groupby(['Name', 'ProductItem', 'AQL', 'Shift', 'Line']).agg({
+                    line_sum_df = line_group.groupby(['Name', 'ProductItem', 'Shift', 'Line']).agg({
                         'min_speed': 'min',  # Min speed
                         'max_speed': 'max',  # Max speed
                         'avg_speed': 'mean',  # Average speed
                         'sum_qty': 'sum',
                     }).reset_index()
+
+                    line_sum_df.insert(line_sum_df.columns.get_loc('ProductItem') + 1, 'AQL', None)
+
                     tmp_rows.append(line_sum_df)
 
                 df_tmp = pd.concat(tmp_rows, ignore_index=True)
