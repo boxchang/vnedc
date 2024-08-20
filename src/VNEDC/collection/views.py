@@ -9,12 +9,13 @@ from django.utils.translation import gettext_lazy as _
 from VNEDC.database import vnedc_database
 from collection.forms import DailyInfoForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
-    Daily_Prod_Info_Head
+    Daily_Prod_Info_Head, Lab_Parameter_Control
 from jobs.database import mes_database
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from django.shortcuts import render
+import re
 
 
 def create_vnedc_connection():
