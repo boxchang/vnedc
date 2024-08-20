@@ -37,8 +37,10 @@ class mes_daily_report(object):
         # SMTP Sever config setting
         smtp_server = 'mail.egvnco.com'
         smtp_port = 587
-        smtp_user = 'vn_report@egvnco.com'
-        smtp_password = ''
+        # smtp_user = 'vn_report@egvnco.com'
+        # smtp_password = ''
+        smtp_user = 'box.chang@egvnco.com'
+        smtp_password = '1qazxsw2'
 
         # Receiver
         to_emails = ['box.chang@egvnco.com', 'phil.wang@egvnco.com']
@@ -127,7 +129,7 @@ class mes_daily_report(object):
             file_list.append({'file_name': file_name, 'excel_file': excel_file})
 
         # Send Email
-        #self.send_email(file_list, report_date1)
+        self.send_email(file_list, report_date1)
 
 
     def shift(self, period):
@@ -303,6 +305,7 @@ class mes_daily_report(object):
                         'sum_qty': 'sum',
                     }).reset_index()
 
+                    # Add AQL Column to fit format
                     line_sum_df.insert(line_sum_df.columns.get_loc('ProductItem') + 1, 'AQL', None)
 
                     tmp_rows.append(line_sum_df)
