@@ -298,7 +298,7 @@ class mes_daily_report(object):
 
                 tmp_rows = []
                 for line_name, line_group in line_grouped:
-                    line_sum_df = line_group.groupby(['Name', 'ProductItem', 'Shift', 'Line']).agg({
+                    line_sum_df = line_group.groupby(['Name', 'Shift', 'Line']).agg({
                         'min_speed': 'min',  # Min speed
                         'max_speed': 'max',  # Max speed
                         'avg_speed': 'mean',  # Average speed
@@ -306,7 +306,8 @@ class mes_daily_report(object):
                     }).reset_index()
 
                     # Add AQL Column to fit format
-                    line_sum_df.insert(line_sum_df.columns.get_loc('ProductItem') + 1, 'AQL', None)
+                    line_sum_df.insert(line_sum_df.columns.get_loc('Name') + 1, 'ProductItem', None)
+                    line_sum_df.insert(line_sum_df.columns.get_loc('Name') + 2, 'AQL', None)
 
                     tmp_rows.append(line_sum_df)
 
@@ -332,8 +333,10 @@ class mes_daily_report(object):
 
                 day_df[['Name', 'ProductItem', 'AQL', 'Shift']] = ''
                 day_df['avg_speed'] = day_df['avg_speed'].round(0)
-                rows.append(day_df)  # Day row data
-                rows.append(subtotal_df)  # Day Shift total summary
+                if not day_df.empty:
+                    rows.append(day_df)  # Day row data
+                if subtotal["sum_qty"] > 0:
+                    rows.append(subtotal_df)  # Day Shift total summary
 
                 # Night Shift
                 night_df = df_tmp[df_tmp['Shift'] == '晚班'].copy()
@@ -354,8 +357,10 @@ class mes_daily_report(object):
 
                 night_df[['Name', 'ProductItem', 'AQL', 'Shift']] = ''
                 night_df['avg_speed'] = night_df['avg_speed'].round(0)
-                rows.append(night_df)  # Night row data
-                rows.append(subtotal_df)  # Night Shift total summary
+                if not night_df.empty:
+                    rows.append(night_df)  # Night row data
+                if not subtotal_df.empty:
+                    rows.append(subtotal_df)  # Night Shift total summary
 
                 subtotal = {
                     'Name': join_values(mach_group['Name']),
