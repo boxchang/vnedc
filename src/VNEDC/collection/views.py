@@ -367,20 +367,12 @@ def test(request):
 
 def rd_select(request):
     if request.method == 'POST':
-        plant = request.POST.get('plant', '')
-        mach = request.POST.get('mach', '')
-        data_date = request.POST.get('data_date', '')
+        request.session['plant'] = request.POST.get('plant', '')
+        request.session['mach'] = request.POST.get('mach', '')
+        request.session['data_date'] = request.POST.get('data_date', '')
 
-        request.session['plant'] = plant
-        request.session['mach'] = mach
-        request.session['data_date'] = data_date
-    else:
-        plant = request.session.get('plant', '')
-        mach = request.session.get('mach', '')
-        data_date = request.session.get('data_date', '')
-    lang = get_language()
-    return plant, mach, data_date, lang
-
+    return (request.session.get('plant', ''), request.session.get('mach', ''),
+            request.session.get('data_date', ''), get_language())
 
 def rd_report(request):
     sPlant, sMach, sData_date, lang = rd_select(request)
@@ -389,7 +381,6 @@ def rd_report(request):
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
 
-    TIMES = ["00", "06", "12", "18"]
     defines = ParameterDefine.objects.filter(
         plant=sPlant,
         mach=sMach,
@@ -403,13 +394,42 @@ def rd_report(request):
 
     for define in defines:
         values = ParameterValue.objects.filter(
+                                    plant=sPlant,
+                                    mach=sMach,
+                                    data_date=sData_date,
+                                    process_type=define.process_type.process_code,
+                                    parameter_name=define.parameter_name
+                                )
+        define.values = values
+
+    try:
+        control_limit = Lab_Parameter_Control.objects.filter(
             plant=sPlant,
             mach=sMach,
-            data_date=sData_date,
-            process_type=define.process_type.process_code,
-            parameter_name=define.parameter_name
-        )
-        define.values = values
+            item_no=re.search(r'-(\d+)', Daily_Prod_Info.objects.filter(
+                                        plant=sPlant,
+                                        mach=sMach,
+                                        data_date=sData_date).first().prod_name_a1).group(1))
+        low_value, high_value = [], []
+        for i in range(len(control_limit)):
+            high_value.append(control_limit[i].control_range_high)
+            low_value.append(control_limit[i].control_range_low)
+
+        low_limit, high_limit = [0]*19, [0]*19
+        for i in ([5, 6, 8, 9] + list(range(10, 18))):
+            if i in [5, 6, 8, 9]:
+                if i == 5 or i == 8:
+                    low_limit[i], high_limit[i] = low_value[3], high_value[3]
+                elif i == 6 or i == 9:
+                    low_limit[i], high_limit[i] = low_value[4], high_value[4]
+            else:
+                if i % 2 == 0:
+                    low_limit[i], high_limit[i] = low_value[0], high_value[0]
+                else:
+                    low_limit[i], high_limit[i] = low_value[1], high_value[1]
+
+    except:
+        pass
 
     return render(request, 'collection/rd_report.html', locals())
 
@@ -425,33 +445,28 @@ def generate_excel_file(request):
         top=Side(style='thin'),
         bottom=Side(style='thin')
     )
-
     medium_border = Border(
         left=Side(style='medium'),
         right=Side(style='medium'),
         top=Side(style='medium'),
         bottom=Side(style='medium')
     )
+    thick_border = Border(
+        left=Side(border_style="thick"),
+        right=Side(border_style="thick"),
+        top=Side(border_style="thick"),
+        bottom=Side(border_style="thick")
+    )
 
-    desired_height = 25
-    desired_font_size = 14
-    font_style = Font(size=desired_font_size)
-
-    if sPlant == 'GDNBR' and sMach != '' and sData_date != '':
-        full_path = f"DATA-{sPlant}-{sMach}-{sData_date}"
-        plant_rp = sPlant
-        mach_rp = sMach
-        date_rp = sData_date
+    if sPlant != '' and sMach != '' and sData_date != '':
+        filename = f"DATA-{sPlant}-{sMach}-{sData_date}.xlsx"
+        plant_rp, mach_rp, date_rp = sPlant, sMach, sData_date
     else:
-        full_path = '#ERROR_VALUE!'
-        plant_rp = ''
-        mach_rp = ''
-        date_rp = ''
-
-    filename = f"{full_path}.xlsx"
+        filename = '#ERROR_VALUE!.xlsx'
+        plant_rp = mach_rp = date_rp = ''
 
     def set_header_row(row, col, value, fill_color="FDE9D9"):
-        worksheet.row_dimensions[row].height = 30  # Adjust the row height
+        worksheet.row_dimensions[row].height = 30
         cell = worksheet[f'{col}{row}']
         cell.value = value
         cell.alignment = Alignment(horizontal="left", vertical="center")
@@ -460,9 +475,10 @@ def generate_excel_file(request):
 
     header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp)]
     for col, label, value in header_data:
-        row = int(col[1:])  # Extract row number from cell reference
-        set_header_row(row, col[0], label)  # Set the label cell
-        set_header_row(row, 'B', value)  # Set the value cell
+        row = int(col[1:])
+        set_header_row(row, col[0], label)
+        set_header_row(row, 'B', value)
+    worksheet.merge_cells('C2:G4')
 
     worksheet.merge_cells('A1:G1')
     worksheet.row_dimensions[1].height = 45
@@ -471,13 +487,6 @@ def generate_excel_file(request):
     merged_cell.alignment = Alignment(horizontal="center", vertical="center")
     merged_cell.font = Font(size=18, bold=True)
     merged_cell.fill = PatternFill(start_color="EBF1DE", end_color="EBF1DE", fill_type="solid")
-    # Define a thick medium black solid border
-    thick_border = Border(
-        left=Side(border_style="medium", color="000000"),
-        right=Side(border_style="medium", color="000000"),
-        top=Side(border_style="medium", color="000000"),
-        bottom=Side(border_style="medium", color="000000")
-    )
 
     for row in worksheet.iter_rows(min_row=2, max_row=4, min_col=1, max_col=7):
         for cell in row:
@@ -487,23 +496,15 @@ def generate_excel_file(request):
                 cell.border = Border(bottom=thick_border.bottom)
             if cell.column == 1:
                 cell.border = Border(left=thick_border.left)
-            if cell.column == 7:
+            if cell.column == 2 or cell.column == 7:
                 cell.border = Border(right=thick_border.right)
-            if cell.row == 2 and cell.column == 1:
-                cell.border = Border(top=thick_border.top, left=thick_border.left)
-            if cell.row == 2 and cell.column == 7:
-                cell.border = Border(top=thick_border.top, right=thick_border.right)
-            if cell.row == 4 and cell.column == 1:
-                cell.border = Border(bottom=thick_border.bottom, left=thick_border.left)
-            if cell.row == 4 and cell.column == 7:
-                cell.border = Border(bottom=thick_border.bottom, right=thick_border.right)
 
     for row in worksheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=7):
         for cell in row:
             cell.border = thick_border
 
-    for row in range(5, 26):
-        worksheet.row_dimensions[row].height = desired_height
+    for row in range(5, 27):
+        worksheet.row_dimensions[row].height = 25
 
     worksheet.column_dimensions['A'].width = 30
     worksheet.column_dimensions['B'].width = 20
@@ -552,10 +553,15 @@ def generate_excel_file(request):
         worksheet[f'B{row_num}'] = param
         worksheet[f'B{row_num}'].alignment = Alignment(horizontal="center", vertical="center")
 
-    for row in worksheet.iter_rows(min_row=5, max_row=26, min_col=1, max_col=7):
+    for row in worksheet.iter_rows(min_row=5, max_row=7, min_col=1, max_col=7):
         for cell in row:
             cell.border = thin_border
-            cell.font = font_style
+            cell.font = Font(size=14)
+
+    for row in worksheet.iter_rows(min_row=8, max_row=26, min_col=1, max_col=7):
+        for cell in row:
+            cell.border = thin_border
+            cell.font = Font(size=13)
 
     for row in worksheet.iter_rows(min_row=5, max_row=7, min_col=1, max_col=7):
         for cell in row:
@@ -578,7 +584,6 @@ def generate_excel_file(request):
     )
 
     start_row = 8
-
     for define in defines:
         values = ParameterValue.objects.filter(
             plant=sPlant,
@@ -600,6 +605,59 @@ def generate_excel_file(request):
                 worksheet[f'G{start_row}'] = value.parameter_value
 
         start_row += 1
+
+    try:
+        control_limit = Lab_Parameter_Control.objects.filter(
+            plant=sPlant,
+            mach=sMach,
+            item_no=re.search(r'-(\d+)', Daily_Prod_Info.objects.filter(
+                plant=sPlant,
+                mach=sMach,
+                data_date=sData_date).first().prod_name_a1).group(1))
+        low_value, high_value = [], []
+        for i in range(len(control_limit)):
+            high_value.append(control_limit[i].control_range_high)
+            low_value.append(control_limit[i].control_range_low)
+
+        low_limit, high_limit = [0] * 19, [0] * 19
+        for i in ([5, 6, 8, 9] + list(range(10, 18))):
+            if i in [5, 6, 8, 9]:
+                if i == 5 or i == 8:
+                    low_limit[i], high_limit[i] = low_value[3], high_value[3]
+                elif i == 6 or i == 9:
+                    low_limit[i], high_limit[i] = low_value[4], high_value[4]
+            else:
+                if i % 2 == 0:
+                    low_limit[i], high_limit[i] = low_value[0], high_value[0]
+                else:
+                    low_limit[i], high_limit[i] = low_value[1], high_value[1]
+
+        range_limit = []
+        for i in range(len(high_limit)):
+            range_limit.append(f'{low_limit[i]} ~ {high_limit[i]}')
+
+        start_row = 8
+
+        for i in range(len(high_limit)):
+            if high_limit[i] != 0:
+                worksheet[f'C{start_row}'] = range_limit[i]
+                worksheet[f'C{start_row}'].alignment = Alignment(vertical="center", horizontal="right")
+            start_row += 1
+
+        for i in range(len(high_limit)):
+            start_row = i + 8
+            if high_limit[i] != 0:
+                for col in ['D', 'E', 'F', 'G']:
+                    if worksheet[f'{col}{start_row}'].value:
+                        if float(worksheet[f'{col}{start_row}'].value) > float(high_limit[i]):
+                            worksheet[f'{col}{start_row}'].fill = PatternFill("solid", fgColor='FF6600')
+                        elif float(worksheet[f'{col}{start_row}'].value) < float(low_limit[i]):
+                            worksheet[f'{col}{start_row}'].fill = PatternFill("solid", fgColor='FF6600')
+                        # else:
+                        #     worksheet[f'{col}{start_row}'].fill = PatternFill("solid", fgColor='33CC33')
+            start_row += 1
+    except:
+        pass
 
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename={filename}'

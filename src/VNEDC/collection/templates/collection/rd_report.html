@@ -15,6 +15,11 @@
     <script src="{% static 'jquery.loading/js/jquery.loading.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'fontawesome-5.4.2/css/all.css' %}">
     <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
+    <style>
+        table {
+            table-layout: fixed; /* Ensures all columns have equal width */
+        }
+    </style>
 </head>
 <body>
     <div class="sidebar collapsed" id="sidebar">
@@ -208,48 +213,152 @@
                                     </table>
                                 </div>
                                 <div class="col-md-6" id="table-right">
-                                    <table class="table table-bordered">
-                                        {% for define in defines %}
-                                            <tr>
-                                                <td class="col-md-4"></td>
-                                                <!-- First Cell: data_time == "00" -->
-                                                <td id="{{ forloop.counter|add:4 }}-4">
-                                                    {% for value in define.values %}
-                                                        {% if value.data_time == "00" %}
-                                                            {{ value.parameter_value }}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </td>
-
-                                                <!-- Second Cell: data_time == "06" -->
-                                                <td id="{{ forloop.counter|add:4 }}-5">
-                                                    {% for value in define.values %}
-                                                        {% if value.data_time == "06" %}
-                                                            {{ value.parameter_value }}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </td>
-
-                                                <!-- Third Cell: data_time == "12" -->
-                                                <td id="{{ forloop.counter|add:4 }}-6">
-                                                    {% for value in define.values %}
-                                                        {% if value.data_time == "12" %}
-                                                            {{ value.parameter_value }}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </td>
-
-                                                <!-- Fourth Cell: data_time == "18" -->
-                                                <td id="{{ forloop.counter|add:4 }}-7">
-                                                    {% for value in define.values %}
-                                                        {% if value.data_time == "18" %}
-                                                            {{ value.parameter_value }}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </table>
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4" id="table-letf-right">
+                                            <table class="table table-bordered">
+                                                {% for define in defines %}
+                                                    <tr class="text-right">
+                                                       <td class="col-md-4 text-center">
+                                                            {% if define.values %}
+                                                                {% for low_item in low_limit %}
+                                                                    {% if low_item != 0 %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                                                            {{ low_item }} ~
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                {% for high_item in high_limit %}
+                                                                    {% if high_item != 0 %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                                                            {{ high_item }}
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                {{ '' }}
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                        <div class="col-md-8" id="table-letf-left">
+                                            <table class="table table-bordered">
+                                                {% for define in defines %}
+                                                    <tr class="text-right">
+                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
+                                                            {% for high_item in high_limit %}
+                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                    {% for low_item in low_limit %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                            {% if define %}
+                                                                                {% for value in define.values %}
+                                                                                    {% if value.data_time == "00" %}
+                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
+                                                                                            red
+                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
+                                                                                            red {# yellow #}
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        ">
+                                                            {% for value in define.values %}
+                                                                {% if value.data_time == "00" %}
+                                                                    {{ value.parameter_value }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
+                                                            {% for high_item in high_limit %}
+                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                    {% for low_item in low_limit %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                            {% if define %}
+                                                                                {% for value in define.values %}
+                                                                                    {% if value.data_time == "06" %}
+                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
+                                                                                            red
+                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
+                                                                                            red {# yellow #}
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        ">
+                                                            {% for value in define.values %}
+                                                                {% if value.data_time == "06" %}
+                                                                    {{ value.parameter_value }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
+                                                            {% for high_item in high_limit %}
+                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                    {% for low_item in low_limit %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                            {% if define %}
+                                                                                {% for value in define.values %}
+                                                                                    {% if value.data_time == "12" %}
+                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
+                                                                                            red
+                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
+                                                                                            red {# yellow #}
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        ">
+                                                            {% for value in define.values %}
+                                                                {% if value.data_time == "12" %}
+                                                                    {{ value.parameter_value }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
+                                                            {% for high_item in high_limit %}
+                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                    {% for low_item in low_limit %}
+                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
+                                                                            {% if define %}
+                                                                                {% for value in define.values %}
+                                                                                    {% if value.data_time == "18" %}
+                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
+                                                                                            red
+                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
+                                                                                            red {# yellow #}
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        ">
+                                                            {% for value in define.values %}
+                                                                {% if value.data_time == "18" %}
+                                                                    {{ value.parameter_value }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -334,7 +443,5 @@
             }
         });
     </script>
-
 </body>
 </html>
-{#Xử lí hai giá trị cùng 1 data_time#}
