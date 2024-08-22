@@ -177,7 +177,7 @@ def param_value_product_api(request):
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
-            chart_records = set((record['mach_id'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
             chart_records = list(chart_records)  # 将集合转换为列表
             chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
 
@@ -186,9 +186,10 @@ def param_value_product_api(request):
             color_index = 1
             for chart_record in chart_records:
                 mach_id = chart_record[0]
-                side = chart_record[1]
+                param_name = chart_record[1]
+                side = chart_record[2]
                 dataset = {}
-                dataset['label'] = mach_id + " " + side
+                dataset['label'] = mach_id + " " + side + " " + param_name
                 dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
                 dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
                 dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
@@ -198,8 +199,9 @@ def param_value_product_api(request):
                     date = date_time.split(' ')[0]
                     time = date_time.split(' ')[1].replace(":00", "")
                     time_filter = [record for record in records if
-                                   record['mach_id'] == mach_id and record['side'] == side and record[
-                                       'data_date'].strftime("%Y-%m-%d") == date and record['data_time'] == time]
+                                   record['mach_id'] == mach_id and record['side'] == side
+                                   and record['data_date'].strftime("%Y-%m-%d") == date
+                                   and record['data_time'] == time and record['parameter_name'] == param_name]
                     if time_filter:
                         data.append(time_filter[0]['parameter_value'])
                     else:
