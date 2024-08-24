@@ -157,6 +157,7 @@ def param_value_api(request):
 
             chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": y_data}
         except Exception as e:
+            chart_data = {"labels": [], "datasets": [], "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": []}
             print(e)
 
     return JsonResponse(chart_data, safe=False)
