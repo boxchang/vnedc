@@ -130,23 +130,23 @@ $(document).ready(function () {
         var plant = $("#id_plant").val();
         var mach = $("#id_mach").val();
         var process_type = $("#id_process_type").val();
-        var param_define = $("#id_param_define").val();
+        var param_type = $("#id_param_type").val();
         var control_high = $("#id_control_high").val();
         var control_low = $("#id_control_low").val();
 
-        if(data_date_start != "" && data_date_end != "" && plant != "" && mach != "" && process_type != "" && param_define != "") {
+        if(data_date_start != "" && data_date_end != "" && plant != "" && mach != "" && process_type != "" && param_type != "") {
             $("body").loading();
-            ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_define, control_high, control_low);
+            ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_type, control_high, control_low);
         }
     }
 
-    function ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_define, control_high, control_low) {
+    function ajax_chart(data_date_start, data_date_end, plant, mach, process_type, param_type, control_high, control_low) {
         var json_url = "{% url 'param_value_api' %}";
         jQuery.support.cors = true;
         $.ajax({
             url: json_url,
             type: "POST",
-            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", data_date_start: data_date_start, data_date_end: data_date_end, plant: plant, mach: mach, process_type: process_type, param_define: param_define, control_high: control_high, control_low: control_low},
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", data_date_start: data_date_start, data_date_end: data_date_end, plant: plant, mach: mach, process_type: process_type, param_type: param_type, control_high: control_high, control_low: control_low},
             timeout: 30000,
             dataType: "json", // "xml", "json"
             success: function(data) {
@@ -175,12 +175,12 @@ $(document).ready(function () {
     function process_type_change(plant, mach, process_type) {
         var lang = "{{ request.LANGUAGE_CODE }}";
         $.ajax({
-            url: '{% url 'get_param_define_api' %}', type: 'post',
+            url: '{% url 'get_param_code_api' %}', type: 'post',
             dataType: 'json',
-            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "mach": mach, "process_type": process_type, "lang": lang},
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "process_type": process_type, "lang": lang},
             success: function(data) {
                 //Update select Options
-                $("#id_param_define").html(data);
+                $("#id_param_type").html(data);
 
                 //Init control value
                 Init();

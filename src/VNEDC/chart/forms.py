@@ -15,7 +15,7 @@ class SearchForm(forms.Form):
     plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
     mach = forms.ModelChoiceField(required=True, label=_('mach_name'), queryset=Machine.objects.all())
     process_type = forms.ModelChoiceField(required=True, label=_('process_type'), queryset=Process_Type.objects.all().order_by('show_order'))
-    param_define = forms.ModelChoiceField(required=True, label=_('param_define'), queryset=ParameterDefine.objects.none())
+    param_type = forms.ModelChoiceField(required=True, label=_('param_define'), queryset=Parameter_Type.objects.none())
     control_high = forms.CharField(required=False, label=_('control_high'))
     control_low = forms.CharField(required=False, label=_('control_low'))
 
@@ -67,7 +67,7 @@ class SearchForm(forms.Form):
                         css_class='row'
                     ),
                     Div(
-                        Div('param_define', css_class='col'),
+                        Div('param_type', css_class='col'),
                         css_class='row'),
                     css_class='col-md-2'
                 ),

@@ -5,6 +5,27 @@ from datetime import datetime, date, timedelta
 from VNEDC.database import mes_database, vnedc_database
 from chart.forms import SearchForm, ProductionSearchForm
 from collection.models import ParameterValue, ParameterDefine, Parameter_Type
+import random
+
+def generate_pastel_color():
+    # 设定颜色值的下限，以保证颜色偏淡
+    lower_bound = 120  # 颜色的下限值
+    upper_bound = 230  # 深色的上限值。通常设置在128以下，以确保颜色是深色
+
+    # 生成淡色系的RGB颜色值
+    r = random.randint(lower_bound, upper_bound)
+    g = random.randint(lower_bound, upper_bound)
+    b = random.randint(lower_bound, upper_bound)
+
+    # 生成淡色系的 RGB 颜色值
+    r = random.randint(lower_bound, upper_bound)
+    g = random.randint(lower_bound, upper_bound)
+    b = random.randint(lower_bound, upper_bound)
+
+    # 将 RGB 颜色转换为十六进制格式
+    pastel_color_hex = '#{:02x}{:02x}{:02x}'.format(r, g, b)
+
+    return pastel_color_hex
 
 
 def get_product_choices(start_date, end_date):
@@ -41,9 +62,13 @@ def param_value_api(request):
         plant = request.POST.get('plant')
         mach = request.POST.get('mach')
         process_type = request.POST.get('process_type')
-        param_define = request.POST.get('param_define')
+        param_type = request.POST.get('param_type')
         control_high = request.POST.get('control_high')
         control_low = request.POST.get('control_low')
+
+        y_label = []
+        datasets = []
+
         backgroundColor = {"01": "#4dc9f6", "02": "#f67019", "03": "#f53794", "04": "#537bc4", "05": "#acc236",
                            "06": "#166a8f", "07": "#00a950", "08": "#58595b", "09": "#4ff9f6", "10": "#fff019",
                            "11": "#fff794", "12": "#5ffbc4", "13": "#aff236", "14": "#1ffa8f", "15": "#0ff950",
@@ -54,32 +79,40 @@ def param_value_api(request):
                        "16": "#5dd95b", "17": "#beef44", "18": "#eeef44", "19": "#deea44", "20": "#ceeaaf"}
 
         try:
-            records = ParameterValue.objects.filter(plant=plant, mach=mach, process_type=process_type,
-                                                    parameter_name=param_define, data_date__gte=data_date_start, data_date__lte=data_date_end)
-            y_label = []
-            datasets = []
-            for record in records:
-                y_label.append("{data_date} {data_time}:00".format(data_date=record.data_date, data_time=record.data_time))
-            y_label = list(set(y_label))
-            y_label.sort()
+
+            defines = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type, param_type=param_type)
+
+            param_name = defines[0].parameter_name
+
+            for define in defines:
+                records = ParameterValue.objects.filter(plant=plant, mach=mach, process_type=process_type,
+                                                        parameter_name=define.parameter_name, data_date__gte=data_date_start, data_date__lte=data_date_end)
+
+                # Date Label
+                for record in records:
+                    tmp = "{data_date} {data_time}:00".format(data_date=record.data_date, data_time=record.data_time)
+                    if tmp not in y_label:
+                        y_label.append(tmp)
+                y_label = list(set(y_label))
+                y_label.sort()
 
 
-            dataset = {}
-            mach_index = mach[-2:]
-            dataset['label'] = mach
-            dataset['backgroundColor'] = backgroundColor[mach_index]
-            dataset['borderColor'] = borderColor[mach_index]
-            dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
-            data = []
-            for date_time in y_label:
-                date = date_time.split(' ')[0]
-                time = date_time.split(' ')[1].replace(":00", "")
-                tmp = records.filter(data_date=date, data_time=time, mach=mach).first()
-                if tmp:
-                    data.append(tmp.parameter_value)
-            if data:
-                dataset['data'] = data
-                datasets.append(dataset)
+                dataset = {}
+                color = generate_pastel_color()
+                dataset['label'] = define.parameter_name
+                dataset['backgroundColor'] = color
+                dataset['borderColor'] = color
+                dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
+                data = []
+                for date_time in y_label:
+                    date = date_time.split(' ')[0]
+                    time = date_time.split(' ')[1].replace(":00", "")
+                    tmp = records.filter(data_date=date, data_time=time, mach=mach).first()
+                    if tmp:
+                        data.append(tmp.parameter_value)
+                if data:
+                    dataset['data'] = data
+                    datasets.append(dataset)
 
             # 取上下限值
             control_high_data = []
@@ -87,7 +120,8 @@ def param_value_api(request):
             control_low_data = []
             define = None
             if control_high == "" and control_low == "":
-                define = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type, parameter_name=param_define).first()
+                define = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type,
+                                                        parameter_name=param_name).first()
                 if define:
                     for date_time in y_label:
                         control_high_data.append(define.control_range_high)
@@ -106,16 +140,18 @@ def param_value_api(request):
                     control_low_data.append(control_low)
                 form_control_range_low = control_low
 
-            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append({'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#aaaaaa',
+                             'borderColor': '#cccccc', 'borderDash': [10, 2]})
             datasets.append(
                 {'label': '控制線', 'data': base_line_data, 'backgroundColor': '#eeeeee', 'borderColor': '#cccccc',
                  'borderDash': [10, 2]})
-            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#ffc4bd', 'borderColor': '#ffb7ad', 'borderDash': [10,2]})
+            datasets.append({'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#aaaaaa',
+                             'borderColor': '#cccccc', 'borderDash': [10, 2]})
 
             if define.scada_column:
-                title = process_type + "__" + param_define + "(" + define.scada_column + ")"
+                title = process_type + "__" + param_type + "(" + define.scada_column + ")"
             else:
-                title = process_type + "__" + param_define
+                title = process_type + "__" + param_type
 
             y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
 

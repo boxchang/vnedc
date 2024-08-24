@@ -67,10 +67,11 @@ def runcard_detail(request):
     runcard = request.GET.get('runcard')
     sql = f"""
     select r.id,r.WorkOrderId,w.CustomerName,w.PartNo,w.ProductItem,q.OptionName,q.Upper_InspectionValue,
-    q.InspectionValue,q.Lower_InspectionValue,q.InspectionStatus, q.InspectionUnit,q.DefectCode, FORMAT(q.CreationTime, 'yyyy/MM/dd HH:mm:ss') as CreationTime
+    q.InspectionValue,q.Lower_InspectionValue,q.InspectionStatus, q.InspectionUnit,q.DefectCode, FORMAT(q.CreationTime, 'yyyy/MM/dd HH:mm:ss') as CreationTime, u.Name
     from [PMGMES].[dbo].[PMG_MES_RunCard] r
     LEFT JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] w on r.WorkOrderId = w.id
     LEFT JOIN [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] q on q.RunCardId = r.id
+    LEFT JOIN [PMGMES].[dbo].[AbpUsers] u on q.CreatorUserId = u.Id
     where r.id = '{runcard}'
     """
     db = mes_database()
