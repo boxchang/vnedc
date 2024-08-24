@@ -122,7 +122,7 @@ class MES2TGM(object):
             SELECT distinct FILE_NAME file_name
               FROM [MEASURE_FILE] f, [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] r
               where f.FILE_NAME COLLATE Chinese_Taiwan_Stroke_CI_AS = r.RunCardId COLLATE Chinese_Taiwan_Stroke_CI_AS
-              and r.OptionName = 'Roll'
+              and r.OptionName = 'Roll' and r.CreationTime < DATEADD(HOUR, -2, GETDATE())
         """
         records = self.tgmdb.select_sql_dict(sql)
 
