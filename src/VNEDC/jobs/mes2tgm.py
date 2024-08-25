@@ -81,7 +81,10 @@ class MES2TGM(object):
                     self.insert_file_info(file_id, 'Lot Number', lot_number)
                     self.insert_file_info(file_id, 'Plant', plant)
 
-        self.clean_data()
+        # 刪除批號會造成Software當掉，改成只有15~20這段時間會刪批號
+        current_minute = datetime.now().minute
+        if 15 <= current_minute <= 20:
+            self.clean_data()
 
     # 新增量測主檔
     def insert_measure_file(self, LOT_NUMBER, inspectionDate):
