@@ -6,10 +6,6 @@ select:required {
     background: #ffffe7;
 }
 
-.content {
-    color: blue;
-}
-
 .django-ckeditor-widget{
     display: inline !important;
 }

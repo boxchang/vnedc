@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load user_groups %}
 <!DOCTYPE html>
 <html lang="{{ request.LANGUAGE_CODE }}">
 <head>
@@ -49,7 +50,12 @@
             </ul>
         </div>
         <ul>
+            {% if user|has_group:"生產關鍵參數" %}
             <li><a href="{% url 'collection_index' %}"><i class="fas fa-cogs"></i> <span>{% trans "Key Parameter" %}</span></a></li>
+            {% endif %}
+            {% if user|has_group:"MES輔助工具" %}
+            <li><a href="{% url 'runcard_info' %}"><i class="fas fa-wrench"></i> <span>{% trans "MES Tools" %}</span></a></li>
+            {% endif %}
             <!--<li><a href="#home"><i class="fas fa-home"></i> <span>關鍵參數</span></a></li>
             <li><a href="#contact"><i class="fas fa-envelope"></i> <span>{% trans "Contact" %}</span></a></li>
             <li><a href="#about"><i class="fas fa-info-circle"></i> <span>{% trans "About" %}</span></a></li>-->
