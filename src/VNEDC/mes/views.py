@@ -587,8 +587,8 @@ def insert_mes(data):
     roll = float(roll)
     cuff = float(cuff)
     palm = float(palm)
-    finger = round(float(finger) / 2, 2)
-    finger_tip = round(float(finger_tip) / 2, 3)
+    finger = float(finger)
+    finger_tip = float(finger_tip)
 
     # Call the stored procedure
     cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", runcard, local_ip, roll, cuff, palm, finger, finger_tip)
