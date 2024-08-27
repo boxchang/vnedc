@@ -584,11 +584,14 @@ def insert_mes(data):
     finger_tip = data.get('finger_tip')
 
     # Adjust the finger and finger_tip values as required
+    roll = float(roll)
+    cuff = float(cuff)
+    palm = float(palm)
     finger = round(float(finger) / 2, 2)
     finger_tip = round(float(finger_tip) / 2, 3)
 
     # Call the stored procedure
-    cursor.execute_sql(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", runcard, local_ip, roll, cuff, palm, finger, finger_tip)
+    cursor.execute(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", runcard, local_ip, roll, cuff, palm, finger, finger_tip)
     conn.commit()
 
     # 關閉連接
