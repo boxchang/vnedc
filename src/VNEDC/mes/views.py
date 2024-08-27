@@ -2,6 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from VNEDC.database import mes_database
 from datetime import datetime, timedelta
+import json
+from django.http import HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+
+from jobs.database import scada_database
 
 
 def work_order_list(request):
@@ -484,3 +489,131 @@ ORDER BY
     table_data2 = [merged_messages[i:i + 24] for i in range(0, len(merged_messages), 24)]
     return render(request, 'mes/fast_check.html', locals())
 
+def runcard_api(request, runcard):
+    sql_query = f"""
+        select 
+            rc.Id,
+            rc.WorkOrderID,
+            wo.CustomerPartNo,
+            wo.PartNo,
+            qc.LowerRoll,
+            qc.UpperRoll,
+            qc.LowerCuff,
+            qc.UpperCuff,
+            qc.LowerPalm,
+            qc.UpperPalm,
+            qc.LowerFinger,
+            qc.UpperFinger,
+            qc.LowerFingerTip,
+            qc.UpperFingerTip
+        from
+            [PMGMES].[dbo].[PMG_MES_RunCard] rc
+        left join
+            [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
+            on rc.WorkOrderId = wo.Id
+        left join
+            [PMGMES].[dbo].[PMG_MES_IPQCNBRStd] qc
+            on wo.CustomerPartNo = qc.CustomerPartNo
+            and wo.PartNo = qc.PartNo
+        where 
+            rc.Id = '{runcard}'
+        """
+
+    try:
+        db = mes_database()
+        results = db.select_sql_dict(sql_query)
+        if results:
+            result = results[0]
+            result_id = result['Id']
+            result_LowerRoll = result['LowerRoll']
+            result_UpperRoll = result['UpperRoll']
+            result_LowerCuff = result['LowerCuff']
+            result_UpperCuff = result['UpperCuff']
+            result_LowerPalm = result['LowerPalm']
+            result_UpperPalm = result['UpperPalm']
+            result_LowerFinger = result['LowerFinger']
+            result_UpperFinger = result['UpperFinger']
+            result_LowerFingerTip = result['LowerFingerTip']
+            result_UpperFingerTip = result['UpperFingerTip']
+            status = 'OK'
+            message = f'{runcard} được nhập thông tin thành công. Got {runcard} information successfully'
+        elif not results:
+            result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
+                result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger =\
+                result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
+            status = 'Fall'
+            message = f'Runcard {runcard} không tồn tại. Runcard {runcard} not existed'
+    except:
+        result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
+            result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger = \
+            result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
+        status = 'Fall'
+        message = f'Không thể kết nối url http://192.168.11.31/mes/runcard/{runcard}'
+
+    response_data = {
+        'runcard': result_id,
+        'ipqc_std': {
+            'LowerRoll': result_LowerRoll,
+            'UpperRoll': result_UpperRoll,
+            'LowerCuff': result_LowerCuff,
+            'UpperCuff': result_UpperCuff,
+            'LowerPalm': result_LowerPalm,
+            'UpperPalm': result_UpperPalm,
+            'LowerFinger': result_LowerFinger,
+            'UpperFinger': result_UpperFinger,
+            'LowerFingerTip': result_LowerFingerTip,
+            'UpperFingerTip': result_UpperFingerTip,
+        },
+        'status': status,
+        'message': message,
+    }
+    return JsonResponse(response_data)
+
+def insert_mes(data):
+    db = scada_database()  # Assuming this is a function that sets up your database connection
+    conn = db.create_sgada_connection()
+    cursor = conn.cursor()
+    procedure_name = '[dbo].[SP_AddTnicknessData]'
+
+    runcard = data.get('runcard')
+    local_ip = data.get('local_ip')
+    roll = data.get('roll')
+    cuff = data.get('cuff')
+    palm = data.get('palm')
+    finger = data.get('finger')
+    finger_tip = data.get('finger_tip')
+
+    # Adjust the finger and finger_tip values as required
+    finger = round(float(finger) / 2, 2)
+    finger_tip = round(float(finger_tip) / 2, 3)
+
+    # Call the stored procedure
+    cursor.execute_sql(f"EXEC {procedure_name} ?, ?, ?, ?, ?, ?, ?", runcard, local_ip, roll, cuff, palm, finger, finger_tip)
+    conn.commit()
+
+    # 關閉連接
+    cursor.close()
+    conn.close()
+
+@csrf_exempt
+def thickness_data_api(request):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            insert_mes(data)
+
+            runcard = data.get('runcard')
+            response_data = {
+                'status': 'OK',
+                'message': f'{runcard} được thêm thành công. {runcard} insert successfully'
+            }
+
+            return JsonResponse(response_data)
+
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid JSON")
+        except Exception as e:
+            return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Only PUT method is allowed'}, status=405)
