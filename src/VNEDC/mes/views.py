@@ -490,59 +490,74 @@ ORDER BY
     return render(request, 'mes/fast_check.html', locals())
 
 def runcard_api(request, runcard):
-    sql_query = f"""
-        select 
-            rc.Id,
-            rc.WorkOrderID,
-            wo.CustomerPartNo,
-            wo.PartNo,
-            qc.LowerRoll,
-            qc.UpperRoll,
-            qc.LowerCuff,
-            qc.UpperCuff,
-            qc.LowerPalm,
-            qc.UpperPalm,
-            qc.LowerFinger,
-            qc.UpperFinger,
-            qc.LowerFingerTip,
-            qc.UpperFingerTip
-        from
-            [PMGMES].[dbo].[PMG_MES_RunCard] rc
-        left join
-            [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
-            on rc.WorkOrderId = wo.Id
-        left join
-            [PMGMES].[dbo].[PMG_MES_IPQCNBRStd] qc
-            on wo.CustomerPartNo = qc.CustomerPartNo
-            and wo.PartNo = qc.PartNo
-        where 
-            rc.Id = '{runcard}'
-        """
-
     try:
+        table_name = ""
         db = mes_database()
-        results = db.select_sql_dict(sql_query)
-        if results:
-            result = results[0]
-            result_id = result['Id']
-            result_LowerRoll = result['LowerRoll']
-            result_UpperRoll = result['UpperRoll']
-            result_LowerCuff = result['LowerCuff']
-            result_UpperCuff = result['UpperCuff']
-            result_LowerPalm = result['LowerPalm']
-            result_UpperPalm = result['UpperPalm']
-            result_LowerFinger = result['LowerFinger']
-            result_UpperFinger = result['UpperFinger']
-            result_LowerFingerTip = result['LowerFingerTip']
-            result_UpperFingerTip = result['UpperFingerTip']
-            status = 'OK'
-            message = f'{runcard} được nhập thông tin thành công. Got {runcard} information successfully'
-        elif not results:
-            result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
-                result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger =\
-                result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
-            status = 'Fall'
-            message = f'Runcard {runcard} không tồn tại. Runcard {runcard} not existed'
+        sql = f"""
+        select * from [PMGMES].[dbo].[PMG_MES_RunCard] rc where rc.Id = '{runcard}'
+        """
+        result = db.select_sql_dict(sql)
+
+        if result:
+            plant = result[0]["WorkCenterTypeName"]
+
+            if plant == "NBR":
+                table_name = "[PMGMES].[dbo].[PMG_MES_IPQCNBRStd]"
+            else:
+                table_name = "[PMGMES].[dbo].[PMG_MES_IPQCPVCStd]"
+
+
+            sql_query = f"""
+                select 
+                rc.Id,
+                rc.WorkOrderID,
+                wo.CustomerPartNo,
+                wo.PartNo,
+                qc.LowerRoll,
+                qc.UpperRoll,
+                qc.LowerCuff,
+                qc.UpperCuff,
+                qc.LowerPalm,
+                qc.UpperPalm,
+                qc.LowerFinger,
+                qc.UpperFinger,
+                qc.LowerFingerTip,
+                qc.UpperFingerTip
+            from
+                [PMGMES].[dbo].[PMG_MES_RunCard] rc
+            left join
+                [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
+                on rc.WorkOrderId = wo.Id
+            left join
+                {table_name} qc
+                on wo.CustomerPartNo = qc.CustomerPartNo
+                and wo.PartNo = qc.PartNo
+            where 
+                rc.Id = '{runcard}'
+            """
+
+            results = db.select_sql_dict(sql_query)
+            if results:
+                result = results[0]
+                result_id = result['Id']
+                result_LowerRoll = result['LowerRoll']
+                result_UpperRoll = result['UpperRoll']
+                result_LowerCuff = result['LowerCuff']
+                result_UpperCuff = result['UpperCuff']
+                result_LowerPalm = result['LowerPalm']
+                result_UpperPalm = result['UpperPalm']
+                result_LowerFinger = result['LowerFinger']
+                result_UpperFinger = result['UpperFinger']
+                result_LowerFingerTip = result['LowerFingerTip']
+                result_UpperFingerTip = result['UpperFingerTip']
+                status = 'OK'
+                message = f'{runcard} được nhập thông tin thành công. Got {runcard} information successfully'
+            elif not results:
+                result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
+                    result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger =\
+                    result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
+                status = 'Fall'
+                message = f'Runcard {runcard} không tồn tại. Runcard {runcard} not existed'
     except:
         result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
             result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger = \
