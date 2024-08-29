@@ -20,6 +20,115 @@
             table-layout: fixed; /* Ensures all columns have equal width */
         }
     </style>
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 30px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(30px);
+    }
+
+    .slider:after {
+        content: 'OFF';
+        color: white;
+        display: block;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+    }
+
+    input:checked + .slider:after {
+        content: 'ON';
+        left: 30%;
+        color: green;
+    }
+</style>
+<!-- CSS for Modal -->
+<style>
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 9999; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 80%;
+        max-width: 300px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        color: #aaa;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
 </head>
 <body>
     <div class="sidebar collapsed" id="sidebar">
@@ -55,7 +164,7 @@
                 <form action="{% url 'rd_report' %}" method="POST" id="session_form">
                     {% csrf_token %}
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div id="div_id_plant" class="form-group">
                                 <label for="id_plant" class="requiredField">
                                     {% trans "Plant" %}<span class="asteriskField">*</span>
@@ -70,7 +179,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div id="div_id_mach" class="form-group">
                                 <label for="id_mach" class="requiredField">
                                     {% trans "Machine" %}<span class="asteriskField">*</span>
@@ -85,12 +194,27 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label for="data_date">{% trans "Record Date" %}*</label>
+                        <div class="col-md-2">
+                            <label for="data_date">{% trans "Start Date" %}*</label>
                             <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" />
                         </div>
-                        <div class="col-md-3">
-                        <label for="data_date"></label>
+                        <div class="col-md-1">
+                            <label for="limit_checkbox">{% trans "Limit" %}</label>
+                            <input type="checkbox" id="limit_checkbox" name="limit_mode" value="1" {% if sLimit_mode == '1' %}checked{% endif %}>
+                        </div>
+                        <div class="col-md-1">
+                            <label for="toggle_record_date">{% trans "- - - - - -" %}</label>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle_record_date" name="enable_mode" {% if sEnable_mode == 'on' %}checked{% endif %} onchange="toggleRecordDate()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="to_date">{% trans "End Date" %}*</label>
+                            <input id="id_to_date" class="form-control" name="to_date" type="date" value="{{ sTo_date }}" required="" />
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_date"></label>
                             <div class="box-nav-container row">
                                 <a class="box-nav-btn" style="margin-top:0.5cm;margin-left: 0.75cm;" href="/chart/param_value/" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="Chart">
                                     <i class="fas fa-chart-line"></i>
@@ -106,10 +230,18 @@
                 {% endif %}
             </div>
             <div class="content">
-                <div style="margin-left:84%">
-                    <form action="{% url 'download_excel' %}" method="get">
-                            <button type="submit">Download Excel</button>
+                <!-- Button and Form -->
+                <div style="margin-left:80%">
+                    <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
+                        <button type="submit">Download Excel</button>
                     </form>
+                </div>
+                <!-- Modal Structure -->
+                <div id="loadingModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button">&times;</span>
+                        <p>{{ modal_message }}</p>
+                    </div>
                 </div>
                 <div class="row m-3" style="height:500px">
                     <div class="col-12"  id="myTable">
@@ -396,21 +528,15 @@
             var plant = $("#id_plant").val();
             var mach = $("#id_mach").val();
             var data_date = $("#id_data_date").val();
-            if(plant!="" && mach !="" && data_date != "") {
+            var enable_mode = $("#toggle_record_date").is(':checked') ? 'on' : 'off';
 
-            $("#session_form").submit();
+            if(plant != "" && mach != "" && data_date != "") {
+                $("<input />").attr("type", "hidden")
+                              .attr("name", "enable_mode")
+                              .attr("value", enable_mode)
+                              .appendTo("#session_form");
+                $("#session_form").submit();
             }
-        }
-
-        function plant_change() {
-            $.ajax({
-                url: '{% url 'get_mach_api' %}', type: 'post',
-                dataType: 'json',
-                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": $("#id_plant :selected").val()},
-                success: function(data) {
-                    $("#id_mach").html(data);
-                }
-            });
         }
     </script>
     <script>
@@ -432,6 +558,24 @@
                 $('#session_form').attr('action', '/collection/rd_report/');
                 $('#session_form').submit();
             });
+
+            // Handle Date change
+            $('#id_to_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#toggle_record_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#limit_checkbox').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
         });
     </script>
     <script>
@@ -443,5 +587,38 @@
             }
         });
     </script>
+<script>
+    function toggleRecordDate() {
+        const toDateInput = document.getElementById('id_to_date');
+        const isChecked = document.getElementById('toggle_record_date').checked;
+
+        toDateInput.disabled = !isChecked; // Disable if unchecked, enable if checked
+        toDateInput.required = isChecked;  // Set required attribute based on the toggle state
+    }
+
+    // Initial load setup
+    window.onload = function() {
+        toggleRecordDate(); // Set the initial state based on the toggle
+    }
+</script>
+<script>
+    document.getElementById('downloadForm').addEventListener('submit', function(event) {
+        // Show the loading modal
+        document.getElementById('loadingModal').style.display = 'block';
+
+        // Submit the form
+        setTimeout(function() {
+            // After the form is submitted, automatically hide the modal after a few seconds
+            window.addEventListener('focus', function() {
+                document.getElementById('loadingModal').style.display = 'none';
+            });
+        }, 1000); // Delay to ensure the modal is shown before the form submission
+    });
+
+    // Close the modal when the user clicks the "X" button
+    document.querySelector('.close-button').addEventListener('click', function() {
+        document.getElementById('loadingModal').style.display = 'none';
+    });
+</script>
 </body>
 </html>

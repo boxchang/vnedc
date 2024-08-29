@@ -7,191 +7,191 @@
 {% endblock css %}
 {% block js %}
 <style>
-.navbar {
-    background-color: #24252A;
-    overflow: hidden;
-    height: 60px;
-}
-.navbar a {
-    display: block;
-    float: left;
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 0px 16px;
-    text-decoration: none;
-    margin-left: 20px;
-    font-size: 18px;
-}
-.navbar a:hover {
-    background-color: #058BB0;
-}
-.page-title{
-    margin-top: 4%;
-    text-align: center;
-}
+    .navbar {
+        background-color: #24252A;
+        overflow: hidden;
+        height: 60px;
+    }
+    .navbar a {
+        display: block;
+        float: left;
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 0px 16px;
+        text-decoration: none;
+        margin-left: 20px;
+        font-size: 18px;
+    }
+    .navbar a:hover {
+        background-color: #058BB0;
+    }
+    .page-title{
+        margin-top: 4%;
+        text-align: center;
+    }
+    .result-table{
+        /* background-color: #f8f9fa; */
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .table-container th {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        border: 2px solid #ffffff;
+    }
+    .table-container td{
+        background-color: #E9E9EB;
+        color: black;
+        padding: 15px;
+        border: 2px solid #ffffff;
+        margin: auto;
+    }
+    .alert-info{
+        margin-left: 0px;
+        height: 82px;
+    }
+    #left-side {
+        padding-top: 15px;
+    }
+    #right-side {
+        padding-top: 15px;
+    }
+    .checkmark, .crossmark {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        position: relative;
+        margin: auto;
+    }
+    .checkmark:after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: -2px;
+        width: 6px;
+        height: 12px;
+        border: solid #4CAF50;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .crossmark:before, .crossmark:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 2px;
+        background-color: red;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .crossmark:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+    .tooltip-text {
+        visibility: hidden;
+        width: auto;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 100%; /* Position above the <td> */
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 
-.result-table{
-    /* background-color: #f8f9fa; */
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.table-container th {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px;
-    border: 2px solid #ffffff;
-}
-.table-container td{
-    background-color: #E9E9EB;
-    color: black;
-    padding: 15px;
-    border: 2px solid #ffffff;
-    margin: auto;
-}
-.alert-info{
-    margin-left: 0px;
-    height: 82px;
-}
-#left-side {
-    padding-top: 15px;
-}
-#right-side {
-    padding-top: 15px;
-}
-.checkmark, .crossmark {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    position: relative;
-    margin: auto;
-}
-.checkmark:after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: -2px;
-    width: 6px;
-    height: 12px;
-    border: solid #4CAF50;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-.crossmark:before, .crossmark:after {
-    content: '';
-    position: absolute;
-    width: 14px;
-    height: 2px;
-    background-color: red;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-.crossmark:after {
-    transform: translate(-50%, -50%) rotate(-45deg);
-}
-.tooltip-text {
-    visibility: hidden;
-    width: auto;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 100%; /* Position above the <td> */
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
+    td:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+    .hover-color {
+        background-color: white; /* Default background color */
+        transition: background-color 0.3s ease;
+    }
 
-td:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-.hover-color {
-    background-color: white; /* Default background color */
-    transition: background-color 0.3s ease;
-}
-
-.hover-color:hover {
-    background-color: #FFD1C3; /* Color when hovering */
-}
-.sub-table td {
-    border: none;
-}
-.sub-checkmark, .sub-crossmark {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    position: relative;
-    margin: auto;
-}
-.sub-checkmark:after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: -2px;
-    width: 5px;
-    height: 10px;
-    border: solid #4CAF50;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-.sub-crossmark:before, .sub-crossmark:after {
-    content: '';
-    position: absolute;
-    width: 14px;
-    height: 2px;
-    background-color: red;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-.sub-crossmark:after {
-    transform: translate(-50%, -50%) rotate(-45deg);
-}
-.table-data {
-    border-collapse: collapse;
-    width: 100%;
-    padding-left: 0;
-    margin-left: 0;
-    margin-right: 0;
-}
-.table-data th, td {
-    border: 2px solid white;
-    padding: 0px;
-    text-align: center;
-    position: relative;
-}
-.table-data td{
-    background-color: #E9E9EB;
-}
- .popup {
-    display: none;
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 5px;
-    background-color: #333;
-    color: #fff;
-    border-radius: 5px;
-    white-space: nowrap;
-    z-index: 1;
-}
-td:hover .popup {
-    display: block;
-}
-#center-right{
-    padding-left: 0px;
-}
-#center-left{
-    padding-right: 0px;
-}
+    .hover-color:hover {
+        background-color: #FFD1C3; /* Color when hovering */
+    }
+    .sub-table td {
+        border: none;
+    }
+    .sub-checkmark, .sub-crossmark {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        position: relative;
+        margin: auto;
+    }
+    .sub-checkmark:after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: -2px;
+        width: 5px;
+        height: 10px;
+        border: solid #4CAF50;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .sub-crossmark:before, .sub-crossmark:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 2px;
+        background-color: red;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .sub-crossmark:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+    .table-data {
+        border-collapse: collapse;
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .table-data th, td {
+        border: 2px solid white;
+        padding: 0px;
+        text-align: center;
+        position: relative;
+    }
+    .table-data td{
+        background-color: #E9E9EB;
+    }
+     .popup {
+        display: none;
+        position: absolute;
+        text-align: left;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px;
+        background-color: #333;
+        color: #fff;
+        border-radius: 5px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+    td:hover .popup {
+        display: block;
+    }
+    #center-right{
+        padding-left: 0px;
+    }
+    #center-left{
+        padding-right: 0px;
+    }
 </style>
 <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -202,24 +202,32 @@ td:hover .popup {
         var form = document.getElementById('date-form');
 
         var today = new Date();
-        today.setDate(today.getDate() - 1); // Set the date to yesterday
-        var flatpickrInstance = flatpickr(calendarInput, {
+        today.setDate(today.getDate()); // This ensures today is set correctly; no need to change it for yesterday if not required.
+
+        // Initialize Flatpickr
+        flatpickr(calendarInput, {
             dateFormat: 'Y-m-d',
-            maxDate: today, // Disable today and future dates
+            maxDate: today, // Disable future dates
+            defaultDate: selectedDateInput.value || null, // Set the default date if available
             onChange: function(selectedDates, dateStr, instance) {
                 selectedDateInput.value = dateStr;
                 form.submit();
             }
         });
+
+        // Attach event to machine select dropdown
+        document.getElementById('machine-select').addEventListener('change', function() {
+            selectedDateInput.value = calendarInput.value;
+            form.submit();
+        });
     });
 </script>
-
 {% endblock js %}
 {% block title %}
 Report Check
 {% endblock title %}
 {% block content %}
-<div class="">
+<div class="content">
     <div class="row m-3">
         <div class="col-12">
             <div class="container">
@@ -233,13 +241,22 @@ Report Check
                         <h1 style="text-align: right">DASHBOARDS ANALYSIS</h1>
                     </div>
                     <div class="col-md-4">
-                        <div class="alert alert-info col-md-5">Selected Date: {{ selected_date }}</div>
-                        <form method="POST" id="date-form">
-                            {% csrf_token %}
-                            <input type="hidden" id="selected-date" name="date">
-                        </form>
-                        <div class="">
-                            <input type="text" id="calendar-input" class="form-control" placeholder="Select a date">
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="alert alert-info col-md-6 mb-0">Selected Date: {{ selected_date }}</div>
+                            <form method="POST" id="date-form" class="col-md-6 mb-0 ml-3" style="padding-left: 10%;">
+                                {% csrf_token %}
+                                <input type="hidden" id="selected-date" name="date">
+                                <div class="form-group mb-0">
+                                    <label for="machine-select">Select Machine:</label>
+                                    <select id="machine-select" name="machine" class="form-control" onchange="this.form.submit()">
+                                        <option value="NBR" {% if selected_machine == 'NBR' %}selected{% endif %}>NBR</option>
+                                        <option value="PVC" {% if selected_machine == 'PVC' %}selected{% endif %}>PVC</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="" style="padding-top: 10px">
+                            <input type="text" id="calendar-input" class="form-control" placeholder="Select a date" value="{{ selected_date }}">
                         </div>
                     </div>
                 </div>
@@ -247,7 +264,7 @@ Report Check
         </div>
     </div>
 </div>
-<div class="">
+<div class="content">
     <div class="row m-3">
         <div class="col-12">
             <div class="container">
@@ -267,45 +284,45 @@ Report Check
                                     {% for machine_name in machine_names %}
                                         {% for work_order in work_orders %}
                                             {% if forloop.counter == forloop.parentloop.counter %}
-                                                {% for run_card in run_cards %}
+                                                {% for machine_data in machines_data %}
                                                     {% if forloop.counter == forloop.parentloop.counter %}
-                                                       {% for data in machine_data %}
+                                                        {% for machine_data_total in machine_data_totals %}
                                                             {% if forloop.counter == forloop.parentloop.counter %}
-                                                                {% for runcard_message in runcard_messages %}
+                                                                {% for run_card in run_card_data%}
                                                                     {% if forloop.counter == forloop.parentloop.counter %}
-                                                                        {% for machine_data_total in machine_data_totals %}
+                                                                        {% for run_card_message in run_card_messages%}
                                                                             {% if forloop.counter == forloop.parentloop.counter %}
-                                                                            <tr>
-                                                                                <td style="height: 85.98px;">{{ machine_name }}</td>
-                                                                                <td  style="height: 85.98px; text-align: center; vertical-align: middle;">
-                                                                                    {% if work_order == 0 %}
-                                                                                        <span class="crossmark"></span>
-                                                                                    {% elif work_order == 1 %}
-                                                                                        <span class="checkmark"></span>
-                                                                                    {% endif %}
-                                                                                </td>
-                                                                                <td class="hover-color"  style="height: 85.98px; text-align: center; vertical-align: middle;">
-                                                                                    {% if run_card == 0 %}
-                                                                                        <span class="crossmark"></span>
-                                                                                        <span class="popup">{{ runcard_message }}</span>
-                                                                                    {% elif run_card == 1 %}
-                                                                                        <span class="checkmark"></span>
-                                                                                    {% endif %}
-                                                                                </td>
-                                                                                <td class="hover-color" style="height: 85.98px; position: relative; text-align: center; vertical-align: middle;">
-                                                                                    {% if data == 0 %}
-                                                                                        <span class="crossmark"></span>
-                                                                                    {% else %}
-                                                                                        <div class="checkmark"></div>
-                                                                                    {% endif %}
-                                                                                    <span class="tooltip-text">{{ machine_data_total }}</span>
-                                                                                </td>
-                                                                            </tr>
+                                                                                <tr>
+                                                                                    <td style="height: 85.98px;">{{ machine_name }}</td>
+                                                                                    <td  style="height: 85.98px; text-align: center; vertical-align: middle;">
+                                                                                        {% if work_order == 0 %}
+                                                                                            <span class="crossmark"></span>
+                                                                                        {% elif work_order == 1 %}
+                                                                                            <span class="checkmark"></span>
+                                                                                        {% endif %}
+                                                                                    </td>
+                                                                                    <td class="hover-color"  style="height: 85.98px; text-align: center; vertical-align: middle;">
+                                                                                        {% if run_card == 0 %}
+                                                                                            <span class="crossmark"></span>
+                                                                                        {% elif run_card == 1 %}
+                                                                                            <span class="checkmark"></span>
+                                                                                        {% endif %}
+                                                                                        <span class="popup">{{ run_card_message }}</span>
+                                                                                    </td>
+                                                                                    <td class="hover-color" style="height: 85.98px; position: relative; text-align: center; vertical-align: middle;">
+                                                                                        {% if machine_data == 0 %}
+                                                                                            <span class="crossmark"></span>
+                                                                                        {% else %}
+                                                                                            <div class="checkmark"></div>
+                                                                                        {% endif %}
+                                                                                        <span class="tooltip-text">{{ machine_data_total }}</span>
+                                                                                    </td>
+                                                                                </tr>
                                                                             {% endif %}
                                                                         {% endfor %}
                                                                     {% endif %}
                                                                 {% endfor %}
-                                                             {% endif %}
+                                                            {% endif %}
                                                         {% endfor %}
                                                     {% endif %}
                                                 {% endfor %}
@@ -345,7 +362,7 @@ Report Check
                                                                             <span class="sub-checkmark"></span>
                                                                         {% endif %}
                                                                         <span class="popup">
-                                                                            {{ cell2 }}
+                                                                            {{ cell2|safe  }}
                                                                         </span>
                                                                     </td>
                                                                 {% endif %}

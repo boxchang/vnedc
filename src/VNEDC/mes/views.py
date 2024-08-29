@@ -133,8 +133,12 @@ def index(request):
 
 def fast_check(request):
     selected_date = ''
+    selected_machine = ''
+
     if request.method == 'POST':
         selected_date = request.POST.get('date', '')
+        selected_machine = request.POST.get('machine', 'PVC')  # Get the selected machine, default to 'PVC' if not set
+
     sql1 = f"""
     WITH Machine AS (
     SELECT *
@@ -164,7 +168,7 @@ WorkOrderCheck AS (
         [PMGMES].[dbo].[PMG_MES_WorkOrderInfo] woi 
         ON wo.Id = woi.WorkOrderId
     WHERE 
-        dml.Name LIKE '%NBR%'
+        dml.Name LIKE '%{selected_machine}%'
 )
 
 SELECT 
@@ -236,7 +240,7 @@ InspectionCheck AS (
         AND rc.Id = qc.RunCardId
         AND wo.Id = qc.WorkOrderId
     WHERE 
-        dml.Name LIKE '%NBR%'
+        dml.Name LIKE '%{selected_machine}%'
 )
 
 SELECT 
@@ -265,7 +269,7 @@ ORDER BY
             [PMGMES].[dbo].[PMG_DML_DataModelList] dm
         WHERE 
             dm.DataModelTypeId = 'DMT000003' 
-            AND dm.Abbreviation LIKE '%NBR%'
+            AND dm.Abbreviation LIKE '%{selected_machine}%'
     ),
     HourlyLineData AS (
         SELECT 
@@ -279,10 +283,10 @@ ORDER BY
             [PMG_DEVICE].[dbo].[COUNTING_DATA] cd
             ON cdm.COUNTING_MACHINE = cd.MachineName
         WHERE 
-            cd.CreationTime BETWEEN CONVERT(DATETIME, '{selected_date} 05:30:00', 120) 
-                              AND CONVERT(DATETIME, DATEADD(SECOND, -1, CONVERT(DATETIME, DATEADD(DAY, 1, '{selected_date}') + ' 05:30:00', 120)), 120)
-            AND cd.MachineName LIKE '%NBR%'
-            AND cd.MachineName LIKE '%NBR_CountingMachine%'
+            cd.CreationTime BETWEEN CONVERT(DATETIME, '{selected_date} 06:00:00', 120) 
+                              AND CONVERT(DATETIME, DATEADD(SECOND, -1, CONVERT(DATETIME, DATEADD(DAY, 1, '{selected_date}') + ' 06:00:00', 120)), 120)
+            AND cd.MachineName LIKE '%{selected_machine}%'
+            AND cd.MachineName LIKE '%CountingMachine%'
         GROUP BY 
             cdm.MES_MACHINE,
             cdm.LINE,
@@ -343,148 +347,103 @@ ORDER BY
     results2 = db.select_sql_dict(sql2)
     results3 = db.select_sql_dict(sql3)
 
-    machine_names, work_orders, run_cards, machine_data = [], [], [], []
-    runcard_stop_hours, runcard_messages = [], []
-    machine_data_totals = []
-    machine_data_hours, machine_data_messages = [], []
-    runcard_modes = []
-    iqpc_modes = []
-    times = []
-    for result1 in results1:
-        machine_names.append(result1['MachineName'])
-        machine_names = list(dict.fromkeys(machine_names))
-
-    for machine_name in machine_names:
-        machine_count = 0
-        data_count = 0
-        machine_data_total = 0
-        rc_exist_hours = []
-        for result1 in results1:
-            if machine_name == result1['MachineName']:
-                if machine_count == 0:
-                    work_orders.append(result1['WorkOrderMode'])
-                    machine_count = 1
-
-        for result2 in results2:
-            if machine_name == result2['MachineName']:
-                rc_exist_hours.append(result2['RuncardHour'])
-        rc_exist_hours = list(dict.fromkeys(rc_exist_hours))
-        expected_time = {f"{i:02}" for i in range(24)}
-        run_hour = [f"{int(i):02}" for i in rc_exist_hours if i is not None]
-        exist_hours = set(run_hour)
-
-        runcard_missed_hours = expected_time - exist_hours
-        runcard_missed_hours = list(runcard_missed_hours)
-        runcard_stop_hours.append(runcard_missed_hours)
-        for result3 in results3:
-            if machine_name == result3['MES_MACHINE']:
-                if data_count == 0:
-                    machine_data.append(result3['QtyCheck'])
-                    data_count = 1
-                machine_data_total += float(result3['A1_Qty']) + float(result3['A2_Qty']) + float(result3['B1_Qty']) + float(result3['B2_Qty'])
-                machine_data_hours.append(result3['CellCheck'])
-                times.append(str(result3['Hour']))
-                machine_data_messages.append('Machine: at: ' + str(result3['Hour']) + ':00 -'
-                               + '\nA1: ' + str(result3['A1_Qty'])
-                               + '\nA2: ' + str(result3['A2_Qty'])
-                               + '\nB1: ' + str(result3['B1_Qty'])
-                               + '\nB2: ' + str(result3['B2_Qty']))
-        machine_data_totals.append(machine_data_total)
-
-
-    for i in range(len(runcard_stop_hours)):
-        if len(runcard_stop_hours[i]) == 0:
-            run_cards.append(1)
-            runcard_messages.append('Normal')
-        else:
-            run_cards.append(0)
-            runcard_messages.append(f'Runcard lost in : {len(runcard_stop_hours[i])} hours')
-
+    machine_names = list(dict.fromkeys(list(results1_['MachineName'] for results1_ in results1)))
+    work_orders, run_card_stop_hours, machines_data = [], [], []
+    machine_data_totals, run_card_data, run_card_messages = [], [], []
     period_times = ['06', '07', '08', '09', '10', '11', '12', '13',
                     '14', '15', '16', '17', '18', '19', '20', '21',
                     '22', '23', '00', '01', '02', '03', '04', '05']
+    for machine_name in machine_names:
+        machine_name_count = 0
+        for results1_ in results1:
+            if machine_name == results1_['MachineName']:
+                work_orders.append(results1_['WorkOrderMode'])
+                break
+        run_card_exist_hours = []
+        for results2_ in results2:
+            if machine_name == results2_['MachineName']:
+                run_card_exist_hours.append(results2_['RuncardHour'])
+        run_card_stop_hours.append(list(set(period_times) - set([f"{int(i):02}" for i in
+                    list(dict.fromkeys(run_card_exist_hours)) if i is not None and f"{int(i):02}" in period_times])))
+        machine_data_count = 0
+        machine_data_total = 0
+        for results3_ in results3:
+            if machine_name == results3_['MES_MACHINE']:
+                if machine_data_count == 0:
+                    machines_data.append(results3_['QtyCheck'])
+                    machine_data_count = 1
+                machine_data_total += float(results3_['A1_Qty']) + float(results3_['A2_Qty']) + float(results3_['B1_Qty']) + float(results3_['B2_Qty'])
+        machine_data_totals.append(machine_data_total)
+    for index in range(len(run_card_stop_hours)):
+        if len(run_card_stop_hours[index]) == 0:
+            run_card_data.append(1)
+            run_card_messages.append('Normal')
+        elif len(run_card_stop_hours[index]) > 0:
+            run_card_data.append(0)
+            run_card_messages.append(f'Machine lost Runcard in: {len(run_card_stop_hours[index])} hour')
+    for index in range(len(machines_data)):
+        if machine_data_totals[index] == 0:
+            machines_data[index] = 0
 
-    runcard_data_hours = []
-    # print(len(runcard_stop_hours))
-
-    for index in runcard_stop_hours:
-        if len(index) == 0:
-            runcard_data_hours.extend([1] * 24)
-        else:
-            for period in period_times:
-                count = 0
-                for time in index:
-                    if float(period) == float(time):
-                        count += 1
-                if count == 0:
-                    runcard_data_hours.append(1)
-                elif count == 1:
-                    runcard_data_hours.append(0)
-
-
-    ipqc_data_hours = [[[] for _ in range(24)] for _ in range(14)]
-    ipqc_messages = []
-    machine_line_index = {f"L{i+1:02}": i for i in range(len(machine_name))}
-    period_time_index = {time: i for i, time in enumerate(period_times)}
-
-    for result2 in results2:
-        machine = result2['MachineName'].split("_")[-1]
-        period = result2['RuncardHour']
-        weight = result2['Weight']
-        if period is None:
-            continue
-
-        period = str(period).zfill(2)
-        if period not in period_time_index:
-            continue
-        if weight is not None:
-            weight = float(weight)
-
-        machine_idx = machine_line_index[machine]
-        period_idx = period_time_index[period]
-        ipqc_data_hours[machine_idx][period_idx].append(weight)
-
-
-    for index, ipqc_data in enumerate(ipqc_data_hours):
-        for hour in ipqc_data:
-            if len(hour) == 0:
-                iqpc_modes.append(0)
-                ipqc_messages.append('NO Runcard !')
-            else:
-                if None in hour:
-                    iqpc_modes.append(0)
-                    ipqc_messages.append(str(hour))
-                else:
-                    iqpc_modes.append(1)
-                    ipqc_messages.append(str(hour))
-
-    runcard_hour_messages = []
-    for runcard_data_hour in runcard_data_hours:
-        if runcard_data_hour == 1:
-            runcard_hour_messages.append("Runcard printed")
-        else:
-            runcard_hour_messages.append("Runcard NOT printed !")
-
-    try:
-        new_value_messages = []
-        new_runcard_messages = []
-        for i in range(336):
-            new_value_messages.append('IPQC weight: at: ' + str(times[i]) + ':00 - ' + str(ipqc_messages[i]))
-            new_runcard_messages.append('Runcard: at: ' + str(times[i]) + ':00 - ' + str(runcard_hour_messages[i]))
-    except:
-        pass
-
-    merged_messages,merged_data = [], []
-    for i in range(0, 336, 24):
-        merged_data.extend(runcard_data_hours[i:i + 24])
-        merged_data.extend(iqpc_modes[i:i + 24])
-        merged_data.extend(machine_data_hours[i:i + 24])
-        merged_messages.extend(new_runcard_messages[i:i + 24])
-        merged_messages.extend(new_value_messages[i:i + 24])
-        merged_messages.extend(machine_data_messages[i:i + 24])
-
-
-    print(len(times))
+    run_card_messages_24 = [''] * (len(machine_names) * 24)
+    run_card_mode_24 = [0] * (len(machine_names) * 24)
+    run_card_messages_24_2 = [''] * (len(machine_names) * 24)
+    run_card_mode_24_2 = [0] * (len(machine_names) * 24)
+    run_card_messages_24_3 = [''] * (len(machine_names) * 24)
+    run_card_mode_24_3 = [0] * (len(machine_names) * 24)
+    for i, machine_name in enumerate(machine_names):
+        for j, period_time in enumerate(period_times):
+            found = False
+            found2 = False
+            found3 = False
+            for results2_ in results2:
+                if machine_name == results2_['MachineName']:
+                    if results2_['RuncardId'] is not None:
+                        if float(results2_['RuncardHour']) == float(period_time):
+                            run_card_mode_24[i * 24 + j] = 1
+                            if run_card_messages_24[i * 24 + j] == '':
+                                run_card_messages_24[i * 24 + j] = 'Runcard: at: '+ str(period_time) + ':00 ' + '<br>' + '&nbsp;&nbsp;&ndash;' + str(results2_['LineId'] + ': ' + results2_['RuncardId'])
+                            else:
+                                run_card_messages_24[i * 24 + j] += '<br>' + '&nbsp;&nbsp;&ndash;' + f"{results2_['LineId']}: {results2_['RuncardId']}"
+                            found = True
+                    if results2_['Weight'] is not None:
+                        if float(results2_['RuncardHour']) == float(period_time):
+                            run_card_mode_24_2[i * 24 + j] = 1
+                            if run_card_messages_24_2[i * 24 + j] == '':
+                                run_card_messages_24_2[i * 24 + j] = 'Weight: at: '+ str(period_time) + ':00 ' + '<br>' + '&nbsp;&nbsp;&ndash;' + str(str(results2_['LineId']) + ': ' + str(results2_['Weight']))
+                            else:
+                                run_card_messages_24_2[i * 24 + j] += '<br>' + '&nbsp;&nbsp;&ndash;' + f"{results2_['LineId']}: {results2_['Weight']}"
+                            found2 = True
+            if not found:
+                run_card_messages_24[i * 24 + j] = 'No Runcard'
+            if not found2:
+                run_card_messages_24_2[i * 24 + j] = 'No Weight Value'
+            machines_data_total = 0
+            machine_data_text = ''
+            for results3_ in results3:
+                machines_data_count = 0
+                if machine_name == results3_['MES_MACHINE']:
+                    if results3_['Hour'] is not None:
+                        if float(results3_['Hour']) == float(period_time):
+                            run_card_messages_24_3[i * 24 + j] = ('Machine: at: ' + str(results3_['Hour']) + ':00<br>'
+                                                        + '&nbsp;&nbsp;&ndash; A1: ' + str(results3_['A1_Qty']) + '<br>'
+                                                        + '&nbsp;&nbsp;&ndash; A2: ' + str(results3_['A2_Qty']) + '<br>'
+                                                        + '&nbsp;&nbsp;&ndash; B1: ' + str(results3_['B1_Qty']) + '<br>'
+                                                        + '&nbsp;&nbsp;&ndash; B2: ' + str(results3_['B2_Qty']))
+                            if (float(results3_['A1_Qty']) + float(results3_['A2_Qty']) + \
+                                float(results3_['B1_Qty']) + float(results3_['B2_Qty'])) > 0:
+                                run_card_mode_24_3[i * 24 + j] = 1
+                            found3 = True
+            if not found3:
+                run_card_messages_24_3[i * 24 + j] = 'No Machine Data'
+    merged_messages, merged_data = [], []
+    for i in range(0, (len(machine_names)*24), 24):
+        merged_data.extend(run_card_mode_24[i:i + 24])
+        merged_data.extend(run_card_mode_24_2[i:i + 24])
+        merged_data.extend(run_card_mode_24_3[i:i + 24])
+        merged_messages.extend(run_card_messages_24[i:i + 24])
+        merged_messages.extend(run_card_messages_24_2[i:i + 24])
+        merged_messages.extend(run_card_messages_24_3[i:i + 24])
     table_data1 = [merged_data[i:i + 24] for i in range(0, len(merged_data), 24)]
     table_data2 = [merged_messages[i:i + 24] for i in range(0, len(merged_messages), 24)]
     return render(request, 'mes/fast_check.html', locals())
