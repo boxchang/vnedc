@@ -398,6 +398,9 @@ def rd_report(request):
     elif sPlant == '' or sMach == '':
         modal_message = 'Some selection empty !'
 
+    if sData_date == '':
+        sData_date = datetime.today()
+
     process_type = Process_Type.objects.filter().first()
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
