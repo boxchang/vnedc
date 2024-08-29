@@ -371,12 +371,32 @@ def rd_select(request):
         request.session['plant'] = request.POST.get('plant', '')
         request.session['mach'] = request.POST.get('mach', '')
         request.session['data_date'] = request.POST.get('data_date', '')
+        request.session['to_date'] = request.POST.get('to_date', '')
+        request.session['enable_mode'] = 'on' if request.POST.get('enable_mode') == 'on' else 'off'
+        request.session['limit_mode'] = '1' if request.POST.get('limit_mode') == '1' else '0'
+    else:
+        request.session['enable_mode'] = request.session.get('enable_mode', 'off')
+        request.session['limit_mode'] = request.session.get('limit_mode', '0')
 
     return (request.session.get('plant', ''), request.session.get('mach', ''),
-            request.session.get('data_date', ''), get_language())
+            request.session.get('data_date', ''), request.session.get('to_date', ''),
+            request.session.get('enable_mode', 'off'), request.session.get('limit_mode', '0'),
+            get_language())
+
 
 def rd_report(request):
-    sPlant, sMach, sData_date, lang = rd_select(request)
+    sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
+
+    modal_message = 'Loading... Please wait while the file is being generated.'
+    if sPlant != '' and sMach != '' and sData_date != '' and sTo_date != '':
+        start_date = datetime.strptime(sData_date, "%Y-%m-%d")
+        end_date = datetime.strptime(sTo_date, "%Y-%m-%d")
+        if start_date > end_date:
+            modal_message = 'Start date is after End date'
+        elif (end_date - start_date).days >= 31:
+            modal_message = 'Day range is bigger than 31 days'
+    elif sPlant == '' or sMach == '':
+        modal_message = 'Some selection empty !'
 
     process_type = Process_Type.objects.filter().first()
     plants = Plant.objects.all()
@@ -395,14 +415,23 @@ def rd_report(request):
 
     for define in defines:
         values = ParameterValue.objects.filter(
-                                    plant=sPlant,
-                                    mach=sMach,
-                                    data_date=sData_date,
-                                    process_type=define.process_type.process_code,
-                                    parameter_name=define.parameter_name
-                                )
-        define.values = values
+            plant=sPlant,
+            mach=sMach,
+            data_date=sData_date,
+            process_type=define.process_type.process_code,
+            parameter_name=define.parameter_name
+        )
 
+        # Deduplicate values based on `data_time`
+        seen_data_times = set()
+        deduplicated_values = []
+
+        for value in values:
+            if value.data_time not in seen_data_times:
+                deduplicated_values.append(value)
+                seen_data_times.add(value.data_time)
+
+        define.values = deduplicated_values
     try:
         control_limit = Lab_Parameter_Control.objects.filter(
             plant=sPlant,
@@ -428,17 +457,14 @@ def rd_report(request):
                     low_limit[i], high_limit[i] = low_value[0], high_value[0]
                 else:
                     low_limit[i], high_limit[i] = low_value[1], high_value[1]
-
     except:
         pass
-
     return render(request, 'collection/rd_report.html', locals())
 
 def generate_excel_file_big(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
     if sEnable_mode == 'off':
         sTo_date == ''
-
     workbook = Workbook()
     worksheet = workbook.active
 

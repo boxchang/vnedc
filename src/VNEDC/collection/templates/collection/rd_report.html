@@ -231,9 +231,11 @@
             </div>
             <div class="content">
                 <!-- Button and Form -->
-                <div style="margin-left:80%">
+                <div style="margin-left:82.5%; padding-top: 10px;">
                     <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
-                        <button type="submit">Download Excel</button>
+                        <button type="submit" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                            Download Excel
+                        </button>
                     </form>
                 </div>
                 <!-- Modal Structure -->
@@ -587,38 +589,38 @@
             }
         });
     </script>
-<script>
-    function toggleRecordDate() {
-        const toDateInput = document.getElementById('id_to_date');
-        const isChecked = document.getElementById('toggle_record_date').checked;
+    <script>
+        function toggleRecordDate() {
+            const toDateInput = document.getElementById('id_to_date');
+            const isChecked = document.getElementById('toggle_record_date').checked;
 
-        toDateInput.disabled = !isChecked; // Disable if unchecked, enable if checked
-        toDateInput.required = isChecked;  // Set required attribute based on the toggle state
-    }
+            toDateInput.disabled = !isChecked; // Disable if unchecked, enable if checked
+            toDateInput.required = isChecked;  // Set required attribute based on the toggle state
+        }
 
-    // Initial load setup
-    window.onload = function() {
-        toggleRecordDate(); // Set the initial state based on the toggle
-    }
-</script>
-<script>
-    document.getElementById('downloadForm').addEventListener('submit', function(event) {
-        // Show the loading modal
-        document.getElementById('loadingModal').style.display = 'block';
+        // Initial load setup
+        window.onload = function() {
+            toggleRecordDate(); // Set the initial state based on the toggle
+        }
+    </script>
+    <script>
+        document.getElementById('downloadForm').addEventListener('submit', function(event) {
+            // Show the loading modal
+            document.getElementById('loadingModal').style.display = 'block';
 
-        // Submit the form
-        setTimeout(function() {
-            // After the form is submitted, automatically hide the modal after a few seconds
-            window.addEventListener('focus', function() {
-                document.getElementById('loadingModal').style.display = 'none';
-            });
-        }, 1000); // Delay to ensure the modal is shown before the form submission
-    });
+            // Submit the form
+            setTimeout(function() {
+                // After the form is submitted, automatically hide the modal after a few seconds
+                window.addEventListener('focus', function() {
+                    document.getElementById('loadingModal').style.display = 'none';
+                });
+            }, 1000); // Delay to ensure the modal is shown before the form submission
+        });
 
-    // Close the modal when the user clicks the "X" button
-    document.querySelector('.close-button').addEventListener('click', function() {
-        document.getElementById('loadingModal').style.display = 'none';
-    });
-</script>
+        // Close the modal when the user clicks the "X" button
+        document.querySelector('.close-button').addEventListener('click', function() {
+            document.getElementById('loadingModal').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
