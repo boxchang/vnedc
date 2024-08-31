@@ -511,12 +511,12 @@ def runcard_api(request, runcard):
                 result_UpperFingerTip = result['UpperFingerTip']
                 status = 'OK'
                 message = f'{runcard} được nhập thông tin thành công. Got {runcard} information successfully'
-            elif not results:
-                result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
-                    result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger =\
-                    result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
-                status = 'Fall'
-                message = f'Runcard {runcard} không tồn tại. Runcard {runcard} not existed'
+        else:
+            result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
+                result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger =\
+                result_UpperFinger = result_LowerFingerTip = result_UpperFingerTip = None
+            status = 'Fall'
+            message = f'Runcard {runcard} không tồn tại. Runcard {runcard} not existed'
     except:
         result_id = result_LowerRoll = result_UpperRoll = result_LowerCuff = \
             result_UpperCuff = result_LowerPalm = result_UpperPalm = result_LowerFinger = \
