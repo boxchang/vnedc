@@ -276,74 +276,16 @@
                             <div class="row no-gutters">
                                 <div class="col-md-6" id="table-letf">
                                     <table class="table table-bordered" id="myTable">
-                                        <tr>
-                                            <th class="col-md-8" style="padding-left: 1cm" id="5-1">Acid tank 1</th>
-                                            <td id="5-2">%</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8" style="padding-left: 1cm" id="6-1">Acid tank 2</th>
-                                            <td id="6-2">%</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8" style="padding-left: 1cm" id="7-1">Alkaline tank 1</th>
-                                            <td id="7-2">%</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8" style="padding-left: 1cm" id="8-1">Alkaline tank 2</th>
-                                            <td id="8-2">%</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="3" id="9-1">Coagulant A</th>
-                                            <td id="9-2">CN (%)</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="10-2">CPF (%)</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="11-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="3" id="12-1">Coagulant B</th>
-                                            <td id="12-2">CN (%)</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="13-2">CPF (%)</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="14-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="15-1">Latex SIDE A-1</th>
-                                            <td id="15-2">TSC %</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="16-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="17-1">Latex SIDE A-2</th>
-                                            <td id="17-2">TSC %</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="18-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="19-1">Latex SIDE B-1</th>
-                                            <td id="19-2">TSC %</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="20-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8 align-middle" style="padding-left: 1cm" rowspan="2" id="21-1">Latex SIDE B-2</th>
-                                            <td id="21-2">TSC %</td>
-                                        </tr>
-                                        <tr>
-                                            <td id="22-2">pH Value</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="col-md-8" style="padding-left: 1cm" id="23-1">Chlorination</th>
-                                            <td id="23-2">ppm</td>
-                                        </tr>
+                                        {% for row in table_data %}
+                                            <tr>
+                                               <th class="col-md-8" style="padding-left: 1cm">
+                                                   {{ row.0 }}
+                                               </th>
+                                               <td>
+                                                    {{ row.1 }}
+                                               </td>
+                                            </tr>
+                                        {% endfor %}
                                     </table>
                                 </div>
                                 <div class="col-md-6" id="table-right">
