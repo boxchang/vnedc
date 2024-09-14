@@ -386,19 +386,20 @@ def rd_select(request):
 
 def rd_report(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
-    # print('Mode :',sEnable_mode)
-    # print('Limit :',sLimit_mode, '- Type: ', type(sLimit_mode))
 
     process_type = Process_Type.objects.filter().first()
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
+    if 'GD' not in sPlant and 'LK' not in sPlant:
+        sPlant = 'GDNBR'
+        machs = Machine.objects.filter(plant=sPlant)
     if 'GD' in sPlant:
         defines = ParameterDefine.objects.filter(
             plant=sPlant,
             mach=sMach,
             process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
             parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
-                                'A_T1_PH',  'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
+                                'A_T1_PH', 'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
                                 'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
                                 'A_PH', 'A_CONCENTRATION', 'B_CPF',
                                 'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
@@ -408,14 +409,15 @@ def rd_report(request):
                 'Latex SIDE A-1', 'Latex SIDE A-2', 'Latex SIDE A-2	', 'Latex SIDE B-1', 'Latex SIDE B-1',
                 'Latex SIDE B-2', 'Latex SIDE B-2', 'Chlorination']
         parameters = ['%', '%', '%', '%', 'CN (%)', 'CPF (%)', 'pH Value', 'CN (%)', 'CPF (%)', 'pH Value', 'TSC %',
-                      'pH Value', 'TSC %', 'pH Value', 'TSC %', 'pH Value',  'TSC %', 'pH Value', 'ppm']
+                      'pH Value', 'TSC %', 'pH Value', 'TSC %', 'pH Value', 'TSC %', 'pH Value', 'ppm']
+
     elif 'LK' in sPlant:
         defines = ParameterDefine.objects.filter(
             plant=sPlant,
             mach=sMach,
             process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
             parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'T1_TSC',
-                                'T1_PH',  'T2_TSC', 'T2_PH', 'A_CPF',
+                                'T1_PH', 'T2_TSC', 'T2_PH', 'A_CPF',
                                 'A_PH', 'A_CONCENTRATION', 'B_CPF',
                                 'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
         )
