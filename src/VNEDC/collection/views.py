@@ -386,12 +386,25 @@ def rd_select(request):
 
 def rd_report(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
+    if sData_date == "":
+        sData_date = datetime.now().strftime('%Y-%m-%d')
+    modal_message = 'Loading... Please wait while the file is being generated.'
+    if sPlant != '' and sMach != '' and sData_date != '' and sTo_date != '':
+        start_date = datetime.strptime(sData_date, "%Y-%m-%d")
+        end_date = datetime.strptime(sTo_date, "%Y-%m-%d")
+        if start_date > end_date:
+            modal_message = 'Start date is after End date'
+        elif (end_date - start_date).days >= 31:
+            modal_message = 'Day range is bigger than 31 days'
+    elif sPlant == '' or sMach == '':
+        modal_message = 'Some selection empty !'
 
     process_type = Process_Type.objects.filter().first()
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
     if 'GD' not in sPlant and 'LK' not in sPlant:
         sPlant = 'GDNBR'
+        sMach = 'GDNBR 01'
         machs = Machine.objects.filter(plant=sPlant)
     if 'GD' in sPlant:
         defines = ParameterDefine.objects.filter(
@@ -404,12 +417,13 @@ def rd_report(request):
                                 'A_PH', 'A_CONCENTRATION', 'B_CPF',
                                 'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
         )
-        item = ['Acid tank 1', 'Acid tank 2', 'Alkaline tank 1', 'Alkaline tank 2', 'Coagulant A', 'Coagulant A',
-                'Coagulant A', 'Coagulant B', 'Coagulant B', 'Coagulant B', 'Latex SIDE A-1',
-                'Latex SIDE A-1', 'Latex SIDE A-2', 'Latex SIDE A-2	', 'Latex SIDE B-1', 'Latex SIDE B-1',
-                'Latex SIDE B-2', 'Latex SIDE B-2', 'Chlorination']
-        parameters = ['%', '%', '%', '%', 'CN (%)', 'CPF (%)', 'pH Value', 'CN (%)', 'CPF (%)', 'pH Value', 'TSC %',
-                      'pH Value', 'TSC %', 'pH Value', 'TSC %', 'pH Value', 'TSC %', 'pH Value', 'ppm']
+
+        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Latex SIDE A-1', ['TSC %', 'pH Value']], ['Latex SIDE A-2', ['TSC %', 'pH Value']],
+                      ['Latex SIDE B-1', ['TSC %', 'pH Value']], ['Latex SIDE B-2', ['TSC %', 'pH Value']],
+                      ['Chlorination', ['ppm']]]
+
 
     elif 'LK' in sPlant:
         defines = ParameterDefine.objects.filter(
@@ -421,15 +435,12 @@ def rd_report(request):
                                 'A_PH', 'A_CONCENTRATION', 'B_CPF',
                                 'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
         )
-        item = ['Acid tank 1', 'Acid tank 2', 'Alkaline tank 1', 'Alkaline tank 2', 'Coagulant A', 'Coagulant A',
-                'Coagulant A', 'Coagulant B', 'Coagulant B', 'Coagulant B', 'Latex 1',
-                'Latex 1', 'Latex 2', 'Latex 2	', 'Chlorination']
-        parameters = ['%', '%', '%', '%', 'CN (%)', 'CPF (%)', 'pH Value', 'CN (%)', 'CPF (%)', 'pH Value', 'TSC %',
-                      'pH Value', 'TSC %', 'pH Value', 'ppm']
-    table_data = [
-        [item_value, parameter_value]
-        for item_value, parameter_value in zip(item, parameters)
-    ]
+
+        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Latex 1', ['TSC %', 'pH Value']], ['Latex 2', ['TSC %', 'pH Value']],
+                      ['Chlorination', ['ppm']]]
+
     for define in defines:
         values = ParameterValue.objects.filter(
                                     plant=sPlant,
@@ -475,7 +486,6 @@ def generate_excel_file_big(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
     if sEnable_mode == 'off':
         sTo_date == ''
-
     workbook = Workbook()
     worksheet = workbook.active
 
@@ -486,35 +496,31 @@ def generate_excel_file_big(request):
         bottom=Side(style='thin')
     )
 
+    download_code = 0
     if sPlant != '' and sMach != '' and sData_date != '':
         if sTo_date != '':
             start_date = datetime.strptime(sData_date, "%Y-%m-%d")
             end_date = datetime.strptime(sTo_date, "%Y-%m-%d")
-            if start_date > end_date:
-                filename = f"Day-miss-match-order.xlsx"
-                plant_rp = mach_rp = date_rp = to_rp = ''
-            elif start_date == end_date:
+            if start_date == end_date:
                 filename = f"DATA-{sPlant}-{sMach}-{sData_date}.xlsx"
                 plant_rp, mach_rp, date_rp, to_rp = sPlant, sMach, sData_date, sTo_date
-            elif start_date < end_date:
+                download_code = 1
+            elif start_date < end_date and (end_date - start_date).days < 31:
                 filename = f"DATA-{sPlant}-{sMach}-{sData_date}-to-{sTo_date}.xlsx"
                 plant_rp, mach_rp, date_rp, to_rp = sPlant, sMach, sData_date, sTo_date
+                download_code = 1
         elif sTo_date == '':
             start_date = datetime.strptime(sData_date, "%Y-%m-%d")
             end_date = start_date
             filename = f"DATA-{sPlant}-{sMach}-{sData_date}.xlsx"
             plant_rp, mach_rp, date_rp, to_rp = sPlant, sMach, sData_date, sTo_date
-    else:
-        start_date = datetime.today().date()
-        end_date = start_date
-        filename = '#ERROR_VALUE!.xlsx'
-        plant_rp = mach_rp = date_rp = to_rp = ''
-    max_row = 26
-    if 'GD' in sPlant:
-        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A", "Coagulant B",
-                 "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Chlorination"]
-        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 1]
+            download_code = 1
 
+    max_row = 26
+    if 'GDNBR' in sPlant:
+        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A",
+                 "Coagulant B", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Chlorination"]
+        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 1]
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
                       "TSC %", "pH Value", "TSC %", "pH Value", "TSC %", "pH Value", "ppm"]
@@ -522,314 +528,298 @@ def generate_excel_file_big(request):
         names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A", "Coagulant B",
                  "Latex 1", "Latex 2", "Chlorination"]
         merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 1]
-
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
                       "TSC %", "pH Value", "ppm"]
         max_row = 22
-    for row in range(5, max_row+1):
-        worksheet.row_dimensions[row].height = 25
-    worksheet.column_dimensions['A'].width = 30
-    worksheet.column_dimensions['B'].width = 20
-    worksheet.column_dimensions['C'].width = 20
-    worksheet.row_dimensions[1].height = 45
-    worksheet.row_dimensions[2].height = 30
-    worksheet.row_dimensions[3].height = 30
-    worksheet.row_dimensions[4].height = 30
 
-    def set_merged_cell(range_str, value, alignment="center", fill_color="F1FF18"):
-        worksheet.merge_cells(range_str)
-        cell = worksheet[range_str.split(':')[0]]
-        cell.value = value
-        cell.alignment = Alignment(horizontal=alignment, vertical="center")
-        cell.font = Font(bold=True, color="333333")
-        cell.fill = PatternFill("solid", fgColor=fill_color)
-    def set_merged_cell2(range_str, value, alignment="center", fill_color="FDE9D9"):
-        worksheet.merge_cells(range_str)
-        cell = worksheet[range_str.split(':')[0]]
-        cell.value = value
-        cell.alignment = Alignment(horizontal=alignment, vertical="center")
-        cell.font = Font(bold=True, color="333333")
-        cell.fill = PatternFill("solid", fgColor=fill_color)
-    set_merged_cell('A5:A7', "ITEM")
-    set_merged_cell('B5:B7', "Parameters")
-    set_merged_cell('C5:C7', "Specs.")
-    set_merged_cell('D5:G5', "Sample Time")
+    if download_code == 1:
+        for row in range(5, max_row+1):
+            worksheet.row_dimensions[row].height = 25
+        worksheet.column_dimensions['A'].width = 30
+        worksheet.column_dimensions['B'].width = 20
+        worksheet.column_dimensions['C'].width = 20
+        worksheet.row_dimensions[1].height = 45
+        worksheet.row_dimensions[2].height = 30
+        worksheet.row_dimensions[3].height = 30
+        worksheet.row_dimensions[4].height = 30
 
-    start_row = 8
-    for name, size in zip(names, merge_sizes):
-        end_row = start_row + size - 1
-        worksheet.merge_cells(f"A{start_row}:A{end_row}")
-        cell = worksheet[f"A{start_row}"]
-        cell.value = name
-        cell.alignment = Alignment(horizontal="left", vertical="center", indent=3)
-        start_row = end_row + 1
+        def set_merged_cell(range_str, value, alignment="center", fill_color="F1FF18"):
+            worksheet.merge_cells(range_str)
+            cell = worksheet[range_str.split(':')[0]]
+            cell.value = value
+            cell.alignment = Alignment(horizontal=alignment, vertical="center")
+            cell.font = Font(bold=True, color="333333")
+            cell.fill = PatternFill("solid", fgColor=fill_color)
+        def set_merged_cell2(range_str, value, alignment="center", fill_color="FDE9D9"):
+            worksheet.merge_cells(range_str)
+            cell = worksheet[range_str.split(':')[0]]
+            cell.value = value
+            cell.alignment = Alignment(horizontal=alignment, vertical="center")
+            cell.font = Font(bold=True, color="333333")
+            cell.fill = PatternFill("solid", fgColor=fill_color)
+        set_merged_cell('A5:A7', "ITEM")
+        set_merged_cell('B5:B7', "Parameters")
+        set_merged_cell('C5:C7', "Specs.")
+        set_merged_cell('D5:G5', "Sample Time")
 
-    for row_num, param in enumerate(parameters, start=8):
-        worksheet[f'B{row_num}'] = param
-        worksheet[f'B{row_num}'].alignment = Alignment(horizontal="center", vertical="center")
-
-    days_diff = (end_date - start_date).days + 1
-    col_end = 7
-    for day_offset in range(days_diff):
-        current_date = start_date + timedelta(days=day_offset)
-        col_start = 4 + (day_offset * 4)
-        col_end = col_start + 3
-        set_merged_cell2(f'{get_column_letter(col_start)}2:{get_column_letter(col_end)}2',  f"{plant_rp}")
-        set_merged_cell2(f'{get_column_letter(col_start)}3:{get_column_letter(col_end)}3',  f"{mach_rp}")
-        set_merged_cell2(f'{get_column_letter(col_start)}4:{get_column_letter(col_end)}4',  f"{current_date.strftime('%Y-%m-%d')}")
-        set_merged_cell(f'{get_column_letter(col_start)}5:{get_column_letter(col_end)}5', "Sample Time")
-        sample_times = ["1", "2", "3", "4"]
-        sample_hours = ["0h", "6h", "12h", "18h"]
-
-        for i, col in enumerate([get_column_letter(col_start),get_column_letter(col_start+1), get_column_letter(col_end-1), get_column_letter(col_end)]):
-            worksheet[f'{col}6'] = sample_times[i]
-            worksheet[f'{col}7'] = sample_hours[i]
-            worksheet[f'{col}6'].alignment = worksheet[f'{col}7'].alignment = Alignment(horizontal="center")
-            worksheet[f'{col}6'].fill = worksheet[f'{col}7'].fill = PatternFill("solid", fgColor="F1FF18")
-
-        if 'GD' in sPlant:
-            defines = ParameterDefine.objects.filter(
-                plant=sPlant,
-                mach=sMach,
-                process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
-                parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
-                                    'A_T1_PH', 'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
-                                    'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
-                                    'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                    'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
-            )
-        elif 'LK' in sPlant:
-            defines = ParameterDefine.objects.filter(
-                plant=sPlant,
-                mach=sMach,
-                process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
-                parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'T1_TSC',
-                                    'T1_PH', 'T2_TSC', 'T2_PH', 'A_CPF',
-                                    'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                    'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
-            )
         start_row = 8
-        for define in defines:
-            values = ParameterValue.objects.filter(
-                plant=sPlant,
-                mach=sMach,
-                data_date=current_date.strftime('%Y-%m-%d'),
-                process_type=define.process_type.process_code,
-                parameter_name=define.parameter_name
-            )
+        for name, size in zip(names, merge_sizes):
+            end_row = start_row + size - 1
+            worksheet.merge_cells(f"A{start_row}:A{end_row}")
+            cell = worksheet[f"A{start_row}"]
+            cell.value = name
+            cell.alignment = Alignment(horizontal="left", vertical="center", indent=3)
+            start_row = end_row + 1
+        for row_num, param in enumerate(parameters, start=8):
+            worksheet[f'B{row_num}'] = param
+            worksheet[f'B{row_num}'].alignment = Alignment(horizontal="center", vertical="center")
 
-            for value in values:
-                # Determine the column based on data_time
-                if value.data_time == '00':
-                    worksheet[f'{get_column_letter(col_start)}{start_row}'] = value.parameter_value
-                elif value.data_time == '06':
-                    worksheet[f'{get_column_letter(col_start + 1)}{start_row}'] = value.parameter_value
-                elif value.data_time == '12':
-                    worksheet[f'{get_column_letter(col_start + 2)}{start_row}'] = value.parameter_value
-                elif value.data_time == '18':
-                    worksheet[f'{get_column_letter(col_start + 3)}{start_row}'] = value.parameter_value
-            start_row += 1
+        days_diff = (end_date - start_date).days + 1
+        col_end = 7
 
-    if int(sLimit_mode) == 1:
-        try:
-            control_limit = Lab_Parameter_Control.objects.filter(
-                plant=sPlant,
-                mach=sMach,
-                item_no=re.search(r'-(\d+)', Daily_Prod_Info.objects.filter(
+        for day_offset in range(days_diff):
+            current_date = start_date + timedelta(days=day_offset)
+            col_start = 4 + (day_offset * 4)
+            col_end = col_start + 3
+            set_merged_cell2(f'{get_column_letter(col_start)}2:{get_column_letter(col_end)}2',  f"{plant_rp}")
+            set_merged_cell2(f'{get_column_letter(col_start)}3:{get_column_letter(col_end)}3',  f"{mach_rp}")
+            set_merged_cell2(f'{get_column_letter(col_start)}4:{get_column_letter(col_end)}4',  f"{current_date.strftime('%Y-%m-%d')}")
+            set_merged_cell(f'{get_column_letter(col_start)}5:{get_column_letter(col_end)}5', "Sample Time")
+            sample_times = ["1", "2", "3", "4"]
+            sample_hours = ["0h", "6h", "12h", "18h"]
+
+            for i, col in enumerate([get_column_letter(col_start),get_column_letter(col_start+1), get_column_letter(col_end-1), get_column_letter(col_end)]):
+                worksheet[f'{col}6'] = sample_times[i]
+                worksheet[f'{col}7'] = sample_hours[i]
+                worksheet[f'{col}6'].alignment = worksheet[f'{col}7'].alignment = Alignment(horizontal="center")
+                worksheet[f'{col}6'].fill = worksheet[f'{col}7'].fill = PatternFill("solid", fgColor="F1FF18")
+            if 'GD' in sPlant:
+                defines = ParameterDefine.objects.filter(
                     plant=sPlant,
                     mach=sMach,
-                    data_date=sData_date).first().prod_name_a1).group(1))
-            low_value, high_value = [], []
-            for i in range(len(control_limit)):
-                high_value.append(control_limit[i].control_range_high)
-                low_value.append(control_limit[i].control_range_low)
+                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
+                    parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
+                                        'A_T1_PH', 'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
+                                        'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
+                                        'A_PH', 'A_CONCENTRATION', 'B_CPF',
+                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
 
-            low_limit, high_limit = [0] * 19, [0] * 19
-            for i in ([5, 6, 8, 9] + list(range(10, 18))):
-                if i in [5, 6, 8, 9]:
-                    if i == 5 or i == 8:
-                        low_limit[i], high_limit[i] = low_value[3], high_value[3]
-                    elif i == 6 or i == 9:
-                        low_limit[i], high_limit[i] = low_value[4], high_value[4]
-                else:
-                    if i % 2 == 0:
-                        low_limit[i], high_limit[i] = low_value[0], high_value[0]
-                    else:
-                        low_limit[i], high_limit[i] = low_value[1], high_value[1]
-
-            range_limit = []
-            for i in range(len(high_limit)):
-                range_limit.append(f'{low_limit[i]} ~ {high_limit[i]}')
-
+                )
+            elif 'LK' in sPlant:
+                defines = ParameterDefine.objects.filter(
+                    plant=sPlant,
+                    mach=sMach,
+                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
+                    parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'T1_TSC',
+                                        'T1_PH', 'T2_TSC', 'T2_PH', 'A_CPF',
+                                        'A_PH', 'A_CONCENTRATION', 'B_CPF',
+                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
+                )
             start_row = 8
+            for define in defines:
+                values = ParameterValue.objects.filter(
+                    plant=sPlant,
+                    mach=sMach,
+                    data_date=current_date.strftime('%Y-%m-%d'),
+                    process_type=define.process_type.process_code,
+                    parameter_name=define.parameter_name
+                )
 
-            for i in range(len(high_limit)):
-                if high_limit[i] != 0:
-                    worksheet[f'C{start_row}'] = range_limit[i]
-                    worksheet[f'C{start_row}'].alignment = Alignment(vertical="center", horizontal="right")
+                for value in values:
+                    # Determine the column based on data_time
+                    if value.data_time == '00':
+                        worksheet[f'{get_column_letter(col_start)}{start_row}'] = value.parameter_value
+                    elif value.data_time == '06':
+                        worksheet[f'{get_column_letter(col_start + 1)}{start_row}'] = value.parameter_value
+                    elif value.data_time == '12':
+                        worksheet[f'{get_column_letter(col_start + 2)}{start_row}'] = value.parameter_value
+                    elif value.data_time == '18':
+                        worksheet[f'{get_column_letter(col_start + 3)}{start_row}'] = value.parameter_value
                 start_row += 1
 
-            for i in range(len(high_limit)):
-                start_row = i + 8
-                if high_limit[i] != 0:
-                    for day_offset in range(days_diff):
-                        current_start_col = 4 + (day_offset * 4)
-                        for col in range(current_start_col, current_start_col + 4):
-                            cell = worksheet[f'{get_column_letter(col)}{start_row}']
-                            if cell.value and float(cell.value):
-                                if float(cell.value) > float(high_limit[i]):
-                                    cell.fill = PatternFill("solid", fgColor='FF0000')
-                                elif float(cell.value) < float(low_limit[i]):
-                                    cell.fill = PatternFill("solid", fgColor='FF0000')
-                start_row += 1
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        if int(sLimit_mode) == 1:
+            try:
+                control_limit = Lab_Parameter_Control.objects.filter(
+                    plant=sPlant,
+                    mach=sMach,
+                    item_no=re.search(r'-(\d+)', Daily_Prod_Info.objects.filter(
+                        plant=sPlant,
+                        mach=sMach,
+                        data_date=sData_date).first().prod_name_a1).group(1))
+                low_value, high_value = [], []
+                for i in range(len(control_limit)):
+                    high_value.append(control_limit[i].control_range_high)
+                    low_value.append(control_limit[i].control_range_low)
 
-    def set_header_row(row, col, value, merged_cells=None, fill_color="FDE9D9"):
-        if merged_cells:
-            worksheet.merge_cells(merged_cells)
-        worksheet.row_dimensions[row].height = 30
-        cell = worksheet[f'{col}{row}']
-        cell.value = value
-        cell.alignment = Alignment(horizontal="left", vertical="center")
-        cell.font = Font(size=14, bold=False)
-        cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
-    header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp)]
-    for col, label, value in header_data:
-        row = int(col[1:])
-        set_header_row(row, col[0], label)
-    worksheet.merge_cells('B2:C4')
-    worksheet.merge_cells(f'A1:{get_column_letter(col_end)}1')
-    worksheet.row_dimensions[1].height = 45
-    merged_cell = worksheet['A1']
-    merged_cell.value = 'Daily Report'
-    merged_cell.alignment = Alignment(horizontal="center", vertical="center")
-    merged_cell.font = Font(size=18, bold=True)
-    merged_cell.fill = PatternFill(start_color="EBF1DE", end_color="EBF1DE", fill_type="solid")
+                low_limit, high_limit = [0] * 19, [0] * 19
+                for i in ([5, 6, 8, 9] + list(range(10, 18))):
+                    if i in [5, 6, 8, 9]:
+                        if i == 5 or i == 8:
+                            low_limit[i], high_limit[i] = low_value[3], high_value[3]
+                        elif i == 6 or i == 9:
+                            low_limit[i], high_limit[i] = low_value[4], high_value[4]
+                    else:
+                        if i % 2 == 0:
+                            low_limit[i], high_limit[i] = low_value[0], high_value[0]
+                        else:
+                            low_limit[i], high_limit[i] = low_value[1], high_value[1]
 
-    left_top_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
-                            top=Side(style='thick'), bottom=Side(style='thin'))
-    right_top_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                            top=Side(style='thick'), bottom=Side(style='thin'))
-    left_bot_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
-                            top=Side(style='thin'), bottom=Side(style='thick'))
-    right_bot_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                            top=Side(style='thin'), bottom=Side(style='thick'))
-    right_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                             top=Side(style='thin'), bottom=Side(style='thin'))
-    left_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
-                             top=Side(style='thin'), bottom=Side(style='thin'))
-    top_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
-                             top=Side(style='thick'), bottom=Side(style='thin'))
-    bot_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
-                             top=Side(style='thin'), bottom=Side(style='thick'))
-    middle = Border(left=Side(style='thin'), right=Side(style='thin'),
-                             top=Side(style='thin'), bottom=Side(style='thin'))
-    for row in worksheet.iter_rows(min_row=5, max_row=max_row, min_col=4, max_col=7):
-        for cell in row:
-            if cell.row == 5 and cell.column == 4:
-                cell.border = left_top_thick
-            elif cell.row == 5 and cell.column == 7:
-                cell.border = right_top_thick
-            elif cell.row == max_row and cell.column == 4:
-                cell.border = left_bot_thick
-            elif cell.row == max_row and cell.column == 7:
-                cell.border = right_bot_thick
-            elif cell.column == 4:
-                cell.border = left_thick
-            elif cell.column == 7:
-                cell.border = right_thick
-            elif cell.row == 5:
-                cell.border = top_thick
-            elif cell.row == max_row:
-                cell.border = bot_thick
-            else:
-                cell.border = middle
+                range_limit = []
+                for i in range(len(high_limit)):
+                    range_limit.append(f'{low_limit[i]} ~ {high_limit[i]}')
 
-    for row in worksheet.iter_rows(min_row=5, max_row=7, min_col=1, max_col=col_end):
-        for cell in row:
-            cell.border = thin_border
-            cell.font = Font(size=14)
+                start_row = 8
 
-    for row in worksheet.iter_rows(min_row=8, max_row=max_row, min_col=1, max_col=col_end):
-        for cell in row:
-            cell.border = thin_border
-            cell.font = Font(size=13)
-    for row in worksheet.iter_rows(min_row=2, max_row=4, min_col=1, max_col=col_end):
-        for cell in row:
-            cell.font = Font(size=14)
-    for row in worksheet.iter_rows():
-        for cell in row:
-            if isinstance(cell.value, str) and cell.value.isdigit():
-                cell.value = int(cell.value)
+                for i in range(len(high_limit)):
+                    if high_limit[i] != 0:
+                        worksheet[f'C{start_row}'] = range_limit[i]
+                        worksheet[f'C{start_row}'].alignment = Alignment(vertical="center", horizontal="right")
+                    start_row += 1
 
-    def thick_boder_table(ws, min_row, max_row, min_col, max_col):
-        thick = Side(border_style="medium", color="000000")
+                for i in range(len(high_limit)):
+                    start_row = i + 8
+                    if high_limit[i] != 0:
+                        for day_offset in range(days_diff):
+                            current_start_col = 4 + (day_offset * 4)
+                            for col in range(current_start_col, current_start_col + 4):
+                                cell = worksheet[f'{get_column_letter(col)}{start_row}']
+                                if cell.value and float(cell.value):
+                                    if float(cell.value) > float(high_limit[i]):
+                                        cell.fill = PatternFill("solid", fgColor='FF0000')
+                                    elif float(cell.value) < float(low_limit[i]):
+                                        cell.fill = PatternFill("solid", fgColor='FF0000')
+                    start_row += 1
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
-        border = Border(left=thick, right=thick, top=thick, bottom=thick)
+        def set_header_row(row, col, value, merged_cells=None, fill_color="FDE9D9"):
+            if merged_cells:
+                worksheet.merge_cells(merged_cells)
+            worksheet.row_dimensions[row].height = 30
+            cell = worksheet[f'{col}{row}']
+            cell.value = value
+            cell.alignment = Alignment(horizontal="left", vertical="center")
+            cell.font = Font(size=14, bold=False)
+            cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
+        header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp)]
+        for col, label, value in header_data:
+            row = int(col[1:])
+            set_header_row(row, col[0], label)
+        worksheet.merge_cells('B2:C4')
+        fill = PatternFill(start_color='FDE9D9', end_color='FDE9D9', fill_type='solid')
+        for row in worksheet.iter_rows(min_row=2, max_row=4, min_col=2, max_col=3):
+            for cell in row:
+                cell.fill = fill
+        worksheet.merge_cells(f'A1:{get_column_letter(col_end)}1')
+        worksheet.row_dimensions[1].height = 45
+        merged_cell = worksheet['A1']
+        merged_cell.value = 'Daily Report'
+        merged_cell.alignment = Alignment(horizontal="center", vertical="center")
+        merged_cell.font = Font(size=18, bold=True)
+        merged_cell.fill = PatternFill(start_color="EBF1DE", end_color="EBF1DE", fill_type="solid")
 
-        # Apply top border
-        for col in range(min_col, max_col + 1):
-            ws.cell(row=min_row, column=col).border = Border(top=thick)
+        left_top_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
+                                top=Side(style='thick'), bottom=Side(style='thin'))
+        right_top_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
+                                top=Side(style='thick'), bottom=Side(style='thin'))
+        left_bot_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
+                                top=Side(style='thin'), bottom=Side(style='thick'))
+        right_bot_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
+                                top=Side(style='thin'), bottom=Side(style='thick'))
+        right_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
+                                 top=Side(style='thin'), bottom=Side(style='thin'))
+        left_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
+                                 top=Side(style='thin'), bottom=Side(style='thin'))
+        top_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
+                                 top=Side(style='thick'), bottom=Side(style='thin'))
+        bot_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
+                                 top=Side(style='thin'), bottom=Side(style='thick'))
+        middle = Border(left=Side(style='thin'), right=Side(style='thin'),
+                                 top=Side(style='thin'), bottom=Side(style='thin'))
+        for row in worksheet.iter_rows(min_row=5, max_row=max_row, min_col=4, max_col=7):
+            for cell in row:
+                if cell.row == 5 and cell.column == 4:
+                    cell.border = left_top_thick
+                elif cell.row == 5 and cell.column == 7:
+                    cell.border = right_top_thick
+                elif cell.row == max_row and cell.column == 4:
+                    cell.border = left_bot_thick
+                elif cell.row == max_row and cell.column == 7:
+                    cell.border = right_bot_thick
+                elif cell.column == 4:
+                    cell.border = left_thick
+                elif cell.column == 7:
+                    cell.border = right_thick
+                elif cell.row == 5:
+                    cell.border = top_thick
+                elif cell.row == max_row:
+                    cell.border = bot_thick
+                else:
+                    cell.border = middle
 
-        # Apply bottom border
-        for col in range(min_col, max_col + 1):
-            ws.cell(row=max_row, column=col).border = Border(bottom=thick)
+        for row in worksheet.iter_rows(min_row=5, max_row=7, min_col=1, max_col=col_end):
+            for cell in row:
+                cell.border = thin_border
+                cell.font = Font(size=14)
 
-        # Apply left border
-        for row in range(min_row, max_row + 1):
-            ws.cell(row=row, column=min_col).border = Border(left=thick)
+        for row in worksheet.iter_rows(min_row=8, max_row=max_row, min_col=1, max_col=col_end):
+            for cell in row:
+                cell.border = thin_border
+                cell.font = Font(size=13)
+        for row in worksheet.iter_rows(min_row=2, max_row=4, min_col=1, max_col=col_end):
+            for cell in row:
+                cell.font = Font(size=14)
+        for row in worksheet.iter_rows():
+            for cell in row:
+                if isinstance(cell.value, str) and cell.value.isdigit():
+                    cell.value = int(cell.value)
 
-        # Apply right border
-        for row in range(min_row, max_row + 1):
-            ws.cell(row=row, column=max_col).border = Border(right=thick)
+        def thick_boder_table(ws, min_row, max_row, min_col, max_col):
+            thick = Side(border_style="medium", color="000000")
+            for col in range(min_col, max_col + 1):
+                ws.cell(row=min_row, column=col).border = Border(top=thick)
+            for col in range(min_col, max_col + 1):
+                ws.cell(row=max_row, column=col).border = Border(bottom=thick)
+            for row in range(min_row, max_row + 1):
+                ws.cell(row=row, column=min_col).border = Border(left=thick)
+            for row in range(min_row, max_row + 1):
+                ws.cell(row=row, column=max_col).border = Border(right=thick)
+            ws.cell(row=min_row, column=min_col).border = Border(top=thick, left=thick)
+            ws.cell(row=min_row, column=max_col).border = Border(top=thick, right=thick)
+            ws.cell(row=max_row, column=min_col).border = Border(bottom=thick, left=thick)
+            ws.cell(row=max_row, column=max_col).border = Border(bottom=thick, right=thick)
 
-        # Apply corners (necessary to avoid overwriting)
-        ws.cell(row=min_row, column=min_col).border = Border(top=thick, left=thick)
-        ws.cell(row=min_row, column=max_col).border = Border(top=thick, right=thick)
-        ws.cell(row=max_row, column=min_col).border = Border(bottom=thick, left=thick)
-        ws.cell(row=max_row, column=max_col).border = Border(bottom=thick, right=thick)
+        def thick_boder_table2(ws, min_row, max_row, min_col, max_col):
+            thick = Side(border_style="medium", color="000000")
+            thin = Side(border_style="thin", color="000000")
 
-    def thick_boder_table2(ws, min_row, max_row, min_col, max_col):
-        thick = Side(border_style="medium", color="000000")
-        thin = Side(border_style="thin", color="000000")
+            for col in range(min_col, max_col + 1):
+                ws.cell(row=min_row, column=col).border = Border(top=thick, bottom=thin, left=thin, right=thin)
+            for col in range(min_col, max_col + 1):
+                ws.cell(row=max_row, column=col).border = Border(bottom=thick, top=thin, left=thin, right=thin)
+            for row in range(min_row, max_row + 1):
+                ws.cell(row=row, column=min_col).border = Border(left=thick, right=thin, top=thin, bottom=thin)
+            for row in range(min_row, max_row + 1):
+                ws.cell(row=row, column=max_col).border = Border(right=thick, top=thin, left=thin, bottom=thin)
 
-        border = Border(left=thick, right=thick, top=thick, bottom=thick)
+            ws.cell(row=min_row, column=min_col).border = Border(top=thick, left=thick, right=thin, bottom=thin)
+            ws.cell(row=min_row, column=max_col).border = Border(top=thick, right=thick, bottom=thin, left=thin)
+            ws.cell(row=max_row, column=min_col).border = Border(bottom=thick, left=thick, top=thin, right=thin)
+            ws.cell(row=max_row, column=max_col).border = Border(bottom=thick, right=thick, left=thin, top=thin)
 
-        # Apply top border
-        for col in range(min_col, max_col + 1):
-            ws.cell(row=min_row, column=col).border = Border(top=thick, bottom=thin, left=thin, right=thin)
+        thick_boder_table(worksheet, min_row=1, max_row=1, min_col=1, max_col=col_end)
+        for col in range(4, col_end, 4):
+            thick_boder_table(worksheet, min_row=2, max_row=4, min_col=col, max_col=col_end)
+        for col in range(4, col_end, 4):
+            thick_boder_table2(worksheet, min_row=5, max_row=max_row, min_col=col, max_col=col_end)
 
-        # Apply bottom border
-        for col in range(min_col, max_col + 1):
-            ws.cell(row=max_row, column=col).border = Border(bottom=thick, top=thin, left=thin, right=thin)
+        worksheet.freeze_panes = 'D8'
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        workbook.save(response)
 
-        # Apply left border
-        for row in range(min_row, max_row + 1):
-            ws.cell(row=row, column=min_col).border = Border(left=thick, right=thin, top=thin, bottom=thin)
-
-        # Apply right border
-        for row in range(min_row, max_row + 1):
-            ws.cell(row=row, column=max_col).border = Border(right=thick, top=thin, left=thin, bottom=thin)
-
-        # Apply corners (necessary to avoid overwriting)
-        ws.cell(row=min_row, column=min_col).border = Border(top=thick, left=thick, right=thin, bottom=thin)
-        ws.cell(row=min_row, column=max_col).border = Border(top=thick, right=thick, bottom=thin, left=thin)
-        ws.cell(row=max_row, column=min_col).border = Border(bottom=thick, left=thick, top=thin, right=thin)
-        ws.cell(row=max_row, column=max_col).border = Border(bottom=thick, right=thick, left=thin, top=thin)
-
-    thick_boder_table(worksheet, min_row=1, max_row=1, min_col=1, max_col=col_end)
-    for col in range(4, col_end, 4):
-        thick_boder_table(worksheet, min_row=2, max_row=4, min_col=col, max_col=col_end)
-    for col in range(4, col_end, 4):
-        thick_boder_table2(worksheet, min_row=5, max_row=max_row, min_col=col, max_col=col_end)
-
-    worksheet.freeze_panes = 'D8'
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename={filename}'
-    workbook.save(response)
-
-    return response
+        return response
+    else:
+        return HttpResponse(status=204)
 

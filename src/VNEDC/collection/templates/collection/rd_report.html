@@ -271,20 +271,26 @@
                                 </thead>
                             </table>
                         </div>
-
                         <div class="container">
                             <div class="row no-gutters">
                                 <div class="col-md-6" id="table-letf">
                                     <table class="table table-bordered" id="myTable">
-                                        {% for row in table_data %}
+                                        {% for  col1, col2  in table_data %}
                                             <tr>
-                                               <th class="col-md-8" style="padding-left: 1cm">
-                                                   {{ row.0 }}
+                                               <th rowspan="{{ col2|length }}" class="col-md-8" style="padding-left: 1cm; vertical-align: middle;">
+                                                   {{ col1 }}
                                                </th>
                                                <td>
-                                                    {{ row.1 }}
+                                                   {{ col2.0 }}
                                                </td>
                                             </tr>
+                                            {% for scol2 in col2|slice:"1:" %}
+                                                <tr>
+                                                   <td>
+                                                        {{ scol2 }}
+                                                   </td>
+                                                </tr>
+                                            {% endfor %}
                                         {% endfor %}
                                     </table>
                                 </div>
