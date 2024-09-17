@@ -213,7 +213,7 @@ def param_value_product_api(request):
             join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
             and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
             join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
-            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' and (i.side = d.side or d.side = '')
             """
 
             vnedc_db = vnedc_database()
