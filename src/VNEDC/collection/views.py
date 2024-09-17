@@ -482,6 +482,7 @@ def rd_report(request):
 
     return render(request, 'collection/rd_report.html', locals())
 
+
 def generate_excel_file_big(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
     if sEnable_mode == 'off':
@@ -558,12 +559,12 @@ def generate_excel_file_big(request):
             cell.alignment = Alignment(horizontal=alignment, vertical="center")
             cell.font = Font(bold=True, color="333333")
             cell.fill = PatternFill("solid", fgColor=fill_color)
-        set_merged_cell('A5:A7', "ITEM")
-        set_merged_cell('B5:B7', "Parameters")
-        set_merged_cell('C5:C7', "Specs.")
-        set_merged_cell('D5:G5', "Sample Time")
+        set_merged_cell('A6:A8', "ITEM")
+        set_merged_cell('B6:B8', "Parameters")
+        # set_merged_cell('C5:C7', "Specs.")
+        # set_merged_cell('D5:G5', "Sample Time")
 
-        start_row = 8
+        start_row = 9
         for name, size in zip(names, merge_sizes):
             end_row = start_row + size - 1
             worksheet.merge_cells(f"A{start_row}:A{end_row}")
@@ -571,29 +572,33 @@ def generate_excel_file_big(request):
             cell.value = name
             cell.alignment = Alignment(horizontal="left", vertical="center", indent=3)
             start_row = end_row + 1
-        for row_num, param in enumerate(parameters, start=8):
+        for row_num, param in enumerate(parameters, start=9):
             worksheet[f'B{row_num}'] = param
             worksheet[f'B{row_num}'].alignment = Alignment(horizontal="center", vertical="center")
 
         days_diff = (end_date - start_date).days + 1
         col_end = 7
 
+        product = "TEST"
+
         for day_offset in range(days_diff):
             current_date = start_date + timedelta(days=day_offset)
-            col_start = 4 + (day_offset * 4)
-            col_end = col_start + 3
+            col_start = 3 + (day_offset * 5)
+            col_end = col_start + 4
             set_merged_cell2(f'{get_column_letter(col_start)}2:{get_column_letter(col_end)}2',  f"{plant_rp}")
             set_merged_cell2(f'{get_column_letter(col_start)}3:{get_column_letter(col_end)}3',  f"{mach_rp}")
             set_merged_cell2(f'{get_column_letter(col_start)}4:{get_column_letter(col_end)}4',  f"{current_date.strftime('%Y-%m-%d')}")
-            set_merged_cell(f'{get_column_letter(col_start)}5:{get_column_letter(col_end)}5', "Sample Time")
+            set_merged_cell2(f'{get_column_letter(col_start)}5:{get_column_letter(col_end)}5', f"{product}")
+            set_merged_cell(f'{get_column_letter(col_start+1)}6:{get_column_letter(col_end)}6', "Sample Time")
+            set_merged_cell(f'{get_column_letter(col_start)}6:{get_column_letter(col_start)}8', "Specs.")
             sample_times = ["1", "2", "3", "4"]
             sample_hours = ["0h", "6h", "12h", "18h"]
 
-            for i, col in enumerate([get_column_letter(col_start),get_column_letter(col_start+1), get_column_letter(col_end-1), get_column_letter(col_end)]):
-                worksheet[f'{col}6'] = sample_times[i]
-                worksheet[f'{col}7'] = sample_hours[i]
-                worksheet[f'{col}6'].alignment = worksheet[f'{col}7'].alignment = Alignment(horizontal="center")
-                worksheet[f'{col}6'].fill = worksheet[f'{col}7'].fill = PatternFill("solid", fgColor="F1FF18")
+            for i, col in enumerate([get_column_letter(col_start+1),get_column_letter(col_start+2), get_column_letter(col_end-1), get_column_letter(col_end)]):
+                worksheet[f'{col}7'] = sample_times[i]
+                worksheet[f'{col}8'] = sample_hours[i]
+                worksheet[f'{col}7'].alignment = worksheet[f'{col}7'].alignment = Alignment(horizontal="center")
+                worksheet[f'{col}7'].fill = worksheet[f'{col}7'].fill = PatternFill("solid", fgColor="F1FF18")
             if 'GD' in sPlant:
                 defines = ParameterDefine.objects.filter(
                     plant=sPlant,
@@ -616,7 +621,7 @@ def generate_excel_file_big(request):
                                         'A_PH', 'A_CONCENTRATION', 'B_CPF',
                                         'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
                 )
-            start_row = 8
+            start_row = 9
             for define in defines:
                 values = ParameterValue.objects.filter(
                     plant=sPlant,
@@ -629,13 +634,13 @@ def generate_excel_file_big(request):
                 for value in values:
                     # Determine the column based on data_time
                     if value.data_time == '00':
-                        worksheet[f'{get_column_letter(col_start)}{start_row}'] = value.parameter_value
-                    elif value.data_time == '06':
                         worksheet[f'{get_column_letter(col_start + 1)}{start_row}'] = value.parameter_value
-                    elif value.data_time == '12':
+                    elif value.data_time == '06':
                         worksheet[f'{get_column_letter(col_start + 2)}{start_row}'] = value.parameter_value
-                    elif value.data_time == '18':
+                    elif value.data_time == '12':
                         worksheet[f'{get_column_letter(col_start + 3)}{start_row}'] = value.parameter_value
+                    elif value.data_time == '18':
+                        worksheet[f'{get_column_letter(col_start + 4)}{start_row}'] = value.parameter_value
                 start_row += 1
 
         if int(sLimit_mode) == 1:
@@ -643,10 +648,10 @@ def generate_excel_file_big(request):
                 control_limit = Lab_Parameter_Control.objects.filter(
                     plant=sPlant,
                     mach=sMach,
-                    item_no=re.search(r'-(\d+)', Daily_Prod_Info.objects.filter(
+                    item_no=re.search(r'-(\d+)', Daily_Prod_Info_Head.objects.filter(
                         plant=sPlant,
                         mach=sMach,
-                        data_date=sData_date).first().prod_name_a1).group(1))
+                        data_date=sData_date).first().product).group(1))
                 low_value, high_value = [], []
                 for i in range(len(control_limit)):
                     high_value.append(control_limit[i].control_range_high)
@@ -702,11 +707,11 @@ def generate_excel_file_big(request):
             cell.alignment = Alignment(horizontal="left", vertical="center")
             cell.font = Font(size=14, bold=False)
             cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
-        header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp)]
+        header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp), ('A5', 'Product :', date_rp)]
         for col, label, value in header_data:
             row = int(col[1:])
             set_header_row(row, col[0], label)
-        worksheet.merge_cells('B2:C4')
+        worksheet.merge_cells('B2:B5')
         fill = PatternFill(start_color='FDE9D9', end_color='FDE9D9', fill_type='solid')
         for row in worksheet.iter_rows(min_row=2, max_row=4, min_col=2, max_col=3):
             for cell in row:
@@ -814,7 +819,7 @@ def generate_excel_file_big(request):
         for col in range(4, col_end, 4):
             thick_boder_table2(worksheet, min_row=5, max_row=max_row, min_col=col, max_col=col_end)
 
-        worksheet.freeze_panes = 'D8'
+        worksheet.freeze_panes = 'C8'
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename={filename}'
         workbook.save(response)
