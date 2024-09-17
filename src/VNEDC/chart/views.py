@@ -235,6 +235,7 @@ def param_value_product_api(request):
                 dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
                 dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
                 dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
+                dataset["spanGaps"] = True
                 data = []
 
                 for date_time in y_label:
