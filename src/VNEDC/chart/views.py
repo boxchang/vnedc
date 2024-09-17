@@ -221,7 +221,7 @@ def param_value_product_api(request):
 
             chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
             chart_records = list(chart_records)  # 将集合转换为列表
-            chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
+            chart_records = sorted(chart_records, key=lambda x: x[1])  # 按照第二个值排序
 
             # Chart Data
             datasets = []
