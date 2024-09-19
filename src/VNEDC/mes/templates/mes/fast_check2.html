@@ -1,0 +1,645 @@
+{% extends 'mes/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+{% load i18n %}
+
+{% endblock css %}
+{% block js %}
+<style>
+    .navbar {
+        background-color: #24252A;
+        overflow: hidden;
+        height: 60px;
+    }
+    .navbar a {
+        display: block;
+        float: left;
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 0px 16px;
+        text-decoration: none;
+        margin-left: 20px;
+        font-size: 18px;
+    }
+    .navbar a:hover {
+        background-color: #058BB0;
+    }
+    .page-title{
+        margin-top: 4%;
+        text-align: center;
+    }
+    .result-table{
+        /* background-color: #f8f9fa; */
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .table-container th {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        border: 2px solid #ffffff;
+    }
+    .table-container td{
+        background-color: #E9E9EB;
+        color: black;
+        padding: 15px;
+        border: 2px solid #ffffff;
+        margin: auto;
+    }
+    .alert-info{
+        margin-left: 0px;
+        height: 82px;
+    }
+    #left-side {
+        padding-top: 15px;
+    }
+    #right-side {
+        padding-top: 15px;
+    }
+    .checkmark, .crossmark {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        position: relative;
+        margin: auto;
+    }
+    .checkmark:after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: -2px;
+        width: 6px;
+        height: 12px;
+        border: solid #4CAF50;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .crossmark:before, .crossmark:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 2px;
+        background-color: red;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .crossmark:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+    .tooltip-text {
+        visibility: hidden;
+        width: auto;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 100%; /* Position above the <td> */
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    td:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+    .hover-color {
+        background-color: white; /* Default background color */
+        transition: background-color 0.3s ease;
+    }
+
+    .hover-color:hover {
+        background-color: #FFD1C3; /* Color when hovering */
+    }
+    .sub-table td {
+        border: none;
+    }
+    .sub-checkmark, .sub-crossmark {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        position: relative;
+        margin: auto;
+    }
+    .sub-checkmark:after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: -2px;
+        width: 5px;
+        height: 10px;
+        border: solid #4CAF50;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .sub-crossmark:before, .sub-crossmark:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 2px;
+        background-color: red;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .sub-crossmark:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+     .sub-alert {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 12px solid gray; /* Triangle in gray color */
+        position: relative;
+        margin: auto;
+    }
+
+    .sub-alert:before {
+        content: '!';
+        position: absolute;
+        color: white; /* Exclamation mark in white */
+        font-weight: bold;
+        font-size: 10px;
+        top: -11px; /* Position the exclamation mark inside the triangle */
+        left: 50%;
+        transform: translateX(-50%) translateY(75%);
+    }
+
+    .table-data {
+        border-collapse: collapse;
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .table-data th, td {
+        border: 2px solid white;
+        padding: 0px;
+        text-align: center;
+        position: relative;
+    }
+    .table-data td{
+        background-color: white;
+    }
+     .popup {
+        display: none;
+        position: absolute;
+        text-align: left;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px;
+        background-color: #333;
+        color: #fff;
+        border-radius: 5px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+    td:hover .popup {
+        display: block;
+    }
+    #center-right{
+        padding-left: 0px;
+    }
+    #center-left{
+        padding-right: 0px;
+    }
+.mode-1 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: red; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: white; /* Text color */
+    border-radius: 25%;
+}
+.mode-1::before {
+    content: ''; /* Insert "X" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+
+.mode-2 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: yellow; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: black; /* Text color */
+    border-radius: 25%;
+}
+.mode-2::before {
+    content: '!'; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+
+.mode-3 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: green; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: white; /* Text color */
+    border-radius: 25%;
+}
+.mode-3::before {
+    content: ''; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+.mode-6 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: yellow; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: black; /* Text color */
+    border-radius: 25%;
+}
+.mode-6::before {
+    content: '✓'; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+.mode-7 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: #EDEDED; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: white; /* Text color */
+}
+.mode-7::before {
+    content: ''; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+.mode-11 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: red; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: white; /* Text color */
+    border-radius: 25%;
+}
+.mode-11::before {
+    content: ''; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+.mode-22 {
+    display: inline-block;
+    width: 20px;  /* Size of the box */
+    height: 20px; /* Size of the box */
+    position: relative;
+    margin: auto;
+    background-color: green; /* Background color of the box */
+    text-align: center; /* Center the text horizontally */
+    line-height: 20px; /* Center the text vertically */
+    font-size: 16px; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    color: white; /* Text color */
+    border-radius: 25%;
+}
+.mode-22::before {
+    content: ''; /* Insert "O" as text */
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+}
+</style>
+<style>
+
+</style>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarInput = document.getElementById('calendar-input');
+        var selectedDateInput = document.getElementById('selected-date');
+        var form = document.getElementById('date-form');
+
+        var today = new Date();
+        today.setDate(today.getDate()); // This ensures today is set correctly; no need to change it for yesterday if not required.
+
+        // Initialize Flatpickr
+        flatpickr(calendarInput, {
+            dateFormat: 'Y-m-d',
+            maxDate: today, // Disable future dates
+            defaultDate: selectedDateInput.value || null, // Set the default date if available
+            onChange: function(selectedDates, dateStr, instance) {
+                selectedDateInput.value = dateStr;
+                form.submit();
+            }
+        });
+
+        // Attach event to machine select dropdown
+        document.getElementById('machine-select').addEventListener('change', function() {
+            selectedDateInput.value = calendarInput.value;
+            form.submit();
+        });
+    });
+</script>
+{% endblock js %}
+{% block title %}
+Report Check
+{% endblock title %}
+{% block content %}
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="col-md-5" style="padding-top: 30px">
+                        <img src="{% static 'images/new.png' %}" alt="Image description" style="width: auto; height: 100px;">
+                    </div>
+                    <div class="page-title col-md-3">
+                        <h1 style="text-align: left">{{ selected_machine }} AIO</h1>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="alert alert-info col-md-6 mb-0">Selected Date: {{ selected_date }}</div>
+                            <form method="POST" id="date-form" class="col-md-6 mb-0 ml-3" style="padding-left: 10%;">
+                                {% csrf_token %}
+                                <input type="hidden" id="selected-date" name="date">
+                                <div class="form-group mb-0">
+                                    <label for="machine-select">Select Machine:</label>
+                                    <select id="machine-select" name="machine" class="form-control" onchange="this.form.submit()">
+                                        <option value="NBR" {% if selected_machine == 'NBR' %}selected{% endif %}>NBR</option>
+                                        <option value="PVC" {% if selected_machine == 'PVC' %}selected{% endif %}>PVC</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="" style="padding-top: 10px">
+                            <input type="text" id="calendar-input" class="form-control" placeholder="Select a date" value="{{ selected_date }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="" id="left-side">
+                    </div>
+                    <div class="col-md-12 result-table" id="center-side">
+                        <div class="row no-gutters">
+                            <div class="col-md-5" id="center-left">
+                                <table class="table-container" style="width: 100%;">
+                                    <tr style="text-align: center">
+                                        <th style="background-color: #4FC1CB; width: 30%; height: 80px">Machine line</th>
+                                        <th style="background-color: #3EB1C4; width: 70%; height: 80px">DeviceId</th>
+                                    </tr>
+                                    {% for device in device_id %}
+                                        <tr>
+                                            {% for device1 in device %}
+                                                {% if forloop.counter == 1 %}
+                                                    <td style="width: 50%;">
+                                                        {{ device1 }}
+                                                    </td>
+                                                {% endif %}
+                                                {% if forloop.counter == 2 %}
+                                                    <td style="width: 50%; padding: 0; height: 80px;">
+                                                        <table style="width: 100%; margin: 0; border-collapse: collapse;">
+                                                            {% for device2 in device1 %}
+                                                                {% if forloop.counter == 1 %}
+                                                                    <tr style="padding: 0;">
+                                                                        {% for device3 in device2 %}
+                                                                            {% if forloop.counter == 1 %}
+                                                                                <td style="padding: 0; height: 80px; width: 100%; border: none; border-top: 1px solid white; border-right: 2px solid white;">
+                                                                                    {{ device3 }}
+                                                                                </td>
+                                                                            {% endif %}
+                                                                            {% if forloop.counter == 2%}
+                                                                                <td style="padding: 0; height: 80px; width: 100%; border: none; border-top: 1px solid white;">
+                                                                                    {% for device4 in device3 %}
+                                                                                        <table style="width: 100%; margin: 0; border-collapse: collapse;">
+                                                                                            {% if forloop.counter == 1 %}
+                                                                                            <tr style="padding: 0;">
+                                                                                                <td style="padding: 0;padding-left: 8px;padding-right: 7px;height: 40px; width: 100%; border: none; border-bottom: 1px solid white;">{{ device4 }}</td>
+                                                                                            </tr>
+                                                                                            {% endif %}
+                                                                                            {% if forloop.counter == 2 %}
+                                                                                            <tr style="padding: 0;">
+                                                                                                <td style="padding: 0;padding-left: 8px;padding-right: 7px;height: 40px; width: 100%; border: none; border-top: 1px solid white;">{{ device4 }}</td>
+                                                                                            </tr>
+                                                                                            {% endif %}
+                                                                                        </table>
+                                                                                    {% endfor %}
+                                                                                </td>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </tr>
+                                                                {% endif %}
+                                                                {% if forloop.counter == 2 %}
+                                                                    <tr style="padding: 0;">
+                                                                        {% for device3 in device2 %}
+                                                                            {% if forloop.counter == 1 %}
+                                                                                <td style="padding: 0; height: 80px; width: 100%; border: none; border-top: 1px solid white; border-right: 2px solid white;">
+                                                                                    {{ device3 }}
+                                                                                </td>
+                                                                            {% endif %}
+                                                                            {% if forloop.counter == 2%}
+                                                                                <td style="padding: 0; height: 80px; width: 100%; border: none; border-top: 1px solid white;">
+                                                                                    {% for device4 in device3 %}
+                                                                                        <table style="width: 100%; margin: 0; border-collapse: collapse;">
+                                                                                            {% if forloop.counter == 1 %}
+                                                                                            <tr style="padding: 0;">
+                                                                                                <td style="padding: 0;padding-left: 8px;padding-right: 7px; height: 40px; width: 100%; border: none; border-bottom: 1px solid white;">{{ device4 }}</td>
+                                                                                            </tr>
+                                                                                            {% endif %}
+                                                                                            {% if forloop.counter == 2 %}
+                                                                                            <tr style="padding: 0;">
+                                                                                                <td style="padding: 0;padding-left: 8px;padding-right: 7px; height: 40px; width: 100%; border: none; border-top: 1px solid white;">{{ device4 }}</td>
+                                                                                            </tr>
+                                                                                            {% endif %}
+                                                                                        </table>
+                                                                                    {% endfor %}
+                                                                                </td>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </tr>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </table>
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            <div class="col-md-7" id="center-right">
+                                <div class="col-md-12">
+                                    <table class="table-data">
+                                        <tr>
+                                            <td colspan="24" style="height:40px; background-color: #0088AC;color: white;" >Good Quality  -->  NotGood Quality</td>
+                                        </tr>
+                                        <tr>
+                                           {% for period in period_times %}
+                                               {% if forloop.counter0 <= 11 %}
+                                                    <td style="height: 40px; background-color: #0088AC;color:white;">{{period}}</td>
+                                               {% else %}
+                                                    <td style="height: 40px; background-color: white;color:black;">{{period}}</td>
+                                               {% endif %}
+                                           {% endfor %}
+                                        </tr>
+                                        {% for row in table_data1 %}
+                                            {% for row2 in table_data2 %}
+                                                {% if forloop.counter == forloop.parentloop.counter %}
+                                                    {% for row3 in table_data3 %}
+                                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                                            {% for row4 in table_data4 %}
+                                                                {% if forloop.counter == forloop.parentloop.counter %}
+                                                                    <tr {% if forloop.parentloop.counter|divisibleby:2 %}style="border-bottom: 3px solid #0088AC;"{% endif %}
+                                                                        {% if forloop.parentloop.counter0|divisibleby:2 %}style="border-bottom: 3px solid floralwhite;"{% endif %}>
+                                                                        {% for cell in row %}
+                                                                            {% for cell2 in row2 %}
+                                                                                {% if forloop.counter == forloop.parentloop.counter %}
+                                                                                    {% for cell3 in row3 %}
+                                                                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                                                                            {% for cell4 in row4 %}
+                                                                                                {% if forloop.counter == forloop.parentloop.counter%}
+                                                                                                    <td class="hover-color" style="height: 41.175px;">
+                                                                                                        {% if cell == 1 %}
+                                                                                                            <span class="mode-1"></span>
+                                                                                                        {% elif cell == 2 %}
+                                                                                                            <span class="mode-2"></span>
+                                                                                                        {% elif cell == 3 %}
+                                                                                                            <span class="mode-3"></span>
+                                                                                                        {% elif cell == 4 %}
+                                                                                                            <span class="mode-2"></span>
+                                                                                                        {% elif cell == 5 %}
+                                                                                                            <span class="mode-2"></span>
+                                                                                                        {% elif cell == 6 %}
+                                                                                                            <span class="mode-6"></span>
+                                                                                                        {% elif cell == 7 %}
+                                                                                                            <span class="mode-7"></span>
+                                                                                                        {% elif cell == 11 %}
+                                                                                                            <span class="mode-11"></span>
+                                                                                                        {% elif cell == 22 %}
+                                                                                                            <span class="mode-22"></span>
+                                                                                                        {% elif cell == 77 %}
+                                                                                                            <span class="mode-7"></span>
+                                                                                                        {% endif %}
+                                                                                                        <span class="popup" style="width: 160px">
+                                                                                                            <div>At time-{{ cell3 }}:00</div>
+                                                                                                            <table>
+                                                                                                                {% for value in cell2 %}
+                                                                                                                    {% for value4 in cell4 %}
+                                                                                                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                                                                                                            {% if forloop.counter0|divisibleby:2 %}
+                                                                                                                                <tr>
+                                                                                                                            {% endif %}
+                                                                                                                                {% if value4 < 10 %}
+                                                                                                                                   <td style="border:0.5px solid white;background-color: black; width: 40px;text-align: left">{{ cell3 }}:0{{ value4 }}</td>
+                                                                                                                                {% else%}
+                                                                                                                                    <td style="border:0.5px solid white;background-color: black; width: 40px;text-align: left">{{ cell3 }}:{{ value4 }}</td>
+                                                                                                                                {% endif %}
+                                                                                                                                <td style="border:0.5px solid white;background-color: black; width: 40px">{{ value }}</td>
+                                                                                                                            {% if forloop.counter0|divisibleby:2 == False %}
+                                                                                                                                </tr>
+                                                                                                                            {% endif %}
+                                                                                                                        {% endif %}
+                                                                                                                    {% endfor %}
+                                                                                                                {% endfor %}
+                                                                                                                    {% if values|length|divisibleby:2 == False %}
+                                                                                                                        <td></td></tr>
+                                                                                                                    {% endif %}
+                                                                                                            </table>
+                                                                                                        </span>
+                                                                                                    </td>
+                                                                                                {% endif %}
+                                                                                            {% endfor %}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        {% endfor %}
+                                                                    </tr>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

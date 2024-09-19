@@ -1,0 +1,265 @@
+{% extends 'mes/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+{% load i18n %}
+{% endblock css %}
+{% block js %}
+<style>
+    .result-table{
+        background: white;
+        border: 1px solid #F5F5F5;
+        border-radius: 8px;
+        padding: 10px ;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+</style>
+<style>
+    .run {
+        display: inline-block;
+        width: 16px;  /* Size of the box */
+        height: 16px; /* Size of the box */
+        position: relative;
+        margin: auto;
+        background-color: #30CA46; /* Background color of the box */
+        text-align: center; /* Center the text horizontally */
+        line-height: 20px; /* Center the text vertically */
+        font-size: 16px; /* Font size for the text */
+        font-weight: bold; /* Bold text */
+        color: white; /* Text color */
+        border-radius: 50%;
+        border: 2px solid #9AE7A4;
+    }
+    .run::before {
+        content: ''; /* Insert "O" as text */
+        display: block;
+        position: absolute;
+        top: 75%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the text */
+    }
+    .stop { 
+        display: inline-block;
+        width: 16px;  /* Size of the box */
+        height: 16px; /* Size of the box */
+        position: relative;
+        margin: auto;
+        background-color: red; /* Background color of the box */
+        text-align: center; /* Center the text horizontally */
+        line-height: 20px; /* Center the text vertically */
+        font-size: 16px; /* Font size for the text */
+        font-weight: bold; /* Bold text */
+        color: white; /* Text color */
+        border-radius: 50%;
+        border: 2px solid #FF7373;
+    }
+    .stop::before {
+        content: ''; /* Insert "O" as text */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the text */
+    }
+    .checkmark, .crossmark {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        position: relative;
+        margin: auto;
+    }
+    .checkmark {
+        padding-top: 10px;
+    }
+    .checkmark:after {
+        content: '';
+        position: absolute;
+        left: 35%;
+        top: 25%;
+        width: 6px;
+        height: 12px;
+        border: solid #4CAF50;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .crossmark:before,
+    .crossmark:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 2px;
+        background-color: red;
+        top: 75%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .crossmark:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarInput = document.getElementById('calendar-input');
+        var selectedDateInput = document.getElementById('selected-date');
+        var form = document.getElementById('date-form');
+
+        var today = new Date();
+        today.setDate(today.getDate()); // This ensures today is set correctly; no need to change it for yesterday if not required.
+
+        // Initialize Flatpickr
+        flatpickr(calendarInput, {
+            dateFormat: 'Y-m-d',
+            maxDate: today, // Disable future dates
+            defaultDate: selectedDateInput.value || null, // Set the default date if available
+            onChange: function(selectedDates, dateStr, instance) {
+                selectedDateInput.value = dateStr;
+                form.submit();
+            }
+        });
+
+        // Attach event to machine select dropdown
+        document.getElementById('machine-select').addEventListener('change', function() {
+            selectedDateInput.value = calendarInput.value;
+            form.submit();
+        });
+    });
+    $(document).ready(function() {
+        $('#limit_checkbox').on('change', function () {
+            $('#date-form').attr('action', '/mes/status/');
+            $('#date-form').submit();
+        });
+    });
+</script>
+{% endblock js %}
+{% block title %}
+Report Check
+{% endblock title %}
+{% block content %}
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="col-md-3" style="padding-top: 30px">
+                       {{execution_time}}
+                    </div>
+                    <div class="col-md-5" style=" margin-top: 4%; text-align: center;">
+                        <h1 style="text-align: center">{{ selected_machine}} Information</h1>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="alert alert-info col-md-6 mb-0" style="margin-left: 0px; height: 82px;">Selected Date: {{ selected_date }}</div>
+                            <form method="POST" action="{% url 'status' %}" id="date-form" class="col-md-6 mb-0 ml-3" style="padding-left: 10%;">
+                                {% csrf_token %}
+                                <input type="hidden" id="selected-date" name="date">
+                                <div class="form-group mb-0">
+                                    <label for="machine-select">Select Machine:</label>
+                                    <select id="machine-select" name="machine" class="form-control" onchange="this.form.submit()">
+                                        <option value="NBR" {% if selected_machine == 'NBR' %}selected{% endif %}>NBR</option>
+                                        <option value="PVC" {% if selected_machine == 'PVC' %}selected{% endif %}>PVC</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="" style="padding-top: 10px">
+                            <input type="text" id="calendar-input" class="form-control" placeholder="Select a date" value="{{ selected_date }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="" id="left-side">
+                    </div>
+                    <div class="col-md-12 result-table">
+                        <div class="row no-gutters">
+                            <div class="col-md-5" id="table-left">
+                                <table style="width: 100%; height: 100%;">
+                                    <thead style="color: white; text-align: center;">
+                                        <tr>
+                                            <th style="background-color: #49BEC7; width: 18%; height: 80px; border: 2px solid white; font-size: 13px;">Machine<br>name</th>
+                                            <th style="background-color: #3FB7C1; width: 18%; height: 80px; border: 2px solid white; font-size: 13px;">Machine<br>line</th>
+                                            <th style="background-color: #2DAEBE; width: 16%; height: 80px; border: 2px solid white; font-size: 13px;">Work<br>Order</th>
+                                            <th style="background-color: #1BA5BC; width: 16%; height: 80px; border: 2px solid white; font-size: 13px;">Run<br>Cards</th>
+                                            <th style="background-color: #0E9CB8; width: 16%; height: 80px; border: 2px solid white; font-size: 13px;">Machine<br>Data</th>
+                                            <th style="background-color: #0E9CB8; width: auto; height: 80px; border: 2px solid white; font-size: 13px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for col1, col2 in machine_name_with_line%}
+                                            <tr>
+                                                <td rowspan="{{ col2|length }}" style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:auto">{{ col1 }}</td>
+                                                {% for scol2 in col2|slice:"1" %}
+                                                    <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px">{{ scol2.0 }}</td>
+                                                    {% if scol2.1|floatformat == 0 %}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px"><span class="crossmark"></span></td>
+                                                    {% else %}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px"><span class="checkmark"></span></td>
+                                                    {% endif %}
+                                                    {% if scol2.2|floatformat == 0%}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px"><span class="checkmark"></span></td>
+                                                    {% else %}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px"><span class="crossmark"></td>
+                                                    {% endif %}
+                                                    <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:72px">{{ scol2.3 }}</td>
+                                                    <td style="background-color: white; text-align: left; border: 2px solid white; height:72px; font-size: 12px; padding-left: 3%;">Runcard<br>Weight<br>Data</td>
+                                                {% endfor%}
+                                            </tr>
+                                            {% for scol2 in col2|slice:"1:" %}
+                                                <tr>
+                                                    <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:40px">{{ scol2.0 }}</td>
+                                                    {% if scol2.1 == 0 %}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:40px"><span class="stop"></span></td>
+                                                    {% else %}
+                                                        <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:40px"><span class="run"></span></td>
+                                                    {% endif %}
+                                                    <td style="background-color: #E9E9EB; text-align: right; border: 2px solid white; height:40px; font-size: 13px">{{ scol2.2 }} mins</td>
+                                                    <td style="background-color: #E9E9EB; text-align: center; border: 2px solid white; height:40px">{{ scol2.3 }}</td>
+                                                    <td style="background-color: white; text-align: left; border: 2px solid white; height:40px; font-size: 12px; padding-left: 3%">OK<br>NG</td>
+                                                </tr>
+                                            {% endfor%}
+                                        {% endfor%}
+                                    </tbody>    
+                                </table>
+                            </div>
+                            <div class="col-md-7" id="table-right">
+                                <table style="width: 100%; height: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="24" style="color: white; text-align: center; background-color: #0494B3; height: 40px; border: 2px solid white; font-size: 16px;" >Time</td>
+                                        </tr>
+                                        <tr>
+                                            {% for period in period_times %}
+                                                {% if forloop.counter < 12 %}
+                                                    <td style="color: white; text-align: center; background-color: #0494B3; height: 40px; border: 2px solid white; font-size: 13px; width: 4.15%;">
+                                                        {{period}}
+                                                    </td>
+                                                {% else %}
+                                                    <td rowspan="2" style="color: black; text-align: center; background-color: white; height: 40px; width: 4.15%;">
+                                                        {{period}}
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor%}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                      
+                                    </tbody>    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
