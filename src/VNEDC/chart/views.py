@@ -12,6 +12,7 @@ import base64
 import io
 import time
 
+
 def generate_pastel_color():
     # 设定颜色值的下限，以保证颜色偏淡
     lower_bound = 120  # 颜色的下限值
@@ -46,9 +47,11 @@ def get_product_choices(start_date, end_date):
     choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
     return choices
 
+
 def param_value(request):
     search_form = SearchForm()
     return render(request, 'chart/param_value.html', locals())
+
 
 def param_value_product(request):
     month_ago = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
@@ -58,6 +61,12 @@ def param_value_product(request):
     search_form = ProductionSearchForm()
     search_form.fields['product'].choices = choices
     return render(request, 'chart/param_value_product.html', locals())
+
+def get_machines_by_plant(request):
+    plant_code = request.GET.get('plant_code')
+    machines = Machine.objects.filter(plant__plant_code=plant_code).values('mach_code', 'mach_name')
+    machines_list = [{'code': machine['mach_code'], 'name': machine['mach_name']} for machine in machines]
+    return JsonResponse({'machines': machines_list})
 
 def param_value_api(request):
     chart_data = {}
@@ -85,13 +94,15 @@ def param_value_api(request):
 
         try:
 
-            defines = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type, param_type=param_type)
+            defines = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type,
+                                                     param_type=param_type)
 
             param_name = defines[0].parameter_name
 
             for define in defines:
                 records = ParameterValue.objects.filter(plant=plant, mach=mach, process_type=process_type,
-                                                        parameter_name=define.parameter_name, data_date__gte=data_date_start, data_date__lte=data_date_end)
+                                                        parameter_name=define.parameter_name,
+                                                        data_date__gte=data_date_start, data_date__lte=data_date_end)
 
                 # Date Label
                 for record in records:
@@ -100,7 +111,6 @@ def param_value_api(request):
                         y_label.append(tmp)
                 y_label = list(set(y_label))
                 y_label.sort()
-
 
                 dataset = {}
                 color = generate_pastel_color()
@@ -160,9 +170,12 @@ def param_value_api(request):
 
             y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
 
-            chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": y_data}
+            chart_data = {"labels": y_label, "datasets": datasets, "title": title,
+                          "control_high": form_control_range_high, "control_low": form_control_range_low,
+                          "y_data": y_data}
         except Exception as e:
-            chart_data = {"labels": [], "datasets": [], "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": []}
+            chart_data = {"labels": [], "datasets": [], "title": title, "control_high": form_control_range_high,
+                          "control_low": form_control_range_low, "y_data": []}
             print(e)
 
     return JsonResponse(chart_data, safe=False)
@@ -205,23 +218,24 @@ def param_value_product_api(request):
             sql = f"""
             WITH ProdInfoHead AS (
                 SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
-                  FROM collection_daily_prod_info_head head
-                  where product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
+                  FROM collection_daily_prod_info_head head, collection_daily_prod_info info
+                  where head.data_date = info.data_date and product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
                  )
-                
+
             select * from collection_parametervalue v 
             join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
             and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
             join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
-            where v.process_type = '{process_type}' and d.param_type = '{param_code}' and (i.side = d.side or d.side = '')
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
             """
 
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
-            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in
+                                records)  # 使用集合去除重复的 (mach_id, side) 组合
             chart_records = list(chart_records)  # 将集合转换为列表
-            chart_records = sorted(chart_records, key=lambda x: x[1])  # 按照第二个值排序
+            chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
 
             # Chart Data
             datasets = []
@@ -235,7 +249,6 @@ def param_value_product_api(request):
                 dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
                 dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
                 dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
-                dataset["spanGaps"] = True
                 data = []
 
                 for date_time in y_label:
@@ -291,17 +304,21 @@ def param_value_product_api(request):
                         control_low_data.append(float(records[0][control_low_column]))
 
                     datasets.append(
-                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
                          'borderDash': [10, 2]})
                     datasets.append(
-                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
                          'borderDash': [10, 2]})
-                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.7}
+                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1,
+                              "max": control_high_data[0] * 1.7}
             else:
                 y_data = {}
 
             chart_data = {"labels": y_label, "datasets": datasets,
-                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product, "y_data": y_data}
+                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product,
+                          "y_data": y_data}
 
         except Exception as e:
             print(e)
@@ -335,6 +352,7 @@ def get_param_define_api(request):
 
     return JsonResponse(html, safe=False)
 
+
 def get_param_code_api(request):
     html = ""
     if request.method == 'POST':
@@ -343,13 +361,10 @@ def get_param_code_api(request):
         html = """<option value="" selected>---------</option>"""
 
         for record in records:
-            html += """<option value="{value}">{name}</option>""".format(value=record.param_type_code, name=record.param_type_code)
+            html += """<option value="{value}">{name}</option>""".format(value=record.param_type_code,
+                                                                         name=record.param_type_code)
 
     return JsonResponse(html, safe=False)
-
-def test(request):
-
-    return render(request, 'chart/test.html', locals())
 
 
 def param_2(request):
@@ -362,19 +377,20 @@ def param_2(request):
             request.session.get('data_date', ''))
 
 
-import json
-import os
 import io
 from .utils import chart_config
 from collections import defaultdict
 
 def param_value2(request):
-    sPlant, sMach, sData_date = param_2(request)
+    sPlant, sMach, sData_month = '', '', ''
+    sPlant, sMach, sData_month = param_2(request)
+
     start_time = time.time()
+    print("Month: ", sData_month)
+    if sData_month == '':
+        sData_month = datetime.today().strftime("%Y-%m")
 
-    if not sData_date:
-        sData_date = datetime.now().strftime('%Y-%m')
-
+    data_mode = 0
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
 
@@ -398,7 +414,7 @@ def param_value2(request):
             AND mach_id = '{sMach}' 
             AND process_type = '{process_type}' 
             AND parameter_name IN ('{variables_str}')
-            AND data_date LIKE '%{sData_date}%'
+            AND data_date LIKE '%{sData_month}%'
             ORDER BY data_date, data_time;
         """
         # Execute the SQL query
@@ -411,10 +427,10 @@ def param_value2(request):
                 'data_date': str(result['data_date']),
                 'parameter_value': result['parameter_value']
             })
-
+            data_mode = 1
+    print(len(results))
     # Plotting data directly from the SQL results
-    if sMach and sPlant and results:
-        start_time_img = time.time()
+    if sPlant != '' and sMach != '' and sData_month != '' and data_mode == 1:
         image_data = []
         for main_key, sub_dict in config.items():
             for sub_key, attributes in sub_dict.items():
@@ -467,7 +483,7 @@ def param_value2(request):
                 plt.ylim(*ylim)
                 plt.xlabel('Date')
                 plt.ylabel('Value')
-                plt.title(f'{sMach} - {main_key} - {sub_key}', fontsize=18)
+                plt.title(f'{sMach} - {main_key} - {sub_key}')
                 plt.legend()
 
                 # Save the plot as a base64 encoded image with reduced border
@@ -479,8 +495,6 @@ def param_value2(request):
 
                 # Add the encoded image to the list
                 image_data.append(image_base64)
-                end_time_img_1 = time.time()
-                end_time_img = time.time()
 
         # Output the generated images or further process as needed
         print("Generated plots and encoded them as base64 images.")
@@ -490,8 +504,10 @@ def param_value2(request):
     # Calculate execution time
     end_time = time.time()
     execution_time = end_time - start_time
+    print(f"Execution time for generating plots: {execution_time:.10f} seconds")
+    print("Month: ", sData_month)
 
-# You would typically call param_value2(request) with the appropriate request object.
+    # You would typically call param_value2(request) with the appropriate request object.
 
     # Pass the image data to the template
     return render(request, 'chart/param_value2.html', locals())
