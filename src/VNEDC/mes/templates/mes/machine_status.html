@@ -1,0 +1,375 @@
+{% extends 'mes/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+{% load i18n %}
+
+{% endblock css %}
+{% block js %}
+<style>
+    .page-title{
+        margin-top: 4%;
+        text-align: center;
+    }
+    .result-table-left{
+        /* background-color: #f8f9fa; */
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius:10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .table-container th {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+    }
+    .table-container td{
+        background-color: #E9E9EB;
+        color: black;
+        padding: 15px;
+        margin: auto;
+    }
+    .alert-info{
+        margin-left: 0px;
+        height: 82px;
+    }
+    #left-side #right-side{
+        padding-top: 15px;
+    }
+    .ok {
+        display: inline-block;
+        width: 20px;  /* Size of the box */
+        height: 20px; /* Size of the box */
+        position: relative;
+        margin: auto;
+        background-color: green; /* Background color of the box */
+        text-align: center; /* Center the text horizontally */
+        line-height: 20px; /* Center the text vertically */
+        font-size: 16px; /* Font size for the text */
+        font-weight: bold; /* Bold text */
+        color: white; /* Text color */
+        border-radius: 50%;
+    }
+    .ok::before {
+        content: ''; /* Insert "O" as text */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the text */
+    }
+    .no {
+        display: inline-block;
+        width: 20px;  /* Size of the box */
+        height: 20px; /* Size of the box */
+        position: relative;
+        margin: auto;
+        background-color: red; /* Background color of the box */
+        text-align: center; /* Center the text horizontally */
+        line-height: 20px; /* Center the text vertically */
+        font-size: 16px; /* Font size for the text */
+        font-weight: bold; /* Bold text */
+        color: white; /* Text color */
+        border-radius: 50%;
+    }
+    .no::before {
+        content: ''; /* Insert "O" as text */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the text */
+    }
+    
+    .flex-container {
+        display: flex;
+        flex-wrap: nowrap; /* Prevent columns from wrapping */
+        width: 100%;
+    }
+
+    .result-table-left, .result-table-right {
+        flex: 1; /* Allow both sides to grow equally */
+        display: flex; /* Ensure inner content stretches */
+        flex-direction: column; /* Align children in a column */
+    }
+
+    .table-container {
+        width: 100%;
+        height: 100%; /* Ensures the table stretches to fill the flex item */
+    }
+
+    .col-md-5, .col-md-7 {
+        padding: 0; /* Remove padding that could affect the layout */
+    }
+
+    .table-container tr, .table-container td, .table-container th {
+        height: 80px; /* Ensures consistent row heights */
+    }
+    .popup {
+        display: none;
+        position: absolute;
+        text-align: left;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px;
+        background-color: #333;
+        color: #fff;
+        border-radius: 5px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+    td:hover .popup {
+        display: block;
+    }
+    .hover-color {
+        background-color: white; /* Default background color */
+        transition: background-color 0.3s ease;
+    }
+
+    .hover-color:hover {
+        background-color: #FFD1C3; /* Color when hovering */
+    }
+   .hover-element {
+        position: relative; /* Make the hover element the reference point */
+        display: inline-block;
+        padding: 10px;
+        margin: 20px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        background-color: #f0f0f0;
+    }
+
+    .popup2 {
+        position: absolute;
+        top: 50%; /* Center the popup vertically relative to the hover element */
+        left: -160px; /* Position the popup to the left of the element */
+        transform: translateY(-50%); /* Adjust for perfect vertical centering */
+        width: 300px; /* Width of the popup */
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: none; /* Hide by default */
+        z-index: 10;
+    }
+    .hover-element:hover .popup2 {
+        display: block; /* Show the popup on hover */
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarInput = document.getElementById('calendar-input');
+    var selectedDateInput = document.getElementById('selected-date');
+    var form = document.getElementById('date-form');
+    var lastUpdateTime = document.getElementById('last-update-time');
+    var today = new Date();
+    today.setDate(today.getDate()); // Ensures today is set correctly.
+
+    // Initialize Flatpickr
+    flatpickr(calendarInput, {
+        dateFormat: 'Y-m-d',
+        maxDate: today, // Disable future dates
+        defaultDate: selectedDateInput.value || null, // Set the default date if available
+        onChange: function(selectedDates, dateStr, instance) {
+            selectedDateInput.value = dateStr;
+            form.submit();
+        }
+    });
+
+    // Attach event to machine select dropdown
+    document.getElementById('machine-select').addEventListener('change', function() {
+        selectedDateInput.value = calendarInput.value;
+        form.submit();
+    });
+
+    // Function to calculate the delay until the next reload time (5:10, 10:10, etc.)
+    function getNextReloadDelay() {
+        var now = new Date();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        // Calculate the next interval of 5 minutes plus 10 seconds
+        var nextReloadMinutes = Math.ceil(minutes / 5) * 5; // Round up to the next multiple of 5
+        var nextReloadTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), nextReloadMinutes, 7, 0); // Set to the next 5-minute mark plus 10 seconds
+
+        // If the calculated reload time is in the past, move to the next interval
+        if (nextReloadTime <= now) {
+            nextReloadTime.setMinutes(nextReloadTime.getMinutes() + 5); // Move to the next 5-minute interval
+        }
+
+        // Return the delay in milliseconds
+        return nextReloadTime - now;
+    }
+
+    // Function to reload the page and update the last updated time
+    function reloadPage() {
+        var now = new Date();
+        lastUpdateTime.textContent = now.toLocaleString(); // Update the last update time
+        location.reload(); // Reloads the current page
+    }
+
+    // Display the current time as the last update when the page loads
+    lastUpdateTime.textContent = new Date().toLocaleString();
+
+    // Set the initial reload timeout based on the calculated delay
+    setTimeout(function() {
+        reloadPage(); // Initial reload
+
+        // Set interval to reload every 5 minutes after the initial reload
+        setInterval(reloadPage, 5 * 60 * 1000); // Reload every 5 minutes (300,000 milliseconds)
+    }, getNextReloadDelay());
+});
+
+</script>
+{% endblock js %}
+{% block title %}
+Report Check
+{% endblock title %}
+{% block content %}
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="col-md-2">
+                        <div id="last-update" style="font-size: 16px; margin-top: 10px; color: #555;">
+                            Last Updated: <span id="last-update-time">Loading...</span>
+                        </div>
+                        <div>{{ execution_time }}</div>
+                    </div>
+                    <div class="page-title col-md-6">
+                        <h1 style="text-align: center">{{ selected_machine }} Speed Monitor</h1>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="alert alert-info col-md-6 mb-0">Selected  Date: {{ selected_date }}</div>
+                            <form method="POST" id="date-form" class="col-md-6 mb-0 ml-3" style="padding-left: 10%;">
+                                {% csrf_token %}
+                                <input type="hidden" id="selected-date" name="date">
+                                <div class="form-group mb-0">
+                                    <label for="machine-select">Select Machine:</label>
+                                    <select id="machine-select" name="machine" class="form-control" onchange="this.form.submit()">
+                                        <option value="NBR" {% if selected_machine == 'NBR' %}selected{% endif %}>NBR</option>
+                                        <option value="PVC" {% if selected_machine == 'PVC' %}selected{% endif %}>PVC</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="" style="padding-top: 10px">
+                            <input type="text" id="calendar-input" class="form-control" placeholder="Select a date" value="{{ selected_date }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="row m-3">
+        <div class="col-12">
+            <div class="container">
+                <div class="row no-gutters flex-container">
+                    <div class="col-md-5 result-table-left" id="left-side">
+                        <div class="row no-gutters">
+                            <div class="col-md-12" id="1-column">
+                                <table class="table-container">
+                                    <tr style="text-align: center">
+                                        <th style="background-color: #4FC1CB; width: 50%; height: 80px; border: 2px solid white">Machine line</th>
+                                        <th style="background-color: #3EB1C4; width: 50%; height: 80px; border: 2px solid white">DeviceId</th>
+                                    </tr>
+                                    {% for device in table_data_left_list_rename %}
+                                        <tr>
+                                            {% for device1 in device %}
+                                                {% if forloop.counter == 1 %}
+                                                    <td style="padding: 0; text-align: center; border: 2px solid white;">
+                                                        {{ device1 }}
+                                                    </td>
+                                                {% endif %}
+                                                {% if forloop.counter == 2 %}
+                                                    <td style="padding: 0; text-align: center; border: none">
+                                                        <table class="nested-table" style="width: 100%; margin: 0; border-collapse: collapse;">
+                                                            {% for device2 in device1 %}
+                                                                <tr>
+                                                                    <td style="padding: 0; text-align: center; border: none">
+                                                                        {{ device2 }}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </table>
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 result-table-right" id="right-side">
+                        <div class="row no-gutters">
+                            <div class="col-md-12" id="1-column">
+                                <table class="table-container">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th style="background-color: #1CA5B8; width: 10%; height: 80px; border: 2px solid white; border-left: 0px">Status now</th>
+                                            <th style="background-color: #1CA5B8; width: 10%; height: 80px; border: 2px solid white">Speed now</th>
+                                            <th style="background-color: #0097B6; width: 20%; height: 80px; border: 2px solid white; font-size: 12.5px">Stop TODAY<br>00:00 to 23:59</th>
+                                            <th style="background-color: #0088AC; width: 20%; height: 80px; border: 2px solid white">ALL month<br>{{ month }}</th>
+                                            <th style="background-color: #0088AC; width: 10%; height: 80px; border: 2px solid white;">>10min</th>
+                                            <th style="background-color: #0088AC; height: 80px; border: 2px solid white"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for data in table_data_right_list_rename %}
+                                            <tr>
+                                                <td style="padding: 0; text-align: center; border: 2px solid white;">
+                                                    {% if data.0 == 0 %}
+                                                        <span class="no"></span>
+                                                    {% elif data.0 == 1 %}
+                                                        <span class="ok"></span>
+                                                    {% endif %}
+                                                </td>
+                                                <td style="padding: 0; text-align: center; border: 2px solid white;">
+                                                    {{ data.1 }}
+                                                </td>
+                                                {% if data.2 < 60 and data.2 > 0 %}
+                                                    <td class="hover-color" style="padding: 0; text-align: center; border: 2px solid white; position: relative;">
+                                                        {{ data.2 }} min
+                                                        {% if data.2 < 60 and data.2 > 0 %}
+                                                            <span class="popup" style="width: auto;">
+                                                                {{ data.3 }}
+                                                            </span>
+                                                        {% endif %}
+                                                    </td>
+                                                {% else %}
+                                                    <td class="" style="padding: 0; text-align: center; border: 2px solid white; position: relative;">
+                                                        {{ data.2 }} min
+                                                    </td>
+                                                {% endif %}
+                                                <td style="padding: 0; text-align: center; border: 2px solid white;">
+                                                    {{ data.4 }} minutes
+                                                </td>
+                                                <td style="padding: 0; text-align: center; border: 2px solid white;">
+                                                    {{ data.5 }}
+                                                </td>
+                                                <td class="hover-element" style="padding: 0; text-align: center; border: 2px solid white; position: relative;">
+                                                    <span class="popup2" style="width: auto;">
+                                                        {{ data.6 }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

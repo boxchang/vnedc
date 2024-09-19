@@ -23,13 +23,22 @@
 {% block container %}
 <div class="card-header">
     <a href="{% url 'fast_check' %}" class="btn btn-warning btn">
-        <i class="fas fa-wrench"></i> Dashbaord
+        <i class="fas fa-wrench"></i> DashBoard
+    </a>
+    <a href="{% url 'fast_check2' %}" class="btn btn-warning btn">
+        <i class="fas fa-wrench"></i> AOI
     </a>
     <a href="{% url 'runcard_info' %}" class="btn btn-warning btn">
         <i class="fas fa-wrench"></i> RunCard
     </a>
     <a href="{% url 'file_list' %}" class="btn btn-warning btn" target="_blank">
         <i class="fas fa-wrench"></i> SCADA File
+    </a>
+    <a href="{% url 'check_disk' %}" class="btn btn-warning btn">
+        <i class="fas fa-wrench"></i> Agent Storage
+    </a>
+    <a href="{% url 'machine_status' %}" class="btn btn-warning btn">
+        <i class="fas fa-wrench"></i> Machine logs
     </a>
 </div>
 <div>
