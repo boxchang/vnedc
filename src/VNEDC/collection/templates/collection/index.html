@@ -9,6 +9,11 @@ $(document).ready(function() {
         $('#session_form').submit();
     });
 });
+
+function plant_change() {
+    $('#session_form').attr('action', '{% url 'collection_index' %}');
+    $('#session_form').submit();
+}
 </script>
 {% endblock js %}
 {% block content %}
@@ -20,7 +25,7 @@ $(document).ready(function() {
                 <th style="text-align: center">{% trans "Production Information" %}</th>
                 <th style="text-align: center">{% trans "Completed Rate" %}</th>
             </tr>
-            {% for mach in tmp_machs %}
+            {% for mach in machs %}
             <tr>
                 <td>{{ mach.mach_code }}</td>
                 <td>

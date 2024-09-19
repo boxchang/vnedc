@@ -28,13 +28,16 @@ def index(request):
     machs = Machine.objects.none()
     if request.method == 'POST':
         sData_date = request.POST.get('data_date')
+        sPlant = request.POST.get('plant')
     else:
+        sPlant = "GDNBR"  # Default is GDNBR
         sData_date = datetime.today()
         sData_date = sData_date.strftime("%Y-%m-%d")
 
-    tmp_machs = Machine.objects.all()
+
+    machs = Machine.objects.filter(plant=sPlant)
     parameter_list = []
-    for tmp_mach in tmp_machs:
+    for tmp_mach in machs:
         daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
         tmp_mach.daily_prod_info_heads = daily_prod_info_heads
 
