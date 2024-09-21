@@ -125,6 +125,9 @@ def param_value_api(request):
                     tmp = records.filter(data_date=date, data_time=time, mach=mach).first()
                     if tmp:
                         data.append(tmp.parameter_value)
+                    else:
+                        data.append('null')
+
                 if data:
                     dataset['data'] = data
                     datasets.append(dataset)

@@ -166,6 +166,7 @@ $(document).ready(function () {
                     config.options.plugins.title.text = data.title;
                     config.options.plugins.subtitle.text = data.subtitle;
                     config.options.scales.y = data.y_data;
+                    config.options.spanGaps = true;
                     chartData.labels = data.labels;
                     chart.update();
                 }
