@@ -158,6 +158,7 @@ $(document).ready(function () {
 
                 config.options.plugins.title["text"] = data.title;
                 config.options.scales.y = data.y_data;
+                config.options.spanGaps = true;
                 chartData.labels = data.labels;
                 chart.update();
                 $("body").loading("stop");  //Loading Hide
