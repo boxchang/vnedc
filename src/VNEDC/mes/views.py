@@ -99,33 +99,17 @@ def runcard_detail(request):
     db = mes_database()
     results = db.select_sql_dict_param(sql, [runcard])
 
-    sql2 = """
-    SELECT 
-        LOT_NUMBER, DATA_ID, DATA_VAL, ROW_NUMBER() OVER (PARTITION BY LOT_NUMBER ORDER BY DATA_ID DESC) AS rn
-    FROM 
-        TGM.dbo.MEASURE_DATA 
-    WHERE 
-        LOT_NUMBER = %s
-    """
-    measures = db.select_sql_dict_param(sql2, [runcard])
-
-    if measures:
-        for result in results:
-            if result['OptionName'] == "Roll":
-                result['InspectionValue'] = str(result['InspectionValue']) + " (" + str(
-                    round(float(measures[4]['DATA_VAL']), 2)) + ")"
-            elif result['OptionName'] == "Cuff":
-                result['InspectionValue'] = str(result['InspectionValue']) + " (" + str(
-                    round(float(measures[3]['DATA_VAL']), 2)) + ")"
-            elif result['OptionName'] == "Palm":
-                result['InspectionValue'] = str(result['InspectionValue']) + " (" + str(
-                    round(float(measures[2]['DATA_VAL']), 2)) + ")"
-            elif result['OptionName'] == "Finger":
-                result['InspectionValue'] = str(result['InspectionValue']) + " (" + str(
-                    round(float(measures[1]['DATA_VAL']) / 2, 3)) + ")"
-            elif result['OptionName'] == "FingerTip":
-                result['InspectionValue'] = str(result['InspectionValue']) + " (" + str(
-                    round(float(measures[0]['DATA_VAL']) / 2, 3)) + ")"
+    for result in results:
+        if result['OptionName'] == "Roll":
+            result['InspectionValue'] = str(result['InspectionValue'])
+        elif result['OptionName'] == "Cuff":
+            result['InspectionValue'] = str(result['InspectionValue'])
+        elif result['OptionName'] == "Palm":
+            result['InspectionValue'] = str(result['InspectionValue'])
+        elif result['OptionName'] == "Finger":
+            result['InspectionValue'] = str(result['InspectionValue'])
+        elif result['OptionName'] == "FingerTip":
+            result['InspectionValue'] = str(result['InspectionValue'])
 
     return JsonResponse(results, safe=False)
 
