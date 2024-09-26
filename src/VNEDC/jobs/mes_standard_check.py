@@ -1,10 +1,10 @@
 import sys
 import requests
 import os
-from jobs.database import mes_database
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
+from jobs.database import mes_database
 from datetime import datetime, timedelta
 import time
 startDate = datetime.today().date() - timedelta(days=1) #Yesterday %Y-%m-%d
