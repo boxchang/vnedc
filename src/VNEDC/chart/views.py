@@ -171,7 +171,9 @@ def param_value_api(request):
             else:
                 title = process_type + "__" + param_type
 
-            y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+            y_data = []
+            if control_low_data[0] and control_high_data[0]:
+                y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
 
             chart_data = {"labels": y_label, "datasets": datasets, "title": title,
                           "control_high": form_control_range_high, "control_low": form_control_range_low,
