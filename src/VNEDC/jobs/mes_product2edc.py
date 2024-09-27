@@ -107,11 +107,56 @@ class mes_production_info(object):
                 """
                 vnedc_db.execute_sql(sql)
 
+def insert_weight(selected_date):
+    sql = f"""
+        SELECT rc.WorkCenterTypeName, rc.MachineName, rc.Id, rc.InspectionDate, rc.Period,  rc.LineName, ir.InspectionValue
+        FROM [PMGMES].[dbo].[PMG_MES_RunCard] rc
+        JOIN [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] ir
+        ON rc.Id = ir.RunCardId
+        AND ir.OptionName = 'Weight'
+        WHERE rc.WorkCenterTypeName = 'NBR'
+        AND (Period = 0 OR Period = 6 OR Period = 12 or Period = 18)
+        AND rc.InspectionDate = '{selected_date}'
+        ORDER BY Cast(Period as INT), MachineName, LineName
+    """
+    db = mes_database()
+    vnedc_db = vnedc_database()
+    rows = db.select_sql_dict(sql)
+    for row in rows:
+        count = 0
+        sdata_date = row['InspectionDate']
+        splant_id = "GDNBR" if 'NBR' == str(row['WorkCenterTypeName']) else 'LK'
+        smach_id = "GDNBR"+ str(row['MachineName'])[-2:] if splant_id == "GDNBR" else "LKNBR" + str(row['MachineName'])[-2:]
+        if str(row['Period']) == '0':
+            sdata_time = '00'
+        elif str(row['Period']) == '6':
+            sdata_time = '06'
+        elif str(row['Period']) == '12':
+            sdata_time = '12'
+        else:
+            sdata_time = '18'
+        sparameter_value = float(row['InspectionValue'])
+
+        check_sql = f"""
+                select * from [VNEDC].[dbo].[collection_parametervalue] 
+                where data_date = '{sdata_date}' and plant_id = '{splant_id}' and mach_id = '{smach_id}' and process_type = 'OTHER' and data_time = {sdata_time} and parameter_name = 'WEIGHT'
+        """
+        check = vnedc_db.select_sql_dict(check_sql)
+        if check:
+            continue
+        elif not check:
+            insert_sql = f"""
+                insert into [VNEDC].[dbo].[collection_parametervalue] (data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, update_at, create_by_id, update_by_id)
+                values ('{sdata_date}', '{splant_id}', '{smach_id}', 'OTHER', '{sdata_time}', 'WEIGHT', {sparameter_value}, GETDATE(), GETDATE(), 30, 30)
+            """
+            vnedc_db.execute_sql(insert_sql)
+
 
 from datetime import datetime, timedelta
 
 today = datetime.today()
 today = today.strftime('%Y-%m-%d')
+insert_weight(today)
 
 prod_info = mes_production_info(today)
 prod_info.main()
