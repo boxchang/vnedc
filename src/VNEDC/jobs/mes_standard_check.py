@@ -1,10 +1,10 @@
 import sys
 import requests
 import os
-from jobs.database import mes_database
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
+from jobs.database import mes_database
 from datetime import datetime, timedelta
 import time
 startDate = datetime.today().date() - timedelta(days=1) #Yesterday %Y-%m-%d
@@ -13,7 +13,13 @@ current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') #Send message time
 
 #Step 5: Send messages from python to Wecom group
 def send_message(msg):
+    path = os.path.dirname(os.path.abspath(__file__))
+    wecom_file = os.path.join(path, "wecom_key.config")
     url = '' #Add Wecom GD_MES group key
+    if os.path.exists(wecom_file):
+        with open(wecom_file, 'r') as file:
+            url = file.read().strip()
+
     headers =   {'Content-Type': 'application/json; charset=utf-8'}
     data = {
         "msgtype": "text",
