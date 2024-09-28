@@ -125,8 +125,15 @@ def insert_weight(selected_date):
     for row in rows:
         count = 0
         sdata_date = row['InspectionDate']
-        splant_id = "GDNBR" if 'NBR' == str(row['WorkCenterTypeName']) else 'LK'
-        smach_id = "GDNBR"+ str(row['MachineName'])[-2:] if splant_id == "GDNBR" else "LKNBR" + str(row['MachineName'])[-2:]
+
+        splant_id = ""
+        if 'NBR' == str(row['WorkCenterTypeName']):
+            splant_id = "GDNBR"
+
+        smach_id = ""
+        if splant_id == "GDNBR":
+            smach_id = "GDNBR" + str(row['MachineName'])[-2:]
+
         if str(row['Period']) == '0':
             sdata_time = '00'
         elif str(row['Period']) == '6':
