@@ -27,9 +27,17 @@ Electric Data Collection
                         </label>
                         <div>
                             {% if not time in define.input_time %}
-                            <input type="text" name="{{ define.parameter_name }}_{{ time }}" class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" readonly>
+                                <input type="text" name="{{ define.parameter_name }}_{{ time }}"
+                                       class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}"
+                                       value="{% get_param_value define time %}" readonly data-initial-value="{% get_param_value define time %}">
                             {% else %}
-                            <input type="text" name="{{ define.parameter_name }}_{{ time }}" {% if define.text_color %}style="background-color: {{ define.text_color }}"{% endif %} class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}" value="{% get_param_value define time %}" onkeypress="validate(event)" {% if define.auto_value %}readonly{% endif %}>
+                                <input type="text" name="{{ define.parameter_name }}_{{ time }}"
+                                       {% if define.text_color %}style="background-color: {{ define.text_color }}"{% endif %}
+                                       class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}"
+                                       value="{% get_param_value define time %}"  onkeypress="validate(event)" oninput="checkValue(this, '{{ define.parameter_name }}')"
+                                       onblur="checkValue(this, '{{ define.parameter_name }}')"
+                                       {% if define.auto_value %}readonly{% endif %}
+                                       data-initial-value="{% get_param_value define time %}" data-alert-shown="true">
                             {% endif %}
                         </div>
                     </div>
@@ -40,8 +48,75 @@ Electric Data Collection
         </div>
         <div class="row" style="padding-top: 20px;">
             <div class="col-12" style="text-align: center">
-                <input class="btn btn-info" type="submit" style="width:150px;height: 50px;" value="{% trans "save" %}" />
+                <input class="btn btn-info" type="submit" name="save_button" style="width:150px;height: 50px;" value="{% trans 'Save' %}" />
             </div>
         </div>
     </form>
+    <script>
+        const limits = [
+            {% for limit in results %}
+                ['{{ limit.parameter_name }}', {{ limit.low_limit }}, {{ limit.high_limit }}]{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        function checkValue(input, parameterName) {
+            let initialValue = input.getAttribute('data-initial-value');
+            let inputValue = input.value;
+            let defaultColor = '#AEFFA8';
+
+            if (!inputValue || inputValue.trim() === '') {
+                input.style.backgroundColor = defaultColor;
+                return;
+            }
+
+            if (inputValue !== initialValue) {
+                let parsedValue = parseFloat(inputValue);
+
+                if (isNaN(parsedValue)) {
+                    input.style.backgroundColor = defaultColor;
+                    return;
+                }
+
+                let limit = limits.find(limit => parameterName.includes(limit[0]));
+
+                if (limit) {
+                    let lowLimit = limit[1]/2;
+                    let highLimit = limit[2]*2;
+                    if (parsedValue < lowLimit || parsedValue > highLimit) {
+                        input.style.backgroundColor = 'red';
+                        input.setAttribute('data-alert-shown', 'false');
+                    } else {
+                        input.style.backgroundColor = defaultColor;
+                        input.setAttribute('data-alert-shown', 'true');
+                    }
+                } else {
+                    input.style.backgroundColor = defaultColor;
+                    input.setAttribute('data-alert-shown', 'true');
+                }
+            }
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            let valueChanged = false;
+            input.addEventListener('input', function() {
+                valueChanged = true;
+                input.setAttribute('data-alert-shown', 'false');
+            });
+            input.addEventListener('blur', function() {
+                if (valueChanged) {
+                    checkValue(input, input.name);
+                }
+                valueChanged = false;
+            });
+            input.addEventListener('mousemove', function() {
+                if (input.style.backgroundColor === 'red' && valueChanged) {
+                    let alertShown = input.getAttribute('data-alert-shown');
+                    if (alertShown === 'false') {
+                        alert(`Are you sure the value is correct ?\nIf no, change it now !`);
+                        input.setAttribute('data-alert-shown', 'true');
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock content %}

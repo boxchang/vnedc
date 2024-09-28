@@ -16,7 +16,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from django.shortcuts import render
 import re
-
+import requests
 
 def create_vnedc_connection():
     pass
@@ -147,6 +147,7 @@ def prod_info_save(request):
 @login_required
 def record(request, process_code):
     sPlant, sMach, sData_date, lang = page_init(request)
+    save = 0
     process_type = Process_Type.objects.filter(process_code=process_code).first()
     processes = Process_Type.objects.all().order_by('show_order')
     data_times = ['00', '06', '12', '18']
@@ -157,12 +158,35 @@ def record(request, process_code):
     else:
         machs = None
 
-    info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
+    sql_01 = f"""
+                SELECT product
+                FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
+                where data_date = '{sData_date}' and mach_id = '{sMach}'
+                """
+    db = vnedc_database()
+    results = db.select_sql_dict(sql_01)
+    result = '/'.join(item['product'] for item in results)
+    item_no = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
+    sql_02 = f"""
+                select parameter_name, control_range_low as low_limit, control_range_high as high_limit
+                from [VNEDC].[dbo].[collection_lab_parameter_control] 
+                where item_no = {item_no} and mach_id = '{sMach}' and process_type = '{process_code}'
+                """
+    results = db.select_sql_dict(sql_02)
+    limit = [[limit['parameter_name'], limit['low_limit'], limit['high_limit']] for limit in results]
 
+    info = Daily_Prod_Info.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date).first()
+    alert_fields = []
     plant = Plant.objects.get(plant_code=sPlant)
     mach = Machine.objects.get(mach_code=sMach)
+    if 'save_click_count' not in request.session:
+        request.session['save_click_count'] = 0
 
     if request.method == 'POST':
+        save = 1
+        request.session['save_click_count'] += 1
+        request.session.modified = True
+
         if process_type:
             defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
             for define in defines:
@@ -175,11 +199,36 @@ def record(request, process_code):
                                                                     process_type=process_type.process_code,
                                                                     data_time=time, parameter_name=define.parameter_name,
                                                                     defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
+
                             msg = _("Update Done")
                     except Exception as e:
                         print(e)
+        if request.session.modified == True:
+            m_sql = f"""
+                        SELECT parameter_name, parameter_value, data_time FROM [VNEDC].[dbo].[collection_parametervalue]
+                        WHERE plant_id = '{sPlant}' AND mach_id = '{sMach}' AND data_date = '{sData_date}'
+                        AND process_type = '{process_code}' 
+                        AND data_time = (
+                            SELECT TOP 1 data_time FROM [VNEDC].[dbo].[collection_parametervalue]
+                            WHERE plant_id = '{sPlant}' AND mach_id = '{sMach}' AND data_date = '{sData_date}'
+                            AND process_type = '{process_code}' ORDER BY data_time DESC);
+                        """
+            values = db.select_sql_dict(m_sql)
+            values_list = [[value['parameter_name'], value['parameter_value'], value['data_time']] for value in values]
+            for limit_item in limit:
+                for value_item in values_list:
+                    if str(limit_item[0]) in str(value_item[0]):
+                        if (float(value_item[1]) < float(limit_item[1])) or (
+                                float(value_item[1]) > float(limit_item[2])):
+                            alert_fields.append(f"{value_item[0]}: {value_item[1]} ({str(limit_item[1])}-{str(limit_item[2])})")
+            alert_fields.append(values_list[0][-1])
+            if len(alert_fields) > 1:
+                record = '\n\t+'.join(alert_fields[:-1])
+                record = '\t+' + record
+                message = f"Vui lòng kiểm tra lại giá trị của {process_code}:\n" + str(record) + f"\nVào lúc {alert_fields[-1]}:00"
+                print(message)
+                record_message(message)
         return redirect(reverse('record', kwargs={'process_code': process_code}))
-
     if process_type:
         defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
         for define in defines:
@@ -197,6 +246,19 @@ def record(request, process_code):
 
     return render(request, 'collection/record.html', locals())
 
+def record_message(msg):
+    url = ''  # Add Wecom GD_MES group key
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+    data = {
+        "msgtype": "text",
+        "text": {
+            "content": '',
+            # "mentioned_list": ["@all"],
+        }
+    }
+    data["text"]["content"] = msg
+    r = requests.post(url, headers=headers, json=data)
+    return r.json()
 
 def get_production_choices(end_date):
     date_obj = datetime.strptime(end_date, "%Y-%m-%d")
