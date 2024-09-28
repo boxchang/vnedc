@@ -17,6 +17,7 @@ from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from django.shortcuts import render
 import re
 import requests
+import os
 
 def create_vnedc_connection():
     pass
@@ -247,7 +248,13 @@ def record(request, process_code):
     return render(request, 'collection/record.html', locals())
 
 def record_message(msg):
+    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    wecom_file = os.path.join(path, 'Jobs', 'wecom_key.config')
     url = ''  # Add Wecom GD_MES group key
+    if os.path.exists(wecom_file):
+        with open(wecom_file, 'r') as file:
+            url = file.read().strip()
+
     headers = {'Content-Type': 'application/json; charset=utf-8'}
     data = {
         "msgtype": "text",
