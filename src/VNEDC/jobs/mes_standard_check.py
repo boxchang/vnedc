@@ -37,10 +37,6 @@ def message():
     #Step 5: Send message to Wecom MES group
     machine = ['NBR', 'PVC']
     db = mes_database()
-    NBR_details = []
-    PVC_details = []
-    machine = ['NBR', 'PVC']
-    db = mes_database()
     machine_details = {'NBR': [], 'PVC': []}
     for selected_machine in machine:
         missingIPQCStandardValue = []
@@ -96,12 +92,44 @@ def message():
         send_code = 1        
     return send_code, wecomMessage
 
+def MES_SAP_RFC():
+    sql = f"""
+        select top 120 
+        IIF(CHARINDEX('nbr',r.WorkCenterName)>0, 'nbr', 'pvc') as WorkCentertype, 
+        r.WorkOrderId, r.id runId, r.LineName, r.Period,
+        d.*, p.StorageLocation
+        from PMG_MES_WorkInProcessDetail d (nolock) inner join PMG_MES_WorkInProcess p (nolock) on d.WorkInProcessId=p.id
+        inner join PMG_MES_RunCard r (nolock) on p.RunCardId=r.id
+        where d.PrintType='ticket'
+        and (D.ErpSTATUS = 'E' )
+        order by D.IsERP desc, WorkCentertype, r.WorkOrderId, D.PrintDate desc
+    """
+    db = mes_database()
+    results = db.select_sql_dict(sql)
+    if results:
+        sap_code = 1
+        text = [[result['LotNo'], result['WorkOrderId']] for result in results]
+        n_text = [' - '.join(item) for item in text]
+        nn_text = '\n\t+ '.join(n_text)
+        nn_text = '\n\t+ ' + nn_text
+        message = f"MES call SAP RFC fail in: {startDate}\n" + nn_text
+    else:
+        sap_code = 0
+        message = ''
+    return sap_code, message
+
+
 if __name__ == "__main__":
     start = time.time()
     code, msg = message()
+    sap_code, sap_msg = MES_SAP_RFC()
     if code == 1: #If send code == 1, it means there's standard value missing and need to be sent alert, else it means nothing needs to be sent
         response = send_message(msg)
         print(response)
-        print(msg)
+        # print(msg)
+    if sap_code == 1:
+        response = send_message(sap_msg)
+        print(response)
+        # print(sap_msg)
     end = time.time()
     print(f'Execution time: {end - start:.3f} seconds')
