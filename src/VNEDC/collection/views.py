@@ -186,6 +186,7 @@ def record(request, process_code):
     if request.method == 'POST':
         save = 1
         request.session['save_click_count'] += 1
+        # request.session.modified = True
 
         if process_type:
             defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
@@ -203,7 +204,31 @@ def record(request, process_code):
                             msg = _("Update Done")
                     except Exception as e:
                         print(e)
-
+        # if request.session.modified == True:
+        #     m_sql = f"""
+        #                 SELECT parameter_name, parameter_value, data_time FROM [VNEDC].[dbo].[collection_parametervalue]
+        #                 WHERE plant_id = '{sPlant}' AND mach_id = '{sMach}' AND data_date = '{sData_date}'
+        #                 AND process_type = '{process_code}'
+        #                 AND data_time = (
+        #                     SELECT TOP 1 data_time FROM [VNEDC].[dbo].[collection_parametervalue]
+        #                     WHERE plant_id = '{sPlant}' AND mach_id = '{sMach}' AND data_date = '{sData_date}'
+        #                     AND process_type = '{process_code}' ORDER BY data_time DESC);
+        #                 """
+        #     values = db.select_sql_dict(m_sql)
+        #     values_list = [[value['parameter_name'], value['parameter_value'], value['data_time']] for value in values]
+        #     for limit_item in limit:
+        #         for value_item in values_list:
+        #             if str(limit_item[0]) in str(value_item[0]):
+        #                 if (float(value_item[1]) < float(limit_item[1])) or (
+        #                         float(value_item[1]) > float(limit_item[2])):
+        #                     alert_fields.append(f"{value_item[0]}: {value_item[1]} ({str(limit_item[1])}-{str(limit_item[2])})")
+        #     alert_fields.append(values_list[0][-1])
+        #     if len(alert_fields) > 1:
+        #         record = '\n\t+'.join(alert_fields[:-1])
+        #         record = '\t+' + record
+        #         message = f"Vui lòng kiểm tra lại giá trị của {process_code}:\n" + str(record) + f"\nVào lúc {alert_fields[-1]}:00"
+        #         print(message)
+        #         record_message(message)
         return redirect(reverse('record', kwargs={'process_code': process_code}))
     if process_type:
         defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
