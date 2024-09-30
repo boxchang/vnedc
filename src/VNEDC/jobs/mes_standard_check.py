@@ -101,7 +101,7 @@ def MES_SAP_RFC():
         from PMG_MES_WorkInProcessDetail d (nolock) inner join PMG_MES_WorkInProcess p (nolock) on d.WorkInProcessId=p.id
         inner join PMG_MES_RunCard r (nolock) on p.RunCardId=r.id
         where d.PrintType='ticket'
-        and (D.ErpSTATUS = 'E' )
+        and (D.ErpSTATUS = 'E' ) and d.CreationTime='{startDate}' 
         order by D.IsERP desc, WorkCentertype, r.WorkOrderId, D.PrintDate desc
     """
     db = mes_database()
@@ -124,12 +124,12 @@ if __name__ == "__main__":
     code, msg = message()
     sap_code, sap_msg = MES_SAP_RFC()
     if code == 1: #If send code == 1, it means there's standard value missing and need to be sent alert, else it means nothing needs to be sent
-        response = send_message(msg)
-        print(response)
-        # print(msg)
+        # response = send_message(msg)
+        # print(response)
+        print(msg)
     if sap_code == 1:
-        response = send_message(sap_msg)
-        print(response)
-        # print(sap_msg)
+        # response = send_message(sap_msg)
+        # print(response)
+        print(sap_msg)
     end = time.time()
     print(f'Execution time: {end - start:.3f} seconds')
