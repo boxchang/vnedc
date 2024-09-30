@@ -83,12 +83,14 @@ Electric Data Collection
                     let lowLimit = limit[1]/2;
                     let highLimit = limit[2]*2;
                     if (parsedValue < lowLimit || parsedValue > highLimit) {
-                        input.style.backgroundColor = 'red';
+                        input.style.backgroundColor = 'pink';
                         input.setAttribute('data-alert-shown', 'false');
                     } else {
                         input.style.backgroundColor = defaultColor;
                         input.setAttribute('data-alert-shown', 'true');
                     }
+                    input.setAttribute('lowLimit', lowLimit);  // For debug
+                    input.setAttribute('highLimit', highLimit);  // For debug
                 } else {
                     input.style.backgroundColor = defaultColor;
                     input.setAttribute('data-alert-shown', 'true');
