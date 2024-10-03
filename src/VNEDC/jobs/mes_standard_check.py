@@ -122,14 +122,11 @@ def MES_SAP_RFC():
 if __name__ == "__main__":
     start = time.time()
     code, msg = message()
-    sap_code, sap_msg = MES_SAP_RFC()
+
     if code == 1: #If send code == 1, it means there's standard value missing and need to be sent alert, else it means nothing needs to be sent
-        # response = send_message(msg)
-        # print(response)
+        response = send_message(msg)
+        print(response)
         print(msg)
-    if sap_code == 1:
-        # response = send_message(sap_msg)
-        # print(response)
-        print(sap_msg)
+
     end = time.time()
     print(f'Execution time: {end - start:.3f} seconds')
