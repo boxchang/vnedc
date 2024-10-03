@@ -474,99 +474,124 @@ def rd_report(request):
     process_type = Process_Type.objects.filter().first()
     plants = Plant.objects.all()
     machs = Machine.objects.filter(plant=sPlant) if sPlant else None
+    db = vnedc_database()
+
     if 'GD' not in sPlant and 'LK' not in sPlant:
         sPlant = 'GDNBR'
-        sMach = 'GDNBR 01'
+        sMach = 'GDNBR01'
         machs = Machine.objects.filter(plant=sPlant)
     if 'GD' in sPlant:
-        defines = ParameterDefine.objects.filter(
-            plant=sPlant,
-            mach=sMach,
-            process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
-            parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
-                                'A_T1_PH', 'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
-                                'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
-                                'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
-        )
-        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A",
-                 "Coagulant B", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Chlorination"]
-        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 1]
+        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Coagulant A", "Coagulant B", "Chlorination"]
+        merge_sizes = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 1]
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
                       "TSC %", "pH Value", "TSC %", "pH Value", "TSC %", "pH Value", "ppm"]
-        sql = f"""
-            SELECT product
-            FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
-            where data_date = '{sData_date}' and mach_id = '{sMach}'
-        """
-        db = vnedc_database()
-        results = db.select_sql_dict(sql)
-        result = '/'.join(item['product'] for item in results)
-        if len(result) > 0:
-            result = result
-        else:
-            result = ''
         table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
-                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Latex SIDE A-1', ['TSC %', 'pH Value']], ['Latex SIDE A-2', ['TSC %', 'pH Value']],
-                      ['Latex SIDE B-1', ['TSC %', 'pH Value']], ['Latex SIDE B-2', ['TSC %', 'pH Value']],
+                      ['Latex SIDE A-1', ['pH Value', 'TSC %']], ['Latex SIDE A-2', ['pH Value', 'TSC %']],
+                      ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Chlorination', ['ppm']]]
 
 
     elif 'LK' in sPlant:
-        defines = ParameterDefine.objects.filter(
-            plant=sPlant,
-            mach=sMach,
-            process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
-            parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'T1_TSC',
-                                'T1_PH', 'T2_TSC', 'T2_PH', 'A_CPF',
-                                'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
-        )
-
         table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
-                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Latex 1', ['TSC %', 'pH Value']], ['Latex 2', ['TSC %', 'pH Value']],
+                      ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Chlorination', ['ppm']]]
-        result = ''
-    for define in defines:
-        values = ParameterValue.objects.filter(
-                                plant=sPlant,
-                                mach=sMach,
-                                data_date=sData_date,
-                                process_type=define.process_type.process_code,
-                                parameter_name=define.parameter_name
-                            )
-        define.values = values
 
-    try:
-        control_limit = Lab_Parameter_Control.objects.filter(
-            plant=sPlant,
-            mach=sMach,
-            item_no=re.findall(r'\d+', result)[0] if len(result) > 0 else 0)
-        low_value, high_value = [], []
-        for i in range(len(control_limit)):
-            high_value.append(control_limit[i].control_range_high)
-            low_value.append(control_limit[i].control_range_low)
+    sql_No = f"""
+            SELECT product
+            FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
+            where data_date = '{sData_date}' and mach_id = '{sMach}'
+            """
+    result02 = db.select_sql_dict(sql_No)
+    result = '/'.join(item['product'] for item in result02)
+    itemNo_display = ' ,'.join(list(set([result['product'] for result in result02])))
+    itemNo = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
 
-        low_limit, high_limit = [0]*19, [0]*19
-        for i in ([5, 6, 8, 9] + list(range(10, 18))):
-            if i in [5, 6, 8, 9]:
-                if i == 5 or i == 8:
-                    low_limit[i], high_limit[i] = low_value[3], high_value[3]
-                elif i == 6 or i == 9:
-                    low_limit[i], high_limit[i] = low_value[4], high_value[4]
-            else:
-                if i % 2 == 0:
-                    low_limit[i], high_limit[i] = low_value[0], high_value[0]
-                else:
-                    low_limit[i], high_limit[i] = low_value[1], high_value[1]
+    sql = f"""
+            SELECT 
+            subquery.parameter_name, 
+            subquery.process_type, 
+            pc.control_range_low,
+            pc.control_range_high,
+            MAX(CASE WHEN cpv.data_time = '00' THEN cpv.parameter_value ELSE NULL END) AS at_00,
+            MAX(CASE WHEN cpv.data_time = '06' THEN cpv.parameter_value ELSE NULL END) AS at_06,
+            MAX(CASE WHEN cpv.data_time = '12' THEN cpv.parameter_value ELSE NULL END) AS at_12,
+            MAX(CASE WHEN cpv.data_time = '18' THEN cpv.parameter_value ELSE NULL END) AS at_18,
+            subquery.mach_id
+            FROM (
+                SELECT DISTINCT parameter_name, process_type, mach_id
+                FROM [VNEDC].[dbo].[collection_parametervalue]
+                WHERE plant_id = '{sPlant}' 
+                  AND mach_id = '{sMach}' 
+                  AND data_date = '{sData_date}'
+                  AND (
+                    (process_type = 'COAGULANT' AND (parameter_name LIKE '%CPF%' OR parameter_name LIKE '%pH%' OR parameter_name LIKE '%CONCENTRATION%'))
+                    OR (process_type = 'LATEX' AND (parameter_name LIKE '%TSC%' OR parameter_name LIKE '%pH%'))
+                    OR (process_type = 'ACID' AND parameter_name LIKE '%CONCENTRATION%')
+                    OR (process_type = 'ALKALINE' AND parameter_name LIKE '%CONCENTRATION%')
+                    OR (process_type = 'CHLORINE' AND parameter_name = 'CONCENTRATION')
+                  )
+            ) AS subquery
+            LEFT JOIN (
+                SELECT parameter_name, process_type, data_time, parameter_value, mach_id
+                FROM [VNEDC].[dbo].[collection_parametervalue]
+                WHERE plant_id = '{sPlant}' 
+                  AND mach_id = '{sMach}' 
+                  AND data_date = '{sData_date}'
+                  AND data_time IN ('00', '06', '12', '18')
+            ) AS cpv
+            ON subquery.parameter_name = cpv.parameter_name
+            AND subquery.process_type = cpv.process_type
+            AND subquery.mach_id = cpv.mach_id
+            LEFT JOIN [VNEDC].[dbo].[collection_lab_parameter_control] pc
+            ON pc.item_no = {itemNo} 
+            AND pc.process_type = subquery.process_type 
+            AND pc.mach_id = subquery.mach_id 
+            AND CHARINDEX(pc.parameter_name, subquery.parameter_name) > 0
+            GROUP BY 
+                subquery.parameter_name, 
+                subquery.process_type, 
+                subquery.mach_id, 
+                pc.control_range_low, 
+                pc.control_range_high
+            ORDER BY 
+                CASE
+                    WHEN subquery.process_type = 'ACID' THEN 1
+                    WHEN subquery.process_type = 'ALKALINE' THEN 2
+                    WHEN subquery.process_type = 'LATEX' THEN 3
+                    WHEN subquery.process_type = 'COAGULANT' THEN 4
+                    WHEN subquery.process_type = 'CHLORINE' THEN 5
+                ELSE 6 END,
+                subquery.process_type,   
+                subquery.parameter_name ASC;
+        """
+    results = db.select_sql_dict(sql)
+    limit = []
+    data = []
+    mode0 = 0
+    mode6 = 0
+    mode12 = 0
+    mode18 = 0
 
-    except:
-        pass
+    for result in results:
+        limit_range = f"{result['control_range_low']} ~ {result['control_range_high']}" if str(result['control_range_high']) != 'None' else ' '
+        limit_low = float(result['control_range_low']) if result['control_range_low'] is not None else 0
+        limit_high = float(result['control_range_high']) if result['control_range_low'] is not None else 10000
+        at_0 = float(result['at_00']) if result['at_00'] is not None else -1
+        at_6 = float(result['at_06']) if result['at_06'] is not None else -1
+        at_12 = float(result['at_12']) if result['at_12'] is not None else -1
+        at_18 = float(result['at_18']) if result['at_18'] is not None else -1
+        mode0 += at_0
+        mode6 += at_6
+        mode12 += at_12
+        mode18 += at_18
+        limit.append(limit_range)
+        data.append([limit_low, limit_high, at_0, at_6, at_12, at_18])
 
     return render(request, 'collection/rd_report.html', locals())
+
 
 
 def generate_excel_file_big(request):

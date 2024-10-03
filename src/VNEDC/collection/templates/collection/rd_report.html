@@ -231,12 +231,24 @@
             </div>
             <div class="content">
                 <!-- Button and Form -->
-                <div style="margin-left:82.5%; padding-top: 10px;">
-                    <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
-                        <button type="submit" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                            Download Excel
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="flex-basis: 70%; padding-left: 40px">
+                        <div id="product-name">{{ itemNo_display }}</div>
+                    </div>
+                    <div style="flex-basis: 10%; padding-left: 40px">
+                        <!-- Capture Button -->
+                        <button id="captureBtn" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                            Capture
                         </button>
-                    </form>
+                    </div>
+                    <div style="flex-basis: auto; text-align: right; padding-right: 50px">
+                        <!-- Download Excel Button -->
+                        <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
+                            <button type="submit" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                Download Excel
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <!-- Modal Structure -->
                 <div id="loadingModal" class="modal">
@@ -246,7 +258,7 @@
                     </div>
                 </div>
                 <div class="row m-3" style="height:500px">
-                    <div class="col-12"  id="myTable">
+                    <div class="col-12 capture-table"  id="myTable">
                         <div class="container">
                             <table class="table table-bordered">
                                 <thead class="text-center">
@@ -298,27 +310,10 @@
                                     <div class="row no-gutters">
                                         <div class="col-md-4" id="table-letf-right">
                                             <table class="table table-bordered">
-                                                {% for define in defines %}
+                                                {% for item in limit %}
                                                     <tr class="text-right">
                                                        <td class="col-md-4 text-center">
-                                                            {% if define.values %}
-                                                                {% for low_item in low_limit %}
-                                                                    {% if low_item != 0 %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter %}
-                                                                            {{ low_item }} ~
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                                {% for high_item in high_limit %}
-                                                                    {% if high_item != 0 %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter %}
-                                                                            {{ high_item }}
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% else %}
-                                                                {{ '' }}
-                                                            {% endif %}
+                                                            {{ item }}
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -326,115 +321,39 @@
                                         </div>
                                         <div class="col-md-8" id="table-letf-left">
                                             <table class="table table-bordered">
-                                                {% for define in defines %}
+                                                {% for row in data %}
                                                     <tr class="text-right">
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "00" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "00" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="color: {% if row.2 < row.0 %} green; {% elif row.2 > row.1 %} red; {%  else %} black; {% endif %}
+                                                                background-color: {% if row.2 == -1 and mode0 > 0 %} #D9D9D9 {% endif %}">
+                                                           {% if row.2 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.2 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "06" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "06" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="color: {% if row.3 < row.0 %} green; {% elif row.3 > row.1 %} red; {%  else %} black; {% endif %}
+                                                                background-color: {% if row.3 == -1 and mode6 > 0 %} #D9D9D9 {% endif %}">
+                                                           {% if row.3 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.3 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "12" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "12" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="color: {% if row.4 < row.0 %} green; {% elif row.4 > row.1 %} red; {%  else %} black; {% endif %}
+                                                                background-color: {% if row.4 == -1 and mode12 > 0 %} #D9D9D9 {% endif %}">
+                                                           {% if row.4 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.4 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "18" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "18" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="color: {% if row.5 < row.0 %} green; {% elif row.5 > row.1 %} red; {%  else %} black; {% endif %}
+                                                                background-color: {% if row.5 == -1 and mode18 > 0 %} #D9D9D9 {% endif %}">
+                                                           {% if row.5 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.5 }}
+                                                           {% endif %}
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -570,5 +489,65 @@
             document.getElementById('loadingModal').style.display = 'none';
         });
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+    document.getElementById('captureBtn').addEventListener('click', function() {
+        // Select the div to capture
+        var captureDiv = document.querySelector('.capture-table');
+
+        // Get the values from the form inputs and the product name
+        var plant = document.getElementById('id_plant').options[document.getElementById('id_plant').selectedIndex].text;
+        var mach = document.getElementById('id_mach').options[document.getElementById('id_mach').selectedIndex].text;
+        var dataDate = document.getElementById('id_data_date').value;
+        var productName = document.getElementById('product-name').innerText; // Get the product name
+
+        // Use html2canvas to capture the div
+        html2canvas(captureDiv).then(function(divCanvas) {
+            // Get the dimensions of the captured div
+            var divImage = divCanvas.toDataURL('image/png');
+            var divWidth = divCanvas.width;
+            var divHeight = divCanvas.height;
+
+            // Create a new canvas with extra space for the text
+            var finalCanvas = document.createElement('canvas');
+            var finalContext = finalCanvas.getContext('2d');
+
+            // Set the final canvas size (div image + extra space for text)
+            var textHeight = 150; // Height for text space
+            finalCanvas.width = divWidth;
+            finalCanvas.height = divHeight + textHeight;
+
+            // Set background color to white
+            finalContext.fillStyle = 'white';
+            finalContext.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill entire canvas with white
+
+            // Set font and add custom text above the div image (including product name)
+            finalContext.font = '38px Arial';
+            finalContext.fillStyle = 'black';
+            finalContext.textAlign = 'center';
+            finalContext.fillText(`${productName} - ${mach} - ${dataDate}`, divWidth / 2, 50); // Position text with product name
+
+            // Draw the captured div image below the text
+            var img = new Image();
+            img.src = divImage;
+            img.onload = function() {
+                finalContext.drawImage(img, 0, textHeight); // Draw image after text space
+
+                // Convert the final canvas to a downloadable image
+                var finalImageData = finalCanvas.toDataURL('image/png');
+
+                // Create a link element to download the combined image
+                var downloadLink = document.createElement('a');
+
+                // Set dynamic filename for the download
+                downloadLink.download = `${productName}-${plant}-${mach}-${dataDate}.png`;
+                downloadLink.href = finalImageData;
+                downloadLink.click();
+            };
+        });
+    });
+
+</script>
+
 </body>
 </html>
