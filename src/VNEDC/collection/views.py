@@ -499,97 +499,78 @@ def rd_report(request):
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Chlorination', ['ppm']]]
 
-    sql_No = f"""
-            SELECT product
-            FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
-            where data_date = '{sData_date}' and mach_id = '{sMach}'
-            """
-    result02 = db.select_sql_dict(sql_No)
-    result = '/'.join(item['product'] for item in result02)
-    itemNo_display = ' ,'.join(list(set([result['product'] for result in result02])))
-    itemNo = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
+    try:
+        sql_No = f"""
+                    SELECT product
+                    FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
+                    where data_date = '{sData_date}' and mach_id = '{sMach}'
+                    """
+        result02 = db.select_sql_dict(sql_No)
+        result = '/'.join(item['product'] for item in result02)
+        itemNo_display = ' ,'.join(sorted(list(set([result['product'] for result in result02]))))
+        itemNo = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
 
-    sql = f"""
-            SELECT 
-            subquery.parameter_name, 
-            subquery.process_type, 
-            pc.control_range_low,
-            pc.control_range_high,
-            MAX(CASE WHEN cpv.data_time = '00' THEN cpv.parameter_value ELSE NULL END) AS at_00,
-            MAX(CASE WHEN cpv.data_time = '06' THEN cpv.parameter_value ELSE NULL END) AS at_06,
-            MAX(CASE WHEN cpv.data_time = '12' THEN cpv.parameter_value ELSE NULL END) AS at_12,
-            MAX(CASE WHEN cpv.data_time = '18' THEN cpv.parameter_value ELSE NULL END) AS at_18,
-            subquery.mach_id
-            FROM (
-                SELECT DISTINCT parameter_name, process_type, mach_id
-                FROM [VNEDC].[dbo].[collection_parametervalue]
-                WHERE plant_id = '{sPlant}' 
-                  AND mach_id = '{sMach}' 
-                  AND data_date = '{sData_date}'
-                  AND (
-                    (process_type = 'COAGULANT' AND (parameter_name LIKE '%CPF%' OR parameter_name LIKE '%pH%' OR parameter_name LIKE '%CONCENTRATION%'))
-                    OR (process_type = 'LATEX' AND (parameter_name LIKE '%TSC%' OR parameter_name LIKE '%pH%'))
-                    OR (process_type = 'ACID' AND parameter_name LIKE '%CONCENTRATION%')
-                    OR (process_type = 'ALKALINE' AND parameter_name LIKE '%CONCENTRATION%')
-                    OR (process_type = 'CHLORINE' AND parameter_name = 'CONCENTRATION')
-                  )
-            ) AS subquery
-            LEFT JOIN (
-                SELECT parameter_name, process_type, data_time, parameter_value, mach_id
-                FROM [VNEDC].[dbo].[collection_parametervalue]
-                WHERE plant_id = '{sPlant}' 
-                  AND mach_id = '{sMach}' 
-                  AND data_date = '{sData_date}'
-                  AND data_time IN ('00', '06', '12', '18')
-            ) AS cpv
-            ON subquery.parameter_name = cpv.parameter_name
-            AND subquery.process_type = cpv.process_type
-            AND subquery.mach_id = cpv.mach_id
-            LEFT JOIN [VNEDC].[dbo].[collection_lab_parameter_control] pc
-            ON pc.item_no = {itemNo} 
-            AND pc.process_type = subquery.process_type 
-            AND pc.mach_id = subquery.mach_id 
-            AND CHARINDEX(pc.parameter_name, subquery.parameter_name) > 0
-            GROUP BY 
-                subquery.parameter_name, 
-                subquery.process_type, 
-                subquery.mach_id, 
-                pc.control_range_low, 
-                pc.control_range_high
-            ORDER BY 
-                CASE
-                    WHEN subquery.process_type = 'ACID' THEN 1
-                    WHEN subquery.process_type = 'ALKALINE' THEN 2
-                    WHEN subquery.process_type = 'LATEX' THEN 3
-                    WHEN subquery.process_type = 'COAGULANT' THEN 4
-                    WHEN subquery.process_type = 'CHLORINE' THEN 5
-                ELSE 6 END,
-                subquery.process_type,   
-                subquery.parameter_name ASC;
-        """
-    results = db.select_sql_dict(sql)
-    limit = []
-    data = []
-    mode0 = 0
-    mode6 = 0
-    mode12 = 0
-    mode18 = 0
+        sql = f"""
+                    SELECT pd.process_type_id, pd.parameter_name, pc.control_range_low, pc.control_range_high,
+                    MAX(CASE WHEN pv.data_time = '00' THEN pv.parameter_value ELSE NULL END) AS at_00,
+                    MAX(CASE WHEN pv.data_time = '06' THEN pv.parameter_value ELSE NULL END) AS at_06,
+                    MAX(CASE WHEN pv.data_time = '12' THEN pv.parameter_value ELSE NULL END) AS at_12,
+                    MAX(CASE WHEN pv.data_time = '18' THEN pv.parameter_value ELSE NULL END) AS at_18,
+                    pd.mach_id
+                    FROM [VNEDC].[dbo].[collection_parameterdefine] pd
+                    left join [VNEDC].[dbo].[collection_parametervalue]  pv
+                    on pv.plant_id = pd.plant_id and pv.mach_id = pd.mach_id and pd.process_type_id = pv.process_type and pd.parameter_name = pv.parameter_name and pv.data_date = '{sData_date}'
+                    left join [VNEDC].[dbo].[collection_lab_parameter_control] pc
+                    on item_no = {itemNo} and pc.mach_id = pd.mach_id and pc.process_type = pd.process_type_id  and CHARINDEX(pc.parameter_name, pd.parameter_name) > 0
+                    where pd.plant_id = '{sPlant}' and pd.mach_id = '{sMach}'  and
+                    ((pd.process_type_id = 'COAGULANT' AND (pd.parameter_name LIKE '%CPF%' OR pd.parameter_name LIKE '%pH%' OR pd.parameter_name LIKE '%CONCENTRATION%'))
+                    OR (pd.process_type_id = 'LATEX' AND (pd.parameter_name LIKE '%TSC%' OR pd.parameter_name LIKE '%pH%'))
+                    OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
+                    OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
+                    OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION'))
+                    GROUP BY 
+                        pd.process_type_id, 
+                        pd.parameter_name,
+                        pd.mach_id,
+                        pc.control_range_low, 
+                        pc.control_range_high
+                    ORDER BY 
+                        CASE
+                            WHEN pd.process_type_id = 'ACID' THEN 1
+                            WHEN pd.process_type_id = 'ALKALINE' THEN 2
+                            WHEN pd.process_type_id = 'LATEX' THEN 3
+                            WHEN pd.process_type_id = 'COAGULANT' THEN 4
+                            WHEN pd.process_type_id = 'CHLORINE' THEN 5
+                        ELSE 6 END,
+                        pd.process_type_id,   
+                        pd.parameter_name ASC;
+                """
+        results = db.select_sql_dict(sql)
+        limit = []
+        data = []
+        mode0 = 0
+        mode6 = 0
+        mode12 = 0
+        mode18 = 0
 
-    for result in results:
-        limit_range = f"{result['control_range_low']} ~ {result['control_range_high']}" if str(result['control_range_high']) != 'None' else ' '
-        limit_low = float(result['control_range_low']) if result['control_range_low'] is not None else 0
-        limit_high = float(result['control_range_high']) if result['control_range_low'] is not None else 10000
-        at_0 = float(result['at_00']) if result['at_00'] is not None else -1
-        at_6 = float(result['at_06']) if result['at_06'] is not None else -1
-        at_12 = float(result['at_12']) if result['at_12'] is not None else -1
-        at_18 = float(result['at_18']) if result['at_18'] is not None else -1
-        mode0 += at_0
-        mode6 += at_6
-        mode12 += at_12
-        mode18 += at_18
-        limit.append(limit_range)
-        data.append([limit_low, limit_high, at_0, at_6, at_12, at_18])
+        for result in results:
+            limit_range = f"{result['control_range_low']} ~ {result['control_range_high']}" if str(
+                result['control_range_high']) != 'None' else ' '
+            limit_low = float(result['control_range_low']) if result['control_range_low'] is not None else 0
+            limit_high = float(result['control_range_high']) if result['control_range_low'] is not None else 10000
+            at_0 = float(result['at_00']) if result['at_00'] is not None else -1
+            at_6 = float(result['at_06']) if result['at_06'] is not None else -1
+            at_12 = float(result['at_12']) if result['at_12'] is not None else -1
+            at_18 = float(result['at_18']) if result['at_18'] is not None else -1
+            mode0 += at_0
+            mode6 += at_6
+            mode12 += at_12
+            mode18 += at_18
+            limit.append(limit_range)
+            data.append([limit_low, limit_high, at_0, at_6, at_12, at_18])
 
+    except:
+        pass
     return render(request, 'collection/rd_report.html', locals())
 
 
