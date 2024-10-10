@@ -8,8 +8,8 @@ from jobs.database import mes_database
 
 
 def send_message(msg):
-    path = os.path.dirname(os.path.abspath(__file__))
-    wecom_file = os.path.join(path, "wecom_key.config")
+    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    wecom_file = os.path.join(path, "static", "wecom", "dt_wecom_key.config")
     url = '' #Add Wecom GD_MES group key
     if os.path.exists(wecom_file):
         with open(wecom_file, 'r') as file:

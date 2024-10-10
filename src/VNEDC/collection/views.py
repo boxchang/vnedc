@@ -255,7 +255,7 @@ def record(request, process_code):
 
 def record_message(msg):
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    wecom_file = os.path.join(path, 'Jobs', 'wecom_key.config')
+    wecom_file = os.path.join(path, 'Jobs', '../static/wecom/wecom_key.config')
     url = ''  # Add Wecom GD_MES group key
     if os.path.exists(wecom_file):
         with open(wecom_file, 'r') as file:
@@ -611,7 +611,14 @@ def rd_message(request):
         confirm = rd_report_confirm(select1_value, select2_value, at_time_value, sPlant, sData_date)
         message = rd_report_message(select1_value, select2_value, at_time_value, sPlant, sData_date)
         if action == "send_wecom":
-            send_message(message)
+            path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            wecom_file = os.path.join(path, "static", "wecom", "key_param.config")
+            key = ''  # Add Wecom GD_MES group key
+            if os.path.exists(wecom_file):
+                with open(wecom_file, 'r') as file:
+                    key = file.read().strip()
+
+            send_message(message, key)
         result = {"result": confirm}
 
         return JsonResponse(result, safe=False)
@@ -871,15 +878,8 @@ def rd_report_message(select1, select2, at_time, plant, date):
         pass
 
 
-def send_message(msg):
+def send_message(msg, key):
     try:
-        path = os.path.dirname(os.path.abspath(__file__))
-        wecom_file = os.path.join(path, "wecom_key.config")
-        url = ''  # Add Wecom GD_MES group key
-        if os.path.exists(wecom_file):
-            with open(wecom_file, 'r') as file:
-                url = file.read().strip()
-
         headers = {'Content-Type': 'application/json; charset=utf-8'}
         data = {
             "msgtype": "text",
@@ -889,7 +889,7 @@ def send_message(msg):
             }
         }
         data["text"]["content"] = msg
-        r = requests.post(url, headers=headers, json=data)
+        r = requests.post(key, headers=headers, json=data)
         return r.json()
     except:
         pass

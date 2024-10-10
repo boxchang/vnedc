@@ -13,8 +13,8 @@ current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') #Send message time
 
 #Step 5: Send messages from python to Wecom group
 def send_message(msg):
-    path = os.path.dirname(os.path.abspath(__file__))
-    wecom_file = os.path.join(path, "wecom_key.config")
+    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    wecom_file = os.path.join(path, "static", "wecom", "dt_wecom_key.config")
     url = '' #Add Wecom GD_MES group key
     if os.path.exists(wecom_file):
         with open(wecom_file, 'r') as file:
