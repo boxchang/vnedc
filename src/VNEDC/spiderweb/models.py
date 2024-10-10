@@ -39,6 +39,7 @@ class Monitor_Device_List(models.Model):
                               blank=False)
     device_type = models.ForeignKey(Device_Type, related_name='monitor_list_device_type', on_delete=models.CASCADE, null=False,
                               blank=False)
+    device_group = models.CharField(max_length=100, null=True, blank=True)
     device_name = models.CharField(max_length=100, null=False, blank=False)
     ip_address = models.CharField(max_length=50, null=True, blank=True)
     port = models.CharField(max_length=100, null=True, blank=True)

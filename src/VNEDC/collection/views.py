@@ -19,6 +19,7 @@ import re
 import requests
 import os
 
+
 def create_vnedc_connection():
     pass
 
@@ -35,11 +36,11 @@ def index(request):
         sData_date = datetime.today()
         sData_date = sData_date.strftime("%Y-%m-%d")
 
-
     machs = Machine.objects.filter(plant=sPlant)
     parameter_list = []
     for tmp_mach in machs:
-        daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=tmp_mach.mach_code).order_by('mach_id', 'line')
+        daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date,
+                                                                    mach=tmp_mach.mach_code).order_by('mach_id', 'line')
         tmp_mach.daily_prod_info_heads = daily_prod_info_heads
 
         defines = ParameterDefine.objects.filter(mach=tmp_mach.mach_code, auto_value=0)
@@ -52,8 +53,8 @@ def index(request):
                 goal_count += 2
 
             # Setup Define Parameter
-            #tmp_param = define.process_type.process_code + "_" + define.parameter_name
-            #if not tmp_param in parameter_list:
+            # tmp_param = define.process_type.process_code + "_" + define.parameter_name
+            # if not tmp_param in parameter_list:
             #    parameter_list.append(define.process_type.process_code + "_" + define.parameter_name)
 
         reach_count = 0
@@ -78,20 +79,20 @@ def index(request):
                 reach_count += 1
 
                 # Remove Completed Parameter
-                #tmp_param = result["process_type_id"] + "_" + result["parameter_name"]
-                #if tmp_param in parameter_list:
+                # tmp_param = result["process_type_id"] + "_" + result["parameter_name"]
+                # if tmp_param in parameter_list:
                 #    parameter_list.remove(tmp_param)
 
         hit_rate_msg = f"{reach_count}/{goal_count}"
 
         hit_rate = 0
         if reach_count > 0:
-            hit_rate = int(round(reach_count/goal_count, 2) * 100)
+            hit_rate = int(round(reach_count / goal_count, 2) * 100)
         tmp_mach.hit_rate_msg = hit_rate_msg
         tmp_mach.hit_rate = hit_rate
 
-        #tmp_msg = "\r\n".join(parameter_list)
-        #tmp_mach.msg = tmp_msg
+        # tmp_msg = "\r\n".join(parameter_list)
+        # tmp_mach.msg = tmp_msg
 
     return render(request, 'collection/index.html', locals())
 
@@ -192,14 +193,17 @@ def record(request, process_code):
             defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
             for define in defines:
                 for time in data_times:
-                    value = request.POST.get(define.parameter_name+'_'+time)
+                    value = request.POST.get(define.parameter_name + '_' + time)
                     try:
                         if value:
                             ParameterValue.objects.update_or_create(plant=plant, mach=mach,
                                                                     data_date=sData_date,
                                                                     process_type=process_type.process_code,
-                                                                    data_time=time, parameter_name=define.parameter_name,
-                                                                    defaults={'parameter_value': value, 'create_by': request.user, 'update_by': request.user})
+                                                                    data_time=time,
+                                                                    parameter_name=define.parameter_name,
+                                                                    defaults={'parameter_value': value,
+                                                                              'create_by': request.user,
+                                                                              'update_by': request.user})
 
                             msg = _("Update Done")
                     except Exception as e:
@@ -234,18 +238,20 @@ def record(request, process_code):
         defines = ParameterDefine.objects.filter(plant=sPlant, mach=sMach, process_type=process_type)
         for define in defines:
             values = ParameterValue.objects.filter(plant=sPlant, mach=sMach, data_date=sData_date,
-                                                   process_type=process_type.process_code, parameter_name=define.parameter_name).order_by('-create_at')
+                                                   process_type=process_type.process_code,
+                                                   parameter_name=define.parameter_name).order_by('-create_at')
 
             if values:
                 for time in data_times:
                     item = values.filter(data_time=time).first()
                     if item:
                         value = item.parameter_value
-                        setattr(define, "T"+time, value)
+                        setattr(define, "T" + time, value)
 
     daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date).order_by('line')
 
     return render(request, 'collection/record.html', locals())
+
 
 def record_message(msg):
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -266,6 +272,7 @@ def record_message(msg):
     data["text"]["content"] = msg
     r = requests.post(url, headers=headers, json=data)
     return r.json()
+
 
 def get_production_choices(end_date):
     date_obj = datetime.strptime(end_date, "%Y-%m-%d")
@@ -385,7 +392,8 @@ def daily_info_create(request):
     form.fields['prod_name_b1'].choices = choices
     form.fields['prod_name_b2'].choices = choices
 
-    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=mach, plant=plant).order_by('line')
+    daily_prod_info_heads = Daily_Prod_Info_Head.objects.filter(data_date=sData_date, mach=mach, plant=plant).order_by(
+        'line')
 
     return render(request, 'collection/daily_info_create.html', locals())
 
@@ -404,7 +412,8 @@ def raw_data_api(request, data_date_start, data_date_end, process_type):
     date_list = [data_date_start + timedelta(days=x) for x in range(0, (data_date_end - data_date_start).days)]
     process_type = process_type
     TIMES = ["00", "06", "12", "18"]
-    control = ParameterDefine.objects.filter(plant="GDNBR", mach="01", process_type="ACID", parameter_name__icontains="TEMPERATURE").first()
+    control = ParameterDefine.objects.filter(plant="GDNBR", mach="01", process_type="ACID",
+                                             parameter_name__icontains="TEMPERATURE").first()
     defines = ParameterDefine.objects.filter(process_type="ACID", parameter_name__icontains="TEMPERATURE")
 
     for data_date in date_list:
@@ -414,14 +423,17 @@ def raw_data_api(request, data_date_start, data_date_end, process_type):
             record["PROCESS_TYPE"] = process_type
             for define in defines:
                 record["PLANT"] = define.plant.plant_code
-                data = ParameterValue.objects.filter(data_date=data_date, process_type=process_type, plant=define.plant, data_time=time, parameter_name=define.parameter_name, mach=define.mach).first()
-                record[define.mach.mach_code+"_"+define.parameter_name] = data.parameter_value if data else 0
+                data = ParameterValue.objects.filter(data_date=data_date, process_type=process_type, plant=define.plant,
+                                                     data_time=time, parameter_name=define.parameter_name,
+                                                     mach=define.mach).first()
+                record[define.mach.mach_code + "_" + define.parameter_name] = data.parameter_value if data else 0
             record["RANGE_HIGH"] = control.control_range_high
             record["BASE"] = control.base_line
             record["RANGE_LOW"] = control.control_range_low
             records.append(record)
 
     return JsonResponse(records, safe=False)
+
 
 def get_mach_api(request):
     if request.method == 'POST':
@@ -481,25 +493,40 @@ def rd_report(request):
         sMach = 'GDNBR01'
         machs = Machine.objects.filter(plant=sPlant)
     if 'GD' in sPlant:
-        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Coagulant A", "Coagulant B", "Chlorination"]
+        names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Latex SIDE A-1", "Latex SIDE A-2",
+                 "Latex SIDE B-1", "Latex SIDE B-2", "Coagulant A", "Coagulant B", "Chlorination"]
         merge_sizes = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 1]
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
                       "TSC %", "pH Value", "TSC %", "pH Value", "TSC %", "pH Value", "ppm"]
-        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
+        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']],
+                      ['Alkaline tank 2', ['%']],
                       ['Latex SIDE A-1', ['pH Value', 'TSC %']], ['Latex SIDE A-2', ['pH Value', 'TSC %']],
                       ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
-                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Chlorination', ['ppm']]]
 
 
     elif 'LK' in sPlant:
-        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']], ['Alkaline tank 2', ['%']],
+        table_data = [['Acid tank 1', ['%']], ['Acid tank 2', ['%']], ['Alkaline tank 1', ['%']],
+                      ['Alkaline tank 2', ['%']],
                       ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
-                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']], ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
+                      ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Chlorination', ['ppm']]]
 
     try:
+        sql_mach = f"""
+                    SELECT data_date, mach_id
+                    FROM [VNEDC].[dbo].[collection_daily_prod_info_head] where data_date = '{sData_date}' 
+                    order by mach_id"""
+
+        machines = db.select_sql_dict(sql_mach)
+        machines_list = [machine['mach_id'] for machine in machines]
+        machines_list = list(set(machines_list))
+        machines_no_list = sorted([machine[-2:] for machine in machines_list])
+        data_time = ['00', '06', '12', '18']
         sql_No = f"""
                     SELECT product
                     FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
@@ -573,6 +600,299 @@ def rd_report(request):
         pass
     return render(request, 'collection/rd_report.html', locals())
 
+def rd_message(request):
+    if request.method == 'POST':
+        sPlant = request.POST.get('plant')
+        sData_date = request.POST.get('data_date')
+        select1_value = request.POST.get('select1')
+        select2_value = request.POST.get('select2')
+        at_time_value = request.POST.get('at_time')
+        action = request.POST.get('action')
+        confirm = rd_report_confirm(select1_value, select2_value, at_time_value, sPlant, sData_date)
+        message = rd_report_message(select1_value, select2_value, at_time_value, sPlant, sData_date)
+        if action == "send_wecom":
+            send_message(message)
+        result = {"result": confirm}
+
+        return JsonResponse(result, safe=False)
+
+def rd_report_confirm(select1, select2, at_time, plant, date):
+    try:
+        select_mach1 = f"{plant}{select1}"
+        select_mach2 = f"{plant}{select2}"
+
+        db = vnedc_database()
+        sql01 = f"""SELECT mach_id
+                           FROM [VNEDC].[dbo].[collection_daily_prod_info_head] where data_date = '{date}' 
+                           and mach_id between '{select_mach1}' and '{select_mach2}'
+                           order by mach_id"""
+        machines_result = db.select_sql_dict(sql01)
+        machines_list = [machine['mach_id'] for machine in machines_result]
+        machines = sorted(list(set(machines_list)))
+        if len(machines) > 1:
+            machines_text = "'" + "','".join(
+                machines) + "'"  # 'GDNBR01','GDNBR02','GDNBR03','GDNBR04','GDNBR05','GDNBR06','GDNBR07'
+        else:
+            machines_text = f"'{machines[0]}'"
+        text = f'SELECT pd.process_type_id, pd.parameter_name'
+        item_no = []
+        for machine in machines:
+            sql02 = f"""SELECT product
+                            FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
+                            where data_date = '{date}' and mach_id = '{machine}'
+                        """
+            itemNo_result = db.select_sql_dict(sql02)
+            result = '/'.join(item['product'] for item in itemNo_result)
+            itemNo = int(re.findall(r'\d+', result)[0] if len(result) > 0 else 0)
+            item_no.append(itemNo)
+            text += f""",MAX(CASE WHEN pv.data_time = '{at_time}' AND pv.mach_id = '{machine}' THEN pv.parameter_value ELSE NULL END) AS {machine},
+                             CASE 
+                                 WHEN MAX(CASE WHEN pc.item_no = {itemNo} and pc.mach_id = '{machine}' THEN pc.control_range_low ELSE NULL END) > MAX(CASE WHEN pv.data_time = '{at_time}' AND pv.mach_id = '{machine}' THEN pv.parameter_value ELSE NULL END) THEN -1
+                                 WHEN MAX(CASE WHEN pc.item_no = {itemNo} and pc.mach_id = '{machine}' THEN pc.control_range_high ELSE NULL END) < MAX(CASE WHEN pv.data_time = '{at_time}' AND pv.mach_id = '{machine}' THEN pv.parameter_value ELSE NULL END) THEN 1	
+                                 ELSE 0
+                             END as {machine}_mode
+                                """
+        text += f"""FROM [VNEDC].[dbo].[collection_parameterdefine] pd
+                        LEFT JOIN [VNEDC].[dbo].[collection_parametervalue] pv
+                        ON pv.plant_id = pd.plant_id
+                        AND pv.mach_id IN ({machines_text})
+                        AND pd.process_type_id = pv.process_type 
+                        AND pd.parameter_name = pv.parameter_name 
+                        AND pv.data_date = '{date}'
+                        LEFT JOIN [VNEDC].[dbo].[collection_lab_parameter_control] pc"""
+        item_no_text = list(set(item_no))
+        if len(item_no_text) > 1:
+            item_no_text = tuple(
+                int(value) for value in item_no_text)  # Convert to tuple of integers for multiple items
+            text += f" ON pc.item_no IN {item_no_text}"
+        else:
+            item_no_text = (item_no_text[0])
+            text += f" ON pc.item_no = {item_no_text}"
+        text += f"""AND pc.mach_id = pv.mach_id
+                        AND pc.process_type = pd.process_type_id
+                        AND CHARINDEX(pc.parameter_name, pd.parameter_name) > 0
+                        WHERE pd.plant_id = 'GDNBR' 
+                            AND pd.mach_id = 'GDNBR01' 
+                            AND (
+                                (pd.process_type_id = 'COAGULANT' AND (pd.parameter_name LIKE '%CPF%' OR pd.parameter_name LIKE '%pH%' OR pd.parameter_name LIKE '%CONCENTRATION%'))
+                                OR (pd.process_type_id = 'LATEX' AND (pd.parameter_name LIKE '%TSC%' OR pd.parameter_name LIKE '%pH%'))
+                                OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
+                                OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
+                                OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
+                            )
+                        GROUP BY 
+                            pd.process_type_id, 
+                            pd.parameter_name,
+                            pd.mach_id
+                        ORDER BY
+                            CASE
+                                WHEN pd.process_type_id = 'ACID' THEN 1
+                                WHEN pd.process_type_id = 'ALKALINE' THEN 2
+                                WHEN pd.process_type_id = 'LATEX' THEN 3
+                                WHEN pd.process_type_id = 'COAGULANT' THEN 4
+                                WHEN pd.process_type_id = 'CHLORINE' THEN 5
+                            ELSE 6 END,
+                            pd.process_type_id,   
+                            pd.parameter_name ASC;"""
+
+        data_table = db.select_sql_dict(text)
+        for row in data_table:
+            if row['process_type_id'] == 'ACID' or row['process_type_id'] == 'ALKALINE' or row[
+                'process_type_id'] == 'CHLORINE':
+                row['parameter_name'] = ''
+            if row['process_type_id'] == 'LATEX':
+                row['parameter_name'] = f" {row['parameter_name'][0]}{row['parameter_name'][3:]}"
+            if row['process_type_id'] == 'COAGULANT':
+                if 'CONCENTRATION' in row['parameter_name']:
+                    row['parameter_name'] = f" {row['parameter_name'][:2]}CN"
+                else:
+                    row['parameter_name'] = f" {row['parameter_name']}"
+        first_row = [[f"- At: {at_time}"]]
+        for value in machines:
+            first_row.append([value[2:], 0])
+        data_rows = []
+        data_rows.append(first_row)
+        for rows in data_table:
+            # item0 = f"{rows['process_type_id']} {str(rows['parameter_name'])[:str(rows['parameter_name']).rfind('_')]}"
+            item0 = f" {rows['process_type_id']}{str(rows['parameter_name'])}"
+            values = [value for key, value in rows.items() if 'GDNBR' in key]
+            grouped_values = [item0] + [values[i:i + 2] for i in range(0, len(values), 2)]
+            data_rows.append(grouped_values)
+        return data_rows
+    except:
+        pass
+
+
+def rd_report_message(select1, select2, at_time, plant, date):
+    try:
+        db = vnedc_database()
+        select_mach1 = f"{plant}{select1}"
+        select_mach2 = f"{plant}{select2}"
+        message = ''
+        sql01 = f"""SELECT mach_id
+                        FROM [VNEDC].[dbo].[collection_daily_prod_info_head] where data_date = '{date}' 
+                        and mach_id between '{select_mach1}' and '{select_mach2}'
+                        order by mach_id"""
+        machines_result = db.select_sql_dict(sql01)
+        machines_list = [machine['mach_id'] for machine in machines_result]
+        machines = sorted(list(set(machines_list)))
+        for machine in machines:
+            sql02 = f"""SELECT product
+                            FROM [VNEDC].[dbo].[collection_daily_prod_info_head]
+                            where data_date = '{date}' and mach_id = '{machine}'
+                        """
+            itemNo_result = db.select_sql_dict(sql02)
+            result = '/'.join(item['product'] for item in itemNo_result)
+            itemNo = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
+
+            sql03 = f"""SELECT pv.mach_id, pv.process_type, pv.parameter_name, pv.parameter_value, pc.control_range_low ,pc.control_range_high,
+                            case 
+                            when pv.parameter_value < pc.control_range_low then -1
+                            when pv.parameter_value > pc.control_range_high then 1
+                            else 0
+                            end as mode
+                            FROM [VNEDC].[dbo].[collection_parametervalue] pv
+                            left join [VNEDC].[dbo].[collection_lab_parameter_control] pc
+                            on  pc.item_no = {itemNo} and pc.process_type = pv.process_type and pc.mach_id = pv.mach_id and CHARINDEX(pc.parameter_name, pv.parameter_name) > 0 
+                            where pv.plant_id = '{plant}' and pv.mach_id = '{machine}' and  pv.data_date = '{date}' and pv.data_time = '{at_time}' 
+                            and ((pv.process_type = 'ACID' and pv.parameter_name LIKE '%CONCENTRATION%') or (pv.process_type = 'ALKALINE' and pv.parameter_name LIKE '%CONCENTRATION%')
+                            or (pv.process_type = 'COAGULANT' and (pv.parameter_name like '%CPF%' or pv.parameter_name like '%pH%' or pv.parameter_name like '%CONCENTRATION%'))
+                            or (pv.process_type = 'LATEX' and (pv.parameter_name like '%TSC%' or pv.parameter_name like '%pH%')))
+                            order by process_type, parameter_name
+                            """
+            result03 = db.select_sql_dict(sql03)
+            acid_list = [[], []]
+            alkaline_list = [[], []]
+            latex_ph = [[], []]
+            latex_tsc = [[], []]
+            coagulant_a = [[], []]
+            coagulant_b = [[], []]
+            text_01, text_02, text_03, text_04, text_05, text_06, text_07 = '', '', '', '', '', '', ''
+            for result in result03:
+                if result['process_type'] == 'ACID':
+                    if float(result['mode']) == -1:
+                        acid_list[0].append(str(result['parameter_name'])[1])
+                    elif float(result['mode']) == 1:
+                        acid_list[1].append(str(result['parameter_name'])[1])
+
+                if len(acid_list[0]) > 0:
+                    text_01 = '+ Acid: ' + ', '.join(acid_list[0]) + ' thấp'
+                if len(acid_list[1]) > 0:
+                    if len(acid_list[0]) > 0:
+                        text_01 += '- ' + ', '.join(acid_list[1]) + ' cao'
+                    else:
+                        text_01 = '+ Acid: ' + ', '.join(acid_list[1]) + ' cao'
+
+                if result['process_type'] == 'ALKALINE':
+                    if float(result['mode']) == -1:
+                        alkaline_list[0].append(str(result['parameter_name'])[1])
+                    elif float(result['mode']) == 1:
+                        alkaline_list[1].append(str(result['parameter_name'])[1])
+
+                if len(alkaline_list[0]) > 0:
+                    text_02 = '+ Alkaline: ' + ', '.join(alkaline_list[0]) + ' thấp'
+                if len(alkaline_list[1]) > 0:
+                    if len(alkaline_list[0]) > 0:
+                        text_02 += ' - ' + ', '.join(alkaline_list[1]) + ' cao'
+                    else:
+                        text_02 = '+ Alkaline: ' + ', '.join(alkaline_list[1]) + ' cao'
+
+                if result['process_type'] == 'LATEX':
+                    if 'PH' in result['parameter_name']:
+                        if result['mode'] == -1:
+                            latex_ph[0].append(f"{result['parameter_name'][0]}{result['parameter_name'][3]}")
+                        elif result['mode'] == 1:
+                            latex_ph[1].append(f"{result['parameter_name'][0]}{result['parameter_name'][3]}")
+
+                    if len(latex_ph[0]) > 0:
+                        text_03 = '+ Latex PH: ' + ', '.join(latex_ph[0]) + ' thấp'
+                    if len(latex_ph[1]) > 0:
+                        if len(latex_ph[0]) > 0:
+                            text_03 += ' - ' + ', '.join(latex_ph[1]) + ' cao'
+                        else:
+                            text_03 = '+ Latex PH: ' + ', '.join(latex_ph[1]) + ' cao'
+
+                    if 'TSC' in result['parameter_name']:
+                        if result['mode'] == -1:
+                            latex_tsc[0].append(f"{result['parameter_name'][0]}{result['parameter_name'][3]}")
+                        elif result['mode'] == 1:
+                            latex_tsc[1].append(f"{result['parameter_name'][0]}{result['parameter_name'][3]}")
+
+                    if len(latex_tsc[0]) > 0:
+                        text_04 = '+ Latex TSC: ' + ', '.join(latex_tsc[0]) + ' thấp'
+                    if len(latex_tsc[1]) > 0:
+                        if len(latex_tsc[0]) > 0:
+                            text_04 += ' - ' + ', '.join(latex_tsc[1]) + ' cao'
+                        else:
+                            text_04 = '+ Latex TSC: ' + ', '.join(latex_tsc[1]) + ' cao'
+
+                if result['process_type'] == 'COAGULANT':
+                    if result['parameter_name'][0] == 'A':
+                        if float(result['mode']) == -1:
+                            coagulant_a[0].append(
+                                'CN' if result['parameter_name'][2:] == 'CONCENTRATION' else result['parameter_name'][
+                                                                                             2:])
+                        elif float(result['mode']) == 1:
+                            coagulant_a[1].append(
+                                'CN' if result['parameter_name'][2:] == 'CONCENTRATION' else result['parameter_name'][
+                                                                                             2:])
+
+                    if len(coagulant_a[0]) > 0:
+                        text_05 = '+ Coagulant A: ' + ', '.join(coagulant_a[0]) + ' thấp'
+                    if len(coagulant_a[1]) > 0:
+                        if len(coagulant_a[0]) > 0:
+                            text_05 += ' - ' + ', '.join(coagulant_a[1]) + ' cao'
+                        else:
+                            text_05 = '+ Coagulant A: ' + ', '.join(coagulant_a[1]) + ' cao'
+
+                    if result['parameter_name'][0] == 'B':
+                        if result['mode'] == -1:
+                            coagulant_b[0].append(
+                                'CN' if result['parameter_name'][2:] == 'CONCENTRATION' else result['parameter_name'][
+                                                                                             2:])
+                        elif result['mode'] == 1:
+                            coagulant_b[1].append(
+                                'CN' if result['parameter_name'][2:] == 'CONCENTRATION' else result['parameter_name'][
+                                                                                             2:])
+
+                    if len(coagulant_b[0]) > 0:
+                        text_06 = '+ Coagulant B: ' + ', '.join(coagulant_b[0]) + ' thấp'
+                    if len(coagulant_b[1]) > 0:
+                        if len(coagulant_b[0]) > 0:
+                            text_06 += ' - ' + ', '.join(coagulant_b[1]) + ' cao'
+                        else:
+                            text_06 = '+ Coagulant B: ' + ', '.join(coagulant_b[1]) + ' cao'
+            text_list = [machine, text_01, text_02, text_03, text_04, text_05, text_06, text_07]
+            text = '\n'.join([t for t in text_list if t])
+            if len(text) > 8:
+                message += text + '\n'
+        return message
+    except:
+        pass
+
+
+def send_message(msg):
+    try:
+        path = os.path.dirname(os.path.abspath(__file__))
+        wecom_file = os.path.join(path, "wecom_key.config")
+        url = ''  # Add Wecom GD_MES group key
+        if os.path.exists(wecom_file):
+            with open(wecom_file, 'r') as file:
+                url = file.read().strip()
+
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        data = {
+            "msgtype": "text",
+            "text": {
+                "content": '',
+                # "mentioned_list": ["@all"],
+            }
+        }
+        data["text"]["content"] = msg
+        r = requests.post(url, headers=headers, json=data)
+        return r.json()
+    except:
+        pass
 
 
 def generate_excel_file_big(request):
@@ -627,7 +947,7 @@ def generate_excel_file_big(request):
         max_row = 23
 
     if download_code == 1:
-        for row in range(5, max_row+1):
+        for row in range(5, max_row + 1):
             worksheet.row_dimensions[row].height = 25
         worksheet.column_dimensions['A'].width = 30
         worksheet.column_dimensions['B'].width = 20
@@ -644,6 +964,7 @@ def generate_excel_file_big(request):
             cell.alignment = Alignment(horizontal=alignment, vertical="center")
             cell.font = Font(bold=True, color="333333")
             cell.fill = PatternFill("solid", fgColor=fill_color)
+
         def set_merged_cell2(range_str, value, alignment="center", fill_color="FDE9D9"):
             worksheet.merge_cells(range_str)
             cell = worksheet[range_str.split(':')[0]]
@@ -651,6 +972,7 @@ def generate_excel_file_big(request):
             cell.alignment = Alignment(horizontal=alignment, vertical="center")
             cell.font = Font(bold=True, color="333333")
             cell.fill = PatternFill("solid", fgColor=fill_color)
+
         set_merged_cell('A6:A8', "ITEM")
         set_merged_cell('B6:B8', "Parameters")
         set_merged_cell('C6:C8', "Specs.")
@@ -694,18 +1016,20 @@ def generate_excel_file_big(request):
             product.append(result)
             # print(result)
 
-
             worksheet.column_dimensions[f'{get_column_letter(col_start)}'].width = 17
             set_merged_cell(f'{get_column_letter(col_start)}6:{get_column_letter(col_start)}8', "Specs.")
-            set_merged_cell2(f'{get_column_letter(col_start)}2:{get_column_letter(col_end)}2',  f"{plant_rp}")
-            set_merged_cell2(f'{get_column_letter(col_start)}3:{get_column_letter(col_end)}3',  f"{mach_rp}")
-            set_merged_cell2(f'{get_column_letter(col_start)}4:{get_column_letter(col_end)}4',  f"{current_date.strftime('%Y-%m-%d')}")
+            set_merged_cell2(f'{get_column_letter(col_start)}2:{get_column_letter(col_end)}2', f"{plant_rp}")
+            set_merged_cell2(f'{get_column_letter(col_start)}3:{get_column_letter(col_end)}3', f"{mach_rp}")
+            set_merged_cell2(f'{get_column_letter(col_start)}4:{get_column_letter(col_end)}4',
+                             f"{current_date.strftime('%Y-%m-%d')}")
             set_merged_cell2(f'{get_column_letter(col_start)}5:{get_column_letter(col_end)}5', result)
             set_merged_cell(f'{get_column_letter(col_start+1)}6:{get_column_letter(col_end)}6', "Sample Time")
             sample_times = ["1", "2", "3", "4"]
             sample_hours = ["0h", "6h", "12h", "18h"]
 
-            for i, col in enumerate([get_column_letter(col_start+1), get_column_letter(col_start+2), get_column_letter(col_end-1), get_column_letter(col_end)]):
+            for i, col in enumerate(
+                    [get_column_letter(col_start + 1), get_column_letter(col_start + 2), get_column_letter(col_end - 1),
+                     get_column_letter(col_end)]):
                 worksheet[f'{col}7'] = sample_times[i]
                 worksheet[f'{col}8'] = sample_hours[i]
                 worksheet[f'{col}7'].alignment = worksheet[f'{col}8'].alignment = Alignment(horizontal="center")
@@ -791,7 +1115,8 @@ def generate_excel_file_big(request):
                     for i in range(len(high_limit)):
                         if high_limit[i] != 0:
                             worksheet[f'{get_column_letter(col_start)}{start_row}'] = range_limit[i]
-                            worksheet[f'{get_column_letter(col_start)}{start_row}'].alignment = Alignment(vertical="center", horizontal="right")
+                            worksheet[f'{get_column_letter(col_start)}{start_row}'].alignment = Alignment(
+                                vertical="center", horizontal="right")
                         start_row += 1
 
                     for i in range(len(high_limit)):
@@ -799,7 +1124,7 @@ def generate_excel_file_big(request):
                         if high_limit[i] != 0:
                             for day_offset in range(days_diff):
                                 current_start_col = 3 + (day_offset * 5)
-                                for col in range(current_start_col+1, current_start_col + 5):
+                                for col in range(current_start_col + 1, current_start_col + 5):
                                     cell = worksheet[f'{get_column_letter(col)}{start_row}']
                                     if cell.value and float(cell.value):
                                         if float(cell.value) > float(high_limit[i]):
@@ -819,7 +1144,9 @@ def generate_excel_file_big(request):
             cell.alignment = Alignment(horizontal="left", vertical="center")
             cell.font = Font(size=14, bold=False)
             cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
-        header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp), ('A5', 'Product', 'Test')]
+
+        header_data = [('A2', 'Plant :', plant_rp), ('A3', 'Machine :', mach_rp), ('A4', 'Date :', date_rp),
+                       ('A5', 'Product', 'Test')]
         for col, label, value in header_data:
             row = int(col[1:])
             set_header_row(row, col[0], label)
@@ -839,21 +1166,21 @@ def generate_excel_file_big(request):
         left_top_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
                                 top=Side(style='thick'), bottom=Side(style='thin'))
         right_top_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                                top=Side(style='thick'), bottom=Side(style='thin'))
+                                 top=Side(style='thick'), bottom=Side(style='thin'))
         left_bot_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
                                 top=Side(style='thin'), bottom=Side(style='thick'))
         right_bot_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                                top=Side(style='thin'), bottom=Side(style='thick'))
-        right_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
-                                 top=Side(style='thin'), bottom=Side(style='thin'))
-        left_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
-                                 top=Side(style='thin'), bottom=Side(style='thin'))
-        top_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
-                                 top=Side(style='thick'), bottom=Side(style='thin'))
-        bot_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
                                  top=Side(style='thin'), bottom=Side(style='thick'))
+        right_thick = Border(left=Side(style='thin'), right=Side(style='thick'),
+                             top=Side(style='thin'), bottom=Side(style='thin'))
+        left_thick = Border(left=Side(style='thick'), right=Side(style='thin'),
+                            top=Side(style='thin'), bottom=Side(style='thin'))
+        top_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
+                           top=Side(style='thick'), bottom=Side(style='thin'))
+        bot_thick = Border(left=Side(style='thin'), right=Side(style='thin'),
+                           top=Side(style='thin'), bottom=Side(style='thick'))
         middle = Border(left=Side(style='thin'), right=Side(style='thin'),
-                                 top=Side(style='thin'), bottom=Side(style='thin'))
+                        top=Side(style='thin'), bottom=Side(style='thin'))
         for row in worksheet.iter_rows(min_row=5, max_row=max_row, min_col=4, max_col=7):
             for cell in row:
                 if cell.row == 6 and cell.column == 4:
