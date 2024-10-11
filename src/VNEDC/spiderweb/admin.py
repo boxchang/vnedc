@@ -5,7 +5,7 @@ from spiderweb.models import Monitor_Status, Monitor_Type, Device_Type, Monitor_
 
 @admin.register(Monitor_Status)
 class Monitor_StatusAdmin(admin.ModelAdmin):
-    list_display = ('status_name', )
+    list_display = ('status_code', 'desc')
 
 
 @admin.register(Monitor_Type)

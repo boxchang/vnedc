@@ -4,13 +4,14 @@ from django.conf import settings
 
 
 class Monitor_Status(models.Model):
-    status_name = models.CharField(max_length=100, unique=True)
+    status_code = models.CharField(max_length=3, unique=True, primary_key=True)
+    desc = models.CharField(max_length=200, null=False, blank=False)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
-                                  related_name='monitor_status_update_by')
+                                  related_name='check_status_update_by')
 
     def __str__(self):
-        return self.status_name
+        return self.status_code
 
 
 class Monitor_Type(models.Model):
@@ -57,3 +58,10 @@ class Monitor_Device_List(models.Model):
 
     def __str__(self):
         return self.device_name
+
+class Check_Log(models.Model):
+    func_name = models.CharField(max_length=50, null=False, blank=False)
+    status_code = models.ForeignKey(Monitor_Status, related_name='check_log_status', on_delete=models.DO_NOTHING,
+                                    null=False, blank=False)
+    comment = models.CharField(max_length=200, null=False, blank=False)
+    update_at = models.DateTimeField(default=timezone.now)
