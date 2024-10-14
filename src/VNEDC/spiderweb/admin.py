@@ -20,4 +20,4 @@ class Device_TypeAdmin(admin.ModelAdmin):
 
 @admin.register(Monitor_Device_List)
 class Monitor_Device_ListAdmin(admin.ModelAdmin):
-    list_display = ('monitor_type', 'device_type', 'device_name', 'ip_address', 'port', 'plant', 'enable', 'status', 'job_start_time', 'job_frequency')
+    list_display = ('monitor_type', 'device_type', 'device_name', 'ip_address', 'port', 'plant', 'enable', 'status')

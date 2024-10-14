@@ -50,8 +50,6 @@ class Monitor_Device_List(models.Model):
                               blank=True)
     status_update_at = models.DateTimeField(default=timezone.now)
     comment = models.CharField(max_length=500, null=True, blank=True)
-    job_start_time = models.CharField(max_length=20, null=True, blank=True)
-    job_frequency = models.CharField(max_length=10, null=False, blank=False)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='monitor_list_update_by')
