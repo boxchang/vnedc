@@ -437,9 +437,9 @@ def fast_check2(request):
             DeviceId, 
             OKQty, 
             NGQty, 
-            CONVERT(DATE, Cdt) AS [Date],                   
-            DATEPART(HOUR, Cdt) AS [Hour],                  
-            DATEPART(MINUTE, Cdt) AS [Minutes]     
+            CONVERT(DATE, Cdt) AS Date,                   
+            DATEPART(HOUR, Cdt) AS Hour,                  
+            DATEPART(MINUTE, Cdt) AS Minutes     
         FROM 
             [PMG_DEVICE].[dbo].[OpticalDevice]
         WHERE 
@@ -453,16 +453,24 @@ def fast_check2(request):
     results2 = db.select_sql_dict(sql2)
 
     kq = []
+    skq = []
     kq2 = []
+    skq2 = []
     min = []
     # Extract unique device IDs from results
+
+
     for device in data:
         data_on_day = []
+        sdata_on_day = []
         data_on_day2 = []
+        sdata_on_day2 = []
         min_on_day = []
         for period in period_times:
             data_on_hour = []
+            sdata_on_hour = []
             data_on_hour2 = []
+            sdata_on_hour2 = []
             min_on_hour = []
             # Filter results for current device and hour
             matching_results = [result for result in results2 if
@@ -471,18 +479,28 @@ def fast_check2(request):
             if matching_results:
                 # Append OKQty values if the period exists in results
                 data_on_hour.extend(result['OKQty'] for result in matching_results)
+                sdata_on_hour.extend(f" {result['Hour']}:0{result['Minutes']} - {result['OKQty']} " if len(str(result['Minutes'])) == 1 else
+                                     f" {result['Hour']}:{result['Minutes']} - {result['OKQty']} " for result in matching_results)
                 data_on_hour2.extend(result['NGQty'] for result in matching_results)
+                sdata_on_hour2.extend(f" {result['Hour']}:0{result['Minutes']} - {result['NGQty']} " if len(str(result['Minutes'])) == 1 else
+                                      f" {result['Hour']}:{result['Minutes']} - {result['NGQty']} " for result in matching_results)
                 min_on_hour.extend(result['Minutes'] for result in matching_results)
             else:
                 # Append a list with 12 zeros if the period is missing
                 data_on_hour = [0]
+                sdata_on_hour = [0]
                 data_on_hour2 = [0]
+                sdata_on_hour2 = [0]
                 min_on_hour = [0]
             data_on_day.append(data_on_hour)
+            sdata_on_day.append(sdata_on_hour)
             data_on_day2.append(data_on_hour2)
+            sdata_on_day2.append(sdata_on_hour2)
             min_on_day.append(min_on_hour)
         kq.append(data_on_day)
+        skq.append(sdata_on_day)
         kq2.append(data_on_day2)
+        skq2.append(sdata_on_day2)
         min.append(min_on_day)
     status_OKQty = []
     status_NGQty = []
@@ -570,190 +588,24 @@ def fast_check2(request):
             status_NGQty.append(mode2)
 
     table_data1 = [status_OKQty[i:i + 24] for i in range(0, len(status_OKQty), 24)]
-    table_data2 = kq
+    # table_data2 = kq
     table_data3 = []
     for i in range(24):
         table_data3.append(period_times)
-    table_data4 = min
+    # table_data4 = min
     merged_status, merged_kq = [], []
     for i in range(0, (len(data)*24), 24):
         merged_status.extend(status_OKQty[i:i + 24])
         merged_status.extend(status_NGQty[i:i + 24])
     table_data11 = [merged_status[i:i + 24] for i in range(0, len(merged_status), 24)]
-    table_data22 = [item for pair in zip(kq, kq2) for item in pair]
+    table_data22 = [item for pair in zip(skq, skq2) for item in pair]
     table_data1 = table_data11
     table_data2 = table_data22
     table_data3 = table_data3*2
-    table_data4 = table_data4*2
+    table_data4 = min*2
 
     return render(request, 'mes/fast_check2.html', locals())
 
-import os
-def agent_storage(request):
-    factoryList = ['GiangDien', 'LongKhanh', 'LongThanh']
-    GiangDien = []
-    LongKhanh = []
-    LongThanh = []
-    files = os.listdir('mes/storage')
-    for file in files:
-        data_temp = []
-        with open(f'mes/storage/{file}', 'r') as data_file:
-            data = data_file.read()
-            data_temp.append(data)
-        if "GiangDien" in (data.split(',')[0]):
-            GiangDien.append(data_temp)
-        elif "LongKhanh" in (data.split(',')[0]):
-            LongKhanh.append(data_temp)
-        elif "LongThanh" in (data.split(',')[0]):
-            LongThanh.append(data_temp)
-    sGiangDien = []
-    sLongKhanh = []
-    sLongThanh = []
-    for item in GiangDien:
-        disk = []
-        disk_info = []
-        info = str(item).split(',')
-        for value in info:
-            if 'Client:' in value:
-                disk.append(value)
-            if 'IP:' in value:
-                disk.append(value)
-            if 'Port:' in value:
-                disk.append(value)
-            if 'Disk' in value:
-                disk.append(value)
-            if '_Used' in value:
-                disk.append(value)
-        for value in info:
-            if '_Code' in value:
-                disk.append(value)
-        for i in range(0, 3, 1):
-            disk_info.append(disk[i])
-        for i in range(3, len(disk), 2):
-            sublist = disk[i:i + 2]
-            disk_info.append(sublist)
-        sublist = ['RAM']
-        for value in info:
-            if 'RAM_Total' in value:
-                sublist.append(value)
-        disk_info.append(sublist)
-        sGiangDien.append(disk_info)
-    for item in LongKhanh:
-        disk = []
-        disk_info = []
-        info = str(item).split(',')
-        for value in info:
-            if 'Client:' in value:
-                disk.append(value)
-            if 'IP:' in value:
-                disk.append(value)
-            if 'Port:' in value:
-                disk.append(value)
-            if 'Disk' in value:
-                disk.append(value)
-            if '_Used' in value:
-                disk.append(value)
-        for value in info:
-            if '_Code' in value:
-                disk.append(value)
-        for i in range(0, 3, 1):
-            disk_info.append(disk[i])
-        for i in range(3, len(disk), 2):
-            sublist = disk[i:i + 2]
-            disk_info.append(sublist)
-        sublist = ['RAM']
-        for value in info:
-            if 'RAM_Total' in value:
-                sublist.append(value)
-        disk_info.append(sublist)
-        sLongKhanh.append(disk_info)
-    for item in LongThanh:
-        disk = []
-        disk_info = []
-        info = str(item).split(',')
-        for value in info:
-            if 'Client:' in value:
-                disk.append(value)
-            if 'IP:' in value:
-                disk.append(value)
-            if 'Port:' in value:
-                disk.append(value)
-            if 'Disk' in value:
-                disk.append(value)
-            if '_Used' in value:
-                disk.append(value)
-        for value in info:
-            if '_Code' in value:
-                disk.append(value)
-        for i in range(0, 3, 1):
-            disk_info.append(disk[i])
-        for i in range(3, len(disk), 2):
-            sublist = disk[i:i + 2]
-            disk_info.append(sublist)
-        sublist = ['RAM']
-        for value in info:
-            if 'RAM_Total' in value:
-                sublist.append(value)
-        disk_info.append(sublist)
-        sLongThanh.append(disk_info)
-    ssGiangDien = []
-    ssLongKhanh = []
-    ssLongThanh = []
-    for i in range(len(sGiangDien)):
-        color = sGiangDien[i][5]
-        sub_ssGiangDien = ['green']
-        for index, color_mode in enumerate(color):
-            color_code = color_mode.split(':')[-1]
-            if 'red' in color_code:
-                sub_ssGiangDien[0] = 'red'
-        sub_ssGiangDien.append(((sGiangDien[i][2]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][0]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][1]).split(':')[-1]).replace(' ', ''))
-        disk_size = sGiangDien[i][3:len(sGiangDien[i]) - 2]
-        disk_info = []
-        for disk in disk_size:
-            for item in disk:
-                disk_info.append(item.split(':')[1].replace(' ', ''))
-        disk_info.extend(['RAM', (sGiangDien[i][-1])[-1].split(':')[-1].replace(' ', '')])
-        sub_ssGiangDien.append(disk_info)
-        ssGiangDien.append(sub_ssGiangDien)
-    for i in range(len(sLongKhanh)):
-        color = sLongKhanh[i][5]
-        sub_ssGiangDien = ['green']
-        for index, color_mode in enumerate(color):
-            color_code = color_mode.split(':')[-1]
-            if 'red' in color_code:
-                sub_ssGiangDien[0] = 'red'
-        sub_ssGiangDien.append(((sGiangDien[i][2]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][0]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][1]).split(':')[-1]).replace(' ', ''))
-        disk_size = sGiangDien[i][3:len(sGiangDien[i]) - 2]
-        disk_info = []
-        for disk in disk_size:
-            for item in disk:
-                disk_info.append(item.split(':')[1].replace(' ', ''))
-        disk_info.extend(['RAM', (sGiangDien[i][-1])[-1].split(':')[-1].replace(' ', '')])
-        sub_ssGiangDien.append(disk_info)
-        ssLongKhanh.append(sub_ssGiangDien)
-    for i in range(len(sLongThanh)):
-        color = sLongThanh[i][5]
-        sub_ssGiangDien = ['green']
-        for index, color_mode in enumerate(color):
-            color_code = color_mode.split(':')[-1]
-            if 'red' in color_code:
-                sub_ssGiangDien[0] = 'red'
-        sub_ssGiangDien.append(((sGiangDien[i][2]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][0]).split(':')[-1]).replace(' ', ''))
-        sub_ssGiangDien.append(((sGiangDien[i][1]).split(':')[-1]).replace(' ', ''))
-        disk_size = sGiangDien[i][3:len(sGiangDien[i]) - 2]
-        disk_info = []
-        for disk in disk_size:
-            for item in disk:
-                disk_info.append(item.split(':')[1].replace(' ', ''))
-        disk_info.extend(['RAM', (sGiangDien[i][-1])[-1].split(':')[-1].replace(' ', '')])
-        sub_ssGiangDien.append(disk_info)
-        ssLongThanh.append(sub_ssGiangDien)
-    return render(request, 'mes/agent_storage.html', locals())
 
 import time
 def machine_status(request):
@@ -940,10 +792,6 @@ def machine_status(request):
     execution_time = end_time - start_time
     return render(request, 'mes/machine_status.html', locals())
 
-def general_status(request):
-
-    return render(request, 'mes/status.html', locals())
-
 
 def runcard_api(request, runcard):
     try:
@@ -1091,3 +939,571 @@ def thickness_data_api(request):
 
     else:
         return JsonResponse({'error': 'Only PUT method is allowed'}, status=405)
+
+
+
+def general_status(request):
+    start_time = time.time()
+    execution_time = 0
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    current_month = datetime.now().strftime('%Y-%m')
+    current_time = datetime.now()
+    time_10_minutes_ago = (current_time - timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')
+    time_10_minutes_next = (current_time + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')
+    selected_date = current_date
+    selected_machine = 'NBR'
+
+    if request.method == 'POST':
+        selected_date = request.POST.get('date', '')
+        selected_machine = request.POST.get('machine', 'PVC')
+        sLimit_mode = request.session.get('limit_mode', '0')
+
+    period_times = ['6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17',
+                    '18', '19', '20', '21', '22', '23', '0', '1', '2', '3', '4', '5']
+    db = mes_database()
+
+    sql1 = f"""
+                WITH LatestRecords AS (
+                        SELECT 
+                            MachineName,
+                            CreationTime,
+                            Speed,
+                            ROW_NUMBER() OVER (PARTITION BY MachineName ORDER BY CreationTime DESC) AS RowNum
+                        FROM 
+                            [PMG_DEVICE].[dbo].[COUNTING_DATA]
+                        WHERE 
+                            CreationTime BETWEEN CONVERT(DATETIME, '{time_10_minutes_ago}', 120) 
+                                            AND CONVERT(DATETIME, '{time_10_minutes_next}', 120) 
+                    ),
+                    FilteredRecords AS (
+                        SELECT 
+                            MachineName,
+                            CreationTime,
+                            Speed
+                        FROM 
+                            LatestRecords
+                        WHERE 
+                            RowNum <= 2  
+                    ),
+                    AggregatedRecords AS (
+                        SELECT 
+                            MachineName,
+                            MAX(CASE WHEN RowNum = 1 THEN Speed END) AS LatestSpeed,
+                            MAX(CASE WHEN RowNum = 2 THEN Speed END) AS SecondLatestSpeed
+                        FROM 
+                            LatestRecords
+                        GROUP BY 
+                            MachineName
+                    )
+
+                    SELECT 
+                        cdm.COUNTING_MACHINE,
+                        ar.SecondLatestSpeed,
+                        ar.LatestSpeed,
+                        CASE 
+                            WHEN (ar.LatestSpeed IS NULL OR ar.LatestSpeed = 0) 
+                                AND (ar.SecondLatestSpeed IS NULL OR ar.SecondLatestSpeed = 0) THEN 0
+                            ELSE 1
+                        END AS [Check]
+                    FROM 
+                        [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] cdm
+                    LEFT JOIN 
+                        AggregatedRecords ar ON cdm.COUNTING_MACHINE = ar.MachineName
+                    WHERE 
+                        cdm.COUNTING_MACHINE LIKE '%{selected_machine}_CountingMachine%'
+                    ORDER BY
+                        cdm.MES_MACHINE,
+                        cdm.COUNTING_MACHINE;
+            """
+
+    machineline_lastedvalue_2lastedvalue_stopstatus_dict = db.select_sql_dict(sql1)
+    machineline_stopstatus_list, machineline_list, lastedvalue_2lastedvalue_list = [], [], []
+    for value in machineline_lastedvalue_2lastedvalue_stopstatus_dict:
+        machineline_stopstatus_list.append([value['COUNTING_MACHINE'], value['Check']])
+        machineline_list.append(value['COUNTING_MACHINE'])
+        lastedvalue_2lastedvalue_list.append([value['SecondLatestSpeed'], value['LatestSpeed']])
+
+    group_machinename_with_machineline = {}
+    group_2lastedvalue_status_machineline = {}
+    group_2lastedvalue_lastedvalue_machineline = {}
+    for index, machine_line in enumerate(machineline_list):
+        machine_name = f"{machine_line.split('_CountingMachine_')[0]} {machine_line.split('_CountingMachine_')[-1][:-1]}"
+        if machine_name not in group_machinename_with_machineline:
+            group_machinename_with_machineline[machine_name] = []
+            group_2lastedvalue_status_machineline[machine_name] = []
+            group_2lastedvalue_lastedvalue_machineline[machine_name] = []
+        group_machinename_with_machineline[machine_name].append(
+            f"{machine_line.split('_CountingMachine_')[0]} {machine_line.split('_CountingMachine_')[-1]}")
+        group_2lastedvalue_status_machineline[machine_name].append(machineline_stopstatus_list[index][1])
+        group_2lastedvalue_lastedvalue_machineline[machine_name].append(lastedvalue_2lastedvalue_list[index])
+    # #Column 3 - part 2 - machine speed status
+    # stopstatus = list(group_2lastedvalue_status_machineline.values())
+    # #-----------------
+
+    # #Column 3 - part 4 - machine speed values
+    # speedvalue = list(group_2lastedvalue_lastedvalue_machineline.values())
+    # #-----------------
+
+    sql2 = f"""
+            SELECT 
+                    dml.Name AS MachineName,
+                    CASE 
+                        WHEN COUNT(wo.Id) > 0 THEN 1 
+                        ELSE 0 
+                    END AS WorkOrderMode
+                FROM 
+                    [PMGMES].[dbo].[PMG_DML_DataModelList] dml
+                LEFT JOIN 
+                    [PMGMES].[dbo].[PMG_MES_WorkOrder] wo 
+                    ON dml.Id = wo.MachineId
+                    AND wo.StartDate IS NOT NULL
+                    AND wo.StartDate BETWEEN '{selected_date} 05:30:00' 
+                                        AND DATEADD(SECOND, -1, DATEADD(DAY, 1, '{selected_date} 05:30:00'))
+                WHERE 
+                    dml.DataModelTypeId = 'DMT000003'
+                    AND dml.Name LIKE '%{selected_machine}%'
+                GROUP BY 
+                    dml.Name
+                ORDER BY 
+                    dml.Name;"""
+
+    machinename_workorder_dict = db.select_sql_dict(sql2)
+    # #Column 3 - part 1 - work order status
+    # workoder = [value['WorkOrderMode'] for value in machinename_workorder_dict]
+    # #-----------------
+
+    sql3 = f"""
+                SELECT 
+                    dml.Name AS MachineName,
+                    wo.Id AS WorkOrderId
+                FROM 
+                    [PMGMES].[dbo].[PMG_DML_DataModelList] dml
+                LEFT JOIN 
+                    [PMGMES].[dbo].[PMG_MES_WorkOrder] wo 
+                    ON dml.Id = wo.MachineId
+                    AND wo.StartDate IS NOT NULL
+                    AND wo.StartDate BETWEEN '{selected_date} 05:30:00' 
+                                        AND DATEADD(SECOND, -1, DATEADD(DAY, 1, '{selected_date} 05:30:00'))
+                WHERE 
+                    dml.DataModelTypeId = 'DMT000003'
+                    AND dml.Name LIKE '%{selected_machine}%'
+                ORDER BY 
+                    dml.Name, wo.Id;
+                """
+
+    machinename_workorderid_dict = db.select_sql_dict(sql3)
+    group_workorderid = defaultdict(list)
+    for entry in machinename_workorderid_dict:
+        group_workorderid[entry['MachineName']].append(entry['WorkOrderId'])
+    # #Column 3 - part 3 - work order id values
+    # workorderid = list(group_workorderid.values())
+    # #-----------------
+
+    sql4 = f"""
+                       select rc.MachineName, rc.LineName, rc.Period,rc.Id, ir.InspectionValue
+            from [PMGMES].[dbo].[PMG_MES_RunCard]  rc
+            left join [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] ir
+            on ir.RunCardId =  rc.Id and OptionName = 'Weight'
+            where rc.MachineName like '%{selected_machine}%' 
+            and ((rc.InspectionDate = '{selected_date}' and period between 6 and 23) 
+            or ( rc.InspectionDate = DATEADD(DAY, 1, '{selected_date}') and period between 0 and 5))
+            order by rc.machineName, rc.InspectionDate, Cast(rc.Period as Int)
+                """
+
+    runcard_and_weights = db.select_sql_dict(sql4)
+    group_runcard_periods = defaultdict(list)
+    group_runcard_machine = defaultdict(lambda: defaultdict(list))
+    group_weights_machine = defaultdict(lambda: defaultdict(list))
+    for entry in runcard_and_weights:
+        group_runcard_periods[entry['MachineName']].append(entry['Period'])
+        group_runcard_machine[entry['MachineName']][entry['Period']].append(entry['Id'])
+        group_weights_machine[entry['MachineName']][entry['Period']].append(entry['InspectionValue'])
+    runcard_periods_with_time = [
+        [machine_name,
+         [[period, periods.get(period, []) if periods.get(period) != [None] else []] for period in period_times]]
+        for machine_name, periods in group_runcard_machine.items()]
+    runcard_weights_with_time = [
+        [machine_name,
+         [[period, [float(value) for value in periods.get(period, []) if value is not None]] for period in
+          period_times]]
+        for machine_name, periods in group_weights_machine.items()]
+    runcard_periods = [[period[-1] for period in machine[1]] for machine in runcard_periods_with_time]
+    weights_periods = [[period[-1] for period in machine[1]] for machine in runcard_weights_with_time]
+
+    # #Column 4 - part 1 - runcard lost periods
+    # runcard_lost = [len([value for value in period_times if value not in period]) for period in list(group_runcard_periods.values())]
+    # #-----------------
+
+    sql5 = f"""
+                SELECT 
+                    cdm.MES_MACHINE as MachineName, 
+                    cdm.LINE, 
+                    cd.Speed,
+                    DATEPART(MINUTE, cd.CreationTime) AS Minute
+                FROM 
+                    [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] cdm
+                LEFT JOIN 
+                    [PMG_DEVICE].[dbo].[COUNTING_DATA] cd 
+                    ON cd.MachineName = cdm.COUNTING_MACHINE 
+                    AND cd.CreationTime BETWEEN CONVERT(DATETIME, '{selected_date} 06:00:00', 120) 
+                                        AND CONVERT(DATETIME, DATEADD(SECOND, -1, CONVERT(DATETIME, DATEADD(DAY, 1, '{selected_date}') + ' 06:00:00', 120)), 120)
+                    AND (cd.Speed = 0 OR cd.Speed IS NULL)
+                WHERE 
+                    cdm.COUNTING_MACHINE LIKE '%{selected_machine}%'
+                ORDER BY 
+                    cdm.MES_MACHINE, 
+                    cdm.LINE, 
+                    cd.CreationTime;
+                """
+
+    stop_or_null_time = db.select_sql_dict(sql5)
+    group_stop_base_machine = {}
+    for entry in stop_or_null_time:
+        machine = entry['MachineName']
+        line = entry['LINE']
+        minute = entry['Minute']
+        if machine not in group_stop_base_machine:
+            group_stop_base_machine[machine] = {}
+        if line not in group_stop_base_machine[machine]:
+            group_stop_base_machine[machine][line] = 0
+        if minute is not None:
+            group_stop_base_machine[machine][line] += 5
+    # #Column 4 - part 2 - machine stopped minutes
+    # stoped_time = [[count for count in line_counts.values()] for line_counts in group_stop_base_machine.values()]
+    # #-----------------
+
+    sql6 = f"""
+            SELECT 
+                cdm.MES_MACHINE as MachineName, 
+                cdm.LINE, 
+                cd.Qty2,
+                DATEPART(HOUR, cd.CreationTime) AS Period
+            FROM 
+                [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] cdm
+            LEFT JOIN 
+                [PMG_DEVICE].[dbo].[COUNTING_DATA] cd 
+                ON cd.MachineName = cdm.COUNTING_MACHINE 
+                AND cd.CreationTime BETWEEN CONVERT(DATETIME, '{selected_date} 06:00:00', 120) 
+                                    AND CONVERT(DATETIME, DATEADD(SECOND, -1, CONVERT(DATETIME, DATEADD(DAY, 1, '{selected_date}') + ' 06:00:00', 120)), 120)
+                AND cd.Qty2 is not NULL
+                AND (Speed is not NULL or cd.Speed >= 60)
+            WHERE 
+                cdm.COUNTING_MACHINE LIKE '%{selected_machine}%'
+            ORDER BY 
+                cdm.MES_MACHINE, 
+                cdm.LINE, 
+                cd.CreationTime;"""
+
+    qty2_and_period = db.select_sql_dict(sql6)
+    group_qty2_and_period = {}
+    for entry in qty2_and_period:
+        machine = entry['MachineName']
+        line = entry['LINE']
+        period = entry['Period']
+        if machine not in group_qty2_and_period:
+            group_qty2_and_period[machine] = {}
+        if line not in group_qty2_and_period[machine]:
+            group_qty2_and_period[machine][line] = {}
+        if period not in group_qty2_and_period[machine][line]:
+            group_qty2_and_period[machine][line][period] = []
+        group_qty2_and_period[machine][line][period].append(entry['Qty2'])
+    qty2_and_period_dict = {}
+    for key, sub_dict in group_qty2_and_period.items():
+        result = []
+        for line, periods in sub_dict.items():
+            line_values = []
+            for period, values in periods.items():
+                line_values.append(values)
+            result.append(line_values)
+        qty2_and_period_dict[key] = result
+    qty2_and_period_list = list(qty2_and_period_dict.values())
+
+    if selected_machine == 'PVC':
+        sql7 = f"""
+                                WITH FirstQuery AS (
+                                    SELECT DISTINCT 
+                                        DeviceId
+                                    FROM 
+                                        [PMG_DEVICE].[dbo].[OpticalDevice]
+                                    WHERE 
+                                        DeviceId LIKE '%PVC%'
+                                        AND DeviceId LIKE '%PVC1_L%'
+                                        AND DeviceId LIKE '%AOI%'
+                                        AND CONVERT(DATE, Cdt) = '2024-09-21'
+                                ),
+                                HoursList AS (
+                                    -- List of hours from 6 AM today to 5 AM tomorrow
+                                    SELECT 6 AS [Hour]
+                                    UNION ALL SELECT 7
+                                    UNION ALL SELECT 8
+                                    UNION ALL SELECT 9
+                                    UNION ALL SELECT 10
+                                    UNION ALL SELECT 11
+                                    UNION ALL SELECT 12
+                                    UNION ALL SELECT 13
+                                    UNION ALL SELECT 14
+                                    UNION ALL SELECT 15
+                                    UNION ALL SELECT 16
+                                    UNION ALL SELECT 17
+                                    UNION ALL SELECT 18
+                                    UNION ALL SELECT 19
+                                    UNION ALL SELECT 20
+                                    UNION ALL SELECT 21
+                                    UNION ALL SELECT 22
+                                    UNION ALL SELECT 23
+                                    UNION ALL SELECT 0
+                                    UNION ALL SELECT 1
+                                    UNION ALL SELECT 2
+                                    UNION ALL SELECT 3
+                                    UNION ALL SELECT 4
+                                    UNION ALL SELECT 5
+                                ),
+                                SecondQuery AS (
+                                    SELECT 
+                                        od.DeviceId, 
+                                        od.OKQty, 
+                                        od.NGQty, 
+                                        DATEPART(HOUR, od.Cdt) AS [Hour],                  
+                                        DATEPART(MINUTE, od.Cdt) AS [Minutes],
+                                        Cdt
+                                    FROM 
+                                        [PMG_DEVICE].[dbo].[OpticalDevice] od
+                                    WHERE 
+                                        od.DeviceId LIKE '%PVC%'
+                                        AND od.Cdt BETWEEN CONVERT(DATETIME, '{selected_date} 06:00:00', 120) 
+                                                       AND CONVERT(DATETIME, DATEADD(SECOND, -1, CONVERT(DATETIME, DATEADD(DAY, 1, '{selected_date}') + ' 06:00:00', 120)), 120)
+                                )
+                                SELECT 
+                                    fq.DeviceId, 
+                                    h.[Hour], 
+                                    sq.OKQty, 
+                                    sq.NGQty, 
+                                    sq.Minutes
+                                FROM 
+                                    FirstQuery fq
+                                CROSS JOIN 
+                                    HoursList h  -- Create all hour combinations with each DeviceId
+                                LEFT JOIN 
+                                    SecondQuery sq
+                                    ON fq.DeviceId = sq.DeviceId 
+                                    AND h.[Hour] = sq.[Hour]  -- Join actual data for each hour
+                                ORDER BY 
+                                    CAST(
+                                        SUBSTRING(
+                                            fq.DeviceId, 
+                                            CHARINDEX('_L', fq.DeviceId) + 2, 
+                                            CHARINDEX('_', fq.DeviceId, CHARINDEX('_L', fq.DeviceId) + 2) - CHARINDEX('_L', fq.DeviceId) - 2
+                                        ) AS INT),
+                                    fq.DeviceId
+                    """
+
+        aoi_dict = db.select_sql_dict(sql7)
+    elif selected_machine == 'NBR':
+        aoi_dict = [{'DeviceId': 'NBR1_L01_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L01_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L02_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L02_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L03_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L03_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L03_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L03_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L04_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L04_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L04_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L04_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L05_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L05_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L05_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L05_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L06_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L06_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L06_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L06_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L07_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L07_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L07_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L07_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L08_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L08_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L08_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L08_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L09_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L09_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L09_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L09_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L10_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L10_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L10_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L10_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L11_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L11_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L11_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L11_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L12_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L12_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L12_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L12_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L13_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L13_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L13_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L13_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L14_A1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L14_A2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L14_B1_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None},
+                    {'DeviceId': 'NBR1_L14_B2_AOI', 'OKQty': None, 'NGQty': None, 'Hour': None, 'Minutes': None}]
+    group_aoi_ok = {}
+    group_aoi_ng = {}
+    group_aoi_mi = {}
+    group_aoi_ok_popup = {}
+    group_aoi_ng_popup = {}
+    for entry in aoi_dict:
+        machine = '_'.join(entry['DeviceId'].split('_')[:2])
+        machine_line = entry['DeviceId']
+        hour = entry['Hour']
+        group_aoi_ok.setdefault(machine, {}).setdefault(machine_line, {}).setdefault(hour, []).append(entry['OKQty'])
+        group_aoi_ng.setdefault(machine, {}).setdefault(machine_line, {}).setdefault(hour, []).append(entry['NGQty'])
+        group_aoi_mi.setdefault(machine, {}).setdefault(machine_line, {}).setdefault(hour, []).append(entry['Minutes'])
+        group_aoi_ok_popup.setdefault(machine, {}).setdefault(machine_line, {}).setdefault(hour, []).append(
+            f"{entry['Hour']}:{entry['Minutes']} - {entry['OKQty']}")
+        group_aoi_ng_popup.setdefault(machine, {}).setdefault(machine_line, {}).setdefault(hour, []).append(
+            f"{entry['Hour']}:{entry['Minutes']} - {entry['NGQty']}")
+
+    aoi_ok = [[[sub_data[hour] for hour in sub_data] for sub_data in sub_dict.values()]
+              for sub_dict in group_aoi_ok.values()]
+    aoi_ng = [[[sub_data[hour] for hour in sub_data] for sub_data in sub_dict.values()]
+              for sub_dict in group_aoi_ng.values()]
+    aoi_mi = [[[sub_data[hour] for hour in sub_data] for sub_data in sub_dict.values()]
+              for sub_dict in group_aoi_mi.values()]
+    aoi_ok_popup = [[[sub_data[hour] for hour in sub_data] for sub_data in sub_dict.values()]
+                    for sub_dict in group_aoi_ok_popup.values()]
+    aoi_ng_popup = [[[sub_data[hour] for hour in sub_data] for sub_data in sub_dict.values()]
+                    for sub_dict in group_aoi_ng_popup.values()]
+    # print(len(aoi_ok[0][1]))
+    # print(len(aoi_ok_popup[0][1]))
+
+
+
+    aoi_ok_mode = []
+    aoi_ng_mode = []
+    for machine in aoi_ok:
+        machine_mode = []
+        for line in machine:
+            line_mode = []
+            for index, period in enumerate(period_times):
+                try:
+                    if all(value == 0 for value in line[index]):
+                        line_mode.append(0)  # RED
+                    elif all(value >= 200 for value in line[index]):
+                        line_mode.append(1)  # GREEN
+                    else:  # all((value > 0 and value < 200) for value in line[index]):
+                        line_mode.append(2)  # YELLOW
+                except:
+                    line_mode.append(3)
+            machine_mode.append(line_mode)
+        aoi_ok_mode.append(machine_mode)
+    for machine in aoi_ng:
+        machine_mode = []
+        for line in machine:
+            line_mode = []
+            for index, period in enumerate(period_times):
+                try:
+                    if all(value == 0 for value in line[index]):
+                        line_mode.append(0)  # RED
+                    elif all(value >= 20 for value in line[index]):
+                        line_mode.append(2)  # GREEN
+                    else:  # all((value > 0 and value < 200) for value in line[index]):
+                        line_mode.append(1)  # YELLOW
+                except:
+                    line_mode.append(3)
+            machine_mode.append(line_mode)
+        aoi_ng_mode.append(machine_mode)
+
+    aoi_ok_zip = []
+    for index, value in enumerate(aoi_ok):
+        aoi_ok_zip.append(list(zip(aoi_ok_mode[index], aoi_ok_popup[index])))
+
+    aoi_ng_zip = []
+    for index, value in enumerate(aoi_ok):
+        aoi_ng_zip.append(list(zip(aoi_ng_mode[index], aoi_ng_popup[index])))
+    # Column 1and2 - machine name and machine lines
+    # List1
+    machine_name_with_line = [[key, value] for key, value in group_machinename_with_machineline.items()]
+    # -----------------
+    # Column 3 - part 1 - work order status
+    # List2
+    workoder = [value['WorkOrderMode'] for value in machinename_workorder_dict]
+    # -----------------
+    # Column 3 - part 2 - machine speed status
+    # List5
+    stopstatus = list(group_2lastedvalue_status_machineline.values())
+    # -----------------
+    # Column 3 - part 3 - work order id values
+    # List4
+    workorderid = list(group_workorderid.values())
+    fworkorderid = ['-'.join(sublist) if sublist[0] is not None else '' for sublist in workorderid]
+    # -----------------
+    # Column 3 - part 4 - machine speed values
+    # List6
+    speedvalue = list(group_2lastedvalue_lastedvalue_machineline.values())
+    # -----------------
+    # Column 4 - part 1 - runcard lost periods
+    # List3
+    runcard_lost = [len([value for value in period_times if value not in period]) for period in
+                    list(group_runcard_periods.values())]
+    # -----------------
+    # Column 4 - part 2 - machine stopped minutes
+    # List7
+    stoped_time = [[count for count in line_counts.values()] for line_counts in group_stop_base_machine.values()]
+    # -----------------
+    # Column 5 - part 1 - machine count data
+    qty2_on_period = []
+    qty2_on_machineline = []
+    for machine in qty2_and_period_list:
+        sqty2 = []
+        ssum_qty2 = 0
+        for item in machine:
+            ssqty2 = [sum(value for value in item2 if value is not None) for item2 in item]
+            sqty2.append(ssqty2)
+            ssum_qty2 += sum(ssqty2)
+        qty2_on_period.append(sqty2)
+        qty2_on_machineline.append(ssum_qty2)
+    counting_machine_mode = [0 if any(0 in data for data in counting_data) else 1 for counting_data in qty2_on_period]
+    counting_data_on_period = [[[item[period] for item in counting_data if len(item) > period]
+                                if not all(
+        value in (None, 0) for value in [item[period] for item in counting_data if len(item) > period]) else []
+                                for period in range(24)] for counting_data in qty2_on_period]
+
+    # -----------------
+
+    list1 = machine_name_with_line
+    list2 = workoder
+    list3 = runcard_lost
+    list4 = fworkorderid
+    list5 = stopstatus
+    list6 = stoped_time
+    list7 = speedvalue
+    list8 = qty2_on_machineline
+    list9 = counting_machine_mode
+    left_table_data = []
+    for i in range(len(list1)):
+        machine_name = list1[i][0]
+        summary_row = [' ', list2[i], list3[i], list9[i], list8[i], list4[i]]
+        detailed_rows = []
+        num_lines = min(len(list1[i][1]), len(list5[i]), len(list6[i]), len(list7[i]))
+        for j in range(num_lines):
+            detailed_row = [list1[i][1][j], list5[i][j], list6[i][j], list7[i][j]]
+            detailed_rows.append(detailed_row)
+        left_table_data.append([machine_name, [summary_row] + detailed_rows])
+    right_table_data = [
+        [runcard_periods[i], weights_periods[i], counting_data_on_period[i], aoi_ok_zip[i][0], aoi_ok_zip[i][0],
+         aoi_ng_zip[i][1], aoi_ng_zip[i][1]]
+        if len(aoi_ok_mode[i]) == 2 and len(aoi_ng_mode[i]) == 2
+        else [runcard_periods[i], weights_periods[i], counting_data_on_period[i], aoi_ok_zip[i][0], aoi_ng_zip[i][0],
+              aoi_ok_zip[i][1], aoi_ng_zip[i][1], aoi_ok_zip[i][2], aoi_ng_zip[i][2], aoi_ok_zip[i][3],
+              aoi_ng_zip[i][3]]
+        for i in range(len(runcard_periods))
+    ]
+    end_time = time.time()
+    execution_time = end_time - start_time
+    return render(request, 'mes/status.html', locals())
+

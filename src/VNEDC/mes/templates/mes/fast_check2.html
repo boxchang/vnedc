@@ -590,26 +590,17 @@ Report Check
                                                                                                         {% elif cell == 77 %}
                                                                                                             <span class="mode-7"></span>
                                                                                                         {% endif %}
-                                                                                                        <span class="popup" style="width: 160px">
-                                                                                                            <div>At time-{{ cell3 }}:00</div>
+                                                                                                        <span class="popup" style="width: auto">
+                                                                                                            <div>At {{ cell3 }}:00</div>
                                                                                                             <table>
                                                                                                                 {% for value in cell2 %}
-                                                                                                                    {% for value4 in cell4 %}
-                                                                                                                        {% if forloop.counter == forloop.parentloop.counter %}
-                                                                                                                            {% if forloop.counter0|divisibleby:2 %}
-                                                                                                                                <tr>
-                                                                                                                            {% endif %}
-                                                                                                                                {% if value4 < 10 %}
-                                                                                                                                   <td style="border:0.5px solid white;background-color: black; width: 40px;text-align: left">{{ cell3 }}:0{{ value4 }}</td>
-                                                                                                                                {% else%}
-                                                                                                                                    <td style="border:0.5px solid white;background-color: black; width: 40px;text-align: left">{{ cell3 }}:{{ value4 }}</td>
-                                                                                                                                {% endif %}
-                                                                                                                                <td style="border:0.5px solid white;background-color: black; width: 40px">{{ value }}</td>
-                                                                                                                            {% if forloop.counter0|divisibleby:2 == False %}
-                                                                                                                                </tr>
-                                                                                                                            {% endif %}
-                                                                                                                        {% endif %}
-                                                                                                                    {% endfor %}
+                                                                                                                    {% if forloop.counter0|divisibleby:2 %}
+                                                                                                                        <tr>
+                                                                                                                    {% endif %}
+                                                                                                                        <td style="border: 0.5px solid white;background-color: black; width: 40px">&nbsp;{{ value }}&nbsp;</td>
+                                                                                                                    {% if forloop.counter0|divisibleby:2 == False %}
+                                                                                                                        </tr>
+                                                                                                                    {% endif %}
                                                                                                                 {% endfor %}
                                                                                                                     {% if values|length|divisibleby:2 == False %}
                                                                                                                         <td></td></tr>
