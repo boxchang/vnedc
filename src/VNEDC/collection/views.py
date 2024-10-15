@@ -505,7 +505,7 @@ def rd_report(request):
                       ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Độ ẩm', ['']], ['Hàm lượng bột', ['']]]
+                      ['Chlorination', ['ppm']], ['Hàm lượng bột', ['mg/gloves']], ['Độ ẩm', ['%']]]
 
 
     elif 'LK' in sPlant:
@@ -514,7 +514,7 @@ def rd_report(request):
                       ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Độ ẩm', ['']], ['Hàm lượng bột', ['']]]
+                      ['Chlorination', ['ppm']], ['Hàm lượng bột', ['mg/gloves']], ['Độ ẩm', ['%']]]
 
     try:
         sql_mach = f"""
