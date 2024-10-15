@@ -505,7 +505,7 @@ def rd_report(request):
                       ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['']], ['Hàm lượng bột', ['']]]
 
 
     elif 'LK' in sPlant:
@@ -514,7 +514,7 @@ def rd_report(request):
                       ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['']], ['Hàm lượng bột', ['']]]
 
     try:
         sql_mach = f"""
@@ -554,7 +554,9 @@ def rd_report(request):
                     OR (pd.process_type_id = 'LATEX' AND (pd.parameter_name LIKE '%TSC%' OR pd.parameter_name LIKE '%pH%'))
                     OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
                     OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
-                    OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION'))
+                    OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
+                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'WATER_CONTENT')
+                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT'))
                     GROUP BY 
                         pd.process_type_id, 
                         pd.parameter_name,
@@ -568,7 +570,8 @@ def rd_report(request):
                             WHEN pd.process_type_id = 'LATEX' THEN 3
                             WHEN pd.process_type_id = 'COAGULANT' THEN 4
                             WHEN pd.process_type_id = 'CHLORINE' THEN 5
-                        ELSE 6 END,
+                            WHEN pd.process_type_id = 'OTHER' THEN 6
+                        ELSE 7 END,
                         pd.process_type_id,   
                         pd.parameter_name ASC;
                 """
