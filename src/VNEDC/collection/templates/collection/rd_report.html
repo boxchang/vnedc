@@ -194,7 +194,6 @@
             background-color: #ffa5d3;
             color: white;
             width: 100px;
-
         }
     </style>
     <script>
@@ -269,10 +268,6 @@
 
             document.getElementById("sendModal").style.display = "block";
         }
-
-
-
-
 
         // Function to close the modal
         function closeModal() {
@@ -697,7 +692,7 @@
                                                 {% for row in data %}
                                                     <tr class="text-right">
                                                         <td style="color: {% if row.2 < row.0 %} green; {% elif row.2 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.2 == -1 and mode0 > 0 %} #D9D9D9 {% endif %}">
+                                                                background-color: {% if row.6 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
                                                            {% if row.2 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
@@ -705,7 +700,7 @@
                                                            {% endif %}
                                                         </td>
                                                         <td style="color: {% if row.3 < row.0 %} green; {% elif row.3 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.3 == -1 and mode6 > 0 %} #D9D9D9 {% endif %}">
+                                                                background-color: {% if row.7 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
                                                            {% if row.3 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
@@ -713,7 +708,7 @@
                                                            {% endif %}
                                                         </td>
                                                         <td style="color: {% if row.4 < row.0 %} green; {% elif row.4 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.4 == -1 and mode12 > 0 %} #D9D9D9 {% endif %}">
+                                                                background-color: {% if row.8 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
                                                            {% if row.4 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
@@ -721,7 +716,7 @@
                                                            {% endif %}
                                                         </td>
                                                         <td style="color: {% if row.5 < row.0 %} green; {% elif row.5 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.5 == -1 and mode18 > 0 %} #D9D9D9 {% endif %}">
+                                                                background-color: {% if row.9 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
                                                            {% if row.5 == -1 %}
                                                                {{ '' }}
                                                            {% else %}

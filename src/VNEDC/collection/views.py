@@ -469,6 +469,7 @@ def rd_select(request):
 
 
 def rd_report(request):
+    today = datetime.today()
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
     if sData_date == "":
         sData_date = datetime.now().strftime('%Y-%m-%d')
@@ -543,7 +544,23 @@ def rd_report(request):
                     MAX(CASE WHEN pv.data_time = '06' THEN pv.parameter_value ELSE NULL END) AS at_06,
                     MAX(CASE WHEN pv.data_time = '12' THEN pv.parameter_value ELSE NULL END) AS at_12,
                     MAX(CASE WHEN pv.data_time = '18' THEN pv.parameter_value ELSE NULL END) AS at_18,
-                    pd.mach_id
+                    pd.mach_id, 
+                    Case 
+                        When CHARINDEX('00', pd.input_time) > 0 THEN 1
+                        else 0
+                    end as time_00,
+                    Case 
+                        When CHARINDEX('06', pd.input_time) > 0 THEN 1
+                        else 0
+                    end as time_06,
+                    Case 
+                        When CHARINDEX('12', pd.input_time) > 0 THEN 1
+                        else 0
+                    end as time_12,
+                    Case 
+                        When CHARINDEX('18', pd.input_time) > 0 THEN 1
+                        else 0
+                    end as time_18
                     FROM [VNEDC].[dbo].[collection_parameterdefine] pd
                     left join [VNEDC].[dbo].[collection_parametervalue]  pv
                     on pv.plant_id = pd.plant_id and pv.mach_id = pd.mach_id and pd.process_type_id = pv.process_type and pd.parameter_name = pv.parameter_name and pv.data_date = '{sData_date}'
@@ -562,7 +579,8 @@ def rd_report(request):
                         pd.parameter_name,
                         pd.mach_id,
                         pc.control_range_low, 
-                        pc.control_range_high
+                        pc.control_range_high,
+                        pd.input_time
                     ORDER BY 
                         CASE
                             WHEN pd.process_type_id = 'ACID' THEN 1
@@ -582,7 +600,6 @@ def rd_report(request):
         mode6 = 0
         mode12 = 0
         mode18 = 0
-
         for result in results:
             limit_range = f"{result['control_range_low']} ~ {result['control_range_high']}" if str(
                 result['control_range_high']) != 'None' else ' '
@@ -592,13 +609,13 @@ def rd_report(request):
             at_6 = float(result['at_06']) if result['at_06'] is not None else -1
             at_12 = float(result['at_12']) if result['at_12'] is not None else -1
             at_18 = float(result['at_18']) if result['at_18'] is not None else -1
-            mode0 += at_0
-            mode6 += at_6
-            mode12 += at_12
-            mode18 += at_18
+            time_0 = int(result['time_00'])
+            time_6 = int(result['time_06'])
+            time_12 = int(result['time_12'])
+            time_18 = int(result['time_18'])
+            is_date = 1 if datetime.strptime(sData_date, '%Y-%m-%d') > today else 0
             limit.append(limit_range)
-            data.append([limit_low, limit_high, at_0, at_6, at_12, at_18])
-
+            data.append([limit_low, limit_high, at_0, at_6, at_12, at_18, time_0, time_6, time_12, time_18])
     except:
         pass
     return render(request, 'collection/rd_report.html', locals())
