@@ -166,8 +166,7 @@
         .send-modal-buttons {
             margin-top: 0px;
             padding-top: 0px;
-            display: flex;
-            justify-content: space-around;
+            justify-content: flex-end;
         }
         .send-button {
             padding: 10px 20px;
@@ -178,22 +177,22 @@
         .send-ok-btn {
             background-color: green;
             color: white;
-            width: 100px;
+            width: 85%;
         }
         .send-ok-btn:hover {
             background-color: #a4fd7d;
             color: white;
-            width: 100px;
+            width: 85%;
         }
         .send-cancel-btn {
             background-color: red;
             color: white;
-            width: 100px;
+            width: 85%;
         }
         .send-cancel-btn:hover {
-            background-color: #ffa5d3;
+            background-color: #FF9393;
             color: white;
-            width: 100px;
+            width: 85%;
         }
     </style>
     <script>
@@ -201,7 +200,6 @@
             var plant = $("#id_plant").val();
             var data_date = $("#id_data_date").val();
             var select1 = $("#select1").val();
-            var select2 = $("#select2").val();
             var select2 = $("#select2").val();
             var at_time = $("#at_time").val();
 
@@ -232,29 +230,33 @@
                         for (var i = 1; i < item.length; i++) {
                             var firstValue = item[i][0];
                             var secondValue = item[i][1];
+                            var thirdValue = item[i][2];
+
+                            // Determine background color based on thirdValue
+                            var backgroundColor = thirdValue === 1 ? 'white' : 'lightgray';
 
                             // If second value is 0, display an empty cell
                             if (secondValue === 0) {
                                 if (firstValue === null || firstValue === undefined || firstValue === '') {
-                                    formattedResult += "<td style='width: 57px;'></td>";
-                                }
-                                else {
-                                    formattedResult += "<td style='color: black; width: 57px;'>" + firstValue + "</td>";
+                                    formattedResult += "<td style='width: 57px; background-color: " + backgroundColor + ";'></td>";
+                                } else {
+                                    formattedResult += "<td style='color: black; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                                 }
                             }
                             // If second value is 1, display first value in red
                             else if (secondValue === 1) {
-                                formattedResult += "<td style='color: red; width: 57px;'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: red; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                             // If second value is -1, display first value in green
                             else if (secondValue === -1) {
-                                formattedResult += "<td style='color: green; width: 57px;'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: green; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                             // Default case to display first value without color if secondValue isn't 1 or -1
                             else {
-                                formattedResult += "<td style='width: 57px;'>" + firstValue + "</td>";
+                                formattedResult += "<td style='width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                         }
+
 
                         formattedResult += "</tr>";
                     });
@@ -592,13 +594,13 @@
                         </div>
                         <!--Modal-->
                         <div id="sendModal" class="send-modal" style="display:none;">
-                            <div class="send-modal-content">
-                                <div style="padding-left:10%">
-                                    <p><span id="message"></span></p>  <!-- Display the message from the backend here -->
+                            <div class="send-modal-content" style="width: 100%; display: flex; flex-direction: row">
+                                <div class="send-modal-buttons" style="width: 10%; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+                                    <button type="submit" title="Ấn để gửi tin nhắn" class="send-button send-ok-btn" style="cursor: pointer; margin-left: 15%" onclick="submitForm()">OK</button>
+                                    <button type="button" title="Hủy bỏ để chỉnh sửa" class="send-button send-cancel-btn" onclick="closeModal()" style="margin-left: 15%; margin-top: 5vh; margin-bottom: 5vh">Cancel</button>
                                 </div>
-                                <div class="send-modal-buttons">
-                                    <button type="submit" title="Ấn để gửi tin nhắn" class="send-button send-ok-btn" style="cursor: pointer;" onclick="submitForm()">OK</button>
-                                    <button type="button" title="Hủy bỏ để chỉnh sửa" class="send-button send-cancel-btn" onclick="closeModal()">Cancel</button>
+                                <div style="width:85%">
+                                   <p style="padding-left: 5%"><span id="message"></span></p>  <!-- Display the message from the backend here -->
                                 </div>
                             </div>
                         </div>
