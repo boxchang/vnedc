@@ -50,6 +50,11 @@ class Monitor_Device_List(models.Model):
                               blank=True)
     status_update_at = models.DateTimeField(default=timezone.now)
     comment = models.CharField(max_length=500, null=True, blank=True)
+    attr1 = models.CharField(max_length=500, null=True, blank=True)
+    attr2 = models.CharField(max_length=500, null=True, blank=True)
+    attr3 = models.CharField(max_length=500, null=True, blank=True)
+    attr4 = models.CharField(max_length=500, null=True, blank=True)
+    attr5 = models.CharField(max_length=500, null=True, blank=True)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='monitor_list_update_by')
@@ -63,3 +68,4 @@ class Check_Log(models.Model):
                                     null=False, blank=False)
     comment = models.CharField(max_length=200, null=False, blank=False)
     update_at = models.DateTimeField(default=timezone.now)
+    notice_flag = models.BooleanField(null=True, blank=True)
