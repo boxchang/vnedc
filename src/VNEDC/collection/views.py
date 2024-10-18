@@ -397,12 +397,13 @@ def daily_info_create(request):
 
     return render(request, 'collection/daily_info_create.html', locals())
 
-
+@login_required
 def daily_info_head_delete(request, pk):
     if request.method == 'GET':
         head = Daily_Prod_Info_Head.objects.get(pk=pk)
         head.delete()
     return redirect(reverse('daily_info_create'))
+
 
 
 def raw_data_api(request, data_date_start, data_date_end, process_type):
@@ -450,6 +451,7 @@ def test(request):
     return render(request, 'collection/test.html', locals())
 
 
+@login_required
 def rd_select(request):
     if request.method == 'POST':
         request.session['plant'] = request.POST.get('plant', '')
@@ -468,6 +470,7 @@ def rd_select(request):
             get_language())
 
 
+@login_required
 def rd_report(request):
     today = datetime.today()
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)
