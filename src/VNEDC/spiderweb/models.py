@@ -62,8 +62,9 @@ class Monitor_Device_List(models.Model):
     def __str__(self):
         return self.device_name
 
-class Check_Log(models.Model):
+class Monitor_Device_Log(models.Model):
     func_name = models.CharField(max_length=50, null=False, blank=False)
+    device = models.ForeignKey(Monitor_Device_List, related_name='log_device', on_delete=models.CASCADE, null=False, blank=False)
     status_code = models.ForeignKey(Monitor_Status, related_name='check_log_status', on_delete=models.DO_NOTHING,
                                     null=False, blank=False)
     comment = models.CharField(max_length=200, null=False, blank=False)
