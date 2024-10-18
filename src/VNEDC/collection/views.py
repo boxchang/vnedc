@@ -715,7 +715,7 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
                                 OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
                                 OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
                                 OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
-                                OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'WATER_CONTENT')
+                                OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'MOISTURE_CONTENT')
                                 OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT')
                                 )
                         GROUP BY 
