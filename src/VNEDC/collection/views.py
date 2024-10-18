@@ -677,7 +677,14 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
                                  WHEN MAX(CASE WHEN pc.item_no = {itemNo} and pc.mach_id = '{machine}' THEN pc.control_range_low ELSE NULL END) > MAX(CASE WHEN pv.data_time = '{at_time}' AND pv.mach_id = '{machine}' THEN pv.parameter_value ELSE NULL END) THEN -1
                                  WHEN MAX(CASE WHEN pc.item_no = {itemNo} and pc.mach_id = '{machine}' THEN pc.control_range_high ELSE NULL END) < MAX(CASE WHEN pv.data_time = '{at_time}' AND pv.mach_id = '{machine}' THEN pv.parameter_value ELSE NULL END) THEN 1	
                                  ELSE 0
-                             END as {machine}_mode
+                             END as {machine}_mode,
+                             CASE 
+                                 WHEN MAX(CASE 
+                                     WHEN pd.mach_id = '{machine}' AND CHARINDEX('{at_time}', pd.input_time) > 0 THEN 1 
+                                     ELSE 0 
+                                     END) = 1 THEN 1 
+                                 ELSE 0 
+                             END AS {machine}_bg
                                 """
         text += f"""FROM [VNEDC].[dbo].[collection_parameterdefine] pd
                         LEFT JOIN [VNEDC].[dbo].[collection_parametervalue] pv
@@ -698,19 +705,20 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
         text += f"""AND pc.mach_id = pv.mach_id
                         AND pc.process_type = pd.process_type_id
                         AND CHARINDEX(pc.parameter_name, pd.parameter_name) > 0
-                        WHERE pd.plant_id = 'GDNBR' 
-                            AND pd.mach_id = 'GDNBR01' 
-                            AND (
+                        WHERE pd.plant_id = '{plant}'  AND
+                                (
                                 (pd.process_type_id = 'COAGULANT' AND (pd.parameter_name LIKE '%CPF%' OR pd.parameter_name LIKE '%pH%' OR pd.parameter_name LIKE '%CONCENTRATION%'))
                                 OR (pd.process_type_id = 'LATEX' AND (pd.parameter_name LIKE '%TSC%' OR pd.parameter_name LIKE '%pH%'))
                                 OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
                                 OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
                                 OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
-                            )
+                                OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'WATER_CONTENT')
+                                OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT')
+                                )
                         GROUP BY 
                             pd.process_type_id, 
                             pd.parameter_name,
-                            pd.mach_id
+                            pd.input_time
                         ORDER BY
                             CASE
                                 WHEN pd.process_type_id = 'ACID' THEN 1
@@ -729,6 +737,9 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
                 row['parameter_name'] = ''
             if row['process_type_id'] == 'LATEX':
                 row['parameter_name'] = f" {row['parameter_name'][0]}{row['parameter_name'][3:]}"
+            if row['process_type_id'] == 'OTHER':
+                row['process_type_id'] = ''
+                row['parameter_name'] = (str(row['parameter_name']).split('_'))[0]
             if row['process_type_id'] == 'COAGULANT':
                 if 'CONCENTRATION' in row['parameter_name']:
                     row['parameter_name'] = f" {row['parameter_name'][:2]}CN"
@@ -736,14 +747,14 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
                     row['parameter_name'] = f" {row['parameter_name']}"
         first_row = [[f"- At: {at_time}"]]
         for value in machines:
-            first_row.append([value[2:], 0])
+            first_row.append([value[2:], 0, 1])
         data_rows = []
         data_rows.append(first_row)
         for rows in data_table:
             # item0 = f"{rows['process_type_id']} {str(rows['parameter_name'])[:str(rows['parameter_name']).rfind('_')]}"
             item0 = f" {rows['process_type_id']}{str(rows['parameter_name'])}"
             values = [value for key, value in rows.items() if 'GDNBR' in key]
-            grouped_values = [item0] + [values[i:i + 2] for i in range(0, len(values), 2)]
+            grouped_values = [item0] + [values[i:i + 3] for i in range(0, len(values), 3)]
             data_rows.append(grouped_values)
         return data_rows
     except:
