@@ -509,7 +509,7 @@ def rd_report(request):
                       ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Hàm lượng bột', ['mg/gloves']], ['Độ ẩm', ['%']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']]]
 
 
     elif 'LK' in sPlant:
@@ -518,7 +518,7 @@ def rd_report(request):
                       ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Hàm lượng bột', ['mg/gloves']], ['Độ ẩm', ['%']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']]]
 
     try:
         sql_mach = f"""
@@ -575,7 +575,7 @@ def rd_report(request):
                     OR (pd.process_type_id = 'ACID' AND pd.parameter_name LIKE '%CONCENTRATION%')
                     OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
                     OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
-                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'WATER_CONTENT')
+                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'MOISTURE_CONTENT')
                     OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT'))
                     GROUP BY 
                         pd.process_type_id, 
