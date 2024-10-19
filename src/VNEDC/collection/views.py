@@ -735,19 +735,21 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
 
         data_table = db.select_sql_dict(text)
         for row in data_table:
-            if row['process_type_id'] == 'ACID' or row['process_type_id'] == 'ALKALINE' or row[
-                'process_type_id'] == 'CHLORINE':
-                row['parameter_name'] = ''
-            if row['process_type_id'] == 'LATEX':
-                row['parameter_name'] = f" {row['parameter_name'][0]}{row['parameter_name'][3:]}"
-            if row['process_type_id'] == 'OTHER':
-                row['process_type_id'] = ''
-                row['parameter_name'] = (str(row['parameter_name']).split('_'))[0]
-            if row['process_type_id'] == 'COAGULANT':
-                if 'CONCENTRATION' in row['parameter_name']:
-                    row['parameter_name'] = f" {row['parameter_name'][:2]}CN"
-                else:
-                    row['parameter_name'] = f" {row['parameter_name']}"
+            # if row['process_type_id'] == 'ACID' or row['process_type_id'] == 'ALKALINE' or row[
+            #     'process_type_id'] == 'CHLORINE':
+            #     row['parameter_name'] = ''
+            # if row['process_type_id'] == 'LATEX':
+            #     row['parameter_name'] = f" {row['parameter_name'][0]}{row['parameter_name'][3:]}"
+            # if row['process_type_id'] == 'OTHER':
+            #     row['process_type_id'] = ''
+            #     row['parameter_name'] = (str(row['parameter_name']).split('_'))[0]
+            # if row['process_type_id'] == 'COAGULANT':
+            #     if 'CONCENTRATION' in row['parameter_name']:
+            #         row['parameter_name'] = f" {row['parameter_name'][:2]}CN"
+            #     else:
+            #         row['parameter_name'] = f" {row['parameter_name']}"
+            row['parameter_name'] = str(row['parameter_name']).replace('PH', 'pH')
+
         first_row = [[f"- At: {at_time}"]]
         for value in machines:
             first_row.append([value[2:], 0, 1])
