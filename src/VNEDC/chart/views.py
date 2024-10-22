@@ -213,128 +213,126 @@ def param_value_product_api(request):
             "26": "#7e34ac", "27": "#e58f33", "28": "#11ac8b", "29": "#d1b30f", "30": "#1ebc61"
         }
 
-        # try:
-        # Generate Y
-        times = ['00:00', '06:00', '12:00', '18:00']  # 定義每天的四個特定時間點
-        y_label = []  # 初始化空列表來存儲結果
+        try:
+            # Generate Y
+            times = ['00:00', '06:00', '12:00', '18:00']  # 定義每天的四個特定時間點
+            y_label = []  # 初始化空列表來存儲結果
 
-        # 迭代日期區間內的每一天
-        start_date = datetime.strptime(data_date_start, '%Y-%m-%d')
-        end_date = datetime.strptime(data_date_end, '%Y-%m-%d')
-        current_date = start_date
-        while current_date <= end_date:
-            for time in times:
-                date_time_str = current_date.strftime('%Y-%m-%d') + ' ' + time  # 將日期和時間點結合並轉換為字符串格式
-                y_label.append(date_time_str)
-            current_date += timedelta(days=1)  # 將日期增加一天
+            # 迭代日期區間內的每一天
+            start_date = datetime.strptime(data_date_start, '%Y-%m-%d')
+            end_date = datetime.strptime(data_date_end, '%Y-%m-%d')
+            current_date = start_date
+            while current_date <= end_date:
+                for time in times:
+                    date_time_str = current_date.strftime('%Y-%m-%d') + ' ' + time  # 將日期和時間點結合並轉換為字符串格式
+                    y_label.append(date_time_str)
+                current_date += timedelta(days=1)  # 將日期增加一天
 
-        # 找出有幾條線
-        sql = f"""
-        WITH ProdInfoHead AS (
-            SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
-              FROM collection_daily_prod_info_head head
-              where product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
-             )
+            # 找出有幾條線
+            sql = f"""
+            WITH ProdInfoHead AS (
+                SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
+                  FROM collection_daily_prod_info_head head
+                  where product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
+                 )
 
-        select * from collection_parametervalue v 
-        join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
-        and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
-        join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
-        where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
-        """
+            select * from collection_parametervalue v 
+            join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
+            and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
+            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
+            """
 
-        vnedc_db = vnedc_database()
-        records = vnedc_db.select_sql_dict(sql)
+            vnedc_db = vnedc_database()
+            records = vnedc_db.select_sql_dict(sql)
 
-        chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in
-                            records)  # 使用集合去除重复的 (mach_id, side) 组合
-        chart_records = list(chart_records)  # 将集合转换为列表
-        chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
+            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in
+                                records)  # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = list(chart_records)  # 将集合转换为列表
+            chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
 
-        # Chart Data
-        datasets = []
-        color_index = 1
-        for chart_record in chart_records:
-            mach_id = chart_record[0]
-            param_name = chart_record[1]
-            side = chart_record[2]
-            dataset = {}
-            dataset['label'] = mach_id + " " + side + " " + param_name
-            dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
-            dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
-            dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
-            data = []
+            # Chart Data
+            datasets = []
+            color_index = 1
+            for chart_record in chart_records:
+                mach_id = chart_record[0]
+                param_name = chart_record[1]
+                side = chart_record[2]
+                dataset = {}
+                dataset['label'] = mach_id + " " + side + " " + param_name
+                dataset['backgroundColor'] = backgroundColor[str(color_index).zfill(2)]
+                dataset['borderColor'] = borderColor[str(color_index).zfill(2)]
+                dataset["datalabels"] = {'align': 'end', 'anchor': 'end'}
+                data = []
 
-            for date_time in y_label:
-                date = date_time.split(' ')[0]
-                time = date_time.split(' ')[1].replace(":00", "")
-                time_filter = [record for record in records if
-                               record['mach_id'] == mach_id and record['side'] == side
-                               and record['data_date'].strftime("%Y-%m-%d") == date
-                               and record['data_time'] == time and record['parameter_name'] == param_name]
-                if time_filter:
-                    data.append(time_filter[0]['parameter_value'])
-                else:
-                    data.append('null')
-            color_index += 1
-            if data:
-                dataset['data'] = data
-                datasets.append(dataset)
-            print(len(datasets))
-
-        # 取上下限值
-        control_high_data = []
-        base_line_data = []
-        control_low_data = []
-        # print(control_low_data)
-        param_type = Parameter_Type.objects.filter(param_type_code=param_code, process_type=process_type).first()
-
-        if param_type:
-            control_table = param_type.control_table
-            control_high_column = param_type.control_high_column
-            control_low_column = param_type.control_low_column
-        if control_table:
-            if 'MES' in control_table:
-                sql = f"""
-                        select {control_high_column}, {control_low_column} from {control_table} where ProductItem = '{product}'
-                    """
-                mew_db = mes_database()
-                records = mew_db.select_sql_dict(sql)
-            else:
-                dash_index = product.find('-')
-                if dash_index != -1 and dash_index + 2 < len(product):
-                    product = product[dash_index + 1:dash_index + 3]
-                sql = f"""
-                        select {control_high_column}, {control_low_column} from {control_table} where item_no = '{product}'
-                        and process_type = '{process_type}' and parameter_name = '{param_code}'
-                    """
-                records = vnedc_db.select_sql_dict(sql)
-            print('product: ', product)
-            if records:
                 for date_time in y_label:
-                    control_high_data.append(float(records[0][control_high_column]))
-                    control_low_data.append(float(records[0][control_low_column]))
+                    date = date_time.split(' ')[0]
+                    time = date_time.split(' ')[1].replace(":00", "")
+                    time_filter = [record for record in records if
+                                   record['mach_id'] == mach_id and record['side'] == side
+                                   and record['data_date'].strftime("%Y-%m-%d") == date
+                                   and record['data_time'] == time and record['parameter_name'] == param_name]
+                    if time_filter:
+                        data.append(time_filter[0]['parameter_value'])
+                    else:
+                        data.append('null')
+                color_index += 1
+                if data:
+                    dataset['data'] = data
+                    datasets.append(dataset)
+            # 取上下限值
+            control_high_data = []
+            base_line_data = []
+            control_low_data = []
+            # print(control_low_data)
+            param_type = Parameter_Type.objects.filter(param_type_code=param_code, process_type=process_type).first()
 
-                datasets.append(
-                    {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc',
-                     'borderColor': '#999999',
-                     'borderDash': [10, 2]})
-                datasets.append(
-                    {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc',
-                     'borderColor': '#999999',
-                     'borderDash': [10, 2]})
-                y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1,
-                          "max": control_high_data[0] * 1.7}
-        else:
-            y_data = {}
+            if param_type:
+                control_table = param_type.control_table
+                control_high_column = param_type.control_high_column
+                control_low_column = param_type.control_low_column
+            if control_table:
+                if 'MES' in control_table:
+                    sql = f"""
+                            select {control_high_column}, {control_low_column} from {control_table} where ProductItem = '{product}'
+                        """
+                    mew_db = mes_database()
+                    records = mew_db.select_sql_dict(sql)
+                else:
+                    dash_index = product.find('-')
+                    if dash_index != -1 and dash_index + 2 < len(product):
+                        product = product[dash_index + 1:dash_index + 3]
+                    sql = f"""
+                            select {control_high_column}, {control_low_column} from {control_table} where item_no = '{product}'
+                            and process_type = '{process_type}' and parameter_name = '{param_code}'
+                        """
+                    records = vnedc_db.select_sql_dict(sql)
 
-        chart_data = {"labels": y_label, "datasets": datasets,
-                      "title": product + "  " + process_type + "  " + param_code, "subtitle": product,
-                      "y_data": y_data}
+                if records:
+                    for date_time in y_label:
+                        control_high_data.append(float(records[0][control_high_column]))
+                        control_low_data.append(float(records[0][control_low_column]))
 
-        # except:
-        #     print('error')
-        #     pass
+                    datasets.append(
+                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
+                         'borderDash': [10, 2]})
+                    datasets.append(
+                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
+                         'borderDash': [10, 2]})
+                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1,
+                              "max": control_high_data[0] * 1.7}
+            else:
+                y_data = {}
+
+            chart_data = {"labels": y_label, "datasets": datasets,
+                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product,
+                          "y_data": y_data}
+
+        except Exception as e:
+            print(e)
+            pass
 
     return JsonResponse(chart_data, safe=False)
 
