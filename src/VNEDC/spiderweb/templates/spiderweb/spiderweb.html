@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 20px;
+    }
+    .card {
+        flex: 1 1 calc(25% - 20px);
+        background-color: #fff;
+        margin: 10px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+        height: 34vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+    }
+    .response-type {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .response-count {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .reload-time {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    .green {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .yellow {
+        background-color: #FFC107;
+        color: white;
+    }
+    .blue {
+        background-color: #00BCD4;
+        color: white;
+    }
+    .red {
+        background-color: #F44336;
+        color: white;
+    }
+    @media (max-width: 768px) {
+        .card {
+            flex: 1 1 calc(50% - 20px);
+        }
+    }
+    @media (max-width: 480px) {
+        .card {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div>
+        <div class="container">
+            {% for name, mode, detail in monitor_web %}
+                <div class="card {% if mode == 0 %} green {% elif mode > 0 and mode < 5 %} yellow {% else %} red {% endif %}">
+                    <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode > 0 and mode < 5 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
+                    <div class="response-type">{{ name }}</div>
+                    <div class="response-count">{% if mode >= 1 and mode < 5 %}Error: <br><p style="font-size: 4vh">{{ detail }} </p>{% elif mode < 1 %} {{ '' }}{% else %} Error: {{ mode }} devices{% endif %}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="reload-time" class="reload-time" style="margin-left: 5%">
+            Last checked time: <span id="last-reload">{{ last_update_time }}</span>
+        </div>
+        <div style="margin-right: 5%">
+            <a href="{% url 'runcard_info' %}" style="text-decoration: none;">
+                <button type="button" style="color: white; background-color: blue; padding: 15px 20px; border-radius: 8px; border: none;">Return</button>
+            </a>
+        </div>
+    </div>
+    <script>
+        setInterval(function() {
+            location.reload();
+            }, {{ reload_time }});
+    </script>
+</body>
+</html>

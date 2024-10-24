@@ -1,5 +1,6 @@
 from django.urls import re_path as url
-from .views import work_order_list, index, runcard_detail, ipqc_log, fast_check, runcard_info, \
+from spiderweb.views import spiderweb
+from mes.views import work_order_list, index, runcard_detail, ipqc_log, fast_check, runcard_info, \
     runcard_api, thickness_data_api, fast_check2, machine_status
 
 urlpatterns = [
@@ -12,5 +13,6 @@ urlpatterns = [
     url(r'^machine_status/', machine_status, name='machine_status'),
     url(r'^runcard_api/(?P<runcard>[\w-]+)/$', runcard_api, name='runcard_api'),
     url(r'^thickness_data_api/', thickness_data_api, name='thickness_data_api'),
+    url(r'^spiderweb/', spiderweb, name='spiderweb'),
     url('', index, name='index'),
 ]
