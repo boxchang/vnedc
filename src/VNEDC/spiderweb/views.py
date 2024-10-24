@@ -28,7 +28,7 @@ def spiderweb(request):
 
         monitor_web = zip(monitor_list, monitor_mode, monitor_name)
         job_frequencies = list(Device_Type.objects.values_list('job_frequency', flat=True))
-        reload_time = min(map(int, job_frequencies))*1000
+        reload_time = (min(map(int, job_frequencies))*1000)/2
         last_update_time = str((Monitor_Device_List.objects.filter(enable='Y').order_by('-status_update_at').values('status_update_at').first())['status_update_at']).split('.')[0]
 
     except:
