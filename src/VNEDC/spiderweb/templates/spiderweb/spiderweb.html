@@ -92,7 +92,7 @@
                 <div class="card {% if mode == 0 %} green {% elif mode > 0 and mode < 5 %} yellow {% else %} red {% endif %}">
                     <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode > 0 and mode < 5 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
                     <div class="response-type">{{ name }}</div>
-                    <div class="response-count">{% if mode >= 1 and mode < 5 %}Error: <br><p style="font-size: 4vh">{{ detail }} </p>{% elif mode < 1 %} {{ '' }}{% else %} Error: {{ mode }} devices{% endif %}</div>
+                    <div class="response-count">{% if mode >= 1 and mode < 5 %}Error: <br><p style="font-size: 4.5vh">{{ detail }}</p>{% elif mode < 1 %} {{ '' }}{% else %}Error: {{ mode }} devices{% endif %}</div>
                 </div>
             {% endfor %}
         </div>
