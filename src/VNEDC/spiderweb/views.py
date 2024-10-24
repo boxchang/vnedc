@@ -5,7 +5,6 @@ def spiderweb(request):
     try:
         device_types = Device_Type.objects.all()
         monitor_list = [device.type_name for device in device_types if device.type_name != 'WECOM']
-        print(monitor_list)
         monitor_mode = []
         monitor_name = []
         for name in monitor_list:
