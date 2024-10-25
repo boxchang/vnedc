@@ -757,7 +757,7 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
         data_rows.append(first_row)
         for rows in data_table:
             # item0 = f"{rows['process_type_id']} {str(rows['parameter_name'])[:str(rows['parameter_name']).rfind('_')]}"
-            item0 = f" {rows['process_type_id']} {str(rows['parameter_name'])}"
+            item0 = f" {rows['process_type_id']}{str(rows['parameter_name'])}"
             values = [value for key, value in rows.items() if 'GDNBR' in key]
             grouped_values = [item0] + [values[i:i + 3] for i in range(0, len(values), 3)]
             data_rows.append(grouped_values)
