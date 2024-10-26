@@ -705,32 +705,32 @@
                                             <table class="table table-bordered">
                                                 {% for row in data %}
                                                     <tr class="text-right">
-                                                        <td style="color: {% if row.2 < row.0 %} green; {% elif row.2 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.6 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
+                                                        <td style="{% if row.2 < row.0 %} color: green; {% elif row.2 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.6 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
                                                            {% if row.2 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
                                                                {{ row.2 }}
                                                            {% endif %}
                                                         </td>
-                                                        <td style="color: {% if row.3 < row.0 %} green; {% elif row.3 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.7 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
+                                                        <td style="{% if row.3 < row.0 %} color:  green; {% elif row.3 > row.1 %} color:  red; {%  else %} color:  black; {% endif %}
+                                                                {% if row.7 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
                                                            {% if row.3 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
                                                                {{ row.3 }}
                                                            {% endif %}
                                                         </td>
-                                                        <td style="color: {% if row.4 < row.0 %} green; {% elif row.4 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.8 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
+                                                        <td style="{% if row.4 < row.0 %} color: green; {% elif row.4 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.8 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
                                                            {% if row.4 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
                                                                {{ row.4 }}
                                                            {% endif %}
                                                         </td>
-                                                        <td style="color: {% if row.5 < row.0 %} green; {% elif row.5 > row.1 %} red; {%  else %} black; {% endif %}
-                                                                background-color: {% if row.9 == 0 and is_date == 0 %} #D9D9D9 {% endif %}">
+                                                        <td style="{% if row.5 < row.0 %} color: green; {% elif row.5 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.9 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
                                                            {% if row.5 == -1 %}
                                                                {{ '' }}
                                                            {% else %}
