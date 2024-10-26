@@ -631,20 +631,71 @@ def rd_message(request):
         select2_value = request.POST.get('select2')
         at_time_value = request.POST.get('at_time')
         action = request.POST.get('action')
+        image = request.POST.get('image')
+        md5 = request.POST.get('md5')
         confirm = rd_report_confirm(select1_value, select2_value, at_time_value, sPlant, sData_date)
         message = rd_report_message(select1_value, select2_value, at_time_value, sPlant, sData_date)
         if action == "send_wecom":
+            base64_str = str(image).split(',')[1]
+            image_data = base64.b64decode(base64_str)
+            md5 = hashlib.md5(image_data).hexdigest()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
             path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            print(path)
             wecom_file = os.path.join(path, "static", "wecom", "key_param.config")
-            key = ''  # Add Wecom GD_MES group key
+            key = ''
             if os.path.exists(wecom_file):
                 with open(wecom_file, 'r') as file:
                     key = file.read().strip()
 
-            send_message(message, key)
+            # key = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68faf4e9-b42c-412f-8ee0-061fe1783c8d'
+
+            send_message(key, image_base64, md5)
         result = {"result": confirm}
 
         return JsonResponse(result, safe=False)
+
+import hashlib
+import base64
+def send_message(key, image_base64, md5_hash):
+    try:
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        data = {
+            "msgtype": "image",
+            "image": {
+                "base64": image_base64,
+                "md5": md5_hash
+            }
+        }
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(key, json=data, headers=headers)
+        print(response.json())
+        return response.json()
+    except:
+        pass
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def save_image(request):
+    if request.method == 'POST':
+        print('HAHAHAHAHHAHAHAHA')
+        data = request.json()
+        image_data = data.get('image')
+        filename = 'image'
+
+        # Decode the image
+        image_data = image_data.replace('data:image/png;base64,', '')
+        image_data = base64.b64decode(image_data)
+
+        # Define the path and save the image
+        file_path = os.path.join('templates', filename)  # specify your path here
+        with open(file_path, 'wb') as f:
+            f.write(image_data)
+
+        return JsonResponse({'status': 'success', 'message': 'Image saved'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
 
 def rd_report_confirm(select1, select2, at_time, plant, date):
     try:
@@ -750,14 +801,14 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
             #         row['parameter_name'] = f" {row['parameter_name']}"
             row['parameter_name'] = str(row['parameter_name']).replace('PH', 'pH')
 
-        first_row = [[f"- At: {at_time}"]]
+        first_row = [[f"Ngày: {date} {at_time}:00"]]
         for value in machines:
             first_row.append([value[2:], 0, 1])
         data_rows = []
         data_rows.append(first_row)
         for rows in data_table:
             # item0 = f"{rows['process_type_id']} {str(rows['parameter_name'])[:str(rows['parameter_name']).rfind('_')]}"
-            item0 = f" {rows['process_type_id']}{str(rows['parameter_name'])}"
+            item0 = f" {rows['process_type_id']}_{str(rows['parameter_name'])}"
             values = [value for key, value in rows.items() if 'GDNBR' in key]
             grouped_values = [item0] + [values[i:i + 3] for i in range(0, len(values), 3)]
             data_rows.append(grouped_values)
@@ -912,24 +963,6 @@ def rd_report_message(select1, select2, at_time, plant, date):
         return message
     except:
         pass
-
-
-def send_message(msg, key):
-    try:
-        headers = {'Content-Type': 'application/json; charset=utf-8'}
-        data = {
-            "msgtype": "text",
-            "text": {
-                "content": '',
-                # "mentioned_list": ["@all"],
-            }
-        }
-        data["text"]["content"] = msg
-        r = requests.post(key, headers=headers, json=data)
-        return r.json()
-    except:
-        pass
-
 
 def generate_excel_file_big(request):
     sPlant, sMach, sData_date, sTo_date, sEnable_mode, sLimit_mode, lang = rd_select(request)

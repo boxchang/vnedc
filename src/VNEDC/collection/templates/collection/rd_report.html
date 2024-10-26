@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{% static 'fontawesome-5.4.2/css/all.css' %}">
     <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <style>
         table {
             table-layout: fixed; /* Ensures all columns have equal width */
@@ -217,14 +218,14 @@
                 },
                 success: function(data) {
                     var resultList = data.result;
-                    var formattedResult = "<table border='1'>";
+                    var formattedResult = "<table class='wecom-img' border='1'>";
 
                     // Loop through the outer list
                     resultList.forEach(function(item) {
                         formattedResult += "<tr>";
 
                         // First element is the title (e.g., 'ACID T1')
-                        formattedResult += "<td style='width: 186px;'><b>" + item[0] + "</b></td>";
+                        formattedResult += "<td style='font-size:2.3vh; width: 6vw; height: 4.3vh;'><b>" + item[0] + "</b></td>";
 
                         // Append each measurement in its own cell, only displaying the first value if the second value is not 0
                         for (var i = 1; i < item.length; i++) {
@@ -238,22 +239,22 @@
                             // If second value is 0, display an empty cell
                             if (secondValue === 0) {
                                 if (firstValue === null || firstValue === undefined || firstValue === '') {
-                                    formattedResult += "<td style='width: 57px; background-color: " + backgroundColor + ";'></td>";
+                                    formattedResult += "<td style='font-size:2.3vh ;width: 4.4vw ;height: 4.3vh;  background-color: " + backgroundColor + ";'></td>";
                                 } else {
-                                    formattedResult += "<td style='color: black; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                    formattedResult += "<td style='color: black;font-size:2.3vh ; width: 4.4vw; height: 4.3vh; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                                 }
                             }
                             // If second value is 1, display first value in red
                             else if (secondValue === 1) {
-                                formattedResult += "<td style='color: red; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: red;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                             // If second value is -1, display first value in green
                             else if (secondValue === -1) {
-                                formattedResult += "<td style='color: green; width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: green;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                             // Default case to display first value without color if secondValue isn't 1 or -1
                             else {
-                                formattedResult += "<td style='width: 57px; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='font-size:2.3vh ;width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                         }
 
@@ -276,23 +277,7 @@
             document.getElementById("sendModal").style.display = "none";
         }
 
-        // Function to submit the form
-        function submitForm() {
-            var plant = $("#id_plant").val();
-            var data_date = $("#id_data_date").val();
-            var select1 = $("#select1").val();
-            var select2 = $("#select2").val();
-            var at_time = $("#at_time").val();
 
-            $.ajax({
-                url: '{% url 'rd_message' %}', type: 'post',
-                dataType: 'json',
-                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "data_date": data_date, "select1": select1, "select2": select2, "at_time": at_time, "action": "send_wecom"},
-                success: function(data) {
-                    closeModal();
-                }
-            });
-        }
 
         function set_session() {
             var plant = $("#id_plant").val();
@@ -417,6 +402,33 @@
                         downloadLink.href = finalImageData;
                         downloadLink.click();
                     };
+                });
+            });
+
+            // Function to submit the form
+            function submitForm(divImage) {
+                var plant = $("#id_plant").val();
+                var data_date = $("#id_data_date").val();
+                var select1 = $("#select1").val();
+                var select2 = $("#select2").val();
+                var at_time = $("#at_time").val();
+
+                $.ajax({
+                    url: '{% url 'rd_message' %}', type: 'post',
+                    dataType: 'json',
+                    data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "data_date": data_date, "select1": select1, "select2": select2, "at_time": at_time, "action": "send_wecom", "image": divImage},
+                    success: function(data) {
+                        closeModal();
+                    }
+                });
+            }
+
+            document.getElementById('ctBtn').addEventListener('click', function() {
+                var captureDiv = document.querySelector('.wecom-img');
+                html2canvas(captureDiv).then(function(divCanvas) {
+                    var divImage = divCanvas.toDataURL('image/png');
+                    submitForm(divImage);
+                    //alert("OK")
                 });
             });
 
@@ -596,11 +608,12 @@
                         <div id="sendModal" class="send-modal" style="display:none;">
                             <div class="send-modal-content" style="width: 100%; display: flex; flex-direction: row">
                                 <div class="send-modal-buttons" style="width: 10%; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
-                                    <button type="submit" title="Ấn để gửi tin nhắn" class="send-button send-ok-btn" style="cursor: pointer; margin-left: 15%" onclick="submitForm()">OK</button>
-                                    <button type="button" title="Hủy bỏ để chỉnh sửa" class="send-button send-cancel-btn" onclick="closeModal()" style="margin-left: 15%; margin-top: 5vh; margin-bottom: 5vh">Cancel</button>
+{#                                    <button type="submit" title="Ấn để gửi tin nhắn" id="sendButton" class="send-button send-ok-btn" style="font-size: 3vh; height: 8vh; width: 8vw; cursor: pointer; margin-left: 15%" onclick="submitForm()">OK</button>#}
+                                    <button type="button" title="Hủy bỏ để chỉnh sửa" class="send-button send-cancel-btn" onclick="closeModal()" style="font-size: 3vh; height: 8vh; width: 8vw; margin-left: 15%; margin-top: 5vh">Cancel</button>
+                                    <button id="ctBtn" class="send-button send-ok-btn" style="font-size: 3vh; height: 8vh; width: 8vw; background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;margin-left: 15%; margin-top: 5vh; margin-bottom: 5vh">WeCom</button>
                                 </div>
                                 <div style="width:85%">
-                                   <p style="padding-left: 5%"><span id="message"></span></p>  <!-- Display the message from the backend here -->
+                                   <p style="padding-left: 5%"><span class="ct-msg" id="message"></span></p>  <!-- Display the message from the backend here -->
                                 </div>
                             </div>
                         </div>
