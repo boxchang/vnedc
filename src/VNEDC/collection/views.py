@@ -672,29 +672,6 @@ def send_message(key, image_base64, md5_hash):
     except:
         pass
 
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
-def save_image(request):
-    if request.method == 'POST':
-        print('HAHAHAHAHHAHAHAHA')
-        data = request.json()
-        image_data = data.get('image')
-        filename = 'image'
-
-        # Decode the image
-        image_data = image_data.replace('data:image/png;base64,', '')
-        image_data = base64.b64decode(image_data)
-
-        # Define the path and save the image
-        file_path = os.path.join('templates', filename)  # specify your path here
-        with open(file_path, 'wb') as f:
-            f.write(image_data)
-
-        return JsonResponse({'status': 'success', 'message': 'Image saved'})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
-
-
-
 def rd_report_confirm(select1, select2, at_time, plant, date):
     try:
         select_mach1 = f"{plant}{select1}"
