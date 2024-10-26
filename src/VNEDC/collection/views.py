@@ -648,8 +648,6 @@ def rd_message(request):
                 with open(wecom_file, 'r') as file:
                     key = file.read().strip()
 
-            # key = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68faf4e9-b42c-412f-8ee0-061fe1783c8d'
-
             send_message(key, image_base64, md5)
         result = {"result": confirm}
 
