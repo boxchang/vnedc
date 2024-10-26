@@ -666,7 +666,6 @@ def send_message(key, image_base64, md5_hash):
         }
         headers = {'Content-Type': 'application/json'}
         response = requests.post(key, json=data, headers=headers)
-        print(response.json())
         return response.json()
     except:
         pass
