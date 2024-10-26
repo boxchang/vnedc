@@ -632,9 +632,8 @@ def rd_message(request):
         at_time_value = request.POST.get('at_time')
         action = request.POST.get('action')
         image = request.POST.get('image')
-        md5 = request.POST.get('md5')
         confirm = rd_report_confirm(select1_value, select2_value, at_time_value, sPlant, sData_date)
-        message = rd_report_message(select1_value, select2_value, at_time_value, sPlant, sData_date)
+        # message = rd_report_message(select1_value, select2_value, at_time_value, sPlant, sData_date)
         if action == "send_wecom":
             base64_str = str(image).split(',')[1]
             image_data = base64.b64decode(base64_str)
