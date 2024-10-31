@@ -18,11 +18,11 @@ from django.shortcuts import render
 import re
 import requests
 import os
-
+import hashlib
+import base64
 
 def create_vnedc_connection():
     pass
-
 
 @login_required
 def index(request):
@@ -652,8 +652,6 @@ def rd_message(request):
 
         return JsonResponse(result, safe=False)
 
-import hashlib
-import base64
 def send_message(key, image_base64, md5_hash):
     try:
         headers = {'Content-Type': 'application/json; charset=utf-8'}
