@@ -774,7 +774,7 @@ def rd_report_confirm(select1, select2, at_time, plant, date):
 
         first_row = [[f"Ngày: {date} {at_time}:00"]]
         for value in machines:
-            first_row.append([value[2:], 0, 1])
+            first_row.append([value[2:], 99, 1])
         data_rows = []
         data_rows.append(first_row)
         for rows in data_table:

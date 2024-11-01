@@ -224,7 +224,7 @@
                         formattedResult += "<tr>";
 
                         // First element is the title (e.g., 'ACID T1')
-                        formattedResult += "<td style='font-size:2.3vh; width: 6vw; height: 4.3vh;'><b>" + item[0] + "</b></td>";
+                        formattedResult += "<td style='font-size:2.3vh; color: black; width: 6vw; height: 4.3vh;'><b>" + item[0] + "</b></td>";
 
                         // Append each measurement in its own cell, only displaying the first value if the second value is not 0
                         for (var i = 1; i < item.length; i++) {
@@ -240,20 +240,23 @@
                                 if (firstValue === null || firstValue === undefined || firstValue === '') {
                                     formattedResult += "<td style='font-size:2.3vh ;width: 4.4vw ;height: 4.3vh;  background-color: " + backgroundColor + ";'></td>";
                                 } else {
-                                    formattedResult += "<td style='color: black;font-size:2.3vh ; width: 4.4vw; height: 4.3vh; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                    formattedResult += "<td style='color: black; text-align: right; font-size:2.3vh ; width: 4.4vw; height: 4.3vh; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                                 }
                             }
                             // If second value is 1, display first value in red
                             else if (secondValue === 1) {
-                                formattedResult += "<td style='color: red;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: red; text-align: right;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                             // If second value is -1, display first value in green
                             else if (secondValue === -1) {
-                                formattedResult += "<td style='color: green;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='color: green; text-align: right;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                            }
+                             else if (secondValue === 99) {
+                                formattedResult += "<td style='color: black; text-align: left;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: white;'><b>" + firstValue + "</b></td>";
                             }
                             // Default case to display first value without color if secondValue isn't 1 or -1
                             else {
-                                formattedResult += "<td style='font-size:2.3vh ;width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                formattedResult += "<td style='font-size:2.3vh ; text-align: right;width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
                             }
                         }
 
