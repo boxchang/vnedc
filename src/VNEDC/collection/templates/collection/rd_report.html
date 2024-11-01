@@ -427,7 +427,7 @@
 
             document.getElementById('ctBtn').addEventListener('click', function() {
                 var captureDiv = document.querySelector('.wecom-img');
-                html2canvas(captureDiv).then(function(divCanvas) {
+                html2canvas(captureDiv, {scale: 2}).then(function(divCanvas) {
                     var divImage = divCanvas.toDataURL('image/png');
                     submitForm(divImage);
                     //alert("OK")
