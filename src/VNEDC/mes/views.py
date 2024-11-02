@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from VNEDC.database import mes_database
+from VNEDC.database import mes_database, vnedc_database
 from datetime import datetime, timedelta
 import json
 from django.http import HttpResponseBadRequest
@@ -759,6 +759,147 @@ def thickness_data_api(request):
 
     else:
         return JsonResponse({'error': 'Only PUT method is allowed'}, status=405)
+
+def machine_master_data_format(request):
+    try:
+        db = vnedc_database()
+        update_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        sql1 = """
+            select distinct(pd.mach_id), pd.plant_id
+            from [VNEDC].[dbo].[collection_parameterdefine] pd
+            order by pd.plant_id, pd.mach_id
+        """
+        machine_list = db.select_sql_dict(sql1)
+        machines = []
+        for item in machine_list:
+            body = {
+                'PLANT': item['plant_id'],
+                'MACH_CODE': item['mach_id'],
+                'MACH_NAME': item['mach_id'],
+                'MOLD_TYPE': 'SINGLE',
+                'UPDATE_DATE': update_date
+            }
+            machines.append(body)
+        json_body = {"MachineMaster": {"Machine": machines}}
+        return JsonResponse(json_body, safe=False)
+
+    except Exception as e:
+        print("Error:", e)
+        pass
+        # return JsonResponse({"error": "Failed to retrieve machine data"}, status=500)
+
+def process_type_master_data_format(request):
+    try:
+        db = vnedc_database()
+        update_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        sql1 = """
+               SELECT process_code, process_name, process_tw, process_cn, process_vn, show_order
+               FROM [VNEDC].[dbo].[collection_process_type]
+               order by show_order
+               """
+
+        process_list = db.select_sql_dict(sql1)
+        process = []
+        for item in process_list:
+            body = {
+                'PROCESS_CODE': item['process_code'],
+                'PROCESS_NAME': item['process_name'],
+                'PROCESS_TW': item['process_tw'],
+                'PROCESS_CN': item['process_cn'],
+                'PROCESS_VN': item['process_vn'],
+                'SHOW_ORDER': item['show_order'],
+                'UPDATE_DATE': update_date
+            }
+            process.append(body)
+        json_body = {"ProcessMaster": {"Process": process}}
+        return JsonResponse(json_body, safe=False)
+
+    except Exception as e:
+        print("Error:", e)
+        pass
+        # return JsonResponse({"error": "Failed to retrieve machine data"}, status=500)
+
+def parameter_define_master_data_format(request):
+    try:
+        db = vnedc_database()
+        update_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        sql1 = """
+                select plant_id, mach_id, process_type_id, parameter_name, parameter_tw, 
+                parameter_cn, parameter_vn, show_order, base_line, control_range_high, 
+                control_range_low, sampling_frequency, unit, side
+                from [VNEDC].[dbo].[collection_parameterdefine]
+                order by plant_id, mach_id, show_order
+               """
+
+        parameter_list = db.select_sql_dict(sql1)
+        parameter = []
+        for item in parameter_list:
+            body = {
+                'PLANT': item['plant_id'],
+                'MACH_CODE': item['mach_id'],
+                'PROCESS_TYPE': item['process_type_id'],
+                'PARAMETER_CODE': item['parameter_name'],
+                'PARAMETER_TW': item['parameter_tw'],
+                'PARAMETER_CN': item['parameter_cn'],
+                'PARAMETER_VN': item['parameter_vn'],
+                'SHOW_ORDER': item['show_order'],
+                'BASE_LINE': item['base_line'],
+                'CONTROL_RANGE_HIGH': item['control_range_high'],
+                'CONTROL_RANGE_LOW': item['control_range_low'],
+                'FREQUENCY': item['sampling_frequency'],
+                'UNIT': item['unit'],
+                'SIDE': item['side'],
+                'UPDATE_DATE': update_date
+            }
+            parameter.append(body)
+        json_body = {"ParameterMaster": {"Parameter": parameter}}
+        return JsonResponse(json_body, safe=False)
+
+    except Exception as e:
+        print("Error:", e)
+        pass
+        # return JsonResponse({"error": "Failed to retrieve machine data"}, status=500)
+
+def excel_api(request):
+    try:
+        db = mes_database()
+        sql = """
+                WITH ProductItem AS (
+                SELECT InspectionDate, MachineName, LineName, STRING_AGG(ProductItem, '/') AS ProductList from (
+                SELECT distinct r.InspectionDate, MachineName, LineName, ProductItem
+                from [PMGMES].[dbo].[PMG_MES_RunCard] r, [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] ipqc, [PMGMES].[dbo].[PMG_MES_WorkOrder] w
+                where r.Id = ipqc.RunCardId and r.WorkOrderId = w.Id and ipqc.OptionName = 'Weight' and r.InspectionDate between '2024-09-18' and GETDATE()
+                ) A group by InspectionDate, MachineName, LineName
+                )
+              
+                SELECT CAST(DATEDIFF(DAY, '1899-12-30', d.CreationTime) AS NVARCHAR(50))+LINE AS ExcelKey, FORMAT(d.CreationTime, 'yyyy-MM-dd') record_date, LINE, sum(Qty2) qty2_sum
+                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d, [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] dm, ProductItem i
+                  where d.MachineName = dm.COUNTING_MACHINE and i.MachineName = dm.MES_MACHINE and i.LineName = LINE and i.InspectionDate = FORMAT(d.CreationTime, 'yyyy-MM-dd')
+                  and CreationTime between CONVERT(DATETIME, '20240918 00:00:00', 120) and GETDATE()
+                  and MES_MACHINE = 'VN_GD_NBR1_L08'
+                  group by DATEDIFF(DAY, '1899-12-30', d.CreationTime), FORMAT(d.CreationTime, 'yyyy-MM-dd'), LINE
+                  order by record_date, LINE
+                """
+        rows = db.select_sql_dict(sql)
+        table_data = []
+        for row in rows:
+            table_data.append([row['ExcelKey'], row['record_date'], row['LINE'], row['qty2_sum']])
+        return render(request, 'mes/excel_update.html', locals())
+    except:
+        pass
+
+
+
+
+
+
+
+
+
+
 
 
 
