@@ -70,3 +70,4 @@ class Monitor_Device_Log(models.Model):
     comment = models.CharField(max_length=200, null=False, blank=False)
     update_at = models.DateTimeField(default=timezone.now)
     notice_flag = models.BooleanField(null=True, blank=True)
+    recover_msg = models.BooleanField(null=True, blank=True)

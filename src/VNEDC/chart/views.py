@@ -241,6 +241,12 @@ def param_value_product_api(request):
             and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
             join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND i.side = d.side
             where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
+            union
+            select * from collection_parametervalue v 
+            join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
+            and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
+            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND d.side = ''
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
             """
 
             vnedc_db = vnedc_database()
