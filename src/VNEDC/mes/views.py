@@ -893,16 +893,6 @@ def excel_api(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
 def general_status(request):
     start_time = time.time()
     execution_time = 0
