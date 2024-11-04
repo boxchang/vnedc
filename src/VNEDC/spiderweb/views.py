@@ -17,7 +17,11 @@ def spiderweb(request):
             monitor_mode.append(len(filtered_result))
 
             if str(name) == 'COUNTING DEVICE' or str(name) == 'AOI DEVICE':
-                monitor_name.append(','.join(sorted(list(set([f"{str(item.device_group).split('_')[-2][:-1]}{str(item.device_group).split('_')[-1][1:]}" for item in filtered_result])))))
+                # monitor_name.append(','.join(sorted(list(set([f"{str(item.device_group).split('_')[-2][:-1]}{str(item.device_group).split('_')[-1][1:]}" for item in filtered_result])))))
+                if str(name) == 'COUNTING DEVICE':
+                    monitor_name.append(','.join(sorted(list(set([f"{str(item.device_name).split('_')[0]}{str(item.device_name).split('_')[-1]}" for item in filtered_result])))))
+                elif str(name) == 'AOI DEVICE':
+                    monitor_name.append(','.join(sorted(list(set([f"{str(item.device_name).split('_')[0][:-1]}{str(item.device_name).split('_')[1][1:]}{str(item.device_name).split('_')[2][0]}" for item in filtered_result])))))
             elif str(name) == 'PLC SCADA':
                 monitor_name.append(','.join(sorted(list(set([f"{str(item.device_name).split('_')[-2][:-1]}{str(item.device_name).split('_')[-1][1:]}" for item in filtered_result])))))
             elif str(name) == 'MES JOB':
