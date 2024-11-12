@@ -1458,3 +1458,20 @@ def general_status(request):
     execution_time = end_time - start_time
     return render(request, 'mes/status.html', locals())
 
+def monthly_check(request):
+
+    db = vnedc_database()
+    sql = f"""
+    SELECT [Name], belong_to,sum(sum_qty) counting, sum(ticket_qty) sap_qty
+  FROM [MES_OLAP].[dbo].[mes_daily_report_raw] where belong_to is not null and ticket_qty is not null
+  and belong_to between '2024-11-01' and '2024-11-30'
+  group by belong_to,[Name]
+  order by belong_to,[Name]
+    """
+    raws = db.select_sql_dict(sql)
+
+    for raw in raws:
+        print(raw['counting'])
+
+    return render(request, 'mes/monthly_check.html', locals())
+
