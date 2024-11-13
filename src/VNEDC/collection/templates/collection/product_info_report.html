@@ -1,0 +1,38 @@
+{% extends 'collection/base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block js %}
+
+{% endblock js %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <table border="1" class='table table-bordered'>
+            <tr>
+                <th style="text-align: center;width: 5%;">填寫日期</th>
+                <th style="text-align: center;width: 5%;">廠別</th>
+                <th style="text-align: center;width: 5%;">機台</th>
+                <th style="text-align: center;width: 10%;">換凝固劑時間</th>
+                <th style="text-align: center;width: 10%;">換乳膠時間</th>
+                <th style="text-align: center;width: 10%;">換模時間</th>
+                <th style="text-align: center;width: 10%;">備註1</th>
+                <th style="text-align: center;width: 30%;">備註2</th>
+                <th style="text-align: center;width: 10%;">更新時間</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.data_date|date:"Y/m/d" }}</td>
+                <td>{{ result.plant_id }}</td>
+                <td>{{ result.mach_id }}</td>
+                <td style="text-align: center">{{ result.coagulant_time_hour }}:{{ result.coagulant_time_min }}</td>
+                <td style="text-align: center">{{ result.latex_time_hour }}:{{ result.latex_time_min }}</td>
+                <td style="text-align: center">{{ result.tooling_time_hour }}:{{ result.tooling_time_min }}</td>
+                <td>{{ result.remark }}</td>
+                <td>{{ result.remark2 }}</td>
+                <td>{{ result.update_at|date:"Y/m/d H:i:s" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock content %}

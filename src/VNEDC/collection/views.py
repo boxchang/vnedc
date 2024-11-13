@@ -1306,3 +1306,26 @@ def generate_excel_file_big(request):
         return response
     else:
         return HttpResponse(status=204)
+
+
+def product_info_report(request):
+    sql = f"""
+        SELECT [data_date]
+          ,[plant_id]
+          ,[mach_id]
+          ,[coagulant_time_hour]
+          ,[coagulant_time_min]
+          ,[latex_time_hour]
+          ,[latex_time_min]
+          ,[tooling_time_hour]
+          ,[tooling_time_min]
+          ,[remark]
+          ,[remark2]
+          ,[create_at]
+          ,[update_at]
+      FROM [VNEDC].[dbo].[collection_daily_prod_info] order by data_date desc, mach_id 
+    """
+    db = vnedc_database()
+    results = db.select_sql_dict(sql)
+
+    return render(request, 'collection/product_info_report.html', locals())
