@@ -1307,25 +1307,45 @@ def generate_excel_file_big(request):
     else:
         return HttpResponse(status=204)
 
-
 def product_info_report(request):
-    sql = f"""
-        SELECT [data_date]
-          ,[plant_id]
-          ,[mach_id]
-          ,[coagulant_time_hour]
-          ,[coagulant_time_min]
-          ,[latex_time_hour]
-          ,[latex_time_min]
-          ,[tooling_time_hour]
-          ,[tooling_time_min]
-          ,[remark]
-          ,[remark2]
-          ,[create_at]
-          ,[update_at]
-      FROM [VNEDC].[dbo].[collection_daily_prod_info] order by data_date desc, mach_id 
-    """
-    db = vnedc_database()
-    results = db.select_sql_dict(sql)
+    today = datetime.now().strftime('%Y-%m-%d')
+    plants = Plant.objects.all()
+    if request.method == 'POST':
+        request.session['plant'] = request.POST.get('plant', '')
+        request.session['mach'] = request.POST.get('mach', '')
+        request.session['data_date'] = request.POST.get('data_date', '')
+        request.session['to_date'] = request.POST.get('to_date', '')
 
+    sPlant = request.session.get('plant', '')
+    sMach = request.session.get('mach', '')
+    sData_date = request.session.get('data_date', '')
+    sTo_date = request.session.get('to_date', '')
+    machs = Machine.objects.filter(plant=sPlant) if sPlant else None
+    try:
+        base_sql = """
+            SELECT data_date, plant_id, mach_id, coagulant_time_hour, coagulant_time_min,
+                   latex_time_hour, latex_time_min, tooling_time_hour, tooling_time_min,
+                   remark, remark2, create_at, update_at
+            FROM [VNEDC].[dbo].[collection_daily_prod_info]
+        """
+        conditions = []
+        if sPlant:
+            conditions.append(f"plant_id = '{sPlant}'")
+        if sMach:
+            conditions.append(f"mach_id = '{sMach}'")
+        if sData_date and sTo_date:
+            date_condition = f"CONVERT(DATE, create_at) BETWEEN CONVERT(DATE, '{sData_date}') AND CONVERT(DATE, '{sTo_date}')"
+        elif sData_date:
+            date_condition = f"CONVERT(DATE, create_at) BETWEEN CONVERT(DATE, '{sData_date}') AND DATEADD(DAY, 30, CONVERT(DATE, '{sData_date}'))"
+        elif sTo_date:
+            date_condition = f"CONVERT(DATE, create_at) BETWEEN DATEADD(DAY, -30, CONVERT(DATE, '{sTo_date}')) AND CONVERT(DATE, '{sTo_date}')"
+        else:
+            date_condition = f"CONVERT(DATE, create_at) BETWEEN DATEADD(DAY, -30, CONVERT(DATE, '{today}')) AND CONVERT(DATE, '{today}')"
+        conditions.append(date_condition)
+        sql = f"{base_sql} WHERE {' AND '.join(conditions)} ORDER BY data_date DESC, mach_id"
+        db = vnedc_database()
+        results = db.select_sql_dict(sql)
+    except Exception as e:
+        print(e)
+        pass
     return render(request, 'collection/product_info_report.html', locals())

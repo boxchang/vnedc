@@ -28,7 +28,6 @@ class RecordForm(forms.Form):
                 css_class='row'),
         )
 
-
         self.fields['data_date'].widget = DatePickerInput(
             attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             options={
@@ -62,13 +61,15 @@ class DailyInfoForm(forms.ModelForm):
     tooling_time_hour = forms.ChoiceField(required=False, label=_('Change Tooling Time(Hour)'), choices=hour)
     tooling_time_min = forms.ChoiceField(required=False, label=_('Change Tooling Time(Minute)'), choices=min)
     plant = forms.ModelChoiceField(required=False, label=_('Plant'), queryset=Plant.objects.all())
+    handmold_brand = forms.ChoiceField(choices=[('', '-------'), ('cn', '中國 China'), ('in', '印尼 Indonesia')], required=False, label='手模規格')
+    handmold_spec = forms.ChoiceField(choices=[('', '-------'), ('s1', 'Option1'), ('s2', 'Option2')], required=False, label='Unknown')
 
     class Meta:
         model = Daily_Prod_Info
         fields = ('prod_name_a1', 'prod_size_a1',
                   'prod_name_a2', 'prod_size_a2', 'prod_name_b1', 'prod_size_b1',
                   'prod_name_b2', 'prod_size_b2', 'remark', 'coagulant_time_hour', 'coagulant_time_min',
-                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2')
+                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2', 'handmold_brand', 'handmold_spec')
 
 
     def __init__(self, *args, submit_title='Submit', **kwargs):
@@ -112,8 +113,11 @@ class DailyInfoForm(forms.ModelForm):
                     Div(
                         Div('tooling_time_hour', css_class='col'),
                         Div('tooling_time_min', css_class='col'),
+                        css_class='row'),
+                    Div(
+                        Div('handmold_brand', css_class='col'),
                         css_class='row')
-                , css_class='col-md-6'),
+                ,css_class='col-md-6'),
                 css_class='row'),
         )
 
