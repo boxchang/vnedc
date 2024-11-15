@@ -42,6 +42,7 @@ class RecordForm(forms.Form):
 class DailyInfoForm(forms.ModelForm):
     CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')), (_('Machine Shutdown'), _('Machine Shutdown')),]
     SIZE_OPTION = [('', '---'), ('XXS', 'XXS'), ('XS', 'XS'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('XL', 'XL'), ('XXL', 'XXL'),]
+    HAND_SPECS = [('JH(中國)-細', 'JH(中國)-細'), ('JH(中國)-粗', 'JH(中國)-粗'), ('PT(印尼)-細', 'PT(印尼)-細'), ('SK(馬來西亞)-細', 'SK(馬來西亞)-細'), ('SK(馬來西亞)-粗', 'SK(馬來西亞)-粗'), ('MC(馬來西亞)-細', 'MC(馬來西亞)-細')]
     hour = [(str(hh).zfill(2), str(hh).zfill(2)) for hh in range(0, 24)]
     min = [(str(mm).zfill(2), str(mm).zfill(2)) for mm in range(0, 60)]
     prod_name_a1 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('A1 Production'), widget=forms.Select(attrs={'class': 'select2'}))
@@ -61,9 +62,8 @@ class DailyInfoForm(forms.ModelForm):
     tooling_time_hour = forms.ChoiceField(required=False, label=_('Change Tooling Time(Hour)'), choices=hour)
     tooling_time_min = forms.ChoiceField(required=False, label=_('Change Tooling Time(Minute)'), choices=min)
     plant = forms.ModelChoiceField(required=False, label=_('Plant'), queryset=Plant.objects.all())
-    handmold_brand = forms.ChoiceField(choices=[('', '-------'), ('cn', '中國 China'), ('in', '印尼 Indonesia')], required=False, label='手模規格')
-    handmold_spec = forms.ChoiceField(choices=[('', '-------'), ('s1', 'Option1'), ('s2', 'Option2')], required=False, label='Unknown')
-
+    handmold_brand = forms.ChoiceField(choices=[('', '-------'), ('china', '中國 China'), ('indo', '印尼 Indonesia')], required=False, label='手模規格')
+    handmold_spec = forms.MultipleChoiceField(choices=HAND_SPECS, required=False, widget=forms.CheckboxSelectMultiple, label='手模規格')
     class Meta:
         model = Daily_Prod_Info
         fields = ('prod_name_a1', 'prod_size_a1',
@@ -85,39 +85,57 @@ class DailyInfoForm(forms.ModelForm):
                 Div('prod_name_a2', css_class='col-md-3'),
                 Div('prod_name_b1', css_class='col-md-3'),
                 Div('prod_name_b2', css_class='col-md-3'),
-                css_class='row'),
+                css_class='row'
+            ),
             Div(
                 Div('prod_size_a1', css_class='col-md-3'),
                 Div('prod_size_a2', css_class='col-md-3'),
                 Div('prod_size_b1', css_class='col-md-3'),
                 Div('prod_size_b2', css_class='col-md-3'),
-                css_class='row'),
+                css_class='row'
+            ),
             Div(
                 Div(
                     Div(
                         Div('remark', css_class='col daily_info_remark'),
-                        css_class='row'),
+                        css_class='row'
+                    ),
                     Div(
                         Div('remark2', css_class='col'),
-                        css_class='row')
-                , css_class='col-md-6'),
+                        css_class='row'
+                    ),
+                    css_class='col-md-6'
+                ),
                 Div(
                     Div(
                         Div('coagulant_time_hour', css_class='col'),
                         Div('coagulant_time_min', css_class='col'),
-                        css_class='row'),
+                        css_class='row'
+                    ),
                     Div(
                         Div('latex_time_hour', css_class='col'),
                         Div('latex_time_min', css_class='col'),
-                        css_class='row'),
+                        css_class='row'
+                    ),
                     Div(
                         Div('tooling_time_hour', css_class='col'),
                         Div('tooling_time_min', css_class='col'),
-                        css_class='row'),
+                        css_class='row'
+                    ),
                     Div(
                         Div('handmold_brand', css_class='col'),
-                        css_class='row')
-                ,css_class='col-md-6'),
-                css_class='row'),
+                        css_class='row'
+                    ),
+                    css_class='col-md-6'
+                ),
+                css_class='row'
+            ),
+            Div(
+                Div(
+                    'handmold_spec',
+                    css_class='col-md-12 horizontal-checkboxes'
+                ),
+            )
         )
+
 
