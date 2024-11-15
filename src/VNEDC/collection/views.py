@@ -1307,6 +1307,7 @@ def generate_excel_file_big(request):
     else:
         return HttpResponse(status=204)
 
+@login_required()
 def product_info_report(request):
     today = datetime.now().strftime('%Y-%m-%d')
     plants = Plant.objects.all()
