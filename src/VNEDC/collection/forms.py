@@ -69,7 +69,7 @@ class DailyInfoForm(forms.ModelForm):
         fields = ('prod_name_a1', 'prod_size_a1',
                   'prod_name_a2', 'prod_size_a2', 'prod_name_b1', 'prod_size_b1',
                   'prod_name_b2', 'prod_size_b2', 'remark', 'coagulant_time_hour', 'coagulant_time_min',
-                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2', 'handmold_brand', 'handmold_spec')
+                  'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2', 'handmold_spec')
 
 
     def __init__(self, *args, submit_title='Submit', **kwargs):
@@ -120,10 +120,6 @@ class DailyInfoForm(forms.ModelForm):
                     Div(
                         Div('tooling_time_hour', css_class='col'),
                         Div('tooling_time_min', css_class='col'),
-                        css_class='row'
-                    ),
-                    Div(
-                        Div('handmold_brand', css_class='col'),
                         css_class='row'
                     ),
                     css_class='col-md-6'
