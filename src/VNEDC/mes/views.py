@@ -934,15 +934,23 @@ def insert_parameter(request):
             plant_id = data.get('plant_id')
             mach_id = data.get('mach_id')
             process_type = data.get('process_type')
-            data_time = data.get('data_time')
             parameter_name = data.get('parameter_name')
             parameter_value = float(data.get('parameter_value'))
             create_at = data.get('create_at')
             create_id = data.get('user_id')
-            if any(value is None for value in [data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, create_id]):
+            if any(value is None for value in [data_date, plant_id, mach_id, process_type, parameter_name, parameter_value, create_at, create_id]):
                 status = False
                 pass
             else:
+                data_time = (str(create_at).split(' '))[-1].split(':')[0]
+                if 0 <= int(data_time) < 6:
+                    data_time = '06'
+                elif 6 <= int(data_time) < 12:
+                    data_time = '12'
+                elif 12 <= int(data_time) < 18:
+                    data_time = '18'
+                else:
+                    data_time = '00'
                 db = vnedc_database()
                 sql = f"""
                     INSERT INTO [VNEDC_Test].[dbo].[collection_parametervalue]
