@@ -62,7 +62,6 @@ class DailyInfoForm(forms.ModelForm):
     tooling_time_hour = forms.ChoiceField(required=False, label=_('Change Tooling Time(Hour)'), choices=hour)
     tooling_time_min = forms.ChoiceField(required=False, label=_('Change Tooling Time(Minute)'), choices=min)
     plant = forms.ModelChoiceField(required=False, label=_('Plant'), queryset=Plant.objects.all())
-    handmold_brand = forms.ChoiceField(choices=[('', '-------'), ('china', '中國 China'), ('indo', '印尼 Indonesia')], required=False, label='手模規格')
     handmold_spec = forms.MultipleChoiceField(choices=HAND_SPECS, required=False, widget=forms.CheckboxSelectMultiple, label='手模規格')
     class Meta:
         model = Daily_Prod_Info
