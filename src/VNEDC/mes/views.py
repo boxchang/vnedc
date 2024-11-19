@@ -895,7 +895,80 @@ def excel_api(request):
     except:
         pass
 
+@csrf_exempt
+def account_check(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            account = data.get('account')
+            password = data.get('password')
+            valid = account_validation(account, password)
+        except Exception as e:
+            print("Exception:", e)
+            valid = False
+    else:
+        valid = False
+    return JsonResponse({'valid': valid})
 
+import hashlib
+import binascii
+def account_validation(account, password):
+    try:
+        db = vnedc_database()
+        sql = f"SELECT password FROM [VNEDC].[dbo].[users_customuser] where emp_no = '{account}'"
+        rows = db.select_sql_dict(sql)
+        user_password = rows[0]['password']
+        algorithm, iterations, salt, hash_value = user_password.split('$')
+        iterations = int(iterations)
+        salt = salt.encode()
+        stored_hash = binascii.a2b_base64(hash_value)
+        new_hash = hashlib.pbkdf2_hmac('sha256', str(password).encode(), salt, iterations)
+        is_valid = new_hash == stored_hash
+    except Exception as e:
+        print("Exception:", e)
+        is_valid = False
+    return is_valid
+
+@csrf_exempt
+def insert_parameter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            data_date = data.get('data_date')
+            plant_id = data.get('plant_id')
+            mach_id = data.get('mach_id')
+            process_type = data.get('process_type')
+            parameter_name = data.get('parameter_name')
+            parameter_value = float(data.get('parameter_value'))
+            create_at = data.get('create_at')
+            create_id = data.get('user_id')
+            if any(value is None for value in [data_date, plant_id, mach_id, process_type, parameter_name, parameter_value, create_at, create_id]):
+                status = False
+                pass
+            else:
+                data_time = (str(create_at).split(' '))[-1].split(':')[0]
+                if 0 <= int(data_time) < 6:
+                    data_time = '06'
+                elif 6 <= int(data_time) < 12:
+                    data_time = '12'
+                elif 12 <= int(data_time) < 18:
+                    data_time = '18'
+                else:
+                    data_time = '00'
+                db = vnedc_database()
+                sql = f"""
+                    INSERT INTO [VNEDC_Test].[dbo].[collection_parametervalue]
+                    (data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, update_at, create_by_id, update_by_id)
+                    VALUES ('{data_date}', '{plant_id}', '{mach_id}', '{process_type}', '{data_time}', '{parameter_name}', {parameter_value}, Cast('{create_at}' as datetime2), Cast('{create_at}' as datetime2), Cast('{create_id}' as int), Cast('{create_id}' as int))
+                """
+                db.execute_sql(sql)
+                status = True
+        except Exception as e:
+            print("Exception:", e)
+            status = False
+    else:
+        status = False
+    return JsonResponse({'success': status})
 
 def general_status(request):
     start_time = time.time()
