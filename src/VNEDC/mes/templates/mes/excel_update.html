@@ -1,0 +1,18 @@
+<body>
+    <table>
+        {% for row in table_data %}
+            <tr>
+                {% for column in row %}
+                    <td>
+                        {{ column }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+<script type="text/javascript">
+    setInterval(function() {
+        location.reload();
+    }, 3600000);
+</script>

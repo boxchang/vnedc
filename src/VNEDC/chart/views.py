@@ -6,6 +6,12 @@ from VNEDC.database import mes_database, vnedc_database
 from chart.forms import SearchForm, ProductionSearchForm
 from collection.models import ParameterValue, ParameterDefine, Parameter_Type
 import random
+from collection.models import Process_Type, Plant, Machine
+import matplotlib.pyplot as plt
+import base64
+import io
+import time
+
 
 def generate_pastel_color():
     # 设定颜色值的下限，以保证颜色偏淡
@@ -41,9 +47,11 @@ def get_product_choices(start_date, end_date):
     choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
     return choices
 
+
 def param_value(request):
     search_form = SearchForm()
     return render(request, 'chart/param_value.html', locals())
+
 
 def param_value_product(request):
     month_ago = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
@@ -53,6 +61,12 @@ def param_value_product(request):
     search_form = ProductionSearchForm()
     search_form.fields['product'].choices = choices
     return render(request, 'chart/param_value_product.html', locals())
+
+def get_machines_by_plant(request):
+    plant_code = request.GET.get('plant_code')
+    machines = Machine.objects.filter(plant__plant_code=plant_code).values('mach_code', 'mach_name')
+    machines_list = [{'code': machine['mach_code'], 'name': machine['mach_name']} for machine in machines]
+    return JsonResponse({'machines': machines_list})
 
 def param_value_api(request):
     chart_data = {}
@@ -80,13 +94,15 @@ def param_value_api(request):
 
         try:
 
-            defines = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type, param_type=param_type)
+            defines = ParameterDefine.objects.filter(plant=plant, mach=mach, process_type=process_type,
+                                                     param_type=param_type)
 
             param_name = defines[0].parameter_name
 
             for define in defines:
                 records = ParameterValue.objects.filter(plant=plant, mach=mach, process_type=process_type,
-                                                        parameter_name=define.parameter_name, data_date__gte=data_date_start, data_date__lte=data_date_end)
+                                                        parameter_name=define.parameter_name,
+                                                        data_date__gte=data_date_start, data_date__lte=data_date_end)
 
                 # Date Label
                 for record in records:
@@ -95,7 +111,6 @@ def param_value_api(request):
                         y_label.append(tmp)
                 y_label = list(set(y_label))
                 y_label.sort()
-
 
                 dataset = {}
                 color = generate_pastel_color()
@@ -110,6 +125,9 @@ def param_value_api(request):
                     tmp = records.filter(data_date=date, data_time=time, mach=mach).first()
                     if tmp:
                         data.append(tmp.parameter_value)
+                    else:
+                        data.append('null')
+
                 if data:
                     dataset['data'] = data
                     datasets.append(dataset)
@@ -153,11 +171,16 @@ def param_value_api(request):
             else:
                 title = process_type + "__" + param_type
 
-            y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
+            y_data = []
+            if control_low_data[0] and control_high_data[0]:
+                y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.9}
 
-            chart_data = {"labels": y_label, "datasets": datasets, "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": y_data}
+            chart_data = {"labels": y_label, "datasets": datasets, "title": title,
+                          "control_high": form_control_range_high, "control_low": form_control_range_low,
+                          "y_data": y_data}
         except Exception as e:
-            chart_data = {"labels": [], "datasets": [], "title": title, "control_high": form_control_range_high, "control_low": form_control_range_low, "y_data": []}
+            chart_data = {"labels": [], "datasets": [], "title": title, "control_high": form_control_range_high,
+                          "control_low": form_control_range_low, "y_data": []}
             print(e)
 
     return JsonResponse(chart_data, safe=False)
@@ -172,14 +195,23 @@ def param_value_product_api(request):
         param_code = request.POST.get('param_code')
         product = request.POST.get('product')
 
-        backgroundColor = {"01": "#4dc9f6", "02": "#f67019", "03": "#f53794", "04": "#537bc4", "05": "#acc236",
-                           "06": "#166a8f", "07": "#00a950", "08": "#58595b", "09": "#4ff9f6", "10": "#fff019",
-                           "11": "#fff794", "12": "#5ffbc4", "13": "#aff236", "14": "#1ffa8f", "15": "#0ff950",
-                           "16": "#5ff95b", "17": "#bfff44", "18": "#efff44", "19": "#dffa44", "20": "#cffaaf"}
-        borderColor = {"01": "#3db9e6", "02": "#e66009", "03": "#e52784", "04": "#436bc3", "05": "#9cb226",
-                       "06": "#065a7f", "07": "#009940", "08": "#48494b", "09": "#4dd9f6", "10": "#fdd019",
-                       "11": "#fdd794", "12": "#5ddbc4", "13": "#add236", "14": "#1dda8f", "15": "#0dd950",
-                       "16": "#5dd95b", "17": "#beef44", "18": "#eeef44", "19": "#deea44", "20": "#ceeaaf"}
+        backgroundColor = {
+            "01": "#4dc9f6", "02": "#f67019", "03": "#f53794", "04": "#537bc4", "05": "#acc236",
+            "06": "#166a8f", "07": "#00a950", "08": "#58595b", "09": "#4ff9f6", "10": "#fff019",
+            "11": "#fff794", "12": "#5ffbc4", "13": "#aff236", "14": "#1ffa8f", "15": "#0ff950",
+            "16": "#5ff95b", "17": "#bfff44", "18": "#efff44", "19": "#dffa44", "20": "#cffaaf",
+            "21": "#ff5733", "22": "#33ff57", "23": "#5733ff", "24": "#ff33a1", "25": "#33d1ff",
+            "26": "#8e44ad", "27": "#ff9f43", "28": "#1abc9c", "29": "#f1c40f", "30": "#2ecc71"
+        }
+
+        borderColor = {
+            "01": "#3db9e6", "02": "#e66009", "03": "#e52784", "04": "#436bc3", "05": "#9cb226",
+            "06": "#065a7f", "07": "#009940", "08": "#48494b", "09": "#4dd9f6", "10": "#fdd019",
+            "11": "#fdd794", "12": "#5ddbc4", "13": "#add236", "14": "#1dda8f", "15": "#0dd950",
+            "16": "#5dd95b", "17": "#beef44", "18": "#eeef44", "19": "#deea44", "20": "#ceeaaf",
+            "21": "#e55323", "22": "#23e553", "23": "#5323e5", "24": "#e52391", "25": "#23cde5",
+            "26": "#7e34ac", "27": "#e58f33", "28": "#11ac8b", "29": "#d1b30f", "30": "#1ebc61"
+        }
 
         try:
             # Generate Y
@@ -200,21 +232,28 @@ def param_value_product_api(request):
             sql = f"""
             WITH ProdInfoHead AS (
                 SELECT distinct head.data_date,head.mach_id,substring(line,1,1) side
-                  FROM collection_daily_prod_info_head head, collection_daily_prod_info info
-                  where head.data_date = info.data_date and product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
+                  FROM collection_daily_prod_info_head head
+                  where product = '{product}' and head.data_date between '{data_date_start}' and '{data_date_end}'
                  )
-                
+
             select * from collection_parametervalue v 
             join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
             and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
-            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id
+            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND i.side = d.side
+            where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
+            union
+            select * from collection_parametervalue v 
+            join collection_parameterdefine d on d.plant_id = v.plant_id and d.mach_id = v.mach_id 
+            and d.process_type_id = v.process_type and v.parameter_name = d.parameter_name 
+            join ProdInfoHead i on v.data_date = i.data_date AND v.mach_id = i.mach_id AND d.side = ''
             where v.process_type = '{process_type}' and d.param_type = '{param_code}' 
             """
 
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
 
-            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in records)  # 使用集合去除重复的 (mach_id, side) 组合
+            chart_records = set((record['mach_id'], record['parameter_name'], record['side']) for record in
+                                records)  # 使用集合去除重复的 (mach_id, side) 组合
             chart_records = list(chart_records)  # 将集合转换为列表
             chart_records = sorted(chart_records, key=lambda x: x[0])  # 按照第一个值排序
 
@@ -243,25 +282,21 @@ def param_value_product_api(request):
                         data.append(time_filter[0]['parameter_value'])
                     else:
                         data.append('null')
-
                 color_index += 1
-
                 if data:
                     dataset['data'] = data
                     datasets.append(dataset)
-
             # 取上下限值
             control_high_data = []
             base_line_data = []
             control_low_data = []
-
+            # print(control_low_data)
             param_type = Parameter_Type.objects.filter(param_type_code=param_code, process_type=process_type).first()
 
             if param_type:
                 control_table = param_type.control_table
                 control_high_column = param_type.control_high_column
                 control_low_column = param_type.control_low_column
-
             if control_table:
                 if 'MES' in control_table:
                     sql = f"""
@@ -285,20 +320,25 @@ def param_value_product_api(request):
                         control_low_data.append(float(records[0][control_low_column]))
 
                     datasets.append(
-                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                        {'label': '控制上限', 'data': control_high_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
                          'borderDash': [10, 2]})
                     datasets.append(
-                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc', 'borderColor': '#999999',
+                        {'label': '控制下限', 'data': control_low_data, 'backgroundColor': '#cccccc',
+                         'borderColor': '#999999',
                          'borderDash': [10, 2]})
-                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1, "max": control_high_data[0] * 1.7}
+                    y_data = {"beginAtZero": "true", "min": control_low_data[0] * 0.1,
+                              "max": control_high_data[0] * 1.7}
             else:
                 y_data = {}
 
             chart_data = {"labels": y_label, "datasets": datasets,
-                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product, "y_data": y_data}
+                          "title": product + "  " + process_type + "  " + param_code, "subtitle": product,
+                          "y_data": y_data}
 
         except Exception as e:
             print(e)
+            pass
 
     return JsonResponse(chart_data, safe=False)
 
@@ -329,6 +369,7 @@ def get_param_define_api(request):
 
     return JsonResponse(html, safe=False)
 
+
 def get_param_code_api(request):
     html = ""
     if request.method == 'POST':
@@ -337,6 +378,7 @@ def get_param_code_api(request):
         html = """<option value="" selected>---------</option>"""
 
         for record in records:
-            html += """<option value="{value}">{name}</option>""".format(value=record.param_type_code, name=record.param_type_code)
+            html += """<option value="{value}">{name}</option>""".format(value=record.param_type_code,
+                                                                         name=record.param_type_code)
 
     return JsonResponse(html, safe=False)

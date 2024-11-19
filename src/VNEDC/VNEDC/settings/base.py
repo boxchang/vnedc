@@ -33,10 +33,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = ['localhost', '0.0.0.0:8000']
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    'spiderweb',
     'mes',
     'filelist',
     'chart',

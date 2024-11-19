@@ -12,6 +12,17 @@
     width: 100% !important; /* 设置Select2的宽度 */
 }
 </style>
+<style>
+.horizontal-checkboxes .custom-control.custom-checkbox {
+    display: inline-block;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.horizontal-checkboxes label {
+    margin-left: 5px;
+}
+</style>
 {% endblock css %}
 {% block js %}
 <link href="{% static "select2/css/select2.min.css" %}" rel="stylesheet" />

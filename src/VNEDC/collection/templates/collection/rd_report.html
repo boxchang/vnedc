@@ -15,120 +15,465 @@
     <script src="{% static 'jquery.loading/js/jquery.loading.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'fontawesome-5.4.2/css/all.css' %}">
     <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         table {
             table-layout: fixed; /* Ensures all columns have equal width */
         }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .slider:after {
+            content: 'OFF';
+            color: white;
+            display: block;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        input:checked + .slider:after {
+            content: 'ON';
+            left: 30%;
+            color: green;
+        }
     </style>
-<style>
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 30px;
-    }
+    <!-- CSS for Modal -->
+    <style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 9999; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
 
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
 
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 30px;
-    }
+        .close-button {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        .inline-elements {
+            display: flex;
+            align-items: center; /* Vertically align elements in the middle */
+        }
+        .inline-elements label, .inline-elements select, .inline-elements p {
+            margin-right: 10px; /* Adds some space between elements */
+        }
+        .inline-elements p {
+            margin: 0;
+        }
+    </style>
+    <style>
+        .send-modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
+        }
+        .send-modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 20px;
+            padding-top: 5px;
+            border: 1px solid #888;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            border-radius: 8px;
+        }
+        .send-modal-buttons {
+            margin-top: 0px;
+            padding-top: 0px;
+            justify-content: flex-end;
+        }
+        .send-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .send-ok-btn {
+            background-color: green;
+            color: white;
+            width: 85%;
+        }
+        .send-ok-btn:hover {
+            background-color: #a4fd7d;
+            color: white;
+            width: 85%;
+        }
+        .send-cancel-btn {
+            background-color: red;
+            color: white;
+            width: 85%;
+        }
+        .send-cancel-btn:hover {
+            background-color: #FF9393;
+            color: white;
+            width: 85%;
+        }
+    </style>
+    <script>
+        function msg_confirm() {
+            var plant = $("#id_plant").val();
+            var data_date = $("#id_data_date").val();
+            var select1 = $("#select1").val();
+            var select2 = $("#select2").val();
+            var at_time = $("#at_time").val();
 
-    input:checked + .slider {
-        background-color: #4CAF50;
-    }
+            $.ajax({
+                url: '{% url "rd_message" %}',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "plant": plant,
+                    "data_date": data_date,
+                    "select1": select1,
+                    "select2": select2,
+                    "at_time": at_time
+                },
+                success: function(data) {
+                    var resultList = data.result;
+                    var formattedResult = "<table class='wecom-img' border='1'>";
 
-    input:checked + .slider:before {
-        transform: translateX(30px);
-    }
+                    // Loop through the outer list
+                    resultList.forEach(function(item) {
+                        formattedResult += "<tr>";
 
-    .slider:after {
-        content: 'OFF';
-        color: white;
-        display: block;
-        position: absolute;
-        transform: translate(-50%, -50%);
-        top: 50%;
-        left: 50%;
-        font-size: 12px;
-        font-family: Arial, sans-serif;
-    }
+                        // First element is the title (e.g., 'ACID T1')
+                        formattedResult += "<td style='font-size:2.3vh; color: black; width: 6vw; height: 4.3vh;'><b>" + item[0] + "</b></td>";
 
-    input:checked + .slider:after {
-        content: 'ON';
-        left: 30%;
-        color: green;
-    }
-</style>
-<!-- CSS for Modal -->
-<style>
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 9999; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-    }
+                        // Append each measurement in its own cell, only displaying the first value if the second value is not 0
+                        for (var i = 1; i < item.length; i++) {
+                            var firstValue = item[i][0];
+                            var secondValue = item[i][1];
+                            var thirdValue = item[i][2];
 
-    .modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #fefefe;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        width: 80%;
-        max-width: 300px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
+                            // Determine background color based on thirdValue
+                            var backgroundColor = thirdValue === 1 ? 'white' : 'lightgray';
 
-    .close-button {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        color: #aaa;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+                            // If second value is 0, display an empty cell
+                            if (secondValue === 0) {
+                                if (firstValue === null || firstValue === undefined || firstValue === '') {
+                                    formattedResult += "<td style='font-size:2.3vh ;width: 4.4vw ;height: 4.3vh;  background-color: " + backgroundColor + ";'></td>";
+                                } else {
+                                    formattedResult += "<td style='color: black; text-align: right; font-size:2.3vh ; width: 4.4vw; height: 4.3vh; background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                                }
+                            }
+                            // If second value is 1, display first value in red
+                            else if (secondValue === 1) {
+                                formattedResult += "<td style='color: red; text-align: right;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                            }
+                            // If second value is -1, display first value in green
+                            else if (secondValue === -1) {
+                                formattedResult += "<td style='color: green; text-align: right;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                            }
+                             else if (secondValue === 99) {
+                                formattedResult += "<td style='color: black; text-align: left;font-size:2.3vh ; width: 4.4vw;height: 4.3vh;  background-color: white;'><b>" + firstValue + "</b></td>";
+                            }
+                            // Default case to display first value without color if secondValue isn't 1 or -1
+                            else {
+                                formattedResult += "<td style='font-size:2.3vh ; text-align: right;width: 4.4vw;height: 4.3vh;  background-color: " + backgroundColor + ";'>" + firstValue + "</td>";
+                            }
+                        }
 
-    .close-button:hover,
-    .close-button:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
-</style>
+
+                        formattedResult += "</tr>";
+                    });
+
+                    formattedResult += "</table>";
+
+                    // Set the formatted result into the message element
+                    $("#message").html(formattedResult);
+                }
+            });
+
+            document.getElementById("sendModal").style.display = "block";
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById("sendModal").style.display = "none";
+        }
+
+
+
+        function set_session() {
+            var plant = $("#id_plant").val();
+            var mach = $("#id_mach").val();
+            var data_date = $("#id_data_date").val();
+            var enable_mode = $("#toggle_record_date").is(':checked') ? 'on' : 'off';
+
+            if(plant != "" && mach != "" && data_date != "") {
+                $("<input />").attr("type", "hidden")
+                              .attr("name", "enable_mode")
+                              .attr("value", enable_mode)
+                              .appendTo("#session_form");
+                $("#session_form").submit();
+            }
+        }
+        $(document).ready(function() {
+            // Handle Plant change
+            $('#id_plant').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Machine change
+            $('#id_mach').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#id_data_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#id_to_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#toggle_record_date').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            // Handle Date change
+            $('#limit_checkbox').on('change', function () {
+                $('#session_form').attr('action', '/collection/rd_report/');
+                $('#session_form').submit();
+            });
+
+            $('table').each(function() {
+                var maxHeight = 0;
+                $(this).find('td').each(function() {
+                    var height = $(this).height();
+                    if (height > maxHeight) {
+                        maxHeight = height;
+                    }
+                });
+                $(this).find('td').height(25); //maxheight
+            });
+
+            document.getElementById('toggle-btn').addEventListener('click', function () {
+                var sidebar = document.getElementById('sidebar');
+                var content = document.getElementById('content');
+                sidebar.classList.toggle('collapsed');
+                sidebar.classList.toggle('expanded');
+                content.classList.toggle('expanded');
+            });
+
+            document.getElementById('captureBtn').addEventListener('click', function() {
+                // Select the div to capture
+                var captureDiv = document.querySelector('.capture-table');
+
+                // Get the values from the form inputs and the product name
+                var plant = document.getElementById('id_plant').options[document.getElementById('id_plant').selectedIndex].text;
+                var mach = document.getElementById('id_mach').options[document.getElementById('id_mach').selectedIndex].text;
+                var dataDate = document.getElementById('id_data_date').value;
+                var productName = document.getElementById('product-name').innerText; // Get the product name
+
+                // Use html2canvas to capture the div
+                html2canvas(captureDiv).then(function(divCanvas) {
+                    // Get the dimensions of the captured div
+                    var divImage = divCanvas.toDataURL('image/png');
+                    var divWidth = divCanvas.width;
+                    var divHeight = divCanvas.height;
+
+                    // Create a new canvas with extra space for the text
+                    var finalCanvas = document.createElement('canvas');
+                    var finalContext = finalCanvas.getContext('2d');
+
+                    // Set the final canvas size (div image + extra space for text)
+                    var textHeight = 150; // Height for text space
+                    finalCanvas.width = divWidth;
+                    finalCanvas.height = divHeight + textHeight;
+
+                    // Set background color to white
+                    finalContext.fillStyle = 'white';
+                    finalContext.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill entire canvas with white
+
+                    // Set font and add custom text above the div image (including product name)
+                    finalContext.font = '38px Arial';
+                    finalContext.fillStyle = 'black';
+                    finalContext.textAlign = 'center';
+                    finalContext.fillText(`${productName} - ${mach} - ${dataDate}`, divWidth / 2, 50); // Position text with product name
+
+                    // Draw the captured div image below the text
+                    var img = new Image();
+                    img.src = divImage;
+                    img.onload = function() {
+                        finalContext.drawImage(img, 0, textHeight); // Draw image after text space
+
+                        // Convert the final canvas to a downloadable image
+                        var finalImageData = finalCanvas.toDataURL('image/png');
+
+                        // Create a link element to download the combined image
+                        var downloadLink = document.createElement('a');
+
+                        // Set dynamic filename for the download
+                        downloadLink.download = `${productName}-${plant}-${mach}-${dataDate}.png`;
+                        downloadLink.href = finalImageData;
+                        downloadLink.click();
+                    };
+                });
+            });
+
+            // Function to submit the form
+            function submitForm(divImage) {
+                var plant = $("#id_plant").val();
+                var data_date = $("#id_data_date").val();
+                var select1 = $("#select1").val();
+                var select2 = $("#select2").val();
+                var at_time = $("#at_time").val();
+
+                $.ajax({
+                    url: '{% url 'rd_message' %}', type: 'post',
+                    dataType: 'json',
+                    data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "plant": plant, "data_date": data_date, "select1": select1, "select2": select2, "at_time": at_time, "action": "send_wecom", "image": divImage},
+                    success: function(data) {
+                        closeModal();
+                    }
+                });
+            }
+
+            document.getElementById('ctBtn').addEventListener('click', function() {
+                var captureDiv = document.querySelector('.wecom-img');
+                html2canvas(captureDiv, {scale: 2}).then(function(divCanvas) {
+                    var divImage = divCanvas.toDataURL('image/png');
+                    submitForm(divImage);
+                    //alert("OK")
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var dateInput = document.getElementById('id_data_date');
+                if (!dateInput.value) {  // If no date is already set
+                    var today = new Date().toISOString().split('T')[0];
+                    dateInput.value = today;
+                }
+            });
+
+            document.getElementById('downloadForm').addEventListener('submit', function(event) {
+                // Show the loading modal
+                document.getElementById('loadingModal').style.display = 'block';
+
+                // Submit the form
+                setTimeout(function() {
+                    // After the form is submitted, automatically hide the modal after a few seconds
+                    window.addEventListener('focus', function() {
+                        document.getElementById('loadingModal').style.display = 'none';
+                    });
+                }, 1); // Delay to ensure the modal is shown before the form submission
+            });
+
+            // Close the modal when the user clicks the "X" button
+            document.querySelector('.close-button').addEventListener('click', function() {
+                document.getElementById('loadingModal').style.display = 'none';
+            });
+        });
+
+        function toggleRecordDate() {
+            const toDateInput = document.getElementById('id_to_date');
+            const isChecked = document.getElementById('toggle_record_date').checked;
+
+            toDateInput.disabled = !isChecked; // Disable if unchecked, enable if checked
+            toDateInput.required = isChecked;  // Set required attribute based on the toggle state
+        }
+
+        // Initial load setup
+        window.onload = function() {
+            toggleRecordDate(); // Set the initial state based on the toggle
+        }
+    </script>
 </head>
 <body>
     <div class="sidebar collapsed" id="sidebar">
@@ -231,22 +576,74 @@
             </div>
             <div class="content">
                 <!-- Button and Form -->
-                <div style="margin-left:82.5%; padding-top: 10px;">
-                    <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
-                        <button type="submit" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                            Download Excel
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="flex-basis: 40%; padding-left: 40px">
+                        <div id="product-name">{{ itemNo_display }}</div>
+                    </div>
+                    <div style="flex-basis: 32%; padding-left: 7px; border: 1px solid black">
+                        <div class="inline-elements">
+                            <label for="select1"><p style="font-size: 12px">from</p>NBR:</label>
+                            <select id="select1" name="select1" style="margin-top: 10px">
+                                {% for number in machines_no_list %}
+                                    <option value="{{ number }}">{{ number }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="select2"><p style="font-size: 12px">to</p>NBR:</label>
+                            <select id="select2" name="select2" style="margin-top: 10px">
+                                {% for number in machines_no_list %}
+                                    <option value="{{ number }}">{{ number }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="at_time" style="margin-top: 20px; padding-left: 4px"> At:</label>
+                            <select id="at_time" name="at_time" style="margin-top: 10px;">
+                                {% for number in data_time %}
+                                    <option value="{{ number }}">{{ number }}</option>
+                                {% endfor %}
+                            </select>
+                            <div>
+                                <button type="button" onclick="msg_confirm()" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                        <!--Modal-->
+                        <div id="sendModal" class="send-modal" style="display:none;">
+                            <div class="send-modal-content" style="width: 100%; display: flex; flex-direction: row">
+                                <div class="send-modal-buttons" style="width: 10%; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+{#                                    <button type="submit" title="Ấn để gửi tin nhắn" id="sendButton" class="send-button send-ok-btn" style="font-size: 3vh; height: 8vh; width: 8vw; cursor: pointer; margin-left: 15%" onclick="submitForm()">OK</button>#}
+                                    <button type="button" title="Hủy bỏ để chỉnh sửa" class="send-button send-cancel-btn" onclick="closeModal()" style="font-size: 3vh; height: 8vh; width: 8vw; margin-left: 15%; margin-top: 5vh">Cancel</button>
+                                    <button id="ctBtn" class="send-button send-ok-btn" style="font-size: 3vh; height: 8vh; width: 8vw; background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;margin-left: 15%; margin-top: 5vh; margin-bottom: 5vh">WeCom</button>
+                                </div>
+                                <div style="width:85%">
+                                   <p style="padding-left: 5%"><span class="ct-msg" id="message"></span></p>  <!-- Display the message from the backend here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex-basis: 0%; padding-left: 0">
+                        <!-- Capture Button -->
+                        <button id="captureBtn" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                            Capture
                         </button>
-                    </form>
+                    </div>
+                    <div style="flex-basis: auto; text-align: right; padding-right: 4%">
+                        <!-- Download Excel Button -->
+                        <form id="downloadForm" action="{% url 'download_excel2' %}" method="get">
+                            <button type="submit" style="background-color: blue; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                Download Excel
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <!-- Modal Structure -->
                 <div id="loadingModal" class="modal">
                     <div class="modal-content">
                         <span class="close-button">&times;</span>
-                        <p>{{ modal_message }}</p>
+                        <p style="padding: 0px auto">{{ modal_message }}</p>
                     </div>
                 </div>
                 <div class="row m-3" style="height:500px">
-                    <div class="col-12"  id="myTable">
+                    <div class="col-12 capture-table"  id="myTable">
                         <div class="container">
                             <table class="table table-bordered">
                                 <thead class="text-center">
@@ -271,48 +668,37 @@
                                 </thead>
                             </table>
                         </div>
-
                         <div class="container">
                             <div class="row no-gutters">
                                 <div class="col-md-6" id="table-letf">
                                     <table class="table table-bordered" id="myTable">
-                                        {% for row in table_data %}
+                                        {% for  col1, col2  in table_data %}
                                             <tr>
-                                               <th class="col-md-8" style="padding-left: 1cm">
-                                                   {{ row.0 }}
+                                               <th rowspan="{{ col2|length }}" class="col-md-8" style="padding-left: 1cm; vertical-align: middle;">
+                                                   {{ col1 }}
                                                </th>
                                                <td>
-                                                    {{ row.1 }}
+                                                   {{ col2.0 }}
                                                </td>
                                             </tr>
+                                            {% for scol2 in col2|slice:"1:" %}
+                                                <tr>
+                                                   <td>
+                                                        {{ scol2 }}
+                                                   </td>
+                                                </tr>
+                                            {% endfor %}
                                         {% endfor %}
                                     </table>
                                 </div>
                                 <div class="col-md-6" id="table-right">
                                     <div class="row no-gutters">
-                                        <div class="col-md-4" id="table-letf-right">
+                                         <div class="col-md-4" id="table-letf-right">
                                             <table class="table table-bordered">
-                                                {% for define in defines %}
+                                                {% for item in limit %}
                                                     <tr class="text-right">
                                                        <td class="col-md-4 text-center">
-                                                            {% if define.values %}
-                                                                {% for low_item in low_limit %}
-                                                                    {% if low_item != 0 %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter %}
-                                                                            {{ low_item }} ~
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                                {% for high_item in high_limit %}
-                                                                    {% if high_item != 0 %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter %}
-                                                                            {{ high_item }}
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% else %}
-                                                                {{ '' }}
-                                                            {% endif %}
+                                                            {{ item }}
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -320,115 +706,39 @@
                                         </div>
                                         <div class="col-md-8" id="table-letf-left">
                                             <table class="table table-bordered">
-                                                {% for define in defines %}
+                                                {% for row in data %}
                                                     <tr class="text-right">
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "00" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "00" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="{% if row.2 < row.0 %} color: green; {% elif row.2 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.6 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
+                                                           {% if row.2 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.2 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "06" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "06" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="{% if row.3 < row.0 %} color:  green; {% elif row.3 > row.1 %} color:  red; {%  else %} color:  black; {% endif %}
+                                                                {% if row.7 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
+                                                           {% if row.3 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.3 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "12" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "12" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="{% if row.4 < row.0 %} color: green; {% elif row.4 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.8 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
+                                                           {% if row.4 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.4 }}
+                                                           {% endif %}
                                                         </td>
-                                                        <td id="{{ parentloop.counter|add:4 }}-4" style="color:
-                                                            {% for high_item in high_limit %}
-                                                                {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                    {% for low_item in low_limit %}
-                                                                        {% if forloop.counter == forloop.parentloop.counter and define %}
-                                                                            {% if define %}
-                                                                                {% for value in define.values %}
-                                                                                    {% if value.data_time == "18" %}
-                                                                                        {% if high_item != 0 and high_item < value.parameter_value %}
-                                                                                            red
-                                                                                        {% elif low_item != 0 and low_item > value.parameter_value %}
-                                                                                            red {# yellow #}
-                                                                                        {% endif %}
-                                                                                    {% endif %}
-                                                                                {% endfor %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        ">
-                                                            {% for value in define.values %}
-                                                                {% if value.data_time == "18" %}
-                                                                    {{ value.parameter_value }}
-                                                                {% endif %}
-                                                            {% endfor %}
+                                                        <td style="{% if row.5 < row.0 %} color: green; {% elif row.5 > row.1 %} color: red; {%  else %} color: black; {% endif %}
+                                                                {% if row.9 == 0 and is_date == 0 %} background-color: #D9D9D9 {% endif %}">
+                                                           {% if row.5 == -1 %}
+                                                               {{ '' }}
+                                                           {% else %}
+                                                               {{ row.5 }}
+                                                           {% endif %}
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -443,126 +753,5 @@
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('toggle-btn').addEventListener('click', function () {
-            var sidebar = document.getElementById('sidebar');
-            var content = document.getElementById('content');
-            sidebar.classList.toggle('collapsed');
-            sidebar.classList.toggle('expanded');
-            content.classList.toggle('expanded');
-        });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('table').each(function() {
-                var maxHeight = 0;
-                $(this).find('td').each(function() {
-                    var height = $(this).height();
-                    if (height > maxHeight) {
-                        maxHeight = height;
-                    }
-                });
-                $(this).find('td').height(25); //maxheight
-            });
-        });
-    </script>
-    <script>
-        function set_session() {
-            var plant = $("#id_plant").val();
-            var mach = $("#id_mach").val();
-            var data_date = $("#id_data_date").val();
-            var enable_mode = $("#toggle_record_date").is(':checked') ? 'on' : 'off';
-
-            if(plant != "" && mach != "" && data_date != "") {
-                $("<input />").attr("type", "hidden")
-                              .attr("name", "enable_mode")
-                              .attr("value", enable_mode)
-                              .appendTo("#session_form");
-                $("#session_form").submit();
-            }
-        }
-    </script>
-    <script>
-       $(document).ready(function() {
-            // Handle Plant change
-            $('#id_plant').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-
-            // Handle Machine change
-            $('#id_mach').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-
-            // Handle Date change
-            $('#id_data_date').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-
-            // Handle Date change
-            $('#id_to_date').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-
-            // Handle Date change
-            $('#toggle_record_date').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-
-            // Handle Date change
-            $('#limit_checkbox').on('change', function () {
-                $('#session_form').attr('action', '/collection/rd_report/');
-                $('#session_form').submit();
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var dateInput = document.getElementById('id_data_date');
-            if (!dateInput.value) {  // If no date is already set
-                var today = new Date().toISOString().split('T')[0];
-                dateInput.value = today;
-            }
-        });
-    </script>
-    <script>
-        function toggleRecordDate() {
-            const toDateInput = document.getElementById('id_to_date');
-            const isChecked = document.getElementById('toggle_record_date').checked;
-
-            toDateInput.disabled = !isChecked; // Disable if unchecked, enable if checked
-            toDateInput.required = isChecked;  // Set required attribute based on the toggle state
-        }
-
-        // Initial load setup
-        window.onload = function() {
-            toggleRecordDate(); // Set the initial state based on the toggle
-        }
-    </script>
-    <script>
-        document.getElementById('downloadForm').addEventListener('submit', function(event) {
-            // Show the loading modal
-            document.getElementById('loadingModal').style.display = 'block';
-
-            // Submit the form
-            setTimeout(function() {
-                // After the form is submitted, automatically hide the modal after a few seconds
-                window.addEventListener('focus', function() {
-                    document.getElementById('loadingModal').style.display = 'none';
-                });
-            }, 1000); // Delay to ensure the modal is shown before the form submission
-        });
-
-        // Close the modal when the user clicks the "X" button
-        document.querySelector('.close-button').addEventListener('click', function() {
-            document.getElementById('loadingModal').style.display = 'none';
-        });
-    </script>
 </body>
 </html>

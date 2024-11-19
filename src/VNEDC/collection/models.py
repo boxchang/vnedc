@@ -141,6 +141,8 @@ class Daily_Prod_Info(models.Model):
     tooling_time_min = models.CharField(max_length=50, null=True, blank=True)
     remark = models.CharField(max_length=50, null=True, blank=True)
     remark2 = models.CharField(max_length=500, null=True, blank=True)
+    handmold_brand = models.CharField(max_length=50, null=True, blank=True)
+    handmold_spec = models.CharField(max_length=50, null=True, blank=True)
     create_at = models.DateTimeField(default=timezone.now)
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='daily_info_create_by')

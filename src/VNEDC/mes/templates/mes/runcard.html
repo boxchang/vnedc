@@ -37,171 +37,223 @@
     .content {
         font-size: 0.9em;
     }
+    .machine-name-hover:hover {
+        color: green;
+    }
+    .machine-name-hover {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .machine-name-hover:hover .popup {
+        display: block;
+    }
+
+    .popup {
+        display: none;
+        position: absolute;
+        top: 100%; /* Position above the MachineName */
+        left: 0;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        z-index: 10;
+        margin-top: 5px;
+    }
+
 </style>
 <script type="text/javascript">
-        $(function() {
-            $("#jsGrid").jsGrid({
-                width: "100%",
-                height: "650px",
+    $(function() {
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "650px",
 
-                inserting: false,
-                editing: false,
-                sorting: true,
-                paging: true,
-                filtering: true,
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+            filtering: true,
 
-                autoload: true,
-                pageSize: 50,
-                pageButtonCount: 5,
+            autoload: true,
+            pageSize: 50,
+            pageButtonCount: 5,
 
-                deleteConfirm: "Do you really want to delete the client?",
-                rowClick: function(args) {
-                    var item = args.item;
-                    var event = args.event;
+            deleteConfirm: "Do you really want to delete the client?",
+            rowClick: function(args) {
+                var item = args.item;
+                var event = args.event;
 
-                    var $td = $(event.target).closest("td");
-                    var columnIndex = $td.index();
-                    var columnName = this.fields[columnIndex].name;
-                    if (columnName === "CreationTime") {
-                        loadDetailGrid(item.Id);
+                var $td = $(event.target).closest("td");
+                var columnIndex = $td.index();
+                var columnName = this.fields[columnIndex].name;
+                if (columnName === "CreationTime") {
+                    loadDetailGrid(item.Id);
+                }
+            },
+            controller: {
+                loadData: function(filter) {
+                    return $.ajax({
+                        type: "GET",
+                        url: "{% url 'work_order_list' %}",
+                        data: filter,
+                        dataType: "json"
+                    }).then(function(data) {
+                        if (filter.RunCardId) {
+                            data = $.grep(data, function(item) {
+                                return item.RunCardId.toLowerCase().indexOf(filter.RunCardId.toLowerCase()) !== -1;
+                            });
+                        }
+                        if (filter.InspectionDate) {
+                            data = $.grep(data, function(item) {
+                                return item.InspectionDate.toLowerCase().indexOf(filter.InspectionDate.toLowerCase()) !== -1;
+                            });
+                        }
+                        if (filter.Period) {
+                            data = $.grep(data, function(item) {
+                                return item.Period.toLowerCase().indexOf(filter.Period.toLowerCase()) !== -1;
+                            });
+                        }
+                        return data;
+                    });
+                }
+            },
+
+            fields: [
+                { name: "InspectionDate", type: "text", width: 50, title: "InspectionDate", autosearch: true, css: "center-align" },
+                {
+                    name: "WorkOrderId",
+                    type: "text",
+                    width: 70,
+                    title: "WorkOrderId",
+                    autosearch: true,
+                    itemTemplate: function(value, item) {
+                        // Create the popup element
+                        var $popup = $("<div>").addClass("popup")
+                            .text("StartDate: " + item.StartDate + " - EndDate: " + item.EndDate);
+
+                        // Create the main element for the WorkOrderId
+                        var $element = $("<div>").addClass("machine-name-hover")
+                            .text(value)
+                            .append($popup);
+
+                        // Check if StartDate or EndDate is null
+                        if (item.StartDate === null || item.EndDate === null) {
+                            $element.css("color", "red");
+                        }
+
+                        return $element;
                     }
                 },
-                controller: {
-                    loadData: function(filter) {
-                        return $.ajax({
-                            type: "GET",
-                            url: "{% url 'work_order_list' %}",
-                            data: filter,
-                            dataType: "json"
-                        }).then(function(data) {
-                            if (filter.RunCardId) {
-                                data = $.grep(data, function(item) {
-                                    return item.RunCardId.toLowerCase().indexOf(filter.RunCardId.toLowerCase()) !== -1;
-                                });
-                            }
-                            if (filter.InspectionDate) {
-                                data = $.grep(data, function(item) {
-                                    return item.InspectionDate.toLowerCase().indexOf(filter.InspectionDate.toLowerCase()) !== -1;
-                                });
-                            }
-                            if (filter.Period) {
-                                data = $.grep(data, function(item) {
-                                    return item.Period.toLowerCase().indexOf(filter.Period.toLowerCase()) !== -1;
-                                });
-                            }
-                            return data;
-                        });
-                    }
-                },
-
-                fields: [
-                    { name: "InspectionDate", type: "text", width: 50, title: "InspectionDate", autosearch: true, css: "center-align" },
-                    { name: "WorkOrderId", type: "text", width: 60, title: "WorkOrderId", autosearch: true, css: "center-align" },
-                    { name: "Period", type: "text", width: 30, title: "Period", autosearch: true, css: "center-align" },
-                    { name: "Id", type: "text", width: 50, title: "RunCard", autosearch: true, css: "center-align" },
-                    { name: "WorkCenterTypeName", type: "text", width: 30, title: "Plant", autosearch: true, css: "center-align" },
-                    { name: "MachineName", type: "text", width: 70, title: "MachineName", autosearch: true },
-                    { name: "LineName", type: "text", width: 40, title: "LineName", autosearch: true, css: "center-align" },
-                    { name: "ProductItem", type: "text", width: 100, title: "ProductItem", autosearch: true },
-                    { name: "CustomerCode", type: "text", width: 40, title: "C. Code", autosearch: true },
-                    { name: "CustomerName", type: "text", width: 70, title: "C. Name", autosearch: true },
-                    { name: "CustomerPartNo", type: "text", width: 70, title: "CustomerPartNo", autosearch: true, css: "center-align" },
-                    { name: "AQL", type: "text", width: 30, title: "AQL", autosearch: true, css: "center-align" },
-                    { name: "PlanQty", type: "text", width: 30, title: "PlanQty", autosearch: true, css: "center-align" },
-                    { name: "NormalizedUserName", type: "text", width: 30, title: "EmpId", autosearch: true, css: "center-align" },
-                    { name: "CreationTime", type: "text", width: 70, title: "CTime", autosearch: true, css: "center-align" },
-                ]
-
-            });
-
-            // 加载详细数据的函数
-            function loadDetailGrid(pk) {
-                $.ajax({
-                    url: '{% url 'runcard_detail' %}'+ '?runcard=' + pk,
-                    method: 'GET',
-                    success: function(data) {
-                        $('#detailGrid').jsGrid({
-                            width: "100%",
-                            height: "500px",
-                            autoload: true,
-                            sorting: true,
-                            paging: true,
-                            data: data,
-                            rowClick: function(args) {
-                                const item = args.item;
-                                var event = args.event;
-
-                                var $td = $(event.target).closest("td");
-                                var columnIndex = $td.index();
-                                var columnName = this.fields[columnIndex].name;
-                                if (columnName === "InspectionStatus") {
-                                    loadLogGrid(item.id, item.OptionName);
-                                }
-                            },
-                            fields: [
-                                { name: "id", type: "text", width: 50, title: "RunCard", css: "center-align" },
-                                { name: "OptionName", type: "text", width: 50, title: "OptionName", css: "center-align" },
-                                { name: "Upper_InspectionValue", type: "text", width: 50, title: "Upper", css: "center-align" },
-                                { name: "InspectionValue", type: "text", width: 50, title: "Value", css: "center-align" },
-                                { name: "Lower_InspectionValue", type: "text", width: 50, title: "Lower", css: "center-align" },
-                                { name: "InspectionStatus", type: "text", width: 50, title: "Status", css: "center-align" },
-                                { name: "Name", type: "text", width: 50, title: "Name", css: "center-align" },
-                                { name: "CreationTime", type: "text", width: 50, title: "InspectedTime", css: "center-align" }
-
-                            ]
-                        })
-                        $('#detailModal').modal('show');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX error: " + status + " - " + error);
-                    }
-                });
-            }
-
-            // 加载子 Log Grid 的函数
-            function loadLogGrid(pk, OptionName) {
-                $.ajax({
-                    url: '{% url 'runcard_ipqc_log' %}'+ '?runcard=' + pk + '&OptionName=' + OptionName,
-                    method: 'GET',
-                    success: function(data) {
-                        $('#logGrid').jsGrid({
-                            width: "100%",
-                            height: "400px",
-                            autoload: true,
-                            sorting: true,
-                            paging: true,
-                            data: data,
-                            rowClick: function(args) {
-                                var item = args.item;
-                                var event = args.event;
-
-                                var $td = $(event.target).closest("td");
-                                var columnIndex = $td.index();
-                                var columnName = this.fields[columnIndex].name;
-                                if (columnName === "CreationTime") {
-                                    loadDetailGrid(item.id);
-                                }
-                            },
-                            fields: [
-                                { name: "RunCardId", type: "text", width: 150, title: "RunCardId" },
-                                { name: "OptionName", type: "text", width: 150, title: "OptionName" },
-                                { name: "InspectionValue", type: "text", width: 150, title: "InspectionValue" },
-                                { name: "DefectCode", type: "text", width: 150, title: "DefectCode" },
-                                { name: "InspectionStatus", type: "text", width: 150, title: "InspectionStatus" },
-                                { name: "LogAction", type: "text", width: 150, title: "LogAction" },
-                                { name: "CreationTime", type: "text", width: 150, title: "CreationTime" },
-                            ]
-                        });
-                        $('#logGridModal').modal('show');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX error: " + status + " - " + error);
-                    }
-                });
-            }
-
+                { name: "Period", type: "text", width: 30, title: "Period", autosearch: true, css: "center-align" },
+                { name: "Id", type: "text", width: 50, title: "RunCard", autosearch: true, css: "center-align" },
+                { name: "WorkCenterTypeName", type: "text", width: 30, title: "Plant", autosearch: true, css: "center-align" },
+                { name: "MachineName", type: "text", width: 60, title: "MachineName", autosearch: true, css: "center-align" },
+                { name: "LineName", type: "text", width: 40, title: "LineName", autosearch: true, css: "center-align" },
+                { name: "ProductItem", type: "text", width: 100, title: "ProductItem", autosearch: true },
+                { name: "CustomerCode", type: "text", width: 40, title: "C. Code", autosearch: true },
+                { name: "CustomerName", type: "text", width: 70, title: "C. Name", autosearch: true },
+                { name: "CustomerPartNo", type: "text", width: 70, title: "CustomerPartNo", autosearch: true, css: "center-align" },
+                { name: "AQL", type: "text", width: 30, title: "AQL", autosearch: true, css: "center-align" },
+                { name: "PlanQty", type: "text", width: 30, title: "PlanQty", autosearch: true, css: "center-align" },
+                { name: "NormalizedUserName", type: "text", width: 30, title: "EmpId", autosearch: true, css: "center-align" },
+                { name: "CreationTime", type: "text", width: 70, title: "CTime", autosearch: true, css: "center-align" },
+            ]
         });
-    </script>
+
+        // Function to load detailed data
+        function loadDetailGrid(pk) {
+            $.ajax({
+                url: '{% url 'runcard_detail' %}'+ '?runcard=' + pk,
+                method: 'GET',
+                success: function(data) {
+                    $('#detailGrid').jsGrid({
+                        width: "100%",
+                        height: "500px",
+                        autoload: true,
+                        sorting: true,
+                        paging: true,
+                        data: data,
+                        rowClick: function(args) {
+                            const item = args.item;
+                            var event = args.event;
+
+                            var $td = $(event.target).closest("td");
+                            var columnIndex = $td.index();
+                            var columnName = this.fields[columnIndex].name;
+                            if (columnName === "InspectionStatus") {
+                                loadLogGrid(item.id, item.OptionName);
+                            }
+                        },
+                        fields: [
+                            { name: "id", type: "text", width: 50, title: "RunCard", css: "center-align" },
+                            { name: "OptionName", type: "text", width: 50, title: "OptionName", css: "center-align" },
+                            { name: "Upper_InspectionValue", type: "text", width: 50, title: "Upper", css: "center-align" },
+                            { name: "InspectionValue", type: "text", width: 50, title: "Value", css: "center-align" },
+                            { name: "Lower_InspectionValue", type: "text", width: 50, title: "Lower", css: "center-align" },
+                            { name: "InspectionStatus", type: "text", width: 50, title: "Status", css: "center-align" },
+                            { name: "Name", type: "text", width: 50, title: "Name", css: "center-align" },
+                            { name: "CreationTime", type: "text", width: 50, title: "InspectedTime", css: "center-align" }
+                        ]
+                    });
+                    $('#detailModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error: " + status + " - " + error);
+                }
+            });
+        }
+
+        // Function to load log grid
+        function loadLogGrid(pk, OptionName) {
+            $.ajax({
+                url: '{% url 'runcard_ipqc_log' %}'+ '?runcard=' + pk + '&OptionName=' + OptionName,
+                method: 'GET',
+                success: function(data) {
+                    $('#logGrid').jsGrid({
+                        width: "100%",
+                        height: "400px",
+                        autoload: true,
+                        sorting: true,
+                        paging: true,
+                        data: data,
+                        rowClick: function(args) {
+                            var item = args.item;
+                            var event = args.event;
+
+                            var $td = $(event.target).closest("td");
+                            var columnIndex = $td.index();
+                            var columnName = this.fields[columnIndex].name;
+                            if (columnName === "CreationTime") {
+                                loadDetailGrid(item.id);
+                            }
+                        },
+                        fields: [
+                            { name: "RunCardId", type: "text", width: 150, title: "RunCardId" },
+                            { name: "OptionName", type: "text", width: 150, title: "OptionName" },
+                            { name: "InspectionValue", type: "text", width: 150, title: "InspectionValue" },
+                            { name: "DefectCode", type: "text", width: 150, title: "DefectCode" },
+                            { name: "InspectionStatus", type: "text", width: 150, title: "InspectionStatus" },
+                            { name: "LogAction", type: "text", width: 150, title: "LogAction" },
+                            { name: "CreationTime", type: "text", width: 150, title: "CreationTime" },
+                        ]
+                    });
+                    $('#logGridModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error: " + status + " - " + error);
+                }
+            });
+        }
+
+    });
+</script>
+
+
+
+
 
 {% endblock js %}
 {% block title %}
