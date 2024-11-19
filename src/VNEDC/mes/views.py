@@ -7,6 +7,10 @@ from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from collections import defaultdict
 from jobs.database import scada_database
+from django.shortcuts import render
+from .forms import DateRangeForm
+from datetime import datetime
+import calendar
 
 
 def work_order_list(request):
@@ -1458,20 +1462,66 @@ def general_status(request):
     execution_time = end_time - start_time
     return render(request, 'mes/status.html', locals())
 
+
 def monthly_check(request):
+    form = DateRangeForm(request.GET or None)
 
-    db = vnedc_database()
-    sql = f"""
-    SELECT [Name], belong_to,sum(sum_qty) counting, sum(ticket_qty) sap_qty
-  FROM [MES_OLAP].[dbo].[mes_daily_report_raw] where belong_to is not null and ticket_qty is not null
-  and belong_to between '2024-11-01' and '2024-11-30'
-  group by belong_to,[Name]
-  order by belong_to,[Name]
-    """
-    raws = db.select_sql_dict(sql)
+    if form.is_valid():
+        selected_month = form.cleaned_data['month']
+        year = int(str(selected_month).split('-')[0])
+        month = int(str(selected_month).split('-')[-1])
+        days_in_month = calendar.monthrange(year, month)[1]  # Số ngày trong tháng
+        days = range(1, days_in_month + 1)  # Các ngày từ 1 đến ngày cuối trong tháng
+        start_date = datetime(year, month, 1).strftime('%Y-%m-%d')
+        end_date = datetime(year, month, days_in_month).strftime('%Y-%m-%d')
 
-    for raw in raws:
-        print(raw['counting'])
+        db = vnedc_database()
+        sql1 = f"""
+            SELECT DISTINCT(Name) FROM [MES_OLAP].[dbo].[mes_daily_report_raw]
+            WHERE belong_to BETWEEN '{start_date}' AND '{end_date}' AND name LIKE '%NBR%' order by name
+        """
+        rows1 = db.select_sql_dict(sql1)
+        sql2 = f"""
+            SELECT Name, belong_to, SUM(sum_qty) AS counting, SUM(ticket_qty) AS sap_qty
+            FROM [MES_OLAP].[dbo].[mes_daily_report_raw]
+            WHERE belong_to BETWEEN '{start_date}' AND '{end_date}' AND belong_to IS NOT NULL AND ticket_qty IS NOT NULL
+            AND name LIKE '%NBR%'
+            GROUP BY belong_to, Name
+            ORDER BY Name, belong_to
+        """
+        rows2 = db.select_sql_dict(sql2)
+
+        data_table = []
+
+        for sub_rows1 in rows1:
+            line = []
+            counter = 0
+            name = sub_rows1['Name']
+            split_name = f"{(sub_rows1['Name'].split('_'))[-1]}"
+            line.append(split_name)
+
+            #sub_data_counting = ["Counting"]
+            # sub_data_counting = [name]
+            # sub_data_sap_qty = [name]
+
+            sub_data_counting = [f"{split_name}  Counting Data"]
+            sub_data_sap_qty = [f"{split_name} SAP Data"]
+            # Khởi tạo giá trị mặc định bằng 0 cho mỗi ngày trong tháng
+            daily_data = {day: {'counting': 0, 'sap_qty': 0} for day in range(1, days_in_month + 1)}
+
+            # Lấy dữ liệu cho mỗi máy (Name)
+            for sub_rows2 in rows2:
+                if sub_rows2['Name'] == name:
+                    day = sub_rows2['belong_to'].day
+                    daily_data[day]['counting'] = sub_rows2['counting']
+                    daily_data[day]['sap_qty'] = sub_rows2['sap_qty']
+
+            # Thêm dữ liệu của từng ngày vào danh sách đếm và sap qty
+            for day in days:
+                sub_data_counting.append(daily_data[day]['counting'])
+                sub_data_sap_qty.append(daily_data[day]['sap_qty'])
+
+            data_table.append(sub_data_counting)
+            data_table.append(sub_data_sap_qty)
 
     return render(request, 'mes/monthly_check.html', locals())
-

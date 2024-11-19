@@ -1,10 +1,155 @@
+<!-- templates/mes/monthly_check.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Monthly Check</title>
+
+
+    <style>
+    /* Reset table styling */
+    /* Reset table styling */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed; /* Giới hạn chiều rộng của các cột */
+    }
+
+    /* Styling for table headers */
+    thead th {
+        background-color: black; /* Black background */
+        color: white; /* White text */
+        padding: 2px;
+        text-align: center;
+        border: 1px solid #ddd; /* Light border */
+        font-size: 12px;
+        white-space: nowrap; /* Không xuống dòng */
+    }
+
+    /* Styling for other table cells */
+    /* Styling for other table cells */
+    td{
+        text-align: center;
+        padding: 8px 4px;
+
+
+    }
+    tbody td {
+        border: 1px solid #ddd;
+        background-color: #f0f0f0;
+        font-size: 14px;
+    }
+
+    /* Highlight empty cells */
+    tbody td:empty {
+        background-color: #d3d3d3; /* Darker gray for empty cells */
+    }
+
+    /* Red text for important data */
+    td.red-text {
+        color: red;
+        font-weight: bold;
+    }
+
+    /* Styling css button */
+    .btn-info {
+        color: #fff;
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    /* Styling css form and button */
+    form {
+        display: flex;
+        justify-content: flex-start; /* Đặt các phần tử sang bên trái */
+        align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+        gap: 10px; /* Khoảng cách giữa các phần tử */
+        padding: 10px 20px; /* Thêm khoảng trống bên trong form */
+        background-color: #f9f9f9; /* Nền form nhẹ nhàng */
+        border: 1px solid #ddd; /* Đường viền mềm mại */
+        border-radius: 8px; /* Góc bo tròn */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
+}
+
+    form input, form button, form select {
+        padding: 8px 12px; /* Thêm khoảng cách bên trong các phần tử */
+        border: 1px solid #ccc; /* Đường viền nhẹ */
+        border-radius: 5px; /* Bo góc mềm mại */
+        font-size: 14px; /* Kích thước chữ vừa phải */
+        outline: none; /* Loại bỏ viền khi focus */
+        transition: all 0.3s ease; /* Hiệu ứng mượt khi hover hoặc focus */
+    }
+
+    form input:focus, form select:focus, form button:hover {
+        border-color: #007bff; /* Đổi màu viền khi focus/hover */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Hiệu ứng ánh sáng */
+    }
+
+    form button {
+        background-color: #007bff; /* Màu nền nút chính */
+        color: white; /* Màu chữ nút */
+        cursor: pointer; /* Thêm con trỏ khi hover */
+    }
+
+    form button:hover {
+        background-color: #0056b3; /* Màu nền khi hover */
+    }
+
+    form button:active {
+        background-color: #003f7f; /* Màu nền khi nhấn */
+        transform: scale(0.98); /* Hiệu ứng nhấn nút */
+    }
+
+    button {
+        margin-top: 0; /* Xóa khoảng cách trên nút */
+    }
+
+    /* Responsive design for smaller screens */
+    @media (max-width: 768px) {
+        table {
+            font-size: 12px;
+        }
+
+        thead th, tbody td {
+            padding: 1px;
+            font-size: 10px;
+        }
+    }
+
+    /* Highlight rows on hover */
+    tbody tr:hover {
+        background-color: #e6e6e6;
+    }
+    </style>
+
 </head>
 <body>
-123
+    <h1>Monthly Check</h1>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-info">Get Data</button>
+    </form>
+
+
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                {% for day in days %}
+                    <th>Day {{ day }}</th>
+                {% endfor %}
+                <!-- Thêm các tiêu đề ngày khác nếu cần -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for machine in data_table %}
+                <tr>
+                    {% for day in machine %}
+                        <td>{{ day }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
