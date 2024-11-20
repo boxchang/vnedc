@@ -93,6 +93,20 @@
             background-color: #F44336;
             color: white;
         }
+
+        {#Styling css table alerts#}
+
+        th {
+            color: white;
+        }
+        th, td {
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center
+        }
+        table {
+            border-spacing: 3px;
+        }
         @media (min-width: 800px) {
             .card:nth-child(1),
             .card:nth-child(2) {
@@ -117,19 +131,40 @@
 <body>
     <div>
         <div class="container">
-            {% for name, mode, detail in monitor_web %}
-                <div class="card {% if mode == 0 %} green {% elif mode > 0 and mode < 2 %} yellow {% else %} red {% endif %}" {% if mode > 1 %}onclick="this.classList.toggle('flipped')"{% endif %}>
+            {% for name, mode, detail, msg in monitor_web %}
+                <div class="card {% if mode == 0 %} green {% elif mode < 0 %} yellow {% else %} red {% endif %}" onclick="this.classList.toggle('flipped')">
                     <div class="card-inner">
                         <div class="card-front">
-                            <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode > 0 and mode < 2 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
+                            <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode < 0 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
                             <div class="response-type">{{ name }}</div>
-                            <div class="response-count">{% if mode >= 1 and mode < 2 %}Error: <br><p style="font-size: 4.5vh">{{ detail }}</p>{% elif mode < 1 %} {{ '' }}{% else %}Error: {{ mode }} devices{% endif %}</div>
+                            <div class="response-count">{% if mode == 0 %}Error: <br><p style="font-size: 4.5vh">{{ detail }}</p>{% elif mode < 0 %} {{ '' }}{% else %}Error: {{ mode }} devices{% endif %}</div>
                         </div>
                         {% if detail|length > 0 %}
                             <div class="card-back">
+                                <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode < 0 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
+                                <div class="response-type">{{ name }}</div>
+                                <div class="response-count">{% if mode == 0 %}Error: <br><p style="font-size: 4.5vh">{{ detail }}</p>{% elif mode < 0 %} {{ '' }}{% else %}Error: {{ mode }} devices{% endif %}</div>
                                 <div style="background-color: rgba(255, 255, 255, 0.25); padding-top: 1.5vh; padding-bottom: 1vh">
-                                    <div style="font-size: 3.5vh">{% if detail %}Details{% endif %}</div>
-                                    <p style="font-size: 3vh; overflow-wrap: break-word;overflow-y: auto;">{{ detail }}</p>
+    {#                                    <div style="font-size: 3.5vh">{% if detail %}Details{% endif %}</div>#}
+    {#                                    <p style="font-size: 3vh; overflow-wrap: break-word;overflow-y: auto;">{{ detail }}</p>#}
+    {#                                #}
+    {##}
+    {#                                CSS TABLE ERROR ALERT#}
+                                    <table style="color: black">
+                                        <tr style="background: #843c0c;">
+                                            <th>DEVICE</th>
+                                            <th>ISSUE TIME</th>
+                                            <th>ERROR MSG</th>
+                                        </tr>
+                                        {% for dn, ua, mg in msg %}
+                                            <tr style="background: #fff2cc">
+                                                <td>{{ dn }}</td>
+                                                <td>{{ ua }}</td>
+                                                <td>{{ mg }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {#END CSS TABLE ERROR ALERT#}
                                 </div>
                             </div>
                         {% endif %}
