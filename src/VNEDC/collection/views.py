@@ -279,15 +279,37 @@ def get_production_choices(end_date):
     date_obj_minus_one = date_obj - timedelta(days=365)
     start_date = date_obj_minus_one.strftime("%Y-%m-%d")
 
-    sql = f"""
-        SELECT distinct ProductItem
+    sql1 = f"""
+        SELECT distinct ProductItem as prod_name
         FROM [PMG_MES_WorkOrder] where SAP_FactoryDescr like '%NBR%' and WorkOrderDate between '{start_date}' and '{end_date}'
 		order by ProductItem"""
     mes_db = mes_database()
-    rows = mes_db.select_sql_dict(sql)
-    choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
-    return choices
+    mes_rows = mes_db.select_sql_dict(sql1)
+    mes_list = [mes_rows['prod_name'] for mes_rows in mes_rows]
 
+    sql2 = f"""
+        SELECT DISTINCT prod_name_a1 AS prod_name
+        FROM [VNEDC].[dbo].[collection_daily_prod_info]
+        WHERE data_date BETWEEN '{start_date}' AND '{end_date}'
+        UNION
+        SELECT DISTINCT prod_name_a2 AS prod_name
+        FROM [VNEDC].[dbo].[collection_daily_prod_info]
+        WHERE data_date BETWEEN '{start_date}' AND '{end_date}'
+        UNION
+        SELECT DISTINCT prod_name_b1 AS prod_name
+        FROM [VNEDC].[dbo].[collection_daily_prod_info]
+        WHERE data_date BETWEEN '{start_date}' AND '{end_date}'
+        UNION
+        SELECT DISTINCT prod_name_b2 AS prod_name
+        FROM [VNEDC].[dbo].[collection_daily_prod_info]
+        WHERE data_date BETWEEN '{start_date}' AND '{end_date}'
+    """
+    vnedc_db = vnedc_database()
+    vnedc_rows = vnedc_db.select_sql_dict(sql2)
+    vnedc_list = [vnedc_row['prod_name'] for vnedc_row in vnedc_rows]
+    rows = list(set(mes_list + vnedc_list))
+    choices = [('', '---')] + [(row, row) for row in rows]
+    return choices
 
 @login_required
 def daily_info_create(request):

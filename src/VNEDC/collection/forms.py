@@ -38,6 +38,16 @@ class RecordForm(forms.Form):
             }
         )
 
+class CustomChoiceField(forms.ChoiceField):
+    def to_python(self, value):
+        """Return a string."""
+        if value in self.empty_values:
+            return ''
+        return str(value)
+
+    def valid_value(self, value):
+        # Allow both predefined choices and custom input
+        return True
 
 class DailyInfoForm(forms.ModelForm):
     CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')), (_('Machine Shutdown'), _('Machine Shutdown')),]
@@ -45,13 +55,13 @@ class DailyInfoForm(forms.ModelForm):
     HAND_SPECS = [('JH(中國)-細', 'JH(中國)-細'), ('JH(中國)-粗', 'JH(中國)-粗'), ('PT(印尼)-細', 'PT(印尼)-細'), ('SK(馬來西亞)-細', 'SK(馬來西亞)-細'), ('SK(馬來西亞)-粗', 'SK(馬來西亞)-粗'), ('MC(馬來西亞)-細', 'MC(馬來西亞)-細')]
     hour = [(str(hh).zfill(2), str(hh).zfill(2)) for hh in range(0, 24)]
     min = [(str(mm).zfill(2), str(mm).zfill(2)) for mm in range(0, 60)]
-    prod_name_a1 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('A1 Production'), widget=forms.Select(attrs={'class': 'select2'}))
+    prod_name_a1 = CustomChoiceField(choices=[('', '---')], required=False, label=_('A1 Production'), widget=forms.Select(attrs={'class': 'select2', 'data-tags': 'true', 'data-allow-clear': 'true'}))
     prod_size_a1 = forms.ChoiceField(required=False, label=_('A1 Size'), choices=SIZE_OPTION)
-    prod_name_a2 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('A2 Production'), widget=forms.Select(attrs={'class': 'select2'}))
+    prod_name_a2 = CustomChoiceField(choices=[('', '---')], required=False, label=_('A2 Production'), widget=forms.Select(attrs={'class': 'select2', 'data-tags': 'true', 'data-allow-clear': 'true'}))
     prod_size_a2 = forms.ChoiceField(required=False, label=_('A2 Size'), choices=SIZE_OPTION)
-    prod_name_b1 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('B1 Production'), widget=forms.Select(attrs={'class': 'select2'}))
+    prod_name_b1 = CustomChoiceField(choices=[('', '---')], required=False, label=_('B1 Production'), widget=forms.Select(attrs={'class': 'select2', 'data-tags': 'true', 'data-allow-clear': 'true'}))
     prod_size_b1 = forms.ChoiceField(required=False, label=_('B1 Size'), choices=SIZE_OPTION)
-    prod_name_b2 = forms.ChoiceField(choices=[('', '---')], required=False, label=_('B2 Production'), widget=forms.Select(attrs={'class': 'select2'}))
+    prod_name_b2 = CustomChoiceField(choices=[('', '---')], required=False, label=_('B2 Production'), widget=forms.Select(attrs={'class': 'select2', 'data-tags': 'true', 'data-allow-clear': 'true'}))
     prod_size_b2 = forms.ChoiceField(required=False, label=_('B2 Size'), choices=SIZE_OPTION)
     remark = forms.MultipleChoiceField(required=False, label=_('Remark'), widget=forms.CheckboxSelectMultiple, choices=CHOICES,)
     remark2 = forms.CharField(required=False, label='', widget=forms.Textarea(attrs={'rows': 5, 'cols': 40}), max_length=500)
