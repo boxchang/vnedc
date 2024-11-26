@@ -63,7 +63,7 @@ class SGADA2EDC(object):
                         mach = define["mach_id"]
                         process_type = define["process_type_id"]
                         parameter_name = define["parameter_name"]
-                        parameter_value = record[define["scada_column"]]
+                        parameter_value = float(format(record[define["scada_column"]], ".4f"))
 
                         if not self.isVNEDCExisted(data_date, plant, mach, process_type, time, parameter_name):
                             self.insert_vnedc(data_date, plant, mach, process_type, time, parameter_name, parameter_value)
