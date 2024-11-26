@@ -957,7 +957,7 @@ def insert_parameter(request):
                     data_time = '00'
                 db = vnedc_database()
                 sql = f"""
-                    INSERT INTO [VNEDC_Test].[dbo].[collection_parametervalue]
+                    INSERT INTO [VNEDC].[dbo].[collection_parametervalue]
                     (data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, update_at, create_by_id, update_by_id)
                     VALUES ('{data_date}', '{plant_id}', '{mach_id}', '{process_type}', '{data_time}', '{parameter_name}', {parameter_value}, Cast('{create_at}' as datetime2), Cast('{create_at}' as datetime2), Cast('{create_id}' as int), Cast('{create_id}' as int))
                 """
