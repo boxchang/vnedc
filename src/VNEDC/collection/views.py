@@ -531,7 +531,7 @@ def rd_report(request):
                       ['Latex SIDE B-1', ['pH Value', 'TSC %']], ['Latex SIDE B-2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']], ['PreLeach', ['TDS']]]
 
 
     elif 'LK' in sPlant:
@@ -540,7 +540,7 @@ def rd_report(request):
                       ['Latex 1', ['pH Value', 'TSC %']], ['Latex 2', ['pH Value', 'TSC %']],
                       ['Coagulant A', ['CN (%)', 'CPF (%)', 'pH Value']],
                       ['Coagulant B', ['CN (%)', 'CPF (%)', 'pH Value']],
-                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']]]
+                      ['Chlorination', ['ppm']], ['Độ ẩm', ['%']], ['Hàm lượng bột', ['mg/gloves']], ['PreLeach', ['TDS']]]
 
     try:
         sql_mach = f"""
@@ -598,7 +598,8 @@ def rd_report(request):
                     OR (pd.process_type_id = 'ALKALINE' AND pd.parameter_name LIKE '%CONCENTRATION%')
                     OR (pd.process_type_id = 'CHLORINE' AND pd.parameter_name = 'CONCENTRATION')
                     OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'MOISTURE_CONTENT')
-                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT'))
+                    OR (pd.process_type_id = 'OTHER' AND pd.parameter_name = 'POWDER_CONTENT')
+                    OR (pd.process_type_id = 'PRELEACH' AND pd.parameter_name = 'T5_TDS'))
                     GROUP BY 
                         pd.process_type_id, 
                         pd.parameter_name,
@@ -614,7 +615,8 @@ def rd_report(request):
                             WHEN pd.process_type_id = 'COAGULANT' THEN 4
                             WHEN pd.process_type_id = 'CHLORINE' THEN 5
                             WHEN pd.process_type_id = 'OTHER' THEN 6
-                        ELSE 7 END,
+                            WHEN pd.process_type_id = 'PRELEACH' THEN 7
+                        ELSE 8 END,
                         pd.process_type_id,   
                         pd.parameter_name ASC;
                 """
@@ -991,22 +993,22 @@ def generate_excel_file_big(request):
             plant_rp, mach_rp, date_rp, to_rp = sPlant, sMach, sData_date, sTo_date
             download_code = 1
 
-    max_row = 27
+    max_row = 30
     if 'GDNBR' in sPlant:
         names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A",
-                 "Coagulant B", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Chlorination"]
-        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 1]
+                 "Coagulant B", "Latex SIDE A-1", "Latex SIDE A-2", "Latex SIDE B-1", "Latex SIDE B-2", "Chlorination", 'Độ ẩm', 'Hàm lượng bột', 'PreLeach']
+        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1]
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
-                      "TSC %", "pH Value", "TSC %", "pH Value", "TSC %", "pH Value", "ppm"]
+                      "TSC %", "pH Value", "TSC %", "pH Value", "TSC %", "pH Value", "ppm", "%", "mg/gloves", "TDS"]
     elif 'LK' in sPlant:
         names = ["Acid tank 1", "Acid tank 2", "Alkaline tank 1", "Alkaline tank 2", "Coagulant A", "Coagulant B",
-                 "Latex 1", "Latex 2", "Chlorination"]
-        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 1]
+                 "Latex 1", "Latex 2", "Chlorination", 'Độ ẩm', 'Hàm lượng bột', "PreLeach"]
+        merge_sizes = [1, 1, 1, 1, 3, 3, 2, 2, 1, 1, 1, 1]
         parameters = ["%", "%", "%", "%", "CN (%)", "CPF (%)", "pH Value",
                       "CN (%)", "CPF (%)", "pH Value", "TSC %", "pH Value",
-                      "TSC %", "pH Value", "ppm"]
-        max_row = 23
+                      "TSC %", "pH Value", "ppm", "%", "mg/gloves", "TDS"]
+        max_row = 26
 
     if download_code == 1:
         for row in range(5, max_row + 1):
@@ -1100,25 +1102,27 @@ def generate_excel_file_big(request):
                 defines = ParameterDefine.objects.filter(
                     plant=sPlant,
                     mach=sMach,
-                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
+                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE', 'OTHER', 'PRELEACH'],
                     parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'A_T1_TSC',
                                         'A_T1_PH', 'A_T2_TSC', 'A_T2_PH', 'B_T1_TSC',
                                         'B_T1_PH', 'B_T2_TSC', 'B_T2_PH', 'A_CPF',
                                         'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
+                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION', 'MOISTURE_CONTENT', 'POWDER_CONTENT', 'T5_TDS']
 
                 )
             elif 'LK' in sPlant:
                 defines = ParameterDefine.objects.filter(
                     plant=sPlant,
                     mach=sMach,
-                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE'],
+                    process_type__in=['ACID', 'ALKALINE', 'LATEX', 'COAGULANT', 'CHLORINE', 'OTHER',  'PRELEACH'],
                     parameter_name__in=['T1_CONCENTRATION', 'T2_CONCENTRATION', 'T1_TSC',
                                         'T1_PH', 'T2_TSC', 'T2_PH', 'A_CPF',
                                         'A_PH', 'A_CONCENTRATION', 'B_CPF',
-                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION']
+                                        'B_PH', 'B_CONCENTRATION', 'CONCENTRATION', 'MOISTURE_CONTENT', 'POWDER_CONTENT', 'T5_TDS']
                 )
             start_row = 9
+            defines = list(defines)
+            defines.sort(key=lambda x: x.parameter_name == 'T5_TDS')
             for define in defines:
                 values = ParameterValue.objects.filter(
                     plant=sPlant,
