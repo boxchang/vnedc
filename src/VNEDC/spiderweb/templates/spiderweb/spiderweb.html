@@ -145,23 +145,27 @@
                             <i class="fas {% if mode == 0 %} fa-check-circle {% elif mode < 0 %} fa-exclamation-circle {% else %} fa-bug {% endif %} icon"></i>
                             <div class="response-type">{{ name }}</div>
                             {% if mode > 0 %}
-                            <div style="background-color: rgba(255, 255, 255, 0.25); padding-top: 1.5vh; padding-bottom: 1vh;border-radius: 5px;">
-                                <table style="color: black; width:100%;">
-                                    <tr style="background: #843c0c;">
-                                        <th>DEVICE</th>
-                                        <th>ISSUE TIME</th>
-                                        <th>ERROR MSG</th>
-                                        <th>REF LINK</th>
-                                    </tr>
-                                    {% for dn, ua, mg, link in msg %}
-                                        <tr style="background: #fff2cc">
-                                            <td>{{ dn }}</td>
-                                            <td>{{ ua|date:"Y/m/d H:i:s" }}</td>
-                                            <td>{{ mg }}</td>
-                                            <td>{% if link %}<a href="{{ link }}" class="btn btn-info" target="_blank">REF</a>{% endif %}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
+                            <div style="">
+                                <div class="row" style="background-color: rgba(0, 0, 0, 1);padding-top: 1.5vh; padding-bottom: 1vh;">
+                                    <div class="col-2">DEVICE</div>
+                                    <div class="col-2">ISSUE TIME</div>
+                                    <div class="col-6">ERROR MSG</div>
+                                    <div class="col-1">REF LINK</div>
+                                    <div class="col-1">RECOVER</div>
+                                </div>
+                                {% for pk, dn, ua, mg, link in msg %}
+                                <div class="row" style="background-color: rgba(0, 0, 0, 0.65);padding-top: 1.5vh; padding-bottom: 1vh;">
+                                    <div class="col-2">{{ dn }}</div>
+                                    <div class="col-2">{{ ua|date:"Y/m/d H:i:s" }}</div>
+                                    <div class="col-6">{{ mg }}</div>
+                                    <div class="col-1">{% if link %}<a href="{{ link }}" class="btn btn-light" target="_blank">REF</a>{% endif %}</div>
+                                    <div class="col-1">
+                                        <a href="{% url 'abnormal_recover' pk %}" class="btn btn-light" onclick="return confirm('Are you sure?')">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
                             {% endif %}
                         </div>

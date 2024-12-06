@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^collection/', include('collection.urls')),
     url(r'^chart/', include('chart.urls')),
     url(r'^home', include('bases.urls')),
+    url(r'^spiderweb/', include('spiderweb.urls')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
