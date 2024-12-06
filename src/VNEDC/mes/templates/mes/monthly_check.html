@@ -1,12 +1,13 @@
-<!-- templates/mes/monthly_check.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Monthly Check</title>
+{% extends 'mes/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+{% load i18n %}
 
+{% endblock css %}
+{% block js %}
 
-    <style>
+<style>
     /* Reset table styling */
     /* Reset table styling */
     table {
@@ -69,7 +70,7 @@
         border: 1px solid #ddd; /* Đường viền mềm mại */
         border-radius: 8px; /* Góc bo tròn */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
-}
+    }
 
     form input, form button, form select {
         padding: 8px 12px; /* Thêm khoảng cách bên trong các phần tử */
@@ -120,36 +121,38 @@
     tbody tr:hover {
         background-color: #e6e6e6;
     }
-    </style>
+</style>
+<script type="text/javascript">
 
-</head>
-<body>
-    <h1>Monthly Check</h1>
-    <form method="get">
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-info">Get Data</button>
-    </form>
+</script>
 
-
-    <table>
-        <thead>
-            <tr>
-                <th></th>
-                {% for day in days %}
-                    <th>Day {{ day }}</th>
-                {% endfor %}
-                <!-- Thêm các tiêu đề ngày khác nếu cần -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for machine in data_table %}
-                <tr>
-                    {% for day in machine %}
-                        <td>{{ day }}</td>
-                    {% endfor %}
-                </tr>
+{% endblock js %}
+{% block title %}
+Monthly Check
+{% endblock title %}
+{% block content %}
+<form method="get">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-info">Get Data</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            {% for day in days %}
+                <th>Day {{ day }}</th>
             {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+            <!-- Thêm các tiêu đề ngày khác nếu cần -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for machine in data_table %}
+            <tr>
+                {% for day in machine %}
+                    <td>{{ day }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

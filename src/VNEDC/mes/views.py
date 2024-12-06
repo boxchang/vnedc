@@ -1598,3 +1598,6 @@ def monthly_check(request):
             data_table.append(sub_data_sap_qty)
 
     return render(request, 'mes/monthly_check.html', locals())
+
+def test(request):
+    return render(request, 'mes/test.html', locals())
