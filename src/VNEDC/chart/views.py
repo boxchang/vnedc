@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from datetime import datetime, date, timedelta
 from VNEDC.database import mes_database, vnedc_database
-from chart.forms import SearchForm, ProductionSearchForm
+from chart.forms import SearchForm, ProductionSearchForm, RateSearchForm
 from collection.models import ParameterValue, ParameterDefine, Parameter_Type
 import random
 from collection.models import Process_Type, Plant, Machine
@@ -47,6 +47,16 @@ def get_product_choices(start_date, end_date):
     choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
     return choices
 
+def get_product_choices_rate(start_date, end_date):
+    sql = f"""
+            SELECT distinct ProductItem
+      FROM [MES_OLAP].[dbo].[mes_daily_report_raw]
+      where date between '{start_date}' and '{end_date}' and sum_qty is not NULL
+        """
+    vnedc_db = vnedc_database()
+    rows = vnedc_db.select_sql_dict(sql)
+    choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
+    return choices
 
 def param_value(request):
     search_form = SearchForm()
@@ -54,13 +64,22 @@ def param_value(request):
 
 
 def param_value_product(request):
-    month_ago = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    month_ago = (date.today() - timedelta(days=60)).strftime("%Y-%m-%d")
     today = (date.today()).strftime("%Y-%m-%d")
     choices = get_product_choices(month_ago, today)
 
     search_form = ProductionSearchForm()
     search_form.fields['product'].choices = choices
     return render(request, 'chart/param_value_product.html', locals())
+
+def param_value_rate(request):
+    month_ago = (date.today() - timedelta(days=60)).strftime("%Y-%m-%d")
+    today = (date.today()).strftime("%Y-%m-%d")
+    choices = get_product_choices_rate(month_ago, today)
+
+    search_form = RateSearchForm()
+    search_form.fields['product'].choices = choices
+    return render(request, 'chart/param_value_rate.html', locals())
 
 def get_machines_by_plant(request):
     plant_code = request.GET.get('plant_code')
@@ -339,6 +358,120 @@ def param_value_product_api(request):
         except Exception as e:
             print(e)
             pass
+
+    return JsonResponse(chart_data, safe=False)
+
+def param_value_rate_api(request):
+    chart_data = {}
+    if request.method == 'POST':
+        data_date_start = request.POST.get('data_date_start')
+        data_date_end = request.POST.get('data_date_end')
+        product = request.POST.get('product')
+
+        backgroundColor = {
+            "01": "#4dc9f6", "02": "#f67019", "03": "#f53794", "04": "#537bc4", "05": "#acc236",
+            "06": "#166a8f", "07": "#00a950", "08": "#58595b", "09": "#4ff9f6", "10": "#fff019",
+            "11": "#fff794", "12": "#5ffbc4", "13": "#aff236", "14": "#1ffa8f", "15": "#0ff950",
+            "16": "#5ff95b", "17": "#bfff44", "18": "#efff44", "19": "#dffa44", "20": "#cffaaf",
+            "21": "#ff5733", "22": "#33ff57", "23": "#5733ff", "24": "#ff33a1", "25": "#33d1ff",
+            "26": "#8e44ad", "27": "#ff9f43", "28": "#1abc9c", "29": "#f1c40f", "30": "#2ecc71"
+        }
+
+        borderColor = {
+            "01": "#3db9e6", "02": "#e66009", "03": "#e52784", "04": "#436bc3", "05": "#9cb226",
+            "06": "#065a7f", "07": "#009940", "08": "#48494b", "09": "#4dd9f6", "10": "#fdd019",
+            "11": "#fdd794", "12": "#5ddbc4", "13": "#add236", "14": "#1dda8f", "15": "#0dd950",
+            "16": "#5dd95b", "17": "#beef44", "18": "#eeef44", "19": "#deea44", "20": "#ceeaaf",
+            "21": "#e55323", "22": "#23e553", "23": "#5323e5", "24": "#e52391", "25": "#23cde5",
+            "26": "#7e34ac", "27": "#e58f33", "28": "#11ac8b", "29": "#d1b30f", "30": "#1ebc61"
+        }
+
+        try:
+            if "'" in product:
+                sproduct = str(product).split("'")
+                sql = f"""
+                    SELECT * FROM (
+                        SELECT 
+                            name, 
+                            date, 
+                            (CAST(SUM(sum_qty) AS FLOAT) / SUM(CASE WHEN sum_qty IS NOT NULL THEN target ELSE 0 END)) * 100 AS rate
+                        FROM 
+                            [MES_OLAP].[dbo].[mes_daily_report_raw]
+                        WHERE 
+                            ProductItem LIKE '%{sproduct[0]}%' and ProductItem LIKE '%{sproduct[-1]}%'
+                            AND date BETWEEN '{data_date_start}' AND '{data_date_end}'
+                            and sum_qty is not NULL 
+                            GROUP BY 
+                                date, name
+                    ) A WHERE rate < 120 and rate > 0
+                    ORDER BY 
+                        date
+                
+                
+                """
+            else:
+                sql = f"""                     
+                    SELECT * FROM (
+                        SELECT 
+                            name, 
+                            date, 
+                            (CAST(SUM(sum_qty) AS FLOAT) / SUM(CASE WHEN sum_qty IS NOT NULL THEN target ELSE 0 END)) * 100 AS rate
+                        FROM 
+                            [MES_OLAP].[dbo].[mes_daily_report_raw]
+                        WHERE 
+                            ProductItem LIKE '%{product}%'
+                            AND date BETWEEN '{data_date_start}' AND '{data_date_end}'
+                            and sum_qty is not NULL 
+                            GROUP BY 
+                                date, name
+                    ) A WHERE rate < 120 and rate > 0
+                    ORDER BY 
+                        date
+                """
+            vnedc_db = vnedc_database()
+            records = vnedc_db.select_sql_dict(sql)
+
+            datasets = []
+            y_label = sorted(list(set(record['date'].strftime('%Y-%m-%d') for record in records)))
+
+            chart_records = {}
+            for record in records:
+                name = record['name']
+                date = record['date'].strftime('%Y-%m-%d')
+                rate = record['rate']
+
+                if name not in chart_records:
+                    chart_records[name] = {}
+
+                chart_records[name][date] = rate
+
+            color_index = 1
+            for name, date_rates in chart_records.items():
+                data = []
+                for date in y_label:
+                    data.append(date_rates.get(date, None))
+
+                dataset = {
+                    "label": name,
+                    "data": data,
+                    "backgroundColor": backgroundColor[str(color_index).zfill(2)],
+                    "borderColor": borderColor[str(color_index).zfill(2)],
+                    "fill": False,
+                }
+                datasets.append(dataset)
+                color_index += 1
+
+            chart_data = {
+                "labels": y_label,
+                "datasets": datasets,
+                "title": product,
+                "subtitle": product,
+                "y_data": {"beginAtZero": "true"}
+            }
+
+        except Exception as e:
+            print(f"Error processing records: {e}")
+            return JsonResponse({"error": "Failed to process records."}, status=500)
 
     return JsonResponse(chart_data, safe=False)
 
