@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倉庫地圖 Layer 示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* 倉庫地圖背景 */
+        .warehouse-map {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: url('https://via.placeholder.com/800x600') no-repeat center center;
+            background-size: cover;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+        }
+
+        /* 層 (Layer) */
+        .zone {
+            position: absolute;
+            border: 2px solid rgba(255, 0, 0, 0.7);
+            background-color: rgba(255, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        /* 彈出表單 */
+        .popup-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            display: none; /* 隱藏表單 */
+            z-index: 10;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-form h3 {
+            margin-top: 0;
+        }
+
+        .popup-form input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .popup-form button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup-form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="warehouse-map">
+        <!-- Layer 1 -->
+        <div class="zone" style="top: 50px; left: 100px; width: 100px; height: 50px;"
+             data-zone="A1"></div>
+        <!-- Layer 2 -->
+        <div class="zone" style="top: 200px; left: 300px; width: 120px; height: 70px;"
+             data-zone="B2"></div>
+        <!-- Layer 3 -->
+        <div class="zone" style="top: 400px; left: 500px; width: 150px; height: 80px;"
+             data-zone="C3"></div>
+    </div>
+
+    <!-- 彈出表單 -->
+    <div class="popup-form" id="popupForm">
+        <h3>輸入數量</h3>
+        <form id="quantityForm">
+            <input type="number" id="quantity" placeholder="請輸入數量" required>
+            <button type="submit">確認</button>
+            <button type="button" onclick="closePopup()">取消</button>
+        </form>
+    </div>
+
+    <script>
+        const zones = document.querySelectorAll('.zone');
+        const popupForm = document.getElementById('popupForm');
+        const quantityInput = document.getElementById('quantity');
+        let currentZone = null;
+
+        // 點擊區域觸發表單
+        zones.forEach(zone => {
+            zone.addEventListener('click', (event) => {
+                currentZone = zone.dataset.zone;
+                popupForm.style.display = 'block';
+            });
+        });
+
+        // 表單提交
+        document.getElementById('quantityForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const quantity = quantityInput.value;
+            alert(`區域 ${currentZone} 的數量已設置為 ${quantity}`);
+            closePopup();
+        });
+
+        // 關閉表單
+        function closePopup() {
+            popupForm.style.display = 'none';
+            quantityInput.value = '';
+        }
+    </script>
+</body>
+</html>

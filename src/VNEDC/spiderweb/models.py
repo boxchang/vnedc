@@ -6,6 +6,7 @@ from django.conf import settings
 class Monitor_Status(models.Model):
     status_code = models.CharField(max_length=3, unique=True, primary_key=True)
     desc = models.CharField(max_length=200, null=False, blank=False)
+    ref_url = models.CharField(max_length=500, null=True, blank=True)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='check_status_update_by')
