@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Bin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+{% load widget_tweaks %}
+    <div class="container mt-5">
+        <h2 class="mb-4">Edit Bin</h2>
+
+        <!-- Hiển thị thông báo thành công hoặc lỗi -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form để chỉnh sửa kho -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="bin_id" class="form-label" disabled="">Bin Id</label>
+                {{ form.bin_id|attr:"readonly:readonly" }}
+                <div class="text-danger">{{ form.bin_id.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="bin_name" class="form-label">Bin Name</label>
+                {{ form.bin_name }}
+                <div class="text-danger">{{ form.bin_name.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="area_id" class="form-label">Area Id</label>
+                {{ form.area }}
+                <div class="text-danger">{{ form.area.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pos_x" class="form-label">Position X</label>
+                {{ form.pos_x }}
+                <div class="text-danger">{{ form.pos_x.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pos_y" class="form-label">Position Y</label>
+                {{ form.pos_y }}
+                <div class="text-danger">{{ form.pos_y.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pos_y" class="form-label">Bin Width</label>
+                {{ form.bin_w }}
+                <div class="text-danger">{{ form.bin_w.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pos_y" class="form-label">Bin Length</label>
+                {{ form.bin_l }}
+                <div class="text-danger">{{ form.bin_l.errors }}</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'bin_list' %}" class="btn btn-secondary ms-3">Back to List</a>
+
+        </form>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
