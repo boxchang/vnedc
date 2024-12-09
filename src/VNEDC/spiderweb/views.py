@@ -42,7 +42,7 @@ def spiderweb(request):
         elif str(name) == 'PLC SCADA':
             monitor_name.append(','.join(sorted(list(set([str(item) for item in filtered_result])))))
             monitor_msg.append([[item['id'], item['device_name'], item['update_at'], item['comment'], item['ref_url']] for item in filtered_result])
-        elif str(name) == 'MES JOB':
+        elif str(name) == 'MES DATA':
             monitor_name.append(','.join(sorted(list(set([str(item) for item in filtered_result])))))
             monitor_msg.append([[item['id'], item['device_name'], item['update_at'], item['comment'], item['ref_url']] for item in filtered_result])
         elif str(name) == 'KEY_DEVICE' or str(name) == 'SAPTicket':
