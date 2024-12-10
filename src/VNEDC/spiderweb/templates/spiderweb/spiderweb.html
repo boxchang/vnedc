@@ -195,7 +195,7 @@
           const divs = document.querySelectorAll("div");
           // 尋找 error="1" 的元素
           divs.forEach(div => {
-            if (div.getAttribute("error") === "1") {
+            if (div.getAttribute("error") > 0) {
               // 將其移動到父節點的第一個子節點
               div.parentNode.insertBefore(div, div.parentNode.firstChild);
             }
