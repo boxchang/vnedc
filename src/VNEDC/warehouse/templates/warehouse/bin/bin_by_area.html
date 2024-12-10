@@ -1,106 +1,135 @@
-{% extends 'bases/base.html' %}
-{% load static %}
+{% extends 'warehouse/bases/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% load i18n %}
-{% block title %} Bin List By Area {% endblock %}
-{% block javascript %}
-    <script>
-        // Dynamic data injection into modal
-        const deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget; // Button that triggered the modal
-            const binName = button.getAttribute('data-bin-name');
-            const binId = button.getAttribute('data-bin-id');
-
-            // Update modal content
-            const modalBinName = document.getElementById('modalBinName');
-            modalBinName.textContent = binName;
-
-            // Update form action dynamically
-            const deleteForm = document.getElementById('deleteForm');
-            deleteForm.action = `/bin/delete/${binId}/`;
-        });
-    </script>
-    <script>
-    // Hàm chuyển hướng đến trang khác
-    function redirectToPage(url) {
-        window.location.href = url;
+{% block title %} {% trans "Bin List By Area" %} {% endblock %}
+{% block base_js %}
+{{ block.super }}
+<!-- Bootstrap CSS -->
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
     }
-    </script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    td {
+        cursor: pointer; /* Thêm con trỏ chuột dạng pointer */
+        transition: background-color 0.3s ease; /* Hiệu ứng nền khi hover */
+    }
+
+    td:hover {
+        {#background-color: #fdf0cb;#}
+        color: #ff2b3b; /* Màu chữ khi hover */
+    }
+</style>
 {% endblock %}
 
-{% block content %}
-        <div class="col-sm-9" style="border: 1px #6c757d solid; height: 90vh;">
-            <h2 class="mb-4">Bin List By Area</h2>
-            <div class="row d-flex justify-content-center">
-                <a class="btn btn-primary mb-3" style="width: 80px" href="{% url 'bin_create' area_code %}" role="button">Add</a>
-                <a class="btn btn-secondary mb-3 ms-5" style="width: auto" href="{% url 'area_by_warehouse' wh_code %}" role="button">Back to List</a>
+{% block container %}
+    <div class="container mt-5">
+        <div class="row">
+            {% block sidebar %} {{ block.super }} {% endblock %}
+            {% block content %}
+            <div class="col-sm-9" style="border: 1px #6c757d solid; height: 90vh;">
+                <h2 class="mb-4">{% trans "Bin List By Area" %}</h2>
+                <a class="btn btn-primary mb-3" style="width: 70px" href="{% url 'bin_create' area_code %}" role="button">{% trans "Add" %}</a>
+    {#            <a class="btn btn-info mb-3 ms-3"  href="{% url 'area_list' %}" role="button">Area List</a>#}
+                <!-- Kiểm tra nếu có dữ liệu -->
+                {% if bins %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>{% trans "Bin Id" %}</th>
+                            <th>{% trans "Bin Name" %}</th>
+                            <th>{% trans "Area Id" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Lặp qua danh sách warehouse -->
+                        {% for bin in bins %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ bin.bin_id }}</td>
+                            <td>{{ bin.bin_name }}</td>
+                            <td>{{ bin.area }}</td>
+        {#                    <td>{{ warehouse.wh_comment }}</td>#}
+        {#                    <td>#}
+        {#                        {% if warehouse.wh_bg %}#}
+        {#                        <img src="{{ warehouse.wh_bg.url }}" alt="Background Image" style="max-width: 100px;">#}
+        {#                        {% else %}#}
+        {#                        <em>No Image</em>#}
+        {#                        {% endif %}#}
+        {#                    </td>#}
+                            <td>
+                                {% if bin.bin_id %}
+                                        <a class="btn btn-primary" style="width: 70px" href="{% url 'edit_bin' bin_code=bin.bin_id %}" role="button">{% trans "Edit" %}</a>
+                                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        data-bin-id="{{ bin.pk }}" data-bin-name="{{ bin.bin_id }}">
+                                    {% trans "Delete" %}
+                                </button>
+                                {% else %}
+                                    <a class="btn btn-primary" style="width: 70px" href="#" role="button">{% trans "Edit" %}</a>
+                                    <a class="btn btn-primary" style="width: 70px" href="#" role="button">{% trans "Delete" %}</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>{% trans "No bins found." %}</p>
+                {% endif %}
             </div>
-            <!-- Kiểm tra nếu có dữ liệu -->
-            {% if bins %}
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Bin Id</th>
-                        <th>Bin Name</th>
-                        <th>Area Id</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Lặp qua danh sách warehouse -->
-                    {% for bin in bins %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ bin.bin_id }}</td>
-                        <td>{{ bin.bin_name }}</td>
-                        <td>{{ bin.area }}</td>
-                        <td>
-                            {% if bin.bin_id %}
-                                <a class="btn btn-primary" style="width: 70px" href="{% url 'edit_bin' bin_code=bin.bin_id %}" role="button">Edit</a>
-                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                data-bin-id="{{ bin.pk }}" data-bin-name="{{ bin.bin_id }}">
-                            Delete
-                        </button>
-
-                            {% else %}
-                                <a class="btn btn-primary" style="width: 70px" href="#" role="button">Edit</a>
-                                <a class="btn btn-primary" style="width: 70px" href="#" role="button">Delete</a>
-                            {% endif %}
-
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No bin found.</p>
-            {% endif %}
+            {% endblock %}
         </div>
     </div>
 
+    {#    Modal#}
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">{% trans "Confirm Delete" %}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete the bin "<strong id="modalBinName"></strong>"?
+                    {% trans "Are you sure you want to delete the bin " %} "<strong id="modalBinName"></strong>"
                 </div>
                 <div class="modal-footer">
                     <form method="post" id="deleteForm">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                        <button type="submit" class="btn btn-danger">{% trans "Yes, Delete" %}</button>
                     </form>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block alert %}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script>
+            // Dynamic data injection into modal
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const binName = button.getAttribute('data-bin-name');
+                const binId = button.getAttribute('data-bin-id');
+
+                // Update modal content
+                const modalBinName = document.getElementById('modalBinName');
+                modalBinName.textContent = binName;
+
+                // Update form action dynamically
+                const deleteForm = document.getElementById('deleteForm');
+                deleteForm.action = `/warehouse/bin/delete/${binId}/`;
+            });
+        </script>
+        <script>
+        // Hàm chuyển hướng đến trang khác
+        function redirectToPage(url) {
+            window.location.href = url;
+        }
+        </script>
 {% endblock %}

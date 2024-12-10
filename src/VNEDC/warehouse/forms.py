@@ -9,15 +9,11 @@ class WarehouseForm(forms.ModelForm):
     class Meta:
         model = Warehouse  # Chỉ định model mà form này sẽ sử dụng
         fields = ['wh_code', 'wh_name', 'wh_comment', 'wh_bg']
-        # widgets = {
-        #     'wh_code': forms.TextInput(attrs={'disabled': 'disabled'}),
-        # }
 
     wh_code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     wh_name = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
     wh_comment = forms.CharField(max_length=500, required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
     wh_bg = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'form-control'}))
-
 
     def save(self, commit=True):
         # Lấy instance của Warehouse từ dữ liệu form
@@ -36,6 +32,12 @@ class WarehouseForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Kiểm tra nếu là form chỉnh sửa
+        if self.instance and self.instance.pk:  # Kiểm tra nếu đối tượng đã tồn tại
+            self.fields['wh_code'].widget.attrs['readonly'] = 'readonly'
 
 
 class AreaForm(forms.ModelForm):
@@ -54,6 +56,9 @@ class AreaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         print(self.fields['warehouse'].queryset)  # Debug queryset
+        # Kiểm tra nếu là form chỉnh sửa
+        if self.instance and self.instance.pk:  # Kiểm tra nếu đối tượng đã tồn tại
+            self.fields['area_id'].widget.attrs['readonly'] = 'readonly'
 
     def save(self, commit=True):
         # Lấy instance của Warehouse từ dữ liệu form
@@ -72,8 +77,6 @@ class AreaForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-
 
 class BinForm(forms.ModelForm):
     class Meta:
@@ -117,3 +120,9 @@ class BinForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #print(self.fields['bin'].queryset)  # Debug queryset
+        # Kiểm tra nếu là form chỉnh sửa
+        if self.instance and self.instance.pk:  # Kiểm tra nếu đối tượng đã tồn tại
+            self.fields['bin_id'].widget.attrs['readonly'] = 'readonly'

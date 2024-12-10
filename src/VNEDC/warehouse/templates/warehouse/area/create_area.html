@@ -1,79 +1,39 @@
-{% extends 'bases/crud_form.html' %}
-{% load widget_tweaks %}
-{% load widget_tweaks %}
+{% extends 'warehouse/bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block title %} {% trans "reate Warehouse" %} {% endblock %}
+{% block container %}
+    <div class="container mt-5">
+        <div class="row">
+            {% block sidebar %} {{ block.super }} {% endblock %}
+            {% block content %}
+                <form method="post" enctype="multipart/form-data" class="col-sm-9">
+                    {% csrf_token %}
+                    <div class="card p-4">
+                        <h3 class="card-title">{% trans "Create Area" %}</h3>
+                        <div class="mb-3">
+                            <label for="area_id" class="form-label">{% trans "Area Id" %}</label>
+                            {{ form.area_id }}
+                            <div class="text-danger">{{ form.area_id.errors }}</div>
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="area_name" class="form-label">{% trans "Area Name" %}</label>
+                            {{ form.area_name }}
+                            <div class="text-danger">{{ form.area_name.errors }}</div>
+                        </div>
 
-{% block content %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="card p-4">
-            <h3 class="card-title">Create Area</h3>
-            <div class="mb-3">
-                <label for="area_id" class="form-label">Area Id</label>
-                {{ form.area_id }}
-                <div class="text-danger">{{ form.area_id.errors }}</div>
-            </div>
+                        <div class="mb-3">
+                            <label for="wh_code" class="form-label">{% trans "Warehouse Id" %}</label>
+                            {{ form.warehouse }}
+                            <div class="text-danger">{{ form.wh_code.errors }}</div>
+                        </div>
 
-            <div class="mb-3">
-                <label for="area_name" class="form-label">Area Name</label>
-                {{ form.area_name }}
-                <div class="text-danger">{{ form.area_name.errors }}</div>
-            </div>
-
-            <div class="mb-3">
-                <label for="wh_code" class="form-label">Warehouse Id</label>
-                {{ form.warehouse }}
-                <div class="text-danger">{{ form.wh_code.errors }}</div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                    </div>
+                </form>
+            {% endblock %}
         </div>
-    </form>
-
+    </div>
 {% endblock %}
-
-
-
-{##}
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Create Warehouse</title>#}
-{##}
-{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">#}
-{##}
-{#    <style>#}
-{##}
-{#    </style>#}
-{#</head>#}
-{#<body>#}
-{#    <div class="row">#}
-{#        <div class="col-sm-3">#}
-{#            <div class="row">#}
-{#                <a class="btn btn-primary" href="{% url 'warehouse_list' %}" role="button" style="margin-bottom: 20px">Warehouse</a>#}
-{#                <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">包材倉1F</a>#}
-{#                <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">成品倉</a>#}
-{#                <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">半成品倉</a>#}
-{#                <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">手模倉</a>#}
-{#            </div>#}
-{#        </div>#}
-{#        <form method="post" enctype="multipart/form-data" class="col-sm-9">#}
-{#        {% csrf_token %}#}
-{##}
-{#        <!-- Create a Bootstrap card for the form -->#}
-{#            <div class="card p-4">#}
-{#                <h3 class="card-title">Create Warehouse</h3>#}
-{##}
-{#                <!-- Form fields -->#}
-{#                <div class="mb-3">#}
-{#                    {{ form.as_p }}#}
-{#                </div>#}
-{##}
-{#                <!-- Submit button -->#}
-{#                <button type="submit" class="btn btn-primary">Submit</button>#}
-{#            </div>#}
-{#        </form>#}
-{#    </div>#}
-{#    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>#}
-{#</body>#}
-{#</html>#}

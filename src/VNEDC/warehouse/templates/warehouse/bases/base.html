@@ -2,61 +2,37 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% load i18n %}
-{% block head %}
-
-{% endblock %}
-{% block title %}
-
-{% endblock title %}
-{% block breadcrumb %}
-
-{% endblock %}
+{% block head %}{% endblock %}
+{% block title %}{% endblock title %}
+{% block breadcrumb %}{% endblock %}
 
 {% block base_js %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Bootstrap CSS -->
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">{% endblock %}
 
-    td {
-        cursor: pointer; /* Thêm con trỏ chuột dạng pointer */
-        transition: background-color 0.3s ease; /* Hiệu ứng nền khi hover */
-    }
-
-    td:hover {
-        {#background-color: #06060a;#}
-        color: #ff2b3b; /* Màu chữ khi hover */
-    }
-</style>
-{% endblock %}
-
-{% block ready %}
-
-{% endblock ready %}
+{% block ready %}{% endblock ready %}
 
 {% block container %}
-
-<div class="container mt-5">
-        <div class="row">
-            {% block sidebar %}
-            <div class="col-sm-3">
-                <div class="list-group">
-                    <a class="btn btn-primary" href="{% url 'warehouse_list' %}" role="button" style="margin-bottom: 20px">Warehouse</a>
-                    <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">包材倉1F</a>
-                    <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">成品倉</a>
-                    <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">半成品倉</a>
-                    <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">手模倉</a>
+    <div class="container mt-5">
+            <div class="row">
+                {% block sidebar %}
+                <div class="col-sm-3">
+                    <div class="list-group">
+                        <a class="btn btn-primary wh" href="{% url 'warehouse_list' %}" role="button" style="margin-bottom: 20px">{% trans "Warehouse" %}</a>
+                        <a class="btn btn-primary" href="{% url 'test' %}" role="button" style="margin-bottom: 15px">{% trans "Packaging Material WH 1F" %}</a>
+                        <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Finished Product WH" %}</a>
+                        <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Semi-finished Product WH" %}</a>
+                        <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Hand Mold WH" %}</a>
+                    </div>
                 </div>
+                {% endblock %}
+
+                {% block content %} {% endblock %}
             </div>
-            {% endblock %}
-
-            {% block content %} {% endblock %}
-        </div>
     </div>
-    {% block js %} {% endblock %}
-
 
 {% endblock %}
+
+{% block alert %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+{% endblock %}
+

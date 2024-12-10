@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>倉庫地圖 Layer 示例</title>
+{% extends 'warehouse/bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block title %} 倉庫地圖 Layer 示例 {% endblock %}
+{% block base_js %}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
             height: 600px;
             background: url('/media/warehouse_images/warehouse.png') no-repeat center center;
             background-size: cover;
-            margin: 20px auto;
+            margin: auto;
             border: 2px solid #ccc;
         }
 
@@ -69,81 +69,106 @@
             background-color: #0056b3;
         }
 
+        .list-group{
+            width: 42vh;
+        }
+        .line {
+            display: grid;
+            grid-template-columns: 1fr 3fr; /* Cột đầu chiếm 25%, cột sau chiếm 75% */
+            gap: 20px; /* Khoảng cách giữa các cột */
+            margin: 0 auto; /* Căn giữa container */
+        }
+        @media (max-width: 768px) {
+            .line {
+                grid-template-columns: 1fr; /* Cả 2 cột sẽ chiếm 100% khi màn hình nhỏ */
+            }
+        }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+{% endblock %}
+{% block container %}
+<div class="container mt-5">
 
-    </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</head>
-<body>
-    <div class="warehouse-map">
+    <div class="line">
+        <div class="list-group">
+            <div class="row" style="margin-left: 3px; margin-bottom: 20px; gap: 10px">
+                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">W</a>
+                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">A</a>
+                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">B</a>
+            </div>
+            <a class="btn btn-warning" href="#" role="button" style="margin-bottom: 15px; outline: 4px solid #ccc;">{% trans "Packaging Material WH 1F" %}</a>
+            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Finished Product WH" %}</a>
+            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Semi-finished Product WH" %}</a>
+            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Hand Mold WH" %}</a>
+        </div>
+        <div class="warehouse-map">
+                    <!-- Line A -->
+            <div class="zone" style="top: 101px; left: 23px; width: 35px; height: 75px;"
+                 data-zone="A1"></div>
+            <div class="zone" style="top: 183px; left: 23px; width: 35px; height: 76px;"
+                 data-zone="A1"></div>
+            <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"
+                 data-zone="A1"></div>
+            <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"
+                 data-zone="A1"></div>
+            <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"
+                 data-zone="A1"></div>
 
-                <!-- Line A -->
-        <div class="zone" style="top: 103px; left: 27px; width: 28px; height: 72px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 181px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 248px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 314px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 379px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 448px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
+                    <!-- Line B -->
+            <div class="zone" style="top: 113px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 181px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 248px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 314px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 379px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 448px; left: 93px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <!-- Layer 3 -->
+            <div class="zone" style="top: 113px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 181px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 248px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 314px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 379px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 448px; left: 158px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
 
-                <!-- Line B -->
-        <div class="zone" style="top: 113px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 181px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 248px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 314px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 379px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 448px; left: 93px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <!-- Layer 3 -->
-        <div class="zone" style="top: 113px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 181px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 248px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 314px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 379px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 448px; left: 158px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
+            <!-- Layer 3 -->
+            <div class="zone" style="top: 113px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 181px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 248px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 314px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 379px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 448px; left: 225px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
 
-        <!-- Layer 3 -->
-        <div class="zone" style="top: 113px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 181px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 248px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 314px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 379px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 448px; left: 225px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-
-        <!-- Layer 3 -->
-        <div class="zone" style="top: 113px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 181px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 248px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 314px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 379px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
-        <div class="zone" style="top: 448px; left: 290px; width: 28px; height: 56px;"
-             data-zone="B1"></div>
+            <!-- Layer 3 -->
+            <div class="zone" style="top: 113px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 181px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 248px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 314px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 379px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+            <div class="zone" style="top: 448px; left: 290px; width: 28px; height: 56px;"
+                 data-zone="B1"></div>
+        </div>
     </div>
 </div>
     <!-- 彈出表單 -->
@@ -156,6 +181,11 @@
         </form>
     </div>
 
+        {% endblock %}
+
+
+{% block alert %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
         const zones = document.querySelectorAll('.zone');
         const popupForm = document.getElementById('popupForm');
@@ -184,5 +214,4 @@
             quantityInput.value = '';
         }
     </script>
-</body>
-</html>
+{% endblock %}

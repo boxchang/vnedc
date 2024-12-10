@@ -8,6 +8,7 @@ from .models import Warehouse, Area, Bin
 
 # Warehouse
 def create_warehouse(request):
+    print("create")
     if request.method == 'POST':
         form = WarehouseForm(request.POST, request.FILES)  # Xử lý dữ liệu POST và FILES
         if form.is_valid():
@@ -19,8 +20,11 @@ def create_warehouse(request):
     return render(request, 'warehouse/create_warehouse.html', {'form': form})
 
 def warehouse_list(request):
+    print("list")
+
     # Lấy toàn bộ danh sách warehouse từ cơ sở dữ liệu
     warehouses = Warehouse.objects.all()
+    x = warehouses
 
     return render(request, 'warehouse/list_warehouse.html', {'warehouses': warehouses})
 
@@ -63,10 +67,9 @@ def warehouse_delete(request, pk):
 
 def test(request):
 
-    warehouse_image = Warehouse.objects.get(wh_code='TEST')
-    x = warehouse_image
+    #warehouse_image = Warehouse.objects.get(wh_code='TEST')
 
-    return render(request, 'warehouse/test.html', {'warehouse_image': warehouse_image})
+    return render(request, 'warehouse/test.html')
 
 
 # Area
@@ -128,7 +131,7 @@ def area_delete(request, pk):
             return JsonResponse({'message': 'Area deleted successfully.', 'redirect': 'warehouse/list/', 'success': True}, status=200)
         else:
             # Điều hướng thông thường nếu không phải là AJAX
-            return redirect(f'area_by_warehouse', wh_code=wh)
+            return redirect(area_by_warehouse, wh_code=wh)
 
     # Không cần render trang riêng cho việc xóa
     return JsonResponse({'message': 'Invalid request method.'}, status=400)
@@ -208,4 +211,5 @@ def bin_by_area(request, area_code):
     return render(request, 'warehouse/bin/bin_by_area.html', {'bins': bins, 'area': area, 'area_code': area_code, 'wh_code': wh_code})
 
 def index(request):
-    return render(request, 'warehouse/index.html')
+    warehouses = Warehouse.objects.all()
+    return render(request, 'warehouse/index.html', {'warehouses': warehouses})

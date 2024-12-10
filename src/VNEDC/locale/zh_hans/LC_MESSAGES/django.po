@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-03 15:33+0700\n"
+"POT-Creation-Date: 2024-12-10 10:31+0700\n"
 "PO-Revision-Date: 2024-08-03 15:35+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -34,31 +34,44 @@ msgid "desc"
 msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:33
-#: .\collection\templates\collection\daily_info_create.html:104
-#: .\collection\templates\collection\record.html:45 .\users\forms.py:61
-#: .\users\templates\users\info.html:17
+#: .\collection\templates\collection\daily_info_create.html:116
+#: .\users\forms.py:61 .\users\templates\users\info.html:17
 msgid "save"
-msgstr "储存"
+msgstr "节省"
 
-#: .\bases\templates\bases\base.html:52
+#: .\bases\templates\bases\base.html:54
+#: .\collection\templates\collection\product_info_report.html:84
+#: .\collection\templates\collection\rd_report.html:491
 msgid "Key Parameter"
 msgstr "关键参数"
 
-#: .\bases\templates\bases\base.html:54
+#: .\bases\templates\bases\base.html:57
+msgid "MES Tools"
+msgstr ""
+
+#: .\bases\templates\bases\base.html:60
+msgid "Warehouse倉管系統"
+msgstr ""
+
+#: .\bases\templates\bases\base.html:63
 #: .\collection\templates\collection\test.html:150
 msgid "Contact"
 msgstr ""
 
-#: .\bases\templates\bases\base.html:55
+#: .\bases\templates\bases\base.html:64
 #: .\collection\templates\collection\test.html:151
 msgid "About"
 msgstr ""
 
-#: .\bases\templates\bases\base.html:64
+#: .\bases\templates\bases\base.html:73
+#: .\collection\templates\collection\product_info_report.html:93
+#: .\collection\templates\collection\rd_report.html:500
 msgid "Personal Setting"
 msgstr "个人资讯"
 
-#: .\bases\templates\bases\base.html:65
+#: .\bases\templates\bases\base.html:74
+#: .\collection\templates\collection\product_info_report.html:94
+#: .\collection\templates\collection\rd_report.html:501
 #: .\collection\templates\collection\test.html:157
 msgid "Logout"
 msgstr "登出"
@@ -67,11 +80,15 @@ msgstr "登出"
 msgid "Update Status"
 msgstr "更新状态"
 
-#: .\chart\forms.py:13 .\chart\forms.py:84
+#: .\chart\forms.py:13 .\chart\forms.py:84 .\chart\forms.py:141
+#: .\collection\templates\collection\product_info_report.html:136
+#: .\collection\templates\collection\rd_report.html:543
 msgid "Start Date"
 msgstr "开始日期"
 
-#: .\chart\forms.py:14 .\chart\forms.py:85
+#: .\chart\forms.py:14 .\chart\forms.py:85 .\chart\forms.py:145
+#: .\collection\templates\collection\product_info_report.html:140
+#: .\collection\templates\collection\rd_report.html:558
 msgid "End Date"
 msgstr "结束日期"
 
@@ -99,14 +116,15 @@ msgstr "控制上限"
 msgid "control_low"
 msgstr "控制下限"
 
-#: .\chart\forms.py:76 .\chart\forms.py:131
+#: .\chart\forms.py:76 .\chart\forms.py:131 .\chart\forms.py:190
 #: .\users\templates\users\login.html:193
+#: .\warehouse\templates\warehouse\bin\create_bin.html:58
 msgid "Submit"
-msgstr ""
+msgstr "创造"
 
-#: .\chart\forms.py:86
-#: .\collection\templates\collection\daily_info_create.html:84
-#: .\collection\templates\collection\index.html:30
+#: .\chart\forms.py:86 .\chart\forms.py:150
+#: .\collection\templates\collection\daily_info_create.html:96
+#: .\collection\templates\collection\index.html:35
 #: .\collection\templates\collection\index2.html:31
 msgid "Product"
 msgstr "产品"
@@ -115,8 +133,8 @@ msgstr "产品"
 msgid "param_code"
 msgstr "参数类型"
 
-#: .\chart\templates\chart\param_value.html:225
-#: .\chart\templates\chart\param_value_product.html:243
+#: .\chart\templates\chart\param_value.html:260
+#: .\chart\templates\chart\param_value_product.html:244
 msgid "Record"
 msgstr "报工新增"
 
@@ -124,90 +142,94 @@ msgstr "报工新增"
 msgid "record_date"
 msgstr "作业日期"
 
-#: .\collection\forms.py:44
+#: .\collection\forms.py:53
 msgid "Chlorine Free"
 msgstr "无氯"
 
-#: .\collection\forms.py:44
+#: .\collection\forms.py:53
 msgid "Polymer Free"
 msgstr "无二次料"
 
-#: .\collection\forms.py:44
+#: .\collection\forms.py:53
 msgid "Alkaline Tank pH Test"
 msgstr "碱槽测pH值"
 
-#: .\collection\forms.py:44
+#: .\collection\forms.py:53
 msgid "Machine Shutdown"
 msgstr "停机"
 
-#: .\collection\forms.py:48
+#: .\collection\forms.py:58
 msgid "A1 Production"
 msgstr "A1产品"
 
-#: .\collection\forms.py:49
+#: .\collection\forms.py:59
 msgid "A1 Size"
 msgstr "A1尺寸"
 
-#: .\collection\forms.py:50
+#: .\collection\forms.py:60
 msgid "A2 Production"
 msgstr "A2产品"
 
-#: .\collection\forms.py:51
+#: .\collection\forms.py:61
 msgid "A2 Size"
 msgstr "A2尺寸"
 
-#: .\collection\forms.py:52
+#: .\collection\forms.py:62
 msgid "B1 Production"
 msgstr "B1产品"
 
-#: .\collection\forms.py:53
+#: .\collection\forms.py:63
 msgid "B1 Size"
 msgstr "B1尺寸"
 
-#: .\collection\forms.py:54
+#: .\collection\forms.py:64
 msgid "B2 Production"
 msgstr "B2产品"
 
-#: .\collection\forms.py:55
+#: .\collection\forms.py:65
 msgid "B2 Size"
 msgstr "B2尺寸"
 
-#: .\collection\forms.py:56
+#: .\collection\forms.py:66
 msgid "Remark"
 msgstr "备注"
 
-#: .\collection\forms.py:58
+#: .\collection\forms.py:68
 msgid "Change Coagulant Time(Hour)"
 msgstr "换凝固剂时间(Hour)"
 
-#: .\collection\forms.py:59
+#: .\collection\forms.py:69
 msgid "Change Coagulant Time(Minute)"
 msgstr "换凝固剂时间(Minute)"
 
-#: .\collection\forms.py:60
+#: .\collection\forms.py:70
 msgid "Change Latex Time(Hour)"
 msgstr "换乳胶时间(Hour)"
 
-#: .\collection\forms.py:61
+#: .\collection\forms.py:71
 msgid "Change Latex Time(Minute)"
 msgstr "换乳胶时间(Minute)"
 
-#: .\collection\forms.py:62
+#: .\collection\forms.py:72
 msgid "Change Tooling Time(Hour)"
 msgstr "换模时间(Hour)"
 
-#: .\collection\forms.py:63
+#: .\collection\forms.py:73
 msgid "Change Tooling Time(Minute)"
 msgstr "换模时间(Minute)"
 
-#: .\collection\forms.py:64 .\collection\templates\collection\base.html:109
+#: .\collection\forms.py:74 .\collection\templates\collection\base.html:109
+#: .\collection\templates\collection\product_info_report.html:108
+#: .\collection\templates\collection\rd_report.html:515
 msgid "Plant"
 msgstr "厂别"
 
 #: .\collection\templates\collection\base.html:124
-#: .\collection\templates\collection\daily_info_create.html:82
-#: .\collection\templates\collection\index.html:19
+#: .\collection\templates\collection\daily_info_create.html:94
+#: .\collection\templates\collection\index.html:24
 #: .\collection\templates\collection\index2.html:20
+#: .\collection\templates\collection\product_info_report.html:123
+#: .\collection\templates\collection\rd_report.html:530
 msgid "Machine"
 msgstr "机台"
 
@@ -217,48 +239,79 @@ msgstr "作业日期"
 
 #: .\collection\templates\collection\base.html:143
 #: .\collection\templates\collection\base.html:146
+#: .\collection\templates\collection\base.html:149
+#: .\collection\templates\collection\product_info_report.html:146
+#: .\collection\templates\collection\product_info_report.html:149
 msgid "Chart"
 msgstr "圖表"
 
-#: .\collection\templates\collection\base.html:165
+#: .\collection\templates\collection\base.html:152
+#: .\collection\templates\collection\base.html:155
+#: .\collection\templates\collection\product_info_report.html:152
+#: .\collection\templates\collection\product_info_report.html:155
+msgid "Report"
+msgstr ""
+
+#: .\collection\templates\collection\base.html:173
+#: .\collection\templates\collection\product_info_report.html:200
 msgid "Production Data"
 msgstr "生产资料"
 
-#: .\collection\templates\collection\daily_info_create.html:83
-#: .\collection\templates\collection\index.html:29
+#: .\collection\templates\collection\daily_info_create.html:95
+#: .\collection\templates\collection\index.html:34
 #: .\collection\templates\collection\index2.html:30
 msgid "Line"
 msgstr "线别"
 
-#: .\collection\templates\collection\daily_info_create.html:85
-#: .\collection\templates\collection\index.html:31
+#: .\collection\templates\collection\daily_info_create.html:97
+#: .\collection\templates\collection\index.html:36
 #: .\collection\templates\collection\index2.html:32
 msgid "Size"
 msgstr "尺寸"
 
-#: .\collection\templates\collection\daily_info_create.html:86
-#: .\collection\templates\collection\index.html:32
+#: .\collection\templates\collection\daily_info_create.html:98
+#: .\collection\templates\collection\index.html:37
 #: .\collection\templates\collection\index2.html:33
 msgid "create_at"
 msgstr "建立时间"
 
-#: .\collection\templates\collection\daily_info_create.html:87
+#: .\collection\templates\collection\daily_info_create.html:99
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:65
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:70
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:68
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:72
+#: .\warehouse\templates\warehouse\list_warehouse.html:64
+#: .\warehouse\templates\warehouse\list_warehouse.html:67
 msgid "Delete"
 msgstr "删除"
 
-#: .\collection\templates\collection\daily_info_create.html:97
+#: .\collection\templates\collection\daily_info_create.html:109
 msgid "Are you sure?"
 msgstr "确定吗？"
 
-#: .\collection\templates\collection\index.html:20
+#: .\collection\templates\collection\index.html:25
 msgid "Production Information"
 msgstr "生产资讯"
 
-#: .\collection\templates\collection\index.html:21
+#: .\collection\templates\collection\index.html:26
 #: .\collection\templates\collection\index2.html:22
 msgid "Completed Rate"
 msgstr "完成率"
+
+#: .\collection\templates\collection\rd_report.html:547
+msgid "Limit"
+msgstr ""
+
+#: .\collection\templates\collection\rd_report.html:551
+msgid "- - - - - -"
+msgstr ""
+
+#: .\collection\templates\collection\record.html:51
+#: .\warehouse\templates\warehouse\area\create_area.html:33
+#: .\warehouse\templates\warehouse\create_warehouse.html:39
+msgid "Save"
+msgstr "节省"
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -272,7 +325,7 @@ msgstr ""
 msgid "Change Password"
 msgstr "变更密码"
 
-#: .\collection\views.py:160 .\collection\views.py:295
+#: .\collection\views.py:208 .\collection\views.py:409
 msgid "Update Done"
 msgstr "更新完成"
 
@@ -1770,6 +1823,226 @@ msgstr ""
 #, python-format
 msgid "%s: error: %s\n"
 msgstr ""
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:5
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:34
+msgid "Area List By Warehouse"
+msgstr "按仓库列出的区域"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:36
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:34
+#: .\warehouse\templates\warehouse\list_warehouse.html:34
+msgid "Add"
+msgstr "添加"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:37
+#: .\warehouse\templates\warehouse\area\edit_area.html:54
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:74
+#: .\warehouse\templates\warehouse\edit_warehouse.html:61
+msgid "Back to List"
+msgstr "返回列表"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:46
+#: .\warehouse\templates\warehouse\area\create_area.html:16
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:44
+#: .\warehouse\templates\warehouse\bin\create_bin.html:29
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:40
+msgid "Area Id"
+msgstr "区域编号"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:47
+#: .\warehouse\templates\warehouse\area\create_area.html:22
+#: .\warehouse\templates\warehouse\area\edit_area.html:38
+msgid "Area Name"
+msgstr "区域名称"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:48
+#: .\warehouse\templates\warehouse\area\create_area.html:28
+#: .\warehouse\templates\warehouse\area\edit_area.html:44
+#: .\warehouse\templates\warehouse\edit_warehouse.html:27
+#: .\warehouse\templates\warehouse\list_warehouse.html:42
+msgid "Warehouse Id"
+msgstr "仓库编号"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:62
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:69
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:65
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:71
+#: .\warehouse\templates\warehouse\list_warehouse.html:63
+#: .\warehouse\templates\warehouse\list_warehouse.html:66
+msgid "Edit"
+msgstr "编辑"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:91
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:92
+#: .\warehouse\templates\warehouse\list_warehouse.html:87
+msgid "Confirm Delete"
+msgstr "确认删除"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:95
+msgid "Are you sure you want to delete the area"
+msgstr "您确定要删除该区域吗"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:100
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:101
+#: .\warehouse\templates\warehouse\list_warehouse.html:96
+msgid "Yes, Delete"
+msgstr "删除"
+
+#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:102
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:103
+#: .\warehouse\templates\warehouse\list_warehouse.html:98
+msgid "Cancel"
+msgstr "取消"
+
+#: .\warehouse\templates\warehouse\area\create_area.html:5
+#, fuzzy
+#| msgid "Create Warehouse"
+msgid "reate Warehouse"
+msgstr "建立倉庫"
+
+#: .\warehouse\templates\warehouse\area\create_area.html:14
+msgid "Create Area"
+msgstr "创建区域"
+
+#: .\warehouse\templates\warehouse\area\edit_area.html:5
+#: .\warehouse\templates\warehouse\area\edit_area.html:25
+#: .\warehouse\templates\warehouse\edit_warehouse.html:5
+#: .\warehouse\templates\warehouse\edit_warehouse.html:25
+#, fuzzy
+#| msgid "Create Warehouse"
+msgid "Edit Warehouse"
+msgstr "建立倉庫"
+
+#: .\warehouse\templates\warehouse\area\edit_area.html:49
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:69
+#: .\warehouse\templates\warehouse\edit_warehouse.html:55
+msgid "Save Changes"
+msgstr "保存更改"
+
+#: .\warehouse\templates\warehouse\bases\base.html:20
+#| msgid "Warehouse Id"
+msgid "Warehouse"
+msgstr "仓库"
+
+#: .\warehouse\templates\warehouse\bases\base.html:21
+#: .\warehouse\templates\warehouse\test.html:104
+msgid "Packaging Material WH 1F"
+msgstr "1F包装材料仓库"
+
+#: .\warehouse\templates\warehouse\bases\base.html:22
+#: .\warehouse\templates\warehouse\test.html:105
+msgid "Finished Product WH"
+msgstr "成品仓库"
+
+#: .\warehouse\templates\warehouse\bases\base.html:23
+#: .\warehouse\templates\warehouse\test.html:106
+msgid "Semi-finished Product WH"
+msgstr "半成品仓库"
+
+#: .\warehouse\templates\warehouse\bases\base.html:24
+#: .\warehouse\templates\warehouse\test.html:107
+msgid "Hand Mold WH"
+msgstr "手模仓库"
+
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:5
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:33
+msgid "Bin List By Area"
+msgstr "按区域分类的 Bin 列表"
+
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:42
+#: .\warehouse\templates\warehouse\bin\create_bin.html:16
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:27
+msgid "Bin Id"
+msgstr "宾代码"
+
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:43
+#: .\warehouse\templates\warehouse\bin\create_bin.html:23
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:34
+msgid "Bin Name"
+msgstr "姓名斌"
+
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:80
+#, fuzzy
+#| msgid "Warehouse Code"
+msgid "No bins found."
+msgstr "沒有找到垃圾桶。"
+
+#: .\warehouse\templates\warehouse\bin\bin_by_area.html:96
+msgid "Are you sure you want to delete the bin "
+msgstr "您确定要删除垃圾箱吗"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:5
+#: .\warehouse\templates\warehouse\create_warehouse.html:5
+#: .\warehouse\templates\warehouse\create_warehouse.html:14
+msgid "Create Warehouse"
+msgstr "建立倉庫"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:14
+msgid "Create Bin"
+msgstr "创建容器"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:35
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:46
+msgid "Position X"
+msgstr "位置 X"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:41
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:52
+msgid "Position Y"
+msgstr "位置 Y"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:47
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:58
+msgid "Bin Width"
+msgstr "箱宽"
+
+#: .\warehouse\templates\warehouse\bin\create_bin.html:53
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:64
+msgid "Bin Length"
+msgstr "箱长"
+
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:5
+#: .\warehouse\templates\warehouse\bin\edit_bin.html:25
+msgid "Edit Bin"
+msgstr "編輯箱"
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:16
+msgid "Warehouse Code"
+msgstr "倉庫代碼"
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:22
+#: .\warehouse\templates\warehouse\edit_warehouse.html:38
+#: .\warehouse\templates\warehouse\list_warehouse.html:43
+msgid "Warehouse Name"
+msgstr "倉庫名稱"
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:28
+#: .\warehouse\templates\warehouse\edit_warehouse.html:44
+msgid "Comment"
+msgstr "評論"
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:34
+#: .\warehouse\templates\warehouse\edit_warehouse.html:50
+msgid "Background Image"
+msgstr "背景圖片"
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:5
+#: .\warehouse\templates\warehouse\list_warehouse.html:33
+#, fuzzy
+#| msgid "Warehouse Code"
+msgid "Warehouse List"
+msgstr "倉庫代碼"
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:75
+#, fuzzy
+#| msgid "Warehouse Code"
+msgid "No warehouses found."
+msgstr "倉庫代碼"
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:91
+msgid "Are you sure you want to delete the warehouse"
+msgstr "您确定要删除仓库吗"
 
 #~ msgid "logout"
 #~ msgstr "登出"
