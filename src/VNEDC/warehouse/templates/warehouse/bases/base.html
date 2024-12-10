@@ -13,6 +13,7 @@
 
 {% block container %}
     <div class="container mt-5">
+    {{ warehouse_items }}
             <div class="row">
                 {% block sidebar %}
                 <div class="col-sm-3">
@@ -22,6 +23,9 @@
                         <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Finished Product WH" %}</a>
                         <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Semi-finished Product WH" %}</a>
                         <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Hand Mold WH" %}</a>
+                        {% for wh in warehouse_items %}
+                            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{{ wh }}</a>
+                        {% endfor %}
                     </div>
                 </div>
                 {% endblock %}

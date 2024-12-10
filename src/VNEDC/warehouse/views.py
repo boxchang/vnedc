@@ -17,7 +17,7 @@ def create_warehouse(request):
     else:
         form = WarehouseForm()  # Tạo form trống
 
-    return render(request, 'warehouse/create_warehouse.html', {'form': form})
+    return render(request, 'warehouse/create_warehouse.html', locals())
 
 def warehouse_list(request):
     print("list")
@@ -26,7 +26,7 @@ def warehouse_list(request):
     warehouses = Warehouse.objects.all()
     x = warehouses
 
-    return render(request, 'warehouse/list_warehouse.html', {'warehouses': warehouses})
+    return render(request, 'warehouse/list_warehouse.html', locals())
 
 def edit_warehouse(request, warehouse_code):
     # Lấy đối tượng Warehouse cần chỉnh sửa dựa trên mã kho (wh_code)
@@ -44,7 +44,7 @@ def edit_warehouse(request, warehouse_code):
         # Khởi tạo form với dữ liệu hiện tại của warehouse
         form = WarehouseForm(instance=warehouse)
 
-    return render(request, 'warehouse/edit_warehouse.html', {'form': form, 'warehouse': warehouse})
+    return render(request, 'warehouse/edit_warehouse.html', locals())
 
 
 def warehouse_delete(request, pk):
@@ -66,10 +66,10 @@ def warehouse_delete(request, pk):
 
 
 def test(request):
-
+    bin = Bin.objects.filter(bin_id='B001')
     #warehouse_image = Warehouse.objects.get(wh_code='TEST')
 
-    return render(request, 'warehouse/test.html')
+    return render(request, 'warehouse/test.html', locals())
 
 
 # Area
@@ -82,11 +82,11 @@ def create_area(request, wh_code):
     else:
         form = AreaForm(initial={'warehouse': wh_code})  # Tạo form trống
 
-    return render(request, 'warehouse/area/create_area.html', {'form': form})
+    return render(request, 'warehouse/area/create_area.html', locals())
 
 def area_list(request):
     areas = Area.objects.all()
-    return render(request, 'warehouse/area/list_area.html', {'areas': areas})
+    return render(request, 'warehouse/area/list_area.html', locals())
 
 def area_by_warehouse(request, wh_code):
     # Lấy đối tượng Warehouse tương ứng với wh_code
@@ -99,7 +99,7 @@ def area_by_warehouse(request, wh_code):
         areas = []
 
     # Truyền dữ liệu vào context
-    return render(request, 'warehouse/area/area_by_warehouse.html', {'areas': areas, 'warehouse': warehouse, 'wh_code': wh_code})
+    return render(request, 'warehouse/area/area_by_warehouse.html', locals())
 
 
 def edit_area(request, area_code):
@@ -116,7 +116,7 @@ def edit_area(request, area_code):
     else:
         form = AreaForm(instance=area)
 
-    return render(request, 'warehouse/area/edit_area.html', {'form': form, 'area': area})
+    return render(request, 'warehouse/area/edit_area.html', locals())
 
 
 def area_delete(request, pk):
@@ -154,7 +154,7 @@ def create_bin(request, area_code):
         # Truyền đối tượng area vào form, không phải chỉ area_code
         form = BinForm(initial={'area': area})
 
-    return render(request, 'warehouse/bin/create_bin.html', {'form': form, 'area': area})
+    return render(request, 'warehouse/bin/create_bin.html', locals())
 
 def bin_list(request):
     bins = Bin.objects.all()
@@ -174,7 +174,7 @@ def edit_bin(request, bin_code):
     else:
         form = BinForm(instance=bin)
 
-    return render(request, 'warehouse/bin/edit_bin.html', {'form': form, 'bin': bin, 'area_code': area_code})
+    return render(request, 'warehouse/bin/edit_bin.html', locals())
 
 
 def bin_delete(request, pk):
@@ -208,8 +208,8 @@ def bin_by_area(request, area_code):
         bins = []
 
     # Truyền dữ liệu vào context
-    return render(request, 'warehouse/bin/bin_by_area.html', {'bins': bins, 'area': area, 'area_code': area_code, 'wh_code': wh_code})
+    return render(request, 'warehouse/bin/bin_by_area.html', locals())
 
 def index(request):
     warehouses = Warehouse.objects.all()
-    return render(request, 'warehouse/index.html', {'warehouses': warehouses})
+    return render(request, 'warehouse/index.html', locals())

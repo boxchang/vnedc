@@ -103,16 +103,28 @@
         </div>
         <div class="warehouse-map">
                     <!-- Line A -->
-            <div class="zone" style="top: 101px; left: 23px; width: 35px; height: 75px;"
-                 data-zone="A1"></div>
-            <div class="zone" style="top: 183px; left: 23px; width: 35px; height: 76px;"
-                 data-zone="A1"></div>
-            <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"
-                 data-zone="A1"></div>
-            <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"
-                 data-zone="A1"></div>
-            <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"
-                 data-zone="A1"></div>
+            {% if bin%}
+                <div class="zone" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;" data-zone="A001"></div>
+                        {% endif %}
+
+                <div class="zone" data-zone="A002"></div>
+                <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"
+                     data-zone="A003"></div>
+                <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"
+                     data-zone="A004"></div>
+                <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"
+                     data-zone="A005"></div>
+
+{#            <div class="zone" style="top: 101px; left: 23px; width: 35px; height: 75px;"#}
+{#                 data-zone="A001"></div>#}
+{#            <div class="zone" style="top: 183px; left: 23px; width: 35px; height: 76px;"#}
+{#                 data-zone="A002"></div>#}
+{#            <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"#}
+{#                 data-zone="A003"></div>#}
+{#            <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"#}
+{#                 data-zone="A004"></div>#}
+{#            <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"#}
+{#                 data-zone="A005"></div>#}
 
                     <!-- Line B -->
             <div class="zone" style="top: 113px; left: 93px; width: 28px; height: 56px;"
@@ -182,8 +194,6 @@
     </div>
 
         {% endblock %}
-
-
 {% block alert %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
