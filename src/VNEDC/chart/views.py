@@ -79,7 +79,7 @@ def param_value_rate(request):
 
     search_form = RateSearchForm()
     search_form.fields['product'].choices = choices
-    return render(request, 'chart/param_value_rate.html', locals())
+    return render(request, 'chart/achieve_rate_by_product.html', locals())
 
 def get_machines_by_plant(request):
     plant_code = request.GET.get('plant_code')
