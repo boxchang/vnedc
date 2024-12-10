@@ -1,0 +1,172 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block head %}
+{% endblock %}
+{% block title %}
+Achievement Rate
+{% endblock title %}
+{% block breadcrumb %}
+{% endblock %}
+{% block base_js %}
+<script src="{% static "chart.js/js/chart.min.js" %}"></script>
+<script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
+<link href="{% static "select2/css/select2.min.css" %}" rel="stylesheet" />
+<script src="{% static "select2/js/select2.min.js" %}"></script>
+<script>
+var chartData = {
+    datasets: []
+};
+
+var config = {
+    type: 'bar', // 長條圖
+    data: chartData,
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: ''
+            },
+            subtitle: {
+                display: true,
+                text: ''
+            },
+            datalabels: {
+                anchor: 'end', // 將數字放置在條形圖的上方
+                align: 'top',
+                backgroundColor: 'rgba(0, 123, 255, 0.8)', // 方形背景顏色
+                borderRadius: 0, // 設為 0 以確保是方形
+                color: 'white', // 數字的顏色
+                font: {
+                    size: 12,
+                    weight: 'bold'
+                },
+                padding: 4, // 控制數字周圍的間距
+                formatter: function (value, context) {
+                    // 如果值為 null 或 undefined，顯示 "-"
+                    if (value === null || value === undefined) {
+                        return null;
+                    }
+                    // 確保是數字，然後保留一位小數
+                    return Number(value).toFixed(1);
+                },
+            },
+        },
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Date'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                max: 120, // 設定 Y 軸的上限為 120
+                title: {
+                    display: true,
+                    text: 'Rate (%)'
+                }
+            }
+        }
+    },
+    plugins: [ChartDataLabels] // 確保插件已加載
+};
+
+$(document).ready(function () {
+    $('.select2').select2({
+        placeholder: '---',
+        allowClear: true
+    });
+
+    var ctx = document.getElementById('canvas').getContext('2d');
+    const chart = new Chart(ctx, config);
+
+    $('#button-id-submit').click(function btn_submit() {
+        Render();
+    });
+
+    function Render() {
+        var data_date_start = $("#id_data_date_start").val();
+        var data_date_end = $("#id_data_date_end").val();
+        var product = $("#id_product").val();
+
+        if (data_date_start !== "" && data_date_end !== "" && product !== "") {
+            $("body").loading();
+            ajax_chart(data_date_start, data_date_end, product);
+        }
+    }
+
+    function ajax_chart(data_date_start, data_date_end, product) {
+        var json_url = "{% url 'param_value_rate_api' %}";
+        $.ajax({
+            url: json_url,
+            type: "POST",
+            data: {
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+                data_date_start: data_date_start,
+                data_date_end: data_date_end,
+                product: product
+            },
+            dataType: "json",
+            success: function (data) {
+                chartData.datasets = [];
+                if (data.datasets) {
+                    chartData.datasets = data.datasets;
+                    config.options.plugins.title.text = data.title;
+                    config.options.plugins.subtitle.text = data.subtitle;
+                    config.options.scales.y.min = data.y_data.min;
+                    config.options.scales.y.max = data.y_data.max;
+                    chartData.labels = data.labels;
+                    chart.update();
+                }
+                $("body").loading("stop");
+            },
+            error: function (jqXHR, textStatus, ex) {
+                alert(`${textStatus}, ${ex}, ${jqXHR.responseText}`);
+            }
+        });
+    }
+});
+
+
+</script>
+<style>
+    .btn-search {
+        margin-top: 31px;
+    }
+    .daily_info_remark {
+        font-size: 18pt;
+    }
+    .select2-container {
+        width: 100% !important;
+        height: 38px;
+    }
+</style>
+{% endblock %}
+{% block ready %}
+{% endblock ready %}
+{% block container %}
+<div class="container-fluid">
+    <input type="hidden" id="hidCondition" value="Hide" />
+    <div class="row pl-3" id="search_condition">
+        <div class="col-10">
+            {% crispy search_form %}
+        </div>
+    </div>
+    <div class="row">
+        <input type="button" class="btn btn-light" style="width: 100%; height:2px" id="btnCondition" />
+    </div>
+    <div class="row">
+        <div style="width:80%;">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
