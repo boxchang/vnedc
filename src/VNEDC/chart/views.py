@@ -405,7 +405,7 @@ def param_value_rate_api(request):
                                 date, name
                     ) A WHERE rate < 120 and rate > 0
                     ORDER BY 
-                        date
+                        date,name
                 
                 
                 """
@@ -426,7 +426,7 @@ def param_value_rate_api(request):
                                 date, name
                     ) A WHERE rate < 120 and rate > 0
                     ORDER BY 
-                        date
+                        date,name
                 """
             vnedc_db = vnedc_database()
             records = vnedc_db.select_sql_dict(sql)
