@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
-from spiderweb.models import Device_Type, Monitor_Device_List, Monitor_Device_Log
+from spiderweb.models import Device_Type, Monitor_Device_List, Monitor_Device_Log, Monitor_Status
 from VNEDC.database import vnedc_database
 
 def spiderweb(request):
@@ -58,6 +58,11 @@ def spiderweb(request):
 
 def abnormal_recover(request, pk):
     issue = get_object_or_404(Monitor_Device_Log, pk=pk)
+
+    device = Monitor_Device_List.objects.get(device_name=issue.device.device_name)
+    device.status = Monitor_Status.objects.get(status_code="S01")
+    device.save()
+
     issue.recover_msg = True
     issue.save()
     return redirect(reverse('spiderweb'))
