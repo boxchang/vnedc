@@ -466,7 +466,11 @@ def param_value_rate_api(request):
                 "datasets": datasets,
                 "title": product,
                 "subtitle": product,
-                "y_data": {"beginAtZero": "true"}
+                "y_data": {"beginAtZero": "true", "max": 120,
+                "title": {
+                    "display": "true",
+                    "text": 'Rate (%)'
+                }}
             }
 
         except Exception as e:
