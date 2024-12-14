@@ -469,7 +469,7 @@ def param_value_rate_api(request):
                 "y_data": {"beginAtZero": "true", "max": 120,
                 "title": {
                     "display": "true",
-                    "text": 'Rate (%)'
+                    "text": '目標達成率 (%)'
                 }}
             }
 
