@@ -66,3 +66,8 @@ def abnormal_recover(request, pk):
     issue.recover_msg = True
     issue.save()
     return redirect(reverse('spiderweb'))
+
+
+def spiderweb_config(request):
+
+    return render(request, 'spiderweb/spiderweb_config.html', locals())

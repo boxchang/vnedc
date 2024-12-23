@@ -47,6 +47,7 @@ class Monitor_Device_List(models.Model):
     port = models.CharField(max_length=100, null=True, blank=True)
     plant = models.CharField(max_length=50, null=True, blank=True)
     enable = models.CharField(max_length=1, null=False, blank=False, default='Y')
+    stop_before = models.CharField(max_length=10, null=True, blank=True)
     status = models.ForeignKey(Monitor_Status, related_name='monitor_list_status', on_delete=models.DO_NOTHING, null=True,
                               blank=True)
     status_update_at = models.DateTimeField(default=timezone.now)
