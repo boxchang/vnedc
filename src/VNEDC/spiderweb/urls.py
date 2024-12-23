@@ -6,5 +6,5 @@ from mes.views import work_order_list, index, runcard_detail, ipqc_log, fast_che
 
 urlpatterns = [
     url(r'^abnormal_recover/(?P<pk>\d+)', abnormal_recover, name='abnormal_recover'),
-    url(r'^spiderweb_config', spiderweb_config, name='spiderweb_config'),
+    url(r'^config', spiderweb_config, name='spiderweb_config'),
 ]
