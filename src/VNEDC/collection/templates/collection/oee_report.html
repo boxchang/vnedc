@@ -21,6 +21,121 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function () {
+        $('#raw-data-container').hide();
+        let activeButton = null;
+
+        $('.action-button').on('click', function () {
+            const $container = $('#raw-data-container');
+            const sButton = $(this).attr('id');
+
+            if ($container.is(':visible') && activeButton === sButton) {
+                $container.hide();
+                activeButton = null;
+            } else {
+                const sPlant = $('#id_plant').val();
+                const sMach = $('#id_mach').val();
+                const sData_date = $('#id_data_date').val();
+
+                $.ajax({
+                    url: '{% url "oee_report" %}',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        plant: sPlant,
+                        mach: sMach,
+                        data_date: sData_date,
+                        button: sButton
+                    },
+                    success: function (response) {
+                        $container.html(response.table).show();
+                        activeButton = sButton;
+
+                        if (sButton === 'id-machine-stop-time') {
+                            $container.find('tr').each(function () {
+                                const $row = $(this);
+                                const $td3 = $row.find('td:nth-child(3)');
+                                const $td7 = $row.find('td:nth-child(7)');
+
+                                [$td3, $td7].forEach($cell => {
+                                    const cellText = $cell.text().trim();
+                                    if (cellText === "NaN" || (/^-?\d*\.?\d+$/.test(cellText) && parseFloat(cellText) < 10) || cellText === "None" ) {
+                                        $cell.css('background-color', 'yellow');
+                                    }
+                                });
+                            });
+                        } else {
+                             $container.find('tr').each(function () {
+                                 const $row = $(this);
+                                 const $td3 = $row.find('td:nth-child(3)');
+                                 const $td7 = $row.find('td:nth-child(7)');
+
+                                  [$td3, $td7].forEach($cell => {
+                                      $cell.css('background-color', '');
+                                  });
+                             });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script>
+     document.addEventListener("DOMContentLoaded", function () {
+        const countingMachineQty = document.getElementById("id-counting-machine-qty");
+        const secondHand = document.getElementById("id-second-hand");
+        const scrap = document.getElementById("id-scrap");
+        const appearanceInspect = document.getElementById("id-appearance-inspect");
+        const failProduct = document.getElementById("id-fail-product");
+        const estimatedOutput = document.getElementById("id-estimated-output");
+        const sapTicket = document.getElementById("id-sap-ticket-qty");
+        const activationValue = document.getElementById("id-activation");
+
+        const outputValue1 = document.getElementById("id-output-value1");
+        const outputValue2 = document.getElementById("id-output-value2");
+        const outputValue3 = document.getElementById("id-output-value3");
+        const capacityEfficiency1 = document.getElementById("id-capacity-efficiency1");
+        const capacityEfficiency2 = document.getElementById("id-capacity-efficiency2");
+        const yieldField1 = document.getElementById("id-yield1");
+        const yieldField2 = document.getElementById("id-yield2");
+        const oee = document.getElementById("id-oee");
+
+        function calculateOutput() {
+            const counting = parseFloat(countingMachineQty.textContent) || 0;
+            const second = parseFloat(secondHand.textContent) || 0;
+            const scrapValue = parseFloat(scrap.textContent) || 0;
+            const appearance = parseFloat(appearanceInspect.value) || 0;
+            const fail = parseFloat(failProduct.value) || 0;
+            const estimated = parseFloat(estimatedOutput.textContent) || 0;
+            const sap = parseFloat(sapTicket.textContent) || 0;
+            const activation = parseFloat(activationValue.textContent) || 0;
+
+            const total = counting + second + scrapValue + appearance + fail;
+            outputValue1.textContent = `${total}`;
+            outputValue2.textContent = `${total}`;
+            outputValue3.textContent = `${total}`;
+
+            const efficiency = total/estimated;
+            capacityEfficiency1.textContent = `${efficiency.toFixed(6)}`;
+            capacityEfficiency2.textContent = `${efficiency.toFixed(6)}`;
+
+            const yieldRate = sap/total;
+            yieldField1.textContent = `${yieldRate.toFixed(6)}`;
+            yieldField2.textContent = `${yieldRate.toFixed(6)}`;
+
+            const oee_rate = activation*efficiency*yieldRate;
+            oee.textContent = `${oee_rate.toFixed(6)}`;
+        }
+
+        appearanceInspect.addEventListener("input", calculateOutput);
+        failProduct.addEventListener("input", calculateOutput);
+    });
+</script>
 {% endblock js %}
 {% block title %}
 Report Check
@@ -174,119 +289,4 @@ Report Check
         </div>
     </div>
 </div>
-<script>
-$(document).ready(function () {
-    $('#raw-data-container').hide();
-    let activeButton = null;
-
-    $('.action-button').on('click', function () {
-        const $container = $('#raw-data-container');
-        const sButton = $(this).attr('id');
-
-        if ($container.is(':visible') && activeButton === sButton) {
-            $container.hide();
-            activeButton = null;
-        } else {
-            const sPlant = $('#id_plant').val();
-            const sMach = $('#id_mach').val();
-            const sData_date = $('#id_data_date').val();
-
-            $.ajax({
-                url: '{% url "oee_report" %}',
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    plant: sPlant,
-                    mach: sMach,
-                    data_date: sData_date,
-                    button: sButton
-                },
-                success: function (response) {
-                    $container.html(response.table).show();
-                    activeButton = sButton;
-
-                    if (sButton === 'id-machine-stop-time') {
-                        $container.find('tr').each(function () {
-                            const $row = $(this);
-                            const $td3 = $row.find('td:nth-child(3)');
-                            const $td7 = $row.find('td:nth-child(7)');
-
-                            [$td3, $td7].forEach($cell => {
-                                const cellText = $cell.text().trim();
-                                if (cellText === "NaN" || (/^-?\d*\.?\d+$/.test(cellText) && parseFloat(cellText) < 10) || cellText === "None" ) {
-                                    $cell.css('background-color', 'yellow');
-                                }
-                            });
-                        });
-                    } else if (sButton === 'id-speed' || sButton === 'id-second-hand' || sButton === 'id-scrap' || sButton === 'id-sap-ticket-qty' || sButton === 'id-counting-machine-qty'){
-                         $container.find('tr').each(function () {
-                             const $row = $(this);
-                             const $td3 = $row.find('td:nth-child(3)');
-                             const $td7 = $row.find('td:nth-child(7)');
-
-                              [$td3, $td7].forEach($cell => {
-                                  $cell.css('background-color', '');
-                              });
-                         });
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error:", status, error);
-                }
-            });
-        }
-    });
-});
-</script>
-<script>
-     document.addEventListener("DOMContentLoaded", function () {
-        const countingMachineQty = document.getElementById("id-counting-machine-qty");
-        const secondHand = document.getElementById("id-second-hand");
-        const scrap = document.getElementById("id-scrap");
-        const appearanceInspect = document.getElementById("id-appearance-inspect");
-        const failProduct = document.getElementById("id-fail-product");
-        const estimatedOutput = document.getElementById("id-estimated-output");
-        const sapTicket = document.getElementById("id-sap-ticket-qty");
-        const activationValue = document.getElementById("id-activation");
-
-        const outputValue1 = document.getElementById("id-output-value1");
-        const outputValue2 = document.getElementById("id-output-value2");
-        const outputValue3 = document.getElementById("id-output-value3");
-        const capacityEfficiency1 = document.getElementById("id-capacity-efficiency1");
-        const capacityEfficiency2 = document.getElementById("id-capacity-efficiency2");
-        const yieldField1 = document.getElementById("id-yield1");
-        const yieldField2 = document.getElementById("id-yield2");
-        const oee = document.getElementById("id-oee");
-
-        function calculateOutput() {
-            const counting = parseFloat(countingMachineQty.textContent) || 0;
-            const second = parseFloat(secondHand.textContent) || 0;
-            const scrapValue = parseFloat(scrap.textContent) || 0;
-            const appearance = parseFloat(appearanceInspect.value) || 0;
-            const fail = parseFloat(failProduct.value) || 0;
-            const estimated = parseFloat(estimatedOutput.textContent) || 0;
-            const sap = parseFloat(sapTicket.textContent) || 0;
-            const activation = parseFloat(activationValue.textContent) || 0;
-
-            const total = counting + second + scrapValue + appearance + fail;
-            outputValue1.textContent = `${total}`;
-            outputValue2.textContent = `${total}`;
-            outputValue3.textContent = `${total}`;
-
-            const efficiency = total/estimated;
-            capacityEfficiency1.textContent = `${efficiency.toFixed(6)}`;
-            capacityEfficiency2.textContent = `${efficiency.toFixed(6)}`;
-
-            const yieldRate = sap/total;
-            yieldField1.textContent = `${yieldRate.toFixed(6)}`;
-            yieldField2.textContent = `${yieldRate.toFixed(6)}`;
-
-            const oee_rate = activation*efficiency*yieldRate;
-            oee.textContent = `${oee_rate.toFixed(6)}`;
-        }
-
-        appearanceInspect.addEventListener("input", calculateOutput);
-        failProduct.addEventListener("input", calculateOutput);
-    });
-</script>
 {% endblock content %}
