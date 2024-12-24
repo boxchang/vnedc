@@ -1400,9 +1400,8 @@ def oee_report(request):
         sPlant ='GDNBR'
     machs = Machine.objects.filter(plant=sPlant)
     if sMach is not '':
-        # try:
+        try:
             split_sMach = [sMach[:2], sMach[2:5], sMach[5:]]
-
             sql = f"""
                 SELECT name
                 FROM [PMGMES].[dbo].[PMG_DML_DataModelList] where DataModelTypeId= 'DMT000003' 
@@ -1468,7 +1467,7 @@ def oee_report(request):
             minus_machine_stop_time = 1440 - machine_stop_time
 
             sql2 = f"""
-                SELECT  rc.MachineName as Machine,nbr.PartNo,nbr.ProductItem,  rc.id as Runcard, 
+                SELECT  rc.MachineName as Machine,nbr.PartNo,nbr.ProductItem, rc.LineName as Line,  rc.id as Runcard, 
                 rc.InspectionDate as InspecDate, rc.period as Period, wo.Id as WorkOrder, 
                 nbr.LowerLineSpeed_Min as LowSpeed, nbr.UpperLineSpeed_Min as UpSpeed,
                 case when ft.ActualQty is not null then ft.ActualQty else 0 end as FaultyQuantity,
@@ -1488,7 +1487,7 @@ def oee_report(request):
                 where rc.MachineName = '{mach}'
                 and ((rc.InspectionDate = '{sData_date}' and rc.Period between 6 and 23 ) 
                 or (rc.InspectionDate = DATEADD(DAY, 1, '{sData_date}') and rc.Period between 0 and 5))
-                order by rc.InspectionDate, cast(rc.Period as int)
+                order by rc.InspectionDate, cast(rc.Period as int), rc.LineName
             """
             data_raws = mes_db.select_sql_dict(sql2)
             if len(data_raws) > 0:
@@ -1500,17 +1499,17 @@ def oee_report(request):
                 speed_df.loc[len(speed_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'LowSpeed': 'Average', 'UpSpeed': f"({int(speed_df.loc[0]['LowSpeed'])} + {int(speed_df.loc[0]['UpSpeed'])})/2 = {int((speed_df.loc[0]['LowSpeed'] + speed_df.loc[0]['UpSpeed'])/2)}"}
                 estimate_ouput = int(speed)*1440*line_num
 
-                second_grade_df = raw_df.loc[raw_df['FaultyQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'FaultyQuantity']]
+                second_grade_df = raw_df.loc[raw_df['FaultyQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'FaultyQuantity']]
                 second_grade = sum(second_grade_df['FaultyQuantity'])
-                second_grade_df.loc[len(second_grade_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '-Total-', 'FaultyQuantity': second_grade}
+                second_grade_df.loc[len(second_grade_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line': '-Total-', 'FaultyQuantity': second_grade}
 
-                scrap_df = raw_df.loc[raw_df['ScrapQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'ScrapQuantity']]
+                scrap_df = raw_df.loc[raw_df['ScrapQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'ScrapQuantity']]
                 scrap = sum(scrap_df['ScrapQuantity'])
-                scrap_df.loc[len(scrap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '-Total-', 'ScrapQuantity': scrap}
+                scrap_df.loc[len(scrap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line': '-Total-', 'ScrapQuantity': scrap}
 
-                sap_df = raw_df.loc[raw_df['SAPQuantity'] >= 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Period', 'SAPQuantity']]
+                sap_df = raw_df.loc[raw_df['SAPQuantity'] >= 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'Period', 'SAPQuantity']]
                 sap = sum(sap_df['SAPQuantity'])
-                sap_df.loc[len(sap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Period': '-Total-', 'SAPQuantity': sap}
+                sap_df.loc[len(sap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line':'', 'Period': '-Total-', 'SAPQuantity': sap}
 
                 sql3 = f"""
                         SELECT cdm.MES_MACHINE as Machine, cdm.line as Line, cast(cd.CreationTime as date) as InspecDate, DATEPART(HOUR, cd.CreationTime) AS Period, cast((case when SUM(cd.qty2) > 0 then SUM(cd.qty2) else 0 end) as int) AS CountingQuantity
@@ -1551,8 +1550,9 @@ def oee_report(request):
                     return JsonResponse({'table': table_html}, safe=False)
             else:
                 msg = f'No runcards of {sMach} on this day!!!'
-        # except Exception as e:
-        #     print(e)
-        #     pass
+        except Exception as e:
+            print(e)
+            msg = f'This day missing data'
+            pass
     return render(request, 'collection/oee_report.html', locals())
 
