@@ -55,15 +55,19 @@
                         if (sButton === 'id-machine-stop-time') {
                             $container.find('tr').each(function () {
                                 const $row = $(this);
-                                const $td3 = $row.find('td:nth-child(3)');
-                                const $td7 = $row.find('td:nth-child(7)');
+                                const $td11 = $row.find('td:nth-child(11)');
+                                let highlightRow = false;
 
-                                [$td3, $td7].forEach($cell => {
+                                [$td11].forEach($cell => {
                                     const cellText = $cell.text().trim();
-                                    if (cellText === "NaN" || (/^-?\d*\.?\d+$/.test(cellText) && parseFloat(cellText) < 10) || cellText === "None" ) {
-                                        $cell.css('background-color', 'yellow');
+                                    if (cellText == 5) {
+                                        highlightRow = true;
                                     }
                                 });
+                                if (highlightRow) {
+                                    console.log('Highlighting row:', $row.html());
+                                    $row.css('background-color', 'yellow');
+                                }
                             });
                         } else {
                              $container.find('tr').each(function () {

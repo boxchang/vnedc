@@ -1465,6 +1465,7 @@ def oee_report(request):
             machine_stop_time = len(stop_time_df_filtered_df)*5
             activation = round((1440 - machine_stop_time)/1440, 2) if machine_stop_time > 0 else 1
             minus_machine_stop_time = 1440 - machine_stop_time
+            stop_time_df = stop_time_df.fillna('')
 
             sql2 = f"""
                 SELECT  rc.MachineName as Machine,nbr.PartNo,nbr.ProductItem, rc.LineName as Line,  rc.id as Runcard, 
