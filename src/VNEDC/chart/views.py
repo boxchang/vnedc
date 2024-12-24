@@ -393,16 +393,16 @@ def param_value_rate_api(request):
                     SELECT * FROM (
                         SELECT 
                             name, 
-                            date, 
+                            belong_to date, 
                             (CAST(SUM(sum_qty) AS FLOAT) / SUM(CASE WHEN sum_qty IS NOT NULL THEN target ELSE 0 END)) * 100 AS rate
                         FROM 
                             [MES_OLAP].[dbo].[mes_daily_report_raw]
                         WHERE 
                             ProductItem LIKE '%{sproduct[0]}%' and ProductItem LIKE '%{sproduct[-1]}%'
-                            AND date BETWEEN '{data_date_start}' AND '{data_date_end}'
+                            AND belong_to BETWEEN '{data_date_start}' AND '{data_date_end}'
                             and sum_qty is not NULL 
                             GROUP BY 
-                                date, name
+                                belong_to, name
                     ) A WHERE rate < 120 and rate > 0
                     ORDER BY 
                         date,name
@@ -414,16 +414,16 @@ def param_value_rate_api(request):
                     SELECT * FROM (
                         SELECT 
                             name, 
-                            date, 
+                            belong_to date, 
                             (CAST(SUM(sum_qty) AS FLOAT) / SUM(CASE WHEN sum_qty IS NOT NULL THEN target ELSE 0 END)) * 100 AS rate
                         FROM 
                             [MES_OLAP].[dbo].[mes_daily_report_raw]
                         WHERE 
                             ProductItem LIKE '%{product}%'
-                            AND date BETWEEN '{data_date_start}' AND '{data_date_end}'
+                            AND belong_to BETWEEN '{data_date_start}' AND '{data_date_end}'
                             and sum_qty is not NULL 
                             GROUP BY 
-                                date, name
+                                belong_to, name
                     ) A WHERE rate < 120 and rate > 0
                     ORDER BY 
                         date,name
@@ -469,7 +469,7 @@ def param_value_rate_api(request):
                 "y_data": {"beginAtZero": "true", "max": 120,
                 "title": {
                     "display": "true",
-                    "text": 'Rate (%)'
+                    "text": '目標達成率 (%)'
                 }}
             }
 
