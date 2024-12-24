@@ -8,21 +8,20 @@
 <script>
     $(document).ready(function() {
         $('#id_data_date').on('change', function () {
-            $('#session_form').attr('action', '/collection/oee_report/');
+            $('#session_form').attr('action', '{% url "oee_report" %}');
             $('#session_form').submit();
         });
         $('#id_plant').on('change', function () {
-            $('#session_form').attr('action', '/collection/oee_report/');
+            $('#session_form').attr('action', '{% url "oee_report" %}');
             $('#session_form').submit();
         });
         $('#id_mach').on('change', function () {
-            $('#session_form').attr('action', '/collection/oee_report/');
+            $('#session_form').attr('action', '{% url "oee_report" %}');
             $('#session_form').submit();
         });
     });
 </script>
 {% endblock js %}
-
 {% block title %}
 Report Check
 {% endblock title %}
@@ -68,7 +67,6 @@ Report Check
         color: white;
         background-color: #3B3838;
     }
-
     .raw-data {
         position: relative;
     }
