@@ -148,7 +148,7 @@ class RateSearchForm(forms.Form):
     product = forms.ChoiceField(
         required=True,
         label=_('Product'),
-        widget=forms.Select(attrs={'class': 'select2'})
+        widget=forms.Select(attrs={'class': 'select2', 'data-tags': 'true', 'data-allow-clear': 'true'})
     )
 
     def __init__(self, *args, submit_title='Submit', **kwargs):

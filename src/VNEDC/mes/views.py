@@ -1577,8 +1577,8 @@ def monthly_check(request):
             # sub_data_counting = [name]
             # sub_data_sap_qty = [name]
 
-            sub_data_counting = [f"{split_name}  Counting Data"]
-            sub_data_sap_qty = [f"{split_name} SAP Data"]
+            sub_data_counting = []
+            sub_data_sap_qty = []
             # Khởi tạo giá trị mặc định bằng 0 cho mỗi ngày trong tháng
             daily_data = {day: {'counting': 0, 'sap_qty': 0} for day in range(1, days_in_month + 1)}
 
@@ -1594,8 +1594,19 @@ def monthly_check(request):
                 sub_data_counting.append(daily_data[day]['counting'])
                 sub_data_sap_qty.append(daily_data[day]['sap_qty'])
 
-            data_table.append(sub_data_counting)
-            data_table.append(sub_data_sap_qty)
+            gap = [b - a for a, b in zip(sub_data_counting, sub_data_sap_qty)]
+            gap_rate = [((b - a)/a)*100 if a!=0 else 0 for a, b in zip(sub_data_counting, sub_data_sap_qty)]
+
+            # Format
+            sub_data_counting = [f"{a // 1000:,} K" for a in sub_data_counting]
+            sub_data_sap_qty = [f"{a // 1000:,} K" for a in sub_data_sap_qty]
+            gap = [f"{a // 1000:,} K" for a in gap]
+            gap_rate = [f"{a:.1f}%" if a != 0 else "0%" for a in gap_rate]
+
+            data_table.append({"mach": f"{split_name}C", "data_type": "COUNTING", "data": sub_data_counting})
+            data_table.append({"mach": f"{split_name}S", "data_type": "SAP", "data": sub_data_sap_qty})
+            data_table.append({"mach": split_name, "data_type": "GAP", "data": gap})
+            data_table.append({"mach": split_name, "data_type": "GAP_RATE", "data": gap_rate})
 
     return render(request, 'mes/monthly_check.html', locals())
 

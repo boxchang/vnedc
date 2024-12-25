@@ -37,7 +37,6 @@
     }
     tbody td {
         border: 1px solid #ddd;
-        background-color: #f0f0f0;
         font-size: 14px;
     }
 
@@ -121,8 +120,39 @@
     tbody tr:hover {
         background-color: #e6e6e6;
     }
+
+    .counting {
+        background-color: #d3d3d4;
+    }
+
+    .sap {
+        background-color: #d3d3d4;
+    }
+
+    .gap {
+        background-color: ghostwhite;
+    }
+
+    .gap_rate {
+        background-color: honeydew;
+    }
+
+    .negative {
+        color: red;
+    }
+
 </style>
 <script type="text/javascript">
+$(document).ready(function () {
+    const tableCells = document.querySelectorAll('td');
+
+    tableCells.forEach(td => {
+        // Check if the cell contains a negative value
+        if (td.textContent.trim().startsWith('-')) {
+            td.classList.add('negative'); // Add 'negative' class
+        }
+    });
+});
 
 </script>
 
@@ -140,15 +170,16 @@ Monthly Check
         <tr>
             <th></th>
             {% for day in days %}
-                <th>Day {{ day }}</th>
+                <th>{{ day }}</th>
             {% endfor %}
             <!-- Thêm các tiêu đề ngày khác nếu cần -->
         </tr>
     </thead>
     <tbody>
-        {% for machine in data_table %}
-            <tr>
-                {% for day in machine %}
+        {% for info in data_table %}
+            <tr {% if info.data_type == "COUNTING" %}class="counting"{% elif info.data_type == "SAP" %}class="sap"{% elif info.data_type == "GAP" %}class="gap"{% else %}class="gap_rate"{% endif %}>
+                <td>{{ info.mach }}</td>
+                {% for day in info.data %}
                     <td>{{ day }}</td>
                 {% endfor %}
             </tr>

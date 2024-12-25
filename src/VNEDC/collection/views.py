@@ -10,7 +10,7 @@ from VNEDC.database import vnedc_database
 from collection.forms import DailyInfoForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
     Daily_Prod_Info_Head, Lab_Parameter_Control
-from jobs.database import mes_database
+from jobs.database import mes_database, scada_database
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
@@ -20,6 +20,7 @@ import requests
 import os
 import hashlib
 import base64
+import pandas as pd
 
 def create_vnedc_connection():
     pass
@@ -1376,3 +1377,183 @@ def product_info_report(request):
         print(e)
         pass
     return render(request, 'collection/product_info_report.html', locals())
+
+
+def oee_report(request):
+    plants = Plant.objects.all()
+    machs = Machine.objects.none()
+    sPlant = request.session.get('plant', '')
+    sMach = request.session.get('mach', '')
+    sData_date = request.session.get('data_date', datetime.today().strftime("%Y-%m-%d"))
+    if request.method == 'POST':
+        sData_date = request.POST.get('data_date')
+        sPlant = request.POST.get('plant')
+        sMach = request.POST.get('mach', datetime.today().strftime("%Y-%m-%d"))
+    if request.is_ajax():
+        sData_date = request.GET.get('data_date')
+        sPlant = request.GET.get('plant')
+        sMach = request.GET.get('mach', datetime.today().strftime("%Y-%m-%d"))
+        sButton = request.GET.get('button')
+    vnedc_db = vnedc_database()
+    mes_db = mes_database()
+    if sPlant == 'LK':
+        sPlant ='GDNBR'
+    machs = Machine.objects.filter(plant=sPlant)
+    if sMach is not '':
+        try:
+            split_sMach = [sMach[:2], sMach[2:5], sMach[5:]]
+            sql = f"""
+                SELECT name
+                FROM [PMGMES].[dbo].[PMG_DML_DataModelList] where DataModelTypeId= 'DMT000003' 
+                and name like '%{split_sMach[0]}%' and name like '%{split_sMach[1]}%' and name like '%{split_sMach[2]}%'
+                """
+            mach = mes_db.select_sql_dict(sql)[0]['name']
+
+            sql_ = f"""SELECT LINE
+                FROM [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] where MES_MACHINE = '{mach}'
+                """
+            line_num = len(mes_db.select_sql_dict(sql_))
+
+            sql1 = f"""
+                        WITH A1 AS (
+                        SELECT m.MES_MACHINE,Qty2,Speed,LINE,CreationTime
+                                          FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                          JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                          where m.MES_MACHINE = '{mach}' and m.LINE = 'A1'
+                                          and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                        ),
+                        B1 AS (
+                        SELECT m.MES_MACHINE,Qty2,Speed,LINE,CreationTime
+                                          FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                          JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                          where m.MES_MACHINE = '{mach}' and m.LINE = 'B1'
+                                          and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                        ),
+                        A2 AS (
+                        SELECT m.MES_MACHINE,Qty2,Speed,LINE,CreationTime
+                                          FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                          JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                          where m.MES_MACHINE = '{mach}' and m.LINE = 'A2'
+                                          and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                        ),
+                        B2 AS (
+                        SELECT m.MES_MACHINE,Qty2,Speed,LINE,CreationTime
+                                          FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                          JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                          where m.MES_MACHINE = '{mach}' and m.LINE = 'B2'
+                                          and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                        )
+        
+                        Select FORMAT(A1.CreationTime, 'yyyy-MM-dd HH:mm:ss') CreationTime, A1.MES_MACHINE, A1.Qty2 A1_Qty, A1.Speed A1_Speed, A2.Qty2 A2_Qty, A2.Speed A2_Speed, B1.Qty2 B1_Qty, B1.Speed B1_Speed, B2.Qty2 B2_Qty, B2.Speed B2_Speed from A1 
+                        left join A2 on A1.CreationTime = A2.CreationTime
+                        join B1 on A1.CreationTime = B1.CreationTime
+                        left join B2 on A1.CreationTime = B2.CreationTime
+        
+                    """
+            detail_raws = mes_db.select_sql_dict(sql1)
+            stop_time_df = pd.DataFrame(detail_raws)
+            stop_time_df['Time'] = ''
+            stop_time_df.loc[
+                ((stop_time_df['A1_Qty'] <= 10) | stop_time_df['A1_Qty'].isna()) &
+                ((stop_time_df['B1_Qty'] <= 10) | stop_time_df['B1_Qty'].isna()),
+                'Time'
+            ] = 5
+            stop_time_df_filtered_df = stop_time_df[~((stop_time_df['A1_Qty'] > 10) | (stop_time_df['B1_Qty'] > 10))]
+            stop_time_df.loc[len(stop_time_df)] = {'CreationTime': '', 'MES_MACHINE': '', 'A1_Qty': '', 'A1_Speed': '',
+                                                   'A2_Qty': '', 'A2_Speed': '', 'B1_Qty': '', 'B1_Speed': '', 'B2_Qty': '',
+                                                   'B2_Speed': '-Total-', 'Time': stop_time_df['Time'].apply(lambda x: int(x) if str(x).isdigit() else 0).sum()}
+            machine_stop_time = len(stop_time_df_filtered_df)*5
+            activation = round((1440 - machine_stop_time)/1440, 2) if machine_stop_time > 0 else 1
+            minus_machine_stop_time = 1440 - machine_stop_time
+            stop_time_df = stop_time_df.fillna('')
+
+            sql2 = f"""
+                SELECT  rc.MachineName as Machine,nbr.PartNo,nbr.ProductItem, rc.LineName as Line,  rc.id as Runcard, 
+                rc.InspectionDate as InspecDate, rc.period as Period, wo.Id as WorkOrder, 
+                nbr.LowerLineSpeed_Min as LowSpeed, nbr.UpperLineSpeed_Min as UpSpeed,
+                case when ft.ActualQty is not null then ft.ActualQty else 0 end as FaultyQuantity,
+                case when sp.ActualQty is not null then sp.ActualQty else 0 end as ScrapQuantity,
+                case when woi.ActualQty is not null then woi.ActualQty else 0 end as SAPQuantity
+                FROM [PMGMES].[dbo].[PMG_MES_RunCard] rc
+                left join [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
+                on wo.id = rc.WorkOrderId and wo.StartDate is not NULL
+                left join [PMGMES].[dbo].[PMG_MES_NBR_SCADA_Std] nbr
+                on nbr.PartNo = wo.PartNo
+                left join [PMGMES].[dbo].[PMG_MES_Faulty] ft
+                on ft.RunCardId = rc.id and ft.WorkOrderId = wo.id
+                left join [PMGMES].[dbo].[PMG_MES_Scrap] sp
+                on sp.RunCardId = rc.id and sp.WorkOrderId = wo.id
+                left join [PMGMES].[dbo].[PMG_MES_WorkInProcess] woi
+                on woi.RunCardId = rc.id and woi.WorkOrderId = wo.id
+                where rc.MachineName = '{mach}'
+                and ((rc.InspectionDate = '{sData_date}' and rc.Period between 6 and 23 ) 
+                or (rc.InspectionDate = DATEADD(DAY, 1, '{sData_date}') and rc.Period between 0 and 5))
+                order by rc.InspectionDate, cast(rc.Period as int), rc.LineName
+            """
+            data_raws = mes_db.select_sql_dict(sql2)
+            if len(data_raws) > 0:
+                msg = ''
+                raw_df = pd.DataFrame(data_raws)
+
+                speed_df = raw_df.loc[0:4, ['Machine', 'PartNo', 'ProductItem', 'LowSpeed', 'UpSpeed']].drop_duplicates(subset=['ProductItem'])
+                speed = int((speed_df.loc[0]['LowSpeed'] + speed_df.loc[0]['UpSpeed'])/2)
+                speed_df.loc[len(speed_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'LowSpeed': 'Average', 'UpSpeed': f"({int(speed_df.loc[0]['LowSpeed'])} + {int(speed_df.loc[0]['UpSpeed'])})/2 = {int((speed_df.loc[0]['LowSpeed'] + speed_df.loc[0]['UpSpeed'])/2)}"}
+                estimate_ouput = int(speed)*1440*line_num
+
+                second_grade_df = raw_df.loc[raw_df['FaultyQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'FaultyQuantity']]
+                second_grade = sum(second_grade_df['FaultyQuantity'])
+                second_grade_df.loc[len(second_grade_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line': '-Total-', 'FaultyQuantity': second_grade}
+
+                scrap_df = raw_df.loc[raw_df['ScrapQuantity'] > 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'ScrapQuantity']]
+                scrap = sum(scrap_df['ScrapQuantity'])
+                scrap_df.loc[len(scrap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line': '-Total-', 'ScrapQuantity': scrap}
+
+                sap_df = raw_df.loc[raw_df['SAPQuantity'] >= 0, ['Machine', 'PartNo', 'ProductItem', 'WorkOrder', 'Line', 'Period', 'SAPQuantity']]
+                sap = sum(sap_df['SAPQuantity'])
+                sap_df.loc[len(sap_df)] = {'Machine': '', 'PartNo': '', 'ProductItem': '', 'WorkOrder': '', 'Line':'', 'Period': '-Total-', 'SAPQuantity': sap}
+
+                sql3 = f"""
+                        SELECT cdm.MES_MACHINE as Machine, cdm.line as Line, cast(cd.CreationTime as date) as InspecDate, DATEPART(HOUR, cd.CreationTime) AS Period, cast((case when SUM(cd.qty2) > 0 then SUM(cd.qty2) else 0 end) as int) AS CountingQuantity
+                        FROM [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] cdm
+                        JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA] cd
+                        ON cdm.COUNTING_MACHINE = cd.MachineName and cd.CreationTime BETWEEN CONVERT(DATETIME, '{sData_date} 06:00:00', 120) 
+                        AND CONVERT(DATETIME,DATEADD(DAY, 1, '{sData_date}') + '05:59:59', 120)
+                        WHERE cdm.MES_MACHINE = '{mach}' 
+                        GROUP BY cdm.MES_MACHINE, cdm.line, cast(cd.CreationTime as date), DATEPART(HOUR, cd.CreationTime)
+                        order by cast(cd.CreationTime as date), DATEPART(HOUR, cd.CreationTime), cdm.line
+                """
+                counting_raws = mes_db.select_sql_dict(sql3)
+                couting_df = pd.DataFrame(counting_raws)
+                counting = int(sum(couting_df['CountingQuantity']))
+                couting_df.loc[len(couting_df)] = {'Machine': '', 'Line': '', 'InspecDate': '', 'Period': '-Total-', 'CountingQuantity': counting}
+
+                output = counting + scrap + second_grade
+                capacity = round(output/estimate_ouput, 3)
+                yied = round(sap/output, 3)
+
+                oee = round(activation*capacity*yied, 3)
+
+                if request.is_ajax():
+                    if sButton == 'id-machine-stop-time':
+                        table_html = stop_time_df.to_html(classes='table table-striped', index=False)
+                    elif sButton == 'id-speed':
+                        table_html = speed_df.to_html(classes='table table-striped', index=False)
+                    elif sButton == 'id-second-hand':
+                        table_html = second_grade_df.to_html(classes='table table-striped', index=False)
+                    elif sButton == 'id-scrap':
+                        table_html = scrap_df.to_html(classes='table table-striped', index=False)
+                    elif sButton == 'id-sap-ticket-qty':
+                        table_html = sap_df.to_html(classes='table table-striped', index=False)
+                    elif sButton == 'id-counting-machine-qty':
+                        table_html = couting_df.to_html(classes='table table-striped', index=False)
+                    else:
+                        table_html = stop_time_df_filtered_df.to_html(classes='table table-striped', index=False)
+                    return JsonResponse({'table': table_html}, safe=False)
+            else:
+                msg = f'No runcards of {sMach} on this day!!!'
+        except Exception as e:
+            print(e)
+            msg = f'This day missing data'
+            pass
+    return render(request, 'collection/oee_report.html', locals())
+
