@@ -31,8 +31,10 @@
             {% block content %}
             <div class="col-sm-9" style="border: 1px #6c757d solid; height: 90vh;">
                 <h2 class="mb-4">{% trans "Bin List By Area" %}</h2>
-                <a class="btn btn-primary mb-3" style="width: 70px" href="{% url 'bin_create' area_code %}" role="button">{% trans "Add" %}</a>
-    {#            <a class="btn btn-info mb-3 ms-3"  href="{% url 'area_list' %}" role="button">Area List</a>#}
+                <div class="row d-flex justify-content-center">
+                    <a class="btn btn-primary mb-3" style="width: 70px" href="{% url 'bin_create' area_code %}" role="button">{% trans "Add" %}</a>
+                    <a class="btn btn-secondary mb-3 ms-5" style="width: auto" href="{% url 'area_by_warehouse' wh_code %}" role="button">{% trans "Back to List" %}</a>
+                </div>
                 <!-- Kiểm tra nếu có dữ liệu -->
                 {% if bins %}
                 <table class="table table-bordered">

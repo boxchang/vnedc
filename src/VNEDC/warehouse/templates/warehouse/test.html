@@ -5,6 +5,7 @@
 {% block title %} 倉庫地圖 Layer 示例 {% endblock %}
 {% block base_js %}
     <style>
+
         body {
             font-family: Arial, sans-serif;
         }
@@ -12,19 +13,26 @@
         /* 倉庫地圖背景 */
         .warehouse-map {
             position: relative;
-            width: 800px;
-            height: 600px;
-            background: url('/media/warehouse_images/warehouse.png') no-repeat center center;
-            background-size: cover;
-            margin: auto;
+            background: url('/media/warehouse_images/warehouse_2.jpg') no-repeat;
+            {#center center#}
+            height: 800px;
+            width: auto;
             border: 2px solid #ccc;
+        }
+
+        .red{
+            border: 2px solid rgba(255, 0, 0, 0.7);
+            background-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .green{
+            border: 2px solid rgba(0, 255, 0, 0.7);  /* Màu xanh lá cây với độ trong suốt 70% */
+            background-color: rgba(0, 255, 0, 0.3);  /* Màu xanh lá cây với độ trong suốt 30% */
         }
 
         /* 層 (Layer) */
         .zone {
             position: absolute;
-            border: 2px solid rgba(255, 0, 0, 0.7);
-            background-color: rgba(255, 0, 0, 0.3);
             cursor: pointer;
         }
 
@@ -34,7 +42,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
+            width: 700px;
             background: white;
             border: 2px solid #ccc;
             border-radius: 10px;
@@ -69,131 +77,52 @@
             background-color: #0056b3;
         }
 
-        .list-group{
-            width: 42vh;
-        }
-        .line {
-            display: grid;
-            grid-template-columns: 1fr 3fr; /* Cột đầu chiếm 25%, cột sau chiếm 75% */
-            gap: 20px; /* Khoảng cách giữa các cột */
-            margin: 0 auto; /* Căn giữa container */
-        }
-        @media (max-width: 768px) {
-            .line {
-                grid-template-columns: 1fr; /* Cả 2 cột sẽ chiếm 100% khi màn hình nhỏ */
-            }
-        }
 </style>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 {% endblock %}
-{% block container %}
-<div class="container mt-5">
-
-    <div class="line">
-        <div class="list-group">
-            <div class="row" style="margin-left: 3px; margin-bottom: 20px; gap: 10px">
-                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">W</a>
-                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">A</a>
-                <a class="btn btn-primary" href="#" style="width: 10vh" role="button">B</a>
-            </div>
-            <a class="btn btn-warning" href="#" role="button" style="margin-bottom: 15px; outline: 4px solid #ccc;">{% trans "Packaging Material WH 1F" %}</a>
-            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Finished Product WH" %}</a>
-            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Semi-finished Product WH" %}</a>
-            <a class="btn btn-primary" href="#" role="button" style="margin-bottom: 15px">{% trans "Hand Mold WH" %}</a>
-        </div>
-        <div class="warehouse-map">
-                    <!-- Line A -->
-            {% if bin%}
-                <div class="zone" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;" data-zone="A001"></div>
-                        {% endif %}
-
-                <div class="zone" data-zone="A002"></div>
-                <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"
-                     data-zone="A003"></div>
-                <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"
-                     data-zone="A004"></div>
-                <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"
-                     data-zone="A005"></div>
-
-{#            <div class="zone" style="top: 101px; left: 23px; width: 35px; height: 75px;"#}
-{#                 data-zone="A001"></div>#}
-{#            <div class="zone" style="top: 183px; left: 23px; width: 35px; height: 76px;"#}
-{#                 data-zone="A002"></div>#}
-{#            <div class="zone" style="top: 265px; left: 23px; width: 35px; height: 76px;"#}
-{#                 data-zone="A003"></div>#}
-{#            <div class="zone" style="top: 348px; left: 23px; width: 35px; height: 76px;"#}
-{#                 data-zone="A004"></div>#}
-{#            <div class="zone" style="top: 430px; left: 23px; width: 35px; height: 75px;"#}
-{#                 data-zone="A005"></div>#}
-
-                    <!-- Line B -->
-            <div class="zone" style="top: 113px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 181px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 248px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 314px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 379px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 448px; left: 93px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <!-- Layer 3 -->
-            <div class="zone" style="top: 113px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 181px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 248px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 314px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 379px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 448px; left: 158px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-
-            <!-- Layer 3 -->
-            <div class="zone" style="top: 113px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 181px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 248px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 314px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 379px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 448px; left: 225px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-
-            <!-- Layer 3 -->
-            <div class="zone" style="top: 113px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 181px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 248px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 314px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 379px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-            <div class="zone" style="top: 448px; left: 290px; width: 28px; height: 56px;"
-                 data-zone="B1"></div>
-        </div>
-    </div>
+{% block content %}
+<div class="warehouse-map">
+    {% if bins %}
+        {% for bin in bins %}
+            {% for status in bins_status %}
+                {% if status.bin_id == bin.bin_id and status.status == 'red' %}
+                    <div class="zone red" bin_name="{{ bin.bin_id }}" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;" data-zone="A001"></div>
+                {% elif status.bin_id == bin.bin_id and status.status == 'green' %}
+                    <div class="zone green" bin_name="{{ bin.bin_id }}" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;" data-zone="A001"></div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
 </div>
     <!-- 彈出表單 -->
     <div class="popup-form" id="popupForm">
-        <h3>輸入數量</h3>
-        <form id="quantityForm">
-            <input type="number" id="quantity" placeholder="請輸入數量" required>
-            <button type="submit">確認</button>
-            <button type="button" onclick="closePopup()">取消</button>
-        </form>
+        <div class="row">
+            <div class="col-4">
+                <form id="quantityForm">
+                    {% csrf_token %}
+                    {% crispy form %}
+                    <button class="justify-content-center" type="button" id="btn_send" style="padding: 5px">{% trans "Confirm" %}</button>
+                    <button type="button" onclick="closePopup()"  style="padding: 5px">{% trans "Cancel" %}</button>
+                    <button type="button" id="btn_clear" style="padding: 5px; width: auto">{% trans "Clear" %}</button>
+                </form>
+            </div>
+            <div class="col-8">
+                <table border="1" width="100%">
+                    <tr>
+                        <td>PO</td>
+                        <td>Size</td>
+                        <td>Qty</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-        {% endblock %}
+{% endblock %}
+
+
 {% block alert %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
@@ -202,10 +131,21 @@
         const quantityInput = document.getElementById('quantity');
         let currentZone = null;
 
+        const idBinField = document.getElementById('id_bin');
         // 點擊區域觸發表單
         zones.forEach(zone => {
             zone.addEventListener('click', (event) => {
-                currentZone = zone.dataset.zone;
+                // 獲取當前點擊的 zone 的 bin_name 屬性值
+                const binName = zone.getAttribute('bin_name');
+
+                // Lưu binName vào localStorage
+                localStorage.setItem('selectedBin', binName);
+
+                // 設置表單中的 id_bin 欄位值
+                if (idBinField) {
+                    idBinField.value = binName;
+                }
+
                 popupForm.style.display = 'block';
             });
         });
@@ -220,8 +160,492 @@
 
         // 關閉表單
         function closePopup() {
+            status = ''
+            console.log(status)
+            // Reset các trường nhập liệu trong form
+            $('#id_bin').val('');
+            $('#id_po_no').val('');
+            $('#id_size').val('');
+            $('#id_qty').val('');
             popupForm.style.display = 'none';
-            quantityInput.value = '';
+            {#quantityInput.value = '';#}
         }
+
+        $(document).ready(function () {
+            let status='STOCK'
+            let action= ''
+            console.log(status)
+
+
+            const storedLink = localStorage.getItem('historyLink');
+            if (storedLink) {
+                // Nếu có, đặt lại nội dung cho #history_link
+                $("#history_link").html(storedLink);
+            }
+
+            // Kiểm tra xem có zone nào đã được lưu trong localStorage không
+            const selectedBin = localStorage.getItem('selectedBin');
+            if (selectedBin) {
+                // Tìm zone tương ứng với binName
+                const zoneToOpen = document.querySelector(`.zone[bin_name="${selectedBin}"]`);
+
+                // Mở lại zone đó (mở form popup và thiết lập giá trị tương ứng)
+                if (zoneToOpen) {
+                    const binName = zoneToOpen.getAttribute('bin_name');
+
+                    if (idBinField) {
+                        idBinField.value = binName;
+                    }
+
+                    popupForm.style.display = 'block';
+                }
+
+                // Xóa thông tin trong localStorage sau khi đã xử lý
+                localStorage.removeItem('selectedBin');
+            }
+
+
+            // Kiểm tra nếu có dữ liệu trong localStorage
+            const tableData = JSON.parse(localStorage.getItem('tableData'));
+
+            if (tableData) {
+                // Nếu có dữ liệu bảng, xóa các dòng hiện tại và thêm lại dữ liệu
+                $('table tr:not(:first)').remove();
+
+                tableData.forEach(bin => {
+                    const tableRow = `
+                        <tr data-bin="${bin.bin}" data-po="${bin.po_no}" data-bins="${bin.bin}">
+                            <td class="po-cell" style="color: red">${bin.po_no}</td>
+                            <td class="size-cell">${bin.size}</td>
+                            <td class="qty-cell">${bin.qty}</td>
+                            <td class="edit-cell">
+                                <button type="button" class="btn btn-danger">
+                                    Stock Out
+                                </button>
+                            </td>
+                        </tr>`;
+                    $('table').append(tableRow);
+
+                    $('button.btn.btn-danger').last().css({
+                        'background-color': 'red',      // Màu nền đỏ
+                        'color': 'white',               // Màu chữ trắng
+                        'font-size': '12px',            // Kích thước chữ nhỏ
+                        'padding': '5px 10px',          // Khoảng cách xung quanh chữ
+                        'border': 'none',               // Bỏ viền
+                        'border-radius': '3px'          // Bo góc
+                    });
+
+                    // Chỉnh độ giãn dòng cho các ô trong bảng
+                    $('table tr:last td').css({
+                        'line-height': '2' // Đặt độ giãn dòng, ví dụ: 1.5
+                    });
+
+                });
+
+
+
+                // Xóa dữ liệu khỏi localStorage sau khi đã hiển thị
+                localStorage.removeItem('tableData');
+            }
+
+            // Sự kiện click vào zone
+            $('.zone').on('click', function () {
+                status = 'STOCK'
+                console.log(status)
+                // Khi nhấn vào nút "Clear"
+                $('#btn_clear').click(function () {
+                    // Reset tất cả các trường nhập liệu trong form
+                    $('#id_po_no').val('');
+                    $('#id_size').val('');
+                    $('#id_qty').val('');
+                });
+
+                const binName = $(this).attr('bin_name');  // Lấy giá trị `bin_name` từ zone đã click
+
+                // Reset các trường nhập liệu trong form
+                $('#id_po_no').val('');
+                $('#id_size').val('');
+                $('#id_qty').val('');
+
+                // Gửi yêu cầu AJAX đến server
+                $.ajax({
+                    url: '{% url "bin_action" %}',  // URL trỏ đến view `bin_action`
+                    type: 'POST',
+                    data: {
+                        bin: binName,  // Gửi bin_id
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Token bảo mật
+                    },
+                    success: function (response) {
+                        // Xóa tất cả các dòng trong bảng, ngoại trừ dòng đầu tiên
+                        $('table tr:not(:first)').remove();
+
+                        // Lặp qua danh sách `bin_value` từ server và thêm vào bảng
+                        response.list_bin_value.forEach(function (bin) {
+                            const tableRow = `
+                                <tr data-bin="${bin.bin}" data-po="${bin.po_no}" data-bins="${bin.bin}">
+                                    <td class="po-cell" style="color: red">${bin.po_no}</td>
+                                    <td class="size-cell">${bin.size}</td>
+                                    <td class="qty-cell">${bin.qty}</td>
+                                    <td class="edit-cell">
+                                        <button type="button" class="btn btn-danger">
+                                            Stock Out
+                                        </button>
+                                    </td>
+                                </tr>`;
+                            $('table').append(tableRow);
+
+
+                            $('button.btn.btn-danger').last().css({
+                                'background-color': 'red',      // Màu nền đỏ
+                                'color': 'white',               // Màu chữ trắng
+                                'font-size': '12px',            // Kích thước chữ nhỏ
+                                'padding': '5px 10px',          // Khoảng cách xung quanh chữ
+                                'border': 'none',               // Bỏ viền
+                                'border-radius': '3px'          // Bo góc
+                            });
+
+                            $('table tr:last td').css({
+                                'line-height': '2' // Đặt độ giãn dòng, ví dụ: 1.5
+                            });
+
+                        });
+
+
+
+                        $("#history_link").html("<a href=\"/warehouse/bin/search/?bin="+response.bin_code+ "&from_date="+ response.from + "&to_date=" + response.to +"\" class=\"bin-icon-link\" target=\"_blank\"><i class=\"fas fa-external-link-alt\"></i></a>");
+
+                        // Thêm sự kiện hover cho các dòng trong bảng
+                        $('table tr').hover(
+                            function () {
+                                $(this).css('background-color', '#f5f5f5');
+                            },
+                            function () {
+                                $(this).css('background-color', '');
+                            }
+                        );
+
+
+                        // Hiển thị thông báo (nếu có)
+                        {#alert(response.message);#}
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error occurred: ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Thêm sự kiện click cho các dòng "Edit"
+            $('table').on('click', '.edit-cell', function () {
+                status = 'edit';
+                console.log(status);
+                action = 'edit'
+
+                // Khi nhấn vào nút "Clear"
+                $('#btn_clear').click(function () {
+                    status = 'STOCK'
+                    console.log(status)
+                    // Reset tất cả các trường nhập liệu trong form
+                    $('#id_po_no').val('');
+                    $('#id_size').val('');
+                    $('#id_qty').val('');
+                });
+
+                const row = $(this).closest('tr'); // Lấy dòng cha chứa cột Edit
+                const bin = row.data('bin'); // Lấy dữ liệu từ thuộc tính data-bin
+                const po = row.data('po'); // Lấy dữ liệu từ thuộc tính data-po
+                const size = row.find('.size-cell').text(); // Lấy dữ liệu cột Size
+                const qty = row.find('.qty-cell').text(); // Lấy dữ liệu cột Qty
+
+                // Điền dữ liệu vào form
+                $('#id_bin').val(bin); // Điền giá trị vào trường id_bin
+                $('#id_po_no').val(po); // Điền giá trị vào trường id_po_no
+                $('#id_size').val(size); // Điền giá trị vào trường id_size
+                $('#id_qty').val(0); // Điền giá trị vào trường id_qty
+
+                // Mở form để người dùng có thể chỉnh sửa
+                $('#popupForm').show(); // Hiển thị form để chỉnh sửa
+            });
+
+            // Khi nhấn vào nút "確認" (Xác nhận)
+            $('#btn_send').click(function () {
+                const idBin = $('#id_bin').val();
+                const idPo = $('#id_po_no').val();
+                const idSize = $('#id_size').val();
+                const idQty = parseInt($('#id_qty').val());  // Lấy giá trị từ trường input có id="id_qty" và chuyển thành số nguyên
+
+                // Kiểm tra nếu giá trị idQty hợp lệ
+                if (isNaN(idQty) || idQty <= 0 || idPo.trim() === "" || idSize.trim() === "") {
+                    alert("Field cannot be blank.");
+                    return;
+                }
+
+                // Lưu trạng thái popup trước khi reload trang
+                localStorage.setItem('popupVisible', 'true');
+                localStorage.setItem('selectedBin', idBin);
+
+                if (action === 'edit'){
+                    {#QUERY CONTRAINS INPUT VALID#}
+                    $.ajax({
+                            url: '{% url 'bin_action' %}',
+                            type: 'POST',
+                            data: {
+                                bin: idBin,
+                                po: idPo,
+                                size: idSize,
+                                qty: idQty,
+                                status: status,
+                                action: action,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function (response) {
+                                // Xóa bảng hiện tại
+                                $('table tr:not(:first)').remove();
+
+                                // Lặp qua danh sách `bin_value` từ server và thêm vào bảng
+                                if (response.list_bin_value.length === 0) {
+                                    // Nếu không có dữ liệu trong danh sách, reload lại trang
+                                    location.reload();
+                                } else if(response.list_bin_value.length === 1){
+                                  // Lưu dữ liệu bảng vào localStorage
+                                    const tableData = response.list_bin_value.map(bin => {
+                                        return {
+                                            bin: bin.bin,
+                                            po_no: bin.po_no,
+                                            size: bin.size,
+                                            qty: bin.qty
+                                        };
+                                    });
+
+                                    localStorage.setItem('tableData', JSON.stringify(tableData));
+
+                                    // Reload trang
+                                    location.reload();
+                                } else {
+                                    $('table tr:not(:first)').remove();
+
+                                    // Lặp qua danh sách `bin_value` từ server và thêm vào bảng
+                                    response.list_bin_value.forEach(function (bin) {
+                                        const tableRow = `
+                                            <tr data-bin="${bin.bin}" data-po="${bin.po_no}" data-bins="${bin.bin}">
+                                                <td class="po-cell" style="color: red">${bin.po_no}</td>
+                                                <td class="size-cell">${bin.size}</td>
+                                                <td class="qty-cell">${bin.qty}</td>
+                                                <td class="edit-cell">
+                                                    <button type="button" class="btn btn-danger">
+                                                        Stock Out
+                                                    </button>
+                                                </td>
+                                            </tr>`;
+                                        $('table').append(tableRow);
+
+                                        $('button.btn.btn-danger').last().css({
+                                            'background-color': 'red',      // Màu nền đỏ
+                                            'color': 'white',               // Màu chữ trắng
+                                            'font-size': '12px',            // Kích thước chữ nhỏ
+                                            'padding': '5px 10px',          // Khoảng cách xung quanh chữ
+                                            'border': 'none',               // Bỏ viền
+                                            'border-radius': '3px'          // Bo góc
+                                        });
+
+                                        $('table tr:last td').css({
+                                            'line-height': '2' // Đặt độ giãn dòng, ví dụ: 1.5
+                                        });
+
+                                    });
+
+
+
+                                }
+
+
+
+                                // Thêm sự kiện hover cho các dòng
+                                $('table tr').hover(
+                                    function() {
+                                        $(this).css('background-color', '#f5f5f5'); // Màu nền khi hover
+                                    },
+                                    function() {
+                                        $(this).css('background-color', ''); // Quay lại màu nền ban đầu khi hover bỏ
+                                    }
+                                );
+
+                                $('#btn_clear').click(function () {
+                                    status = 'STOCK'
+                                    console.log(status)
+                                    // Reset tất cả các trường nhập liệu trong form
+                                    $('#id_po_no').val('');
+                                    $('#id_size').val('');
+                                    $('#id_qty').val('');
+                                });
+
+                                    // Hiển thị thông báo thành công
+                                alert(response.message);
+                                // Reset tất cả các trường nhập liệu trong form
+                                $('#id_po_no').val('');
+                                $('#id_size').val('');
+                                $('#id_qty').val('');
+
+                            },
+
+                            error: function (xhr, status, error) {
+                                alert('Error occurred: ' + xhr.responseText);
+                            }
+                    });
+                        {#end ajax#}
+                } else {
+                    {#CLICK EDIT AND CAN DELETE SAME BIN_ID#}
+                    $.ajax({
+                    url: '{% url 'check_po_exists' %}',  // Đảm bảo URL chính xác
+                    type: 'POST',
+                    data: {
+                        bin_id: idBin,
+                        po_no: idPo,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Đảm bảo bạn có csrf token đúng
+                    },
+                    success: function(response) {
+                        $("#history_link").html("<a href=\"/warehouse/bin/search/?bin="+response.bin_code+ "&from_date="+ response.from + "&to_date=" + response.to +"\" class=\"bin-icon-link\" target=\"_blank\"><i class=\"fas fa-external-link-alt\"></i></a>");
+
+                        if (response.exists) {
+                            alert("PO No already exists. Please enter a different PO.");
+                            return;
+                        }
+
+                        $.ajax({
+                            url: '{% url 'bin_action' %}',
+                            type: 'POST',
+                            data: {
+                                bin: idBin,
+                                po: idPo,
+                                size: idSize,
+                                qty: idQty,
+                                status: status,
+                                action: action,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function (response) {
+                                $("#history_link").html("<a href=\"/warehouse/bin/search/?bin="+response.bin_code+ "&from_date="+ response.from + "&to_date=" + response.to +"\" class=\"bin-icon-link\" target=\"_blank\"><i class=\"fas fa-external-link-alt\"></i></a>");
+
+                                // Xóa bảng hiện tại
+                                $('table tr:not(:first)').remove();
+
+                                // Lặp qua danh sách `bin_value` từ server và thêm vào bảng
+                                if (response.list_bin_value.length === 0) {
+                                    // Nếu không có dữ liệu trong danh sách, reload lại trang
+                                    location.reload();
+                                } else if(response.list_bin_value.length === 1){
+                                  // Lưu dữ liệu bảng vào localStorage
+                                    const tableData = response.list_bin_value.map(bin => {
+                                        return {
+                                            bin: bin.bin,
+                                            po_no: bin.po_no,
+                                            size: bin.size,
+                                            qty: bin.qty
+                                        };
+                                    });
+
+                                    localStorage.setItem('tableData', JSON.stringify(tableData));
+
+                                    // Reload trang
+                                    location.reload();
+                                } else {
+                                    $('table tr:not(:first)').remove();
+
+                                    // Lặp qua danh sách `bin_value` từ server và thêm vào bảng
+                                    response.list_bin_value.forEach(function (bin) {
+                                        const tableRow = `
+                                            <tr data-bin="${bin.bin}" data-po="${bin.po_no}" data-bins="${bin.bin}">
+                                                <td class="po-cell" style="color: red">${bin.po_no}</td>
+                                                <td class="size-cell">${bin.size}</td>
+                                                <td class="qty-cell">${bin.qty}</td>
+                                                <td class="edit-cell">
+                                                    <button type="button" class="btn btn-danger">
+                                                        Stock Out
+                                                    </button>
+                                                </td>
+                                            </tr>`;
+                                        $('table').append(tableRow);
+
+                                        $('button.btn.btn-danger').last().css({
+                                            'background-color': 'red',      // Màu nền đỏ
+                                            'color': 'white',               // Màu chữ trắng
+                                            'font-size': '12px',            // Kích thước chữ nhỏ
+                                            'padding': '5px 10px',          // Khoảng cách xung quanh chữ
+                                            'border': 'none',               // Bỏ viền
+                                            'border-radius': '3px'          // Bo góc
+                                        });
+
+                                        $('table tr:last td').css({
+                                            'line-height': '2' // Đặt độ giãn dòng, ví dụ: 1.5
+                                        });
+
+                                    });
+
+
+
+                                }
+
+                                $("#history_link").html("<a href=\"/warehouse/bin/search/?bin="+response.bin_code+ "&from_date="+ response.from + "&to_date=" + response.to +"\" class=\"bin-icon-link\" target=\"_blank\"><i class=\"fas fa-external-link-alt\"></i></a>");
+                                localStorage.setItem('historyLink', $("#history_link").html());
+
+                                // Thêm sự kiện hover cho các dòng
+                                $('table tr').hover(
+                                    function() {
+                                        $(this).css('background-color', '#f5f5f5'); // Màu nền khi hover
+                                    },
+                                    function() {
+                                        $(this).css('background-color', ''); // Quay lại màu nền ban đầu khi hover bỏ
+                                    }
+                                );
+
+                                // Thêm hiệu ứng hover cho mục "Edit"
+                                {#$('.edit-cell').hover(#}
+                                {#    function() {#}
+                                {#        $(this).css('background-color', '#f50a0c'); // Màu nền khi hover#}
+                                {#        $(this).css('cursor', 'pointer'); // Thay đổi con trỏ thành pointer khi hover#}
+                                {#    },#}
+                                {#    function() {#}
+                                {#        $(this).css('background-color', ''); // Quay lại màu nền ban đầu khi hover bỏ#}
+                                {#    }#}
+                                {#);#}
+                                // Khi nhấn vào nút "Clear"
+                                $('#btn_clear').click(function () {
+                                    status = 'STOCK'
+                                    console.log(status)
+                                    // Reset tất cả các trường nhập liệu trong form
+                                    $('#id_po_no').val('');
+                                    $('#id_size').val('');
+                                    $('#id_qty').val('');
+                                });
+
+                                    // Hiển thị thông báo thành công
+                                alert(response.message);
+                                // Reset tất cả các trường nhập liệu trong form
+                                $('#id_po_no').val('');
+                                $('#id_size').val('');
+                                $('#id_qty').val('');
+
+                            },
+
+                            error: function (xhr, status, error) {
+                                alert('Error occurred: ' + xhr.responseText);
+                            }
+                        });
+                        {#end ajax#}
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                    }
+                });
+                }
+                {#end else#}
+
+
+            });
+
+        });
+
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}
