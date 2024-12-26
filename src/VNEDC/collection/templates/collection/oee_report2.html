@@ -1,0 +1,309 @@
+{% extends 'collection/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+{% load i18n %}
+{% endblock css %}
+{% block js %}
+<script>
+    $(document).ready(function() {
+        $('#id_data_date').on('change', function () {
+            $('#session_form').attr('action', '{% url "oee_report2" %}');
+            $('#session_form').submit();
+        });
+        $('#id_plant').on('change', function () {
+            $('#session_form').attr('action', '{% url "oee_report2" %}');
+            $('#session_form').submit();
+        });
+        $('#id_mach').on('change', function () {
+            $('#session_form').attr('action', '{% url "oee_report2" %}');
+            $('#session_form').submit();
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#raw-data-container').hide();
+        let activeButton = null;
+
+        $('.action-button').on('click', function () {
+            const $container = $('#raw-data-container');
+            const sButton = $(this).attr('id');
+
+            if ($container.is(':visible') && activeButton === sButton) {
+                $container.hide();
+                activeButton = null;
+            } else {
+                const sPlant = $('#id_plant').val();
+                const sMach = $('#id_mach').val();
+                const sData_date = $('#id_data_date').val();
+
+                $.ajax({
+                    url: '{% url "oee_report" %}',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        plant: sPlant,
+                        mach: sMach,
+                        data_date: sData_date,
+                        button: sButton
+                    },
+                    success: function (response) {
+                        $container.html(response.table).show();
+                        activeButton = sButton;
+
+                        if (sButton === 'id-machine-stop-time') {
+                            $container.find('tr').each(function () {
+                                const $row = $(this);
+                                const $td11 = $row.find('td:nth-child(11)');
+                                let highlightRow = false;
+
+                                [$td11].forEach($cell => {
+                                    const cellText = $cell.text().trim();
+                                    if (cellText == 5) {
+                                        highlightRow = true;
+                                    }
+                                });
+                                if (highlightRow) {
+                                    console.log('Highlighting row:', $row.html());
+                                    $row.css('background-color', 'yellow');
+                                }
+                            });
+                        } else {
+                             $container.find('tr').each(function () {
+                                 const $row = $(this);
+                                 const $td3 = $row.find('td:nth-child(3)');
+                                 const $td7 = $row.find('td:nth-child(7)');
+
+                                  [$td3, $td7].forEach($cell => {
+                                      $cell.css('background-color', '');
+                                  });
+                             });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script>
+     document.addEventListener("DOMContentLoaded", function () {
+        const countingMachineQty = document.getElementById("id-counting-machine-qty");
+        const secondHand = document.getElementById("id-second-hand");
+        const scrap = document.getElementById("id-scrap");
+        const appearanceInspect = document.getElementById("id-appearance-inspect");
+        const failProduct = document.getElementById("id-fail-product");
+        const estimatedOutput = document.getElementById("id-estimated-output");
+        const sapTicket = document.getElementById("id-sap-ticket-qty");
+        const activationValue = document.getElementById("id-activation");
+
+        const outputValue1 = document.getElementById("id-output-value1");
+        const outputValue2 = document.getElementById("id-output-value2");
+        const outputValue3 = document.getElementById("id-output-value3");
+        const capacityEfficiency1 = document.getElementById("id-capacity-efficiency1");
+        const capacityEfficiency2 = document.getElementById("id-capacity-efficiency2");
+        const yieldField1 = document.getElementById("id-yield1");
+        const yieldField2 = document.getElementById("id-yield2");
+        const oee = document.getElementById("id-oee");
+
+        function calculateOutput() {
+            const counting = parseFloat(countingMachineQty.textContent) || 0;
+            const second = parseFloat(secondHand.textContent) || 0;
+            const scrapValue = parseFloat(scrap.textContent) || 0;
+            const appearance = parseFloat(appearanceInspect.value) || 0;
+            const fail = parseFloat(failProduct.value) || 0;
+            const estimated = parseFloat(estimatedOutput.textContent) || 0;
+            const sap = parseFloat(sapTicket.textContent) || 0;
+            const activation = parseFloat(activationValue.textContent) || 0;
+
+            const total = counting + second + scrapValue + appearance + fail;
+            outputValue1.textContent = `${total}`;
+            outputValue2.textContent = `${total}`;
+            outputValue3.textContent = `${total}`;
+
+            const efficiency = total/estimated;
+            capacityEfficiency1.textContent = `${efficiency.toFixed(6)}`;
+            capacityEfficiency2.textContent = `${efficiency.toFixed(6)}`;
+
+            const yieldRate = sap/total;
+            yieldField1.textContent = `${yieldRate.toFixed(6)}`;
+            yieldField2.textContent = `${yieldRate.toFixed(6)}`;
+
+            const oee_rate = activation*efficiency*yieldRate;
+            oee.textContent = `${oee_rate.toFixed(6)}`;
+        }
+
+        appearanceInspect.addEventListener("input", calculateOutput);
+        failProduct.addEventListener("input", calculateOutput);
+    });
+</script>
+{% endblock js %}
+{% block title %}
+Report Check
+{% endblock title %}
+{% block content %}
+<style>
+    .block-item{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border: 1px solid #2C5493;
+        border-radius: 5px;
+    }
+    .block-color-green{
+        color: white;
+        background-color: green;
+    }
+    .block-color-light-green{
+        color: white;
+        background-color: #00B050;
+    }
+    .block-color-red{
+        color: white;
+        background-color: red;
+    }
+    .block-color-light-blue{
+        color: white;
+        background-color: #00B0F0;
+    }
+    .block-color-blue{
+        color: white;
+        background-color: #0070C0;
+    }
+    .block-color-orange{
+        color: white;
+        background-color: #C55A11;
+    }
+    .block-color-gold{
+        color: white;
+        background-color: #BF9000;
+    }
+    .block-color-gray{
+        color: white;
+        background-color: #3B3838;
+    }
+    .raw-data {
+        position: relative;
+    }
+    .raw-data-content {
+        position: relative;
+    }
+    #raw-data-container {
+        max-height: 44vh;
+        overflow-y: auto;
+        overflow-x: auto;
+        padding: 0px;
+        background-color: #f9f9f9;
+    }
+    #raw-data-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    #raw-data-container thead {
+        position: sticky;
+        top: 0;
+        transform: translateY(-1%);
+        background-color: #f1f1f1;
+        z-index: 1;
+    }
+    #raw-data-container th,
+    #raw-data-container td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    #raw-data-container tbody{
+        margin-top: 10px;
+    }
+    #raw-data-container tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    input::placeholder {
+        color: white;
+    }
+</style>
+<div class="content-layout" style="margin-left: 0px">
+    {% for line in line_data %}
+    <div class="row m-3" style="margin-left: 0px">
+        <div class="col-md-12 d-flex">
+            <span class="col-md-2" style="text-align: center;">{{ line.line_name }}稼動率</span>
+            <span style="width: 40px;"></span>
+            <span class="col-md-2" style="width: 10%;text-align: center;">每天可運轉時間(分)</span>
+            <span class="col-md-2" style="width: 20%;text-align: center;">停機時間(分)</span>
+            <span class="col-md-2" style="width: 10%;text-align: center;">每天可運轉時間(分)</span>
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-light-blue" id="id-activation">{{ line.activation }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+            <div class="col-md-1 block-item block-color-green">1440</div>
+            <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">{{ line.machine_stop_time }}</div>{# Machine Stop Time #}
+            <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+            <div class="col-md-1 block-item block-color-green">1440</div>
+        </div>
+        <div class="col-md-12 d-flex">
+            <span style="width: 220px;text-align: center;">預估產能(Pcs)</span>
+            <span style="width: 200px;text-align: center;">最適產能:定速</span>
+            <span style="width: 150px;text-align: center;">扣除停機後可運轉時間(分)</span>
+            <span style="width: 280px;text-align: center;"></span>
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-blue" id="id-estimated-output">{{ line.estimate_ouput }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div class="col-md-1 block-item block-color-green action-button" id="id-speed">{{ line.speed }}</div>{# Speed #}
+            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+            <div class="col-md-3 block-item block-color-green" id="id-machine-stop-time">{{ line.run_time }}</div>{# 1440-Machine Stop Time #}
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-green" id="id-output-value1">{{ line.output }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">{{ line.counting }}</div>{# Counting Machine Qty (lPQc) Second #}
+            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+            <div class="col-md-1 block-item block-color-green action-button" id="id-second-hand">{{ line.second_grade }}</div>
+            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+            <div class="col-md-1 block-item block-color-green action-button" id="id-scrap">{{ line.scrap }}</div>
+            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+            <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+            <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">{{ line.capacity }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-green" id="id-output-value2">{{ line.output }}</div>
+            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-blue">{{ line.estimate_ouput }}</div>
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-light-green" id="id-yield1">{{ line.yied }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">{{ line.sap }}</div>{# SAP Ticket Qty #}
+            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-green" id="id-output-value3">{{ line.output }}</div>
+        </div>
+        <div class="col-md-12 d-flex mb-3">
+            <div class="col-md-2 block-item block-color-green" id="id-oee">{{ line.oee }}</div>
+            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-light-blue">{{ line.activation }}</div>
+            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">{{ line.capacity }}</div>
+            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+            <div class="col-md-2 block-item block-color-light-green" id="id-yield2">{{ line.yied }}</div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="raw-data">
+        <div class="raw-data-content">
+            <div id="raw-data-container">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
