@@ -2,10 +2,11 @@ from django.urls import re_path as url
 
 from collection.views import record, daily_info_create, prod_info_save, prod_info_reset, index, raw_data_api, \
     get_mach_api, test, daily_info_head_delete, rd_report, generate_excel_file_big, rd_message, send_message, \
-    product_info_report, oee_report
+    product_info_report, oee_report, oee_report2
 
 urlpatterns = [
     url(r'^oee_report/', oee_report, name='oee_report'),
+    url(r'^oee_report2/', oee_report2, name='oee_report2'),
     url(r'^index/$', index, name='collection_index'),
     url(r'^record/(?P<process_code>\w+)/$', record, name='record'),
     url(r'^prod_info_save/$', prod_info_save, name='prod_info_save'),
