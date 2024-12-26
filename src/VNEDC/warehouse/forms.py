@@ -1,8 +1,13 @@
+from datetime import timedelta, date
+
 from django import forms
 import PIL
 from PIL import Image
 
 from warehouse.models import Warehouse, Area, Bin
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Div, Submit, HTML
+from django.utils.translation import gettext_lazy as _
 
 
 class WarehouseForm(forms.ModelForm):
@@ -78,17 +83,12 @@ class AreaForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class BinForm(forms.ModelForm):
     class Meta:
         model = Bin  # Chỉ định model mà form này sẽ sử dụng
-        #exclude = ['area']  # Loại bỏ trường area khỏi form
         fields = ['bin_id', 'bin_name', 'area', 'pos_x', 'pos_y', 'bin_w', 'bin_l']
 
-    # widgets = {
-    #     'area_id': forms.TextInput(attrs={'class': 'form-control'}),
-    #     'area_name': forms.TextInput(attrs={'class': 'form-control'}),
-    #     'wh_code': forms.Select(attrs={'class': 'form-select'}),
-    # }
     bin_id = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
     bin_name = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
     area = forms.ModelChoiceField(
@@ -100,8 +100,6 @@ class BinForm(forms.ModelForm):
     pos_y = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     bin_w = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     bin_l = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-
-
 
     def save(self, commit=True):
         # Lấy instance của Bin từ dữ liệu form
@@ -120,9 +118,86 @@ class BinForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #print(self.fields['bin'].queryset)  # Debug queryset
         # Kiểm tra nếu là form chỉnh sửa
         if self.instance and self.instance.pk:  # Kiểm tra nếu đối tượng đã tồn tại
             self.fields['bin_id'].widget.attrs['readonly'] = 'readonly'
+
+
+class BinValueForm(forms.Form):
+    bin = forms.CharField(
+        required=True,
+        label=_('Bin'),
+        max_length=20,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+    po_no = forms.CharField(required=True, label=_('Product Order'), max_length=20)
+    size = forms.CharField(required=True, label=_('Size'), max_length=20)
+    qty = forms.IntegerField(required=True, label=_('Qty'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+        self.helper.layout = Layout(
+            Div(
+                Div('bin', css_class='col-md-10'),  # Đặt class input-container vào div chứa bin
+                Div(
+                    HTML(
+                        f"<div id='history_link'></div>"),
+                    css_class='col-md-2'
+                ),
+                css_class='row'
+            ),
+            Div(
+                Div('po_no', css_class='col-md-12'),
+                css_class='row'
+            ),
+            Div(
+                Div('size', css_class='col-md-12'),
+                css_class='row'
+            ),
+            Div(
+                Div('qty', css_class='col-md-12'),
+                css_class='row'
+            ),
+        )
+
+
+class BinSearchForm(forms.Form):
+    bin = forms.CharField(
+        required=False,
+        label="Bin:",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-left: 4vh'}))
+    po_no = forms.CharField(
+        required=False,
+        label="PO:",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-left: 4vh'}))
+    size = forms.CharField(
+        required=False,
+        label="Size",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-left: 4vh'})
+    )
+    from_date = forms.DateField(
+        required=False,
+        label="From",
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'style': 'margin-left: 2vh'})
+    )
+    to_date = forms.DateField(
+        required=False,
+        label="To",
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'style': 'margin-left: 5vh'})
+    )
+
+    def __init__(self, *args, bin_value=None, **kwargs):
+        day7_ago = date.today() - timedelta(days=7)
+        today = date.today()
+        super().__init__(*args, **kwargs)
+        self.fields['from_date'].initial = day7_ago
+        self.fields['to_date'].initial = today
+
+
+

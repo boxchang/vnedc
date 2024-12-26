@@ -2,7 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% load i18n %}
-{% block title %} {% trans "Edit Warehouse" %} {% endblock %}
+{% block title %} {% trans "Edit Area" %} {% endblock %}
 {% block container %}
 
     <div class="container mt-5">
@@ -22,7 +22,7 @@
             <form method="post" enctype="multipart/form-data" class="col-sm-9">
                 {% csrf_token %}
                 <div class="card p-4">
-                    <h3 class="card-title">{% trans "Edit Warehouse" %}</h3>
+                    <h3 class="card-title">{% trans "Edit Area" %}</h3>
                     <div class="mb-3">
                         <label for="wh_code" class="form-label" disabled=""></label>
     {#                    {% if is_readonly %}#}
@@ -51,7 +51,7 @@
             </form>
 
             {% endblock %}
-            <a href="{% url 'area_list' %}" class="btn btn-secondary mt-3">{% trans "Back to List" %}</a>
+            <a href="{% url 'area_by_warehouse' wh_code %}" class="btn btn-secondary mt-3">{% trans "Back to List" %}</a>
     </div>
 </div>
 
