@@ -34,6 +34,18 @@ DATABASES = {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     },
+    'SAP': {
+        'ENGINE': 'mssql',
+        'NAME': 'PMG_DEVICE',
+        'USER': 'sa',
+        'PASSWORD': '!QAw3ed',
+        'HOST': '10.13.102.22',
+        'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
     'MES': {
         'ENGINE': 'mssql',
         'NAME': 'PMGMES',

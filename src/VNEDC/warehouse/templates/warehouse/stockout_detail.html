@@ -1,0 +1,76 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Stock In Detail" %} {% endblock %}
+{% block base_js %}
+{{ block.super }}
+<script>
+function open_window(url) {
+    window.open(url, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
+}
+</script>
+{% endblock %}
+
+{% block container %}
+<div class="row p-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <fieldset>
+            <div class="row">
+                <div class="col p-3" style="font-size: 1.5em">出庫單</div>
+                <div class="col p-3" style="text-align: right"></div>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-2 p-2" style="text-align:right;">入庫單號：</div>
+                        <div class="col-2 p-2 content">{{ form.form_no }}</div>
+                        <div class="col-2 p-2" style="text-align:right;">申請日期：</div>
+                        <div class="col-2 p-2 content">{{ form.apply_date }}</div>
+                        <div class="col-2 p-2" style="text-align:right;">填單者：</div>
+                        <div class="col-2 p-2 content">{{ form.requester }}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-2 p-2" style="text-align:right;">申請原因：</div>
+                        <div class="col-10 p-2 content">{{ form.reason|default:'' }}</div>
+                    </div>
+                </li>
+            </ul>
+        </fieldset>
+        <table class="table table-bordered table-striped">
+            <thead class="table-info">
+                <tr>
+                    <th style="width: 10%;text-align: center;">物品類別</th>
+                    <th style="width: 45%">品名</th>
+                    <th style="width: 7%;text-align: center;">數量</th>
+                    <th style="width: 7%;text-align: center;">單位</th>
+                    <th style="width: 24%">備註</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form_item in items %}
+                    <tr>
+                        <td style="text-align: center">{{ form_item.item.item_type }}</td>
+                        <td>
+                        {% for pic in form_item.item.item_pics.all %}
+                            <a href="#" onclick="open_window('{{ pic.files.url }}')">{{ form_item.item.spec }}</a>
+                        {% endfor %}
+                        </td>
+                        <td style="text-align: center">{{ form_item.minus_qty }}</td>
+                        <td style="text-align: center">{{ form_item.item.unit }}</td>
+                        <td>{{ form_item.comment|default:'' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock %}
+
+{% block alert %}
+        
+{% endblock %}

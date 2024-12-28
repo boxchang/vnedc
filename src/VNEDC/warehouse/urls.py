@@ -1,7 +1,8 @@
 from django.urls import path
 from django.urls import re_path as url
 
-from warehouse.views import index
+from warehouse.views import index, stock_in, stockin_detail, get_product_order_info, \
+    stock_in_post
 from . import views
 
 
@@ -28,6 +29,10 @@ urlpatterns = [
     url(r'^bin/bin_by_area/(?P<area_code>[^/]+)$', views.bin_by_area, name='bin_by_area'),
     url(r'^bin/delete/(?P<pk>[^/]+)/$', views.bin_delete, name='bin-delete'),
     url(r'^$', views.warehouse_list, name='warehouse_list'),
+    url(r'^stock_in/', stock_in, name='stock_in'),
+    url(r'^stockin_detail/(?P<pk>\w+)/$', stockin_detail, name='stockin_detail'),
+    url(r'^get_product_order_info/', get_product_order_info, name='get_product_order_info'),
+    url(r'^stock_in_post/', stock_in_post, name='stock_in_post'),
     url(r'^$', views.index, name='warehouse_index'),
 
 ]

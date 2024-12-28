@@ -1,13 +1,14 @@
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 from django import forms
 import PIL
 from PIL import Image
-
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 from warehouse.models import Warehouse, Area, Bin
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div, Submit, HTML
+from crispy_forms.layout import Layout, Div, Button, Submit, HTML
 from django.utils.translation import gettext_lazy as _
+from django import forms
 
 
 class WarehouseForm(forms.ModelForm):
@@ -199,5 +200,192 @@ class BinSearchForm(forms.Form):
         self.fields['from_date'].initial = day7_ago
         self.fields['to_date'].initial = today
 
+class StockInPForm(forms.Form):
+    product_order = forms.CharField(max_length=20, label="訂單", required=False, )  # VBELN 收貨單號
+    customer_no = forms.CharField(max_length=20, label="客戶", required=False,)  # 無
+    version_no = forms.CharField(max_length=20, label="包裝版本號", required=False,)  # ZZVERSION
+    version_seq = forms.CharField(max_length=20, label="版次", required=False, )  # ZZVERSION_SEQ
+    lot_no = forms.CharField(max_length=20, label="LOT NUMBER", required=False, )  # LOTNO
+    item_type = forms.CharField(max_length=20, label="收貨類型", required=False, )  # WGBEZ 物料群組說明
+    packing_type = forms.CharField(max_length=20, label="包裝方式", required=False, )  # 包裝方式
+    purchase_no = forms.CharField(max_length=20, label="採購單號", required=False, )  # EBELN 採購單號
+    purchase_qty = forms.CharField(max_length=20, label="採購數量", required=False, )  # MENGE_PO 採購數量
+    size = forms.CharField(max_length=20, label="SIZE", required=False, )  # ZSIZE 尺寸
+    purchase_unit = forms.CharField(max_length=20, label="採購單位", required=False, )  # MEINS 數量單位
+    post_date = forms.DateField(label="過帳日期")  # BUDAT收貨日期
+    order_qty = forms.CharField(max_length=20, label="收貨數量", required=False, initial=0)  # MENGE
+    order_bin = forms.CharField(max_length=20, label="訂單儲格", required=False, )
+    gift_qty = forms.CharField(max_length=20, label="贈品數量", required=False, initial=0)
+    gift_bin = forms.CharField(max_length=20, label="贈品儲格", required=False, )
+    supplier = forms.CharField(max_length=10, label="供應商", required=False)  # NAME1
+    sap_mtr_no = forms.CharField(max_length=20, label="物料文件", required=False, )  # MBLNR
+    desc = forms.CharField(max_length=2000, label="備註", required=False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 15}))
+    comment = forms.CharField(max_length=200, label="備註", required=False, )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+
+        self.helper.layout = Layout(
+            Div(
+                Div('product_order', css_class='col-md-3'),
+                Div('customer_no', css_class='col-md-3'),
+                Div('version_no', css_class='col-md-3'),
+                Div('version_seq', css_class='col-md-3'),
+                css_class='row'),
+            Div(
+                Div('post_date', css_class='col-md-3'),
+                Div('sap_mtr_no', css_class='col-md-3'),
+                Div('item_type', css_class='col-md-3'),
+                Div('packing_type', css_class='col-md-3'),
+                css_class='row'),
+            Div(
+                Div('purchase_no', css_class='col-md-3'),
+                Div('supplier', css_class='col-md-3'),
+                Div('lot_no', css_class='col-md-2'),
+                Div('size', css_class='col-md-2'),
+                Div('purchase_qty', css_class='col-md-3'),
+                Div('purchase_unit', css_class='col-md-3'),
+                Div('order_qty', css_class='col-md-2'),
+                Div('order_bin', css_class='col-md-2'),
+                Div(Button('bin_search', '查詢', css_class='btn btn-light', onclick="stock_item_popup();"),
+                    css_class='col-md-1 d-flex align-items-center pt-3'),
+                Div('comment', css_class='col-md-10'),
+                Div(HTML(
+                    '<a href="#" class="btn btn-info" onclick="add_item();"><i class="fas fa-plus-circle"></i> 加入</a>'),
+                    css_class='col-md-2 d-flex align-items-center pt-3'),
+                css_class='row'),
+        )
+
+        self.fields['post_date'].widget = DatePickerInput(
+            attrs={'value': (datetime.now()).strftime('%Y-%m-%d')},
+            options={
+                "format": "YYYY-MM-DD",
+                "showClose": False,
+                "showClear": False,
+                "showTodayButton": False,
+            }
+        )
+
+
+class StockInPForm2(forms.Form):
+    product_order = forms.CharField(max_length=20, label="訂單", required=False, )  # VBELN 收貨單號
+    customer_no = forms.CharField(max_length=20, label="客戶", required=False,)  # 無
+    version_no = forms.CharField(max_length=20, label="包裝版本號", required=False,)  # ZZVERSION
+    version_seq = forms.CharField(max_length=20, label="版次", required=False, )  # ZZVERSION_SEQ
+    lot_no = forms.CharField(max_length=20, label="LOT NUMBER", required=False, )  # LOTNO
+    item_type = forms.CharField(max_length=20, label="收貨類型", required=False, )  # WGBEZ 物料群組說明
+    packing_type = forms.CharField(max_length=20, label="包裝方式", required=False, )  # 包裝方式
+    purchase_no = forms.CharField(max_length=20, label="採購單號", required=False, )  # EBELN 採購單號
+    purchase_qty = forms.CharField(max_length=20, label="採購數量", required=False, )  # MENGE_PO 採購數量
+    size = forms.CharField(max_length=20, label="SIZE", required=False, )  # ZSIZE 尺寸
+    purchase_unit = forms.CharField(max_length=20, label="採購單位", required=False, )  # MEINS 數量單位
+    post_date = forms.DateField(label="過帳日期")  # BUDAT收貨日期
+    order_qty = forms.CharField(max_length=20, label="收貨數量", required=False, initial=0)  # MENGE
+    order_bin = forms.CharField(max_length=20, label="訂單儲格", required=False, )
+    gift_qty = forms.CharField(max_length=20, label="贈品數量", required=False, initial=0)
+    gift_bin = forms.CharField(max_length=20, label="贈品儲格", required=False, )
+    supplier = forms.CharField(max_length=10, label="供應商", required=False)  # NAME1
+    sap_mtr_no = forms.CharField(max_length=20, label="物料文件", required=False, )  # MBLNR
+    desc = forms.CharField(max_length=2000, label="備註", required=False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 15}))
+    comment = forms.CharField(max_length=200, label="備註", required=False, )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+
+        self.helper.layout = Layout(
+            Div(
+                Div('product_order', css_class='col-md-3'),
+                Div('customer_no', css_class='col-md-3'),
+                Div('version_no', css_class='col-md-3'),
+                Div('version_seq', css_class='col-md-3'),
+                css_class='row'),
+            Div(
+                Div('post_date', css_class='col-md-3'),
+                Div('sap_mtr_no', css_class='col-md-3'),
+                Div('item_type', css_class='col-md-3'),
+                Div('packing_type', css_class='col-md-3'),
+                Div('', css_class='col-md-3'),
+                css_class='row'),
+            Div(
+                Div('purchase_no', css_class='col-md-3'),
+                Div('supplier', css_class='col-md-3'),
+                Div('lot_no', css_class='col-md-2'),
+                Div('size', css_class='col-md-2'),
+                Div('purchase_qty', css_class='col-md-3'),
+                Div('purchase_unit', css_class='col-md-3'),
+                Div('order_qty', css_class='col-md-2'),
+                Div('order_bin', css_class='col-md-2'),
+                Div(Button('bin_search', '查詢', css_class='btn btn-light', onclick="stock_item_popup();"),
+                    css_class='col-md-1 d-flex align-items-center pt-3'),
+                Div('comment', css_class='col-md-10'),
+                Div(HTML(
+                    '<a href="#" class="btn btn-info" onclick="add_item();"><i class="fas fa-plus-circle"></i> 加入</a>'),
+                    css_class='col-md-2 d-flex align-items-center pt-3'),
+                css_class='row'),
+        )
+
+        self.fields['post_date'].widget = DatePickerInput(
+            attrs={'value': (datetime.now()).strftime('%Y-%m-%d')},
+            options={
+                "format": "YYYY-MM-DD",
+                "showClose": False,
+                "showClear": False,
+                "showTodayButton": False,
+            }
+        )
+
+
+class StockOutPForm(forms.Form):
+    apply_date = forms.DateField(label="異動日期")
+    desc = forms.CharField(max_length=250, label="說明", required=False, widget=forms.Textarea(attrs={'rows': 4, 'cols': 15}))
+    item_code = forms.CharField(max_length=20, label="料號", required=False,)
+    bin_code = forms.CharField(max_length=20, label="儲格", required=False, )
+    qty = forms.CharField(max_length=10, label="數量", required=False, initial=1)
+    comment = forms.CharField(max_length=30, label="備註", required=False, )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+
+        self.helper.layout = Layout(
+            Div(
+                Div('apply_date', css_class='col-md-3'),
+                css_class='row'),
+            Div(
+                Div('desc', css_class='col-md-12'),
+                css_class='row'),
+            Div(
+                Div('item_code', css_class='col-md-2'),
+                Div('bin_code', css_class='col-md-2'),
+                Div(Button('bin_search', '查詢', css_class='btn btn-light', onclick="stock_item_popup();"),
+                    css_class='col-md-1 d-flex align-items-center pt-3'),
+                Div('qty', css_class='col-md-1'),
+                Div('comment', css_class='col-md-3'),
+                Div(HTML(
+                    '<a href="#" class="btn btn-info" onclick="add_item();"><i class="fas fa-plus-circle"></i> 加入</a>'),
+                    css_class='col-md-2 d-flex align-items-center pt-3'),
+                css_class='row'),
+        )
+
+        self.fields['apply_date'].widget = DatePickerInput(
+            attrs={'value': (datetime.now()).strftime('%Y-%m-%d')},
+            options={
+                "format": "YYYY-MM-DD",
+                "showClose": False,
+                "showClear": False,
+                "showTodayButton": False,
+            }
+        )
 
 

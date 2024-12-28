@@ -1,0 +1,237 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Stock In" %} {% endblock %}
+{% block css %}
+<style>
+.item_list {
+    background: #ffffe7;
+    border-color: #f7e1b5;
+    border-width: 1px;
+    border-style: dashed solid;
+}
+</style>
+
+{% endblock css %}
+{% block base_js %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#id_product_order").on("change", function() {
+
+            get_order_info();
+        });
+
+        get_order_info = function() {
+
+            var product_order = $("#id_product_order").val();
+            alert(product_order);
+            $.ajax({
+                url: '{% url 'get_product_order_info' %}', type: 'post',
+                dataType: 'json',
+                async: false,
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "product_order": product_order},
+                success: function(data) {
+                    $("#jsGrid").jsGrid("option", "data", data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("資料加載失敗：", error);
+                }
+            });
+        }
+
+        data: [], // 初始為空，將透過 AJAX 加載資料
+
+        // 初始化 jsGrid
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "400px",
+
+            inserting: true,  // 啟用新增功能
+            editing: true,    // 啟用編輯功能
+            sorting: true,    // 啟用排序功能
+            paging: true,     // 啟用分頁功能
+
+            rowClick: function (args) {
+                // 禁止點擊行進入編輯模式
+                console.log("行被點擊，但不進入編輯模式", args.item);
+            },
+
+            data: [],   // 將 JSON 資料導入表格
+
+            fields: [
+                { type: "control" }, // 控制欄位 (編輯/刪除按鈕)
+                { name: "id", type: "number", width: 50, title: "ID", align: "center", readOnly: true, visible: false },
+                { name: "order_qty", type: "text", width: 100, title: "Order Qty" },
+                {
+                    name: "order_bin",
+                    type: "text",
+                    width: 100,
+                    title: "Order Bin",
+                    itemTemplate: function (value) {
+                        return value; // 顯示內容
+                    },
+                    editTemplate: function (value, item) {
+                        const $input = $("<input>").val(value); // 建立輸入框
+
+                        // 將 $input 暴露給外部更新方法
+                        this._input = $input;
+
+                        // 綁定點擊事件顯示數字選擇彈窗
+                        $input.on("click", () => {
+                            $("#numberPicker").fadeIn(); // 顯示彈窗
+                            // 暴露 callback 以更新值
+                            $("#numberPicker").data("updateInput", (newValue) => {
+                                $input.val(newValue); // 更新輸入框的值
+                            });
+                        });
+
+                        return $input;
+                    },
+                    insertValue: function () {
+                        return this._input.val();
+                    },
+                    editValue: function () {
+                        return this._input.val();
+                    }
+                },
+                { name: "comment", type: "text", width: 100, title: "Comment", align: "center", editing: true },
+                { name: "product_order", type: "text", width: 100, title: "Product Order", validate: "required", editing: false },
+                { name: "version_no", type: "number", width: 100, title: "Version No", align: "center", editing: false },
+                { name: "version_seq", type: "text", width: 50, title: "Version Seq", editing: false },
+                { name: "lot_no", type: "text", width: 130, title: "Lot No", editing: false },
+                { name: "item_type", type: "text", width: 120, title: "Item Type", editing: false },
+                { name: "packing_type", type: "text", width: 100, title: "Packing Type", editing: false },
+                { name: "purchase_no", type: "text", width: 130, title: "Purchase No", editing: false },
+                { name: "purchase_qty", type: "text", width: 100, title: "Purchase Qty", editing: false },
+                { name: "size", type: "text", width: 50, title: "Size", editing: false },
+                { name: "purchase_unit", type: "text", width: 50, title: "Purchase Unit", editing: false },
+                { name: "post_date", type: "text", width: 100, title: "Post Date", editing: false },
+                { name: "supplier", type: "text", width: 100, title: "Supplier", editing: false },
+                { name: "sap_mtr_no", type: "text", width: 100, title: "Mtr No", editing: false },
+                {
+                    name: "copy", // 自定義控制欄欄位名稱
+                    title: "操作", // 欄位標題
+                    align: "center", // 置中對齊
+                    width: 250, // 欄位寬度
+                    itemTemplate: function (_, item) {
+                        // 自定義「複製」按鈕
+                        const $copyButton = $("<button>")
+                            .text("複製")
+                            .addClass("btn btn-info")
+                            .on("click", (e) => {
+                                e.stopPropagation();
+
+                                // 獲取當前行的索引
+                                const gridData = $("#jsGrid").jsGrid("option", "data");
+                                const index = gridData.indexOf(item);
+
+                                // 複製行並修改內容
+                                const newItem = { ...item };
+                                newItem.id = Date.now(); // 新的唯一 ID
+                                newItem.order_bin = "";
+                                newItem.order_qty = "";
+
+                                // 插入到當前行的下方
+                                gridData.splice(index + 1, 0, newItem);
+
+                                // 重新載入數據
+                                $("#jsGrid").jsGrid("option", "data", gridData);
+
+                                alert("複製並插入到該行下方成功！");
+                            });
+
+                        return $copyButton;
+                    }
+                },
+            ]
+        });
+
+        // 彈窗內按鈕選擇數字
+        $(".number-btn").on("click", function () {
+            const selectedValue = $(this).data("value"); // 選取的數值
+            const updateInput = $("#numberPicker").data("updateInput"); // 取得回調函數
+            if (updateInput) {
+                updateInput(selectedValue); // 更新輸入框的值
+            }
+            $("#numberPicker").fadeOut(); // 關閉彈窗
+        });
+
+        // 關閉彈窗
+        $("#closePicker").on("click", function () {
+            $("#numberPicker").fadeOut();
+        });
+
+        // 當按下過帳按鈕時
+        $('#postDataButton').click(function() {
+            // 獲取 jsGrid 的所有數據
+            var gridData = $("#jsGrid").data("JSGrid").data;
+
+            // 檢查 order_qty 是否都有值
+            for (var i = 0; i < gridData.length; i++) {
+                if (!gridData[i].order_bin || gridData[i].order_bin.trim() === "") {
+                    alert("第 " + (i + 1) + " 行的 'order_bin' 欄位不可為空！");
+                    return; // 阻止繼續執行
+                }
+            }
+
+            // 將數據轉換為 JSON 格式
+            var jsonData = JSON.stringify(gridData);
+
+            // 使用 Ajax 發送數據到後端
+            $.ajax({
+                url: '{% url 'stock_in_post' %}',  // 設置後端接收數據的 URL
+                type: 'POST',
+                contentType: 'application/json',
+                data: jsonData,
+                success: function(response) {
+                    alert("過帳成功！");
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    alert("過帳失敗！");
+                    console.log(error);
+                }
+            });
+        });
+
+    });
+
+</script>
+{% endblock %}
+
+{% block container %}
+<div class="row p-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="row">
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">包材倉入庫單</div>
+        </div>
+        {% crispy form %}
+        <div id="jsGrid"></div>
+            <div id="numberPicker" style="display:none; position:fixed; top:20%; left:30%; width:300px; padding:20px; background:#fff; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
+            <h3>選擇儲格</h3>
+            {% for bin in bins %}
+            <button class="number-btn" data-value="{{ bin.bin_id }}" style="{% if bin.has_stock %}background-color: #d2e8b9{% else %}background-color: #fff{% endif %}">{{ bin.bin_id }}</button>
+            {% endfor %}
+            <br><br>
+            <button id="closePicker">關閉</button>
+        </div>
+        <hr />
+        <div style="text-align: center" class="p-3">
+            <button id="postDataButton">過帳</button>
+        </div>
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock %}
+
+{% block alert %}
+
+{% endblock %}
+
+
