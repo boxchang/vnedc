@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.urls import reverse
 
 class Warehouse(models.Model):
     wh_code = models.CharField(primary_key=True, max_length=20)  # Primary key with varchar(20)
@@ -148,3 +149,93 @@ class Bin_Value_History(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='bin_value_hist_create_by'
     )  # Create_by
+
+
+class MovementType(models.Model):
+    mvt_code = models.CharField(max_length=20, primary_key=True)
+    mvt_name = models.CharField(max_length=20, blank=False, null=False)
+    desc = models.CharField(max_length=200, blank=True, null=True)
+    create_at = models.DateTimeField(auto_now_add=True, editable=True)  # 建立日期
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='mvt_create_by')  # 建立者
+
+    def __str__(self):
+        return self.desc
+
+
+class ItemType(models.Model):
+    type_code = models.CharField(max_length=20, primary_key=True)
+    type_name = models.CharField(max_length=20, blank=False, null=False)
+    desc = models.CharField(max_length=200, blank=True, null=True)
+    create_at = models.DateTimeField(auto_now_add=True, editable=True)  # 建立日期
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='itemtype_create_by')  # 建立者
+
+    def __str__(self):
+        return self.desc
+
+
+class StockInForm(models.Model):
+    form_no = models.CharField(max_length=20, primary_key=True)
+    create_at = models.DateTimeField(auto_now_add=True, editable=True)  # 建立日期
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='stockin_form_create_by')  # 建立者
+
+    def get_absolute_url(self):
+        return reverse('stockin_detail', kwargs={'pk': self.pk})
+
+
+class StockInFormDetail(models.Model):
+    form_no = models.ForeignKey('StockInForm', related_name='stockin_detail_form', on_delete=models.CASCADE)
+    order_no = models.CharField(max_length=20, blank=True, null=True)
+    customer_no = models.CharField(max_length=20, blank=True, null=True)
+    version_no = models.CharField(max_length=20, blank=True, null=True)
+    version_seq = models.CharField(max_length=20, blank=True, null=True)
+    lot_no = models.CharField(max_length=20, blank=True, null=True)
+    item_type = models.ForeignKey('ItemType', related_name='stockin_itemtype', on_delete=models.DO_NOTHING)
+    packing_type = models.CharField(max_length=20, blank=True, null=True)
+    purchase_no = models.CharField(max_length=20, blank=True, null=True)
+    purchase_qty = models.CharField(max_length=20, blank=True, null=True)
+    size = models.CharField(max_length=20, blank=True, null=True)
+    purchase_unit = models.CharField(max_length=20, blank=True, null=True)
+    post_date = models.CharField(max_length=20, blank=True, null=True)
+    order_qty = models.CharField(max_length=20, blank=True, null=True)
+    order_bin = models.ForeignKey('Bin', related_name='stockin_order_bin', on_delete=models.DO_NOTHING)
+    supplier = models.CharField(max_length=20, blank=True, null=True)
+    sap_mtr_no = models.CharField(max_length=20, blank=True, null=True)
+    desc = models.CharField(max_length=2000, blank=True, null=True)
+
+
+class StockOutForm(models.Model):
+    form_no = models.CharField(max_length=20, primary_key=True)
+    order_no = models.CharField(max_length=20, blank=True, null=True)
+    customer_no = models.CharField(max_length=20, blank=True, null=True)
+    version_no = models.CharField(max_length=20, blank=True, null=True)
+    version_seq = models.CharField(max_length=20, blank=True, null=True)
+    lot_no = models.CharField(max_length=20, blank=True, null=True)
+    item_type = models.ForeignKey('ItemType', related_name='stockout_itemtype', on_delete=models.DO_NOTHING)
+    packing_type = models.CharField(max_length=20, blank=True, null=True)
+    purchase_no = models.CharField(max_length=20, blank=True, null=True)
+    purchase_qty = models.CharField(max_length=20, blank=True, null=True)
+    size = models.CharField(max_length=20, blank=True, null=True)
+    purchase_unit = models.CharField(max_length=20, blank=False, null=True)
+    post_date = models.CharField(max_length=20, blank=True, null=True)
+    order_qty = models.CharField(max_length=20, blank=True, null=True)
+    order_bin = models.ForeignKey('Bin', related_name='stockout_order_bin', on_delete=models.DO_NOTHING)
+    gift_qty = models.CharField(max_length=20, blank=True, null=True)
+    gift_bin = models.ForeignKey('Bin', related_name='stockout_gift_bin', on_delete=models.DO_NOTHING)
+    supplier = models.CharField(max_length=20, blank=True, null=True)
+    sap_mtr_no = models.CharField(max_length=20, blank=True, null=True)
+    comment = models.CharField(max_length=2000, blank=True, null=True)
+    create_at = models.DateTimeField(auto_now_add=True, editable=True)  # 建立日期
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='stockout_form_create_by')  # 建立者
+
+    def get_absolute_url(self):
+        return reverse('stockout_detail', kwargs={'pk': self.pk})
+
+
+class Series(models.Model):
+    key = models.CharField(max_length=50, blank=False, null=False)
+    series = models.IntegerField()
+    desc = models.CharField(max_length=50, blank=True, null=True)

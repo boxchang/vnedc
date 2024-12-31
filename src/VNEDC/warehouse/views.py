@@ -1,10 +1,31 @@
+import json
 from datetime import datetime
+
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.shortcuts import render
-from .forms import WarehouseForm, AreaForm, BinForm, BinValueForm, BinSearchForm
-from .models import Warehouse, Area, Bin, Bin_Value, Bin_Value_History
+from django.views.decorators.csrf import csrf_exempt
+
+from VNEDC.database import sap_database
+from warehouse.utils import Do_Transaction
+from .forms import WarehouseForm, AreaForm, BinForm, BinValueForm, BinSearchForm, StockInPForm
+from .models import Warehouse, Area, Bin, Bin_Value, Bin_Value_History, StockInForm, Series, StockInFormDetail, \
+    MovementType
+from django.db.models import Case, When, Value, BooleanField
+
+
+def get_series_number(_key, _key_name):
+    obj = Series.objects.filter(key=_key)
+    if obj:
+        _series = obj[0].series + 1
+        obj.update(series=_series, desc=_key_name)
+    else:
+        _series = 1
+        Series.objects.create(key=_key, series=1, desc=_key_name)
+    return _series
 
 
 # Warehouse
@@ -458,3 +479,129 @@ def bin_action(request):
 def index(request):
     warehouses = Warehouse.objects.all()
     return render(request, 'warehouse/index.html', locals())
+
+# 入庫作業
+@transaction.atomic
+@login_required
+def stock_in(request):
+    bins = Bin.objects.filter(area__warehouse__wh_code='W001').annotate(
+        has_stock=Case(
+            When(value_bin__isnull=False, then=Value(True)),
+            default=Value(False),
+            output_field=BooleanField()
+        )
+    )
+
+
+    if request.method == 'POST':
+        hidItem_list = request.POST.get('hidItem_list')
+        if hidItem_list:
+            items = json.loads(hidItem_list)
+
+        apply_date = request.POST.get('apply_date')
+        pr_no = request.POST.get('pr_no')
+        desc = request.POST.get('desc')
+
+        save_tag = transaction.savepoint()
+        try:
+            stock_in = StockInForm()
+            YYYYMM = datetime.now().strftime("%Y%m")
+            key = "SI"+YYYYMM
+            stock_in.form_no = key + str(get_series_number(key, "入庫單")).zfill(3)
+            stock_in.pr_no = pr_no
+            stock_in.requester = request.user
+            stock_in.apply_date = apply_date
+            stock_in.reason = desc
+            stock_in.create_by = request.user
+            stock_in.save()
+
+            for item in items:
+                Do_Transaction(request, stock_in.form_no, 'STIN', item['item_code'], item['bin_code'], int(item['qty']), item['comment'])
+
+        except Exception as e:
+            transaction.savepoint_rollback(save_tag)
+            print(e)
+
+        return redirect(stock_in.get_absolute_url())
+    form = StockInPForm()
+    return render(request, 'warehouse/stock_in.html', locals())
+
+
+@login_required
+def stockin_detail(request, pk):
+    # try:
+    #     form = StockInForm.objects.get(pk=pk)
+    #     items = StockHistory.objects.filter(batch_no=pk)
+    # except StockInForm.DoesNotExist:
+    #     raise Http404('Form does not exist')
+
+    return render(request, 'stock/stockin_detail.html', locals())
+
+
+
+def get_product_order_info(request):
+    data_list = []
+    if request.method == 'POST':
+        product_order = request.POST.get('product_order')
+        db = sap_database()
+        sql = f"""
+        SELECT VBELN, ZZVERSION, ZZVERSION_SEQ, LOTNO, WGBEZ, EBELN, MENGE_PO, ZSIZE, MEINS, BUDAT, MENGE,
+        NAME1, MBLNR
+        FROM [PMG_SAP].[dbo].[ZMMT4001] WHERE VBELN = '{product_order}'
+        """
+        raws = db.select_sql_dict(sql)
+
+        for raw in raws:
+            data_list.append({'product_order': raw['VBELN'], 'customer_no': '', 'version_no': raw['ZZVERSION'],
+                              'version_seq': raw['ZZVERSION_SEQ'], 'lot_no': raw['LOTNO'], 'item_type': raw['WGBEZ'],
+                              'packing_type': '', 'purchase_no': raw['EBELN'], 'purchase_qty': raw['MENGE_PO'],
+                              'size': raw['ZSIZE'], 'purchase_unit': raw['MEINS'], 'post_date': raw['BUDAT'],
+                              'order_qty': raw['MENGE'], 'supplier': raw['NAME1'], 'sap_mtr_no': raw['MBLNR']
+                              })
+
+    return JsonResponse(data_list, safe=False)
+
+def get_series_number(_key, _key_name):
+    obj = Series.objects.filter(key=_key)
+    if obj:
+        _series = obj[0].series + 1
+        obj.update(series=_series, desc=_key_name)
+    else:
+        _series = 1
+        Series.objects.create(key=_key, series=1, desc=_key_name)
+    return _series
+
+
+@csrf_exempt
+def stock_in_post(request):
+    if request.method == "POST":
+        try:
+            # 解析 JSON 資料
+            data = json.loads(request.body)
+
+            # STIN-202412310001
+            YYYYMM = datetime.now().strftime("%Y%m")
+            key = "STIN" + YYYYMM
+            form_no = key + str(get_series_number(key, "STOCKIN")).zfill(3)
+
+            mvt = MovementType.objects.get(mvt_code="STIN")
+
+            for item in data:
+            #     form = StockInForm.objects.create(form_no=form_no)
+            #     form.save()
+            #
+            #     bin_value_instance = StockInFormDetail(
+            #         form_no = form,
+            #         order_bin= = data.order_bin,
+            #
+            #     )
+            #     bin_value_instance.save()
+
+                Do_Transaction(request, form_no, mvt, data.order_bin, data.order_qty, data.comment)
+
+            return JsonResponse({'status': 'success'}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)

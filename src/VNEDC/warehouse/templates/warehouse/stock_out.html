@@ -1,0 +1,201 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Stock Out" %} {% endblock %}
+
+{% block css %}
+<style>
+.item_list {
+    background: #ffffe7;
+    border-color: #f7e1b5;
+    border-width: 1px;
+    border-style: dashed solid;
+}
+</style>
+
+{% endblock css %}
+
+{% block base_js %}
+{{ block.super }}
+<script>
+    //送出時驗證
+    function validation() {
+        if(list.length == 0) {
+            alert("請輸入品項");
+            return false;
+        }
+
+        return confirm('確認資料是否正確')
+    }
+
+    function stock_item_popup() {
+        x = window.open("/stock/item_stock_search_popup/","popup_page","location=1,status=1,scrollbars=1,  width=1000,height=1000")
+        x.moveTo(0, 0);
+    }
+
+    //Return Item
+    return_item = function(item_code) {
+        $("#id_item_code").val(item_code);
+    }
+
+    //Return Bin
+    return_bin = function(bin_code) {
+        $("#id_bin_code").val(bin_code);
+    }
+
+    var list = [];
+
+    refresh_table = function(list) {
+        $("#item_list").html('');
+        var tmp_btn = "<button type='button' class='btn btn-danger' onclick=\"remove_item('{0}')\">移除</button>";
+        var row = "<tr><td>{0}</td><td>{1}</td><td style='text-align:center'>{2}</td><td style='text-align:center'>{3}</td><td style='text-align:center'>{4}</td><td>{5}</td><td>{6}</td></tr>";
+        $.each(list, function(index, item){
+            remove_btn = String.format(tmp_btn, item.spec);
+            tmp_row = String.format(row, item.item_code, item.spec, item.qty, item.unit, item.bin_name, item.comment, remove_btn);
+            $("#item_list").append(tmp_row);
+        })
+        $("#hidItem_list").val(JSON.stringify(list));
+    }
+
+    //Get Item Info
+    get_item_info = function() {
+        var item = "";
+        var item_code = $("#id_item_code").val();
+        $.ajax({
+            url: '{% url '' %}', type: 'post',
+            dataType: 'json',
+            async: false,
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "item_code": item_code},
+            success: function(data) {
+                if(data.length > 0){
+                    item = data[0];
+                }
+            }
+        });
+        return item;
+    }
+
+    //Get Item Info
+    get_bin_info = function() {
+        var bin = "";
+        var bin_code = $("#id_bin_code").val();
+        $.ajax({
+            url: '{% url 'stock_out' %}', type: 'post',
+            dataType: 'json',
+            async: false,
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "bin_code": bin_code},
+            success: function(data) {
+                if(data.length > 0){
+                    bin = data[0];
+                }
+            }
+        });
+        return bin;
+    }
+
+    //刪除品項
+    remove_item = function(spec) {
+        var tmp_list = [];
+        list.forEach(function(item) {
+            if(item.spec != spec){
+                tmp_list.push(item);
+            }
+        });
+        list = tmp_list;
+        refresh_table(list);
+    }
+
+    //新增品項
+    add_item = function() {
+        var item_code = $("#id_item_code").val();
+        var valid = true;
+
+        list.forEach(function(list_item) {
+            if(list_item.item_code == item_code){
+                valid = false;
+            }
+        });
+
+        if(valid){
+            item = get_item_info();
+            if(item.item_code == undefined) {
+                valid = false;
+                alert("找不到料號");
+                return false;
+            }
+        }
+
+        if(valid){
+            bin = get_bin_info();
+            if(bin.bin_code == undefined) {
+                valid = false;
+                alert("找不到儲格");
+                return false;
+            }
+        }
+
+        if(valid){
+            item.qty = $("#id_qty").val();
+            item.comment = $("#id_comment").val();
+            item.bin_code = bin.bin_code;
+            item.bin_name = bin.bin_name;
+            list.push(item);
+
+            $("#id_item_code").val('');
+            $("#id_qty").val('1');
+            $("#id_bin_code").val('');
+            $("#id_comment").val('');
+
+        }else{
+            alert("清單已存在");
+        }
+        refresh_table(list);
+    }
+
+
+</script>
+{% endblock %}
+
+{% block container %}
+<div class="row p-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="row">
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">出庫單</div>
+        </div>
+        <form id="form" action="{% url 'stock_out' %}" method="post">
+            {% csrf_token %}
+            {% crispy form %}
+            <div class="item_list">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-info">
+                        <tr>
+                            <th style="width: 10%;text-align: center;">物品類別</th>
+                            <th style="width: 45%">品名</th>
+                            <th style="width: 10%;text-align: center;">數量</th>
+                            <th style="width: 10%;text-align: center;">單位</th>
+                            <th style="width: 10%;text-align: center;">儲格</th>
+                            <th style="width: 20%">備註</th>
+                            <th style="width: 5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="item_list">
+
+                    </tbody>
+                </table>
+            </div>
+            <hr />
+            <div style="text-align: center" class="p-3">
+                <input type="hidden" id="hidItem_list" name="hidItem_list" />
+                <input type="submit" value="過帳" class='btn btn-info' onclick="return validation()" />
+            </div>
+        </form>
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock %}
+
+{% block alert %}
+        
+{% endblock %}
