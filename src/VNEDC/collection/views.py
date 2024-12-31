@@ -1482,6 +1482,7 @@ def oee_report(request):
                                 OR (rc.InspectionDate = DATEADD(DAY, 1, '{sData_date}') AND rc.Period BETWEEN 0 AND 5)) 
                             --AND cd.Cdt > wo.StartDate 
                             AND (cd.Cdt < wo.EndDate OR wo.EndDate IS NULL)
+                            AND woi.PackingType = 'OnlinePacking'
                         GROUP BY wo.Id, wo.PartNo,
                             wo.ProductItem, rc.InspectionDate, rc.MachineName, rc.LineName, rc.Id, rc.period, cd.Qty,
                             nbr.LowerLineSpeed_Min, nbr.UpperLineSpeed_Min, cd.stop_time 
