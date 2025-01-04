@@ -1442,10 +1442,47 @@ def oee_report(request):
         mach_list = mes_db.select_sql_dict(sql)
         mach = mach_list[0]['name']
         line_list = [item['Line'] for item in mach_list]
+
+        sql1 = f"""
+                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
+                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'A1' AND Qty2 is not null  --排除網路瞬斷的情況
+                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                                union all
+                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
+                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'B1' AND Qty2 is not null
+                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                                union all
+                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
+                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'A2' AND Qty2 is not null
+                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+                                union all
+                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
+                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
+                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'B2' AND Qty2 is not null
+                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
+
+                            """
+        detail_raws = mes_db.select_sql_dict(sql1)
+        stop_time_df = pd.DataFrame(detail_raws)
+        stop_time_df['Stop_time'] = ''
+        stop_time_df.loc[
+            (stop_time_df['Qty2'] <= sLimit) | stop_time_df['Speed'].isna(),
+            'Stop_time'
+        ] = 5
+
+        stop_time_df = stop_time_df.fillna('')
+
         sql = f"""
                 WITH COUNTING_DATA AS (
                             SELECT MES_MACHINE, LINE, CAST(DATEPART(hour, CreationTime) AS INT) Period, SUM(case when Qty2 >= 0 then Qty2 else 0 end) Qty, 
-                                SUM(CASE WHEN Qty2 > {sLimit} THEN 0 ELSE 5 END) stop_time, DATEADD(HOUR, DATEDIFF(HOUR, 0, CreationTime), 0) Cdt
+                                DATEADD(HOUR, DATEDIFF(HOUR, 0, CreationTime), 0) Cdt
                             FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
                             JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m 
                                 ON d.MachineName = m.COUNTING_MACHINE
@@ -1455,12 +1492,11 @@ def oee_report(request):
                         )
                         SELECT 
                             wo.Id AS WorkOrder, wo.PartNo, wo.ProductItem, rc.InspectionDate AS InspecDate, rc.MachineName AS Machine, rc.LineName AS Line,
-                            rc.Id as Runcard, rc.period AS Period,  cd.Qty as CoutingQuantity, nbr.LowerLineSpeed_Min AS LowSpeed, nbr.UpperLineSpeed_Min AS UpSpeed,
+                            rc.Id as Runcard, woi.PackingType, rc.period AS Period,  cd.Qty as CoutingQuantity, nbr.LowerLineSpeed_Min AS LowSpeed, nbr.UpperLineSpeed_Min AS UpSpeed,
                             CAST(ROUND((nbr.LowerLineSpeed_Min + nbr.UpperLineSpeed_Min) / 2, 1) AS FLOAT) AS StdSpeed,
                             SUM(CASE WHEN ft.ActualQty IS NOT NULL THEN ft.ActualQty ELSE 0 END) AS FaultyQuantity,
                             SUM(CASE WHEN sp.ActualQty IS NOT NULL THEN sp.ActualQty ELSE 0 END) AS ScrapQuantity,
                             SUM(CASE WHEN woi.ActualQty IS NOT NULL THEN woi.ActualQty ELSE 0 END) AS SAPQuantity,
-                            cd.stop_time as Stop_time, (nbr.LowerLineSpeed_Min + nbr.UpperLineSpeed_Min) / 2 * 60 AS Target,
                             MAX(ipqc.InspectionValue) AS InspectionValue, MIN(wo.StartDate) AS StartDate, MAX(wo.EndDate) AS EndDate
                         FROM [PMGMES].[dbo].[PMG_MES_RunCard] rc
                         LEFT JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
@@ -1482,10 +1518,10 @@ def oee_report(request):
                                 OR (rc.InspectionDate = DATEADD(DAY, 1, '{sData_date}') AND rc.Period BETWEEN 0 AND 5)) 
                             --AND cd.Cdt > wo.StartDate 
                             AND (cd.Cdt < wo.EndDate OR wo.EndDate IS NULL)
-                            AND woi.PackingType = 'OnlinePacking'
+                            --AND woi.PackingType = 'OnlinePacking'
                         GROUP BY wo.Id, wo.PartNo,
-                            wo.ProductItem, rc.InspectionDate, rc.MachineName, rc.LineName, rc.Id, rc.period, cd.Qty,
-                            nbr.LowerLineSpeed_Min, nbr.UpperLineSpeed_Min, cd.stop_time 
+                            wo.ProductItem, rc.InspectionDate, rc.MachineName, rc.LineName, rc.Id, woi.PackingType, rc.period, cd.Qty,
+                            nbr.LowerLineSpeed_Min, nbr.UpperLineSpeed_Min 
                         ORDER BY rc.LineName, rc.InspectionDate, CAST(rc.Period AS INT)
 
                 """
@@ -1496,32 +1532,67 @@ def oee_report(request):
         print('sMach: ', sMach)
         if len_detail_raws > 0:
             raw_df = pd.DataFrame(detail_raws)
-            raw_df['Stop_time'] = raw_df['Stop_time'].apply(lambda x: 0 if x <= stopLimit else x)
+            #raw_df['Stop_time'] = raw_df['Stop_time'].apply(lambda x: 0 if x <= stopLimit else x)
             for line in line_list:
                 main_df_list_item = {}
                 data = {}
                 data_df = raw_df[raw_df['Line'] == line]
 
-                stop_time_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'Stop_time']].copy()
-                machine_stop_time = int(stop_time_df['Stop_time'].sum())
+                #stop_time_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'Stop_time']].copy()
+
+                line_stop_time_df = stop_time_df[stop_time_df['LINE'] == line]
+
+                line_stop_time_df['Qty2'] = pd.to_numeric(line_stop_time_df['Qty2'], errors='coerce')
+
+                stop_time_df_filtered_df = line_stop_time_df[~(line_stop_time_df['Qty2'] > sLimit)]
+
+                machine_stop_time = len(stop_time_df_filtered_df) * 5
+                activation = round((1440 - machine_stop_time) / 1440, 2) if machine_stop_time > 0 else 1
+                minus_machine_stop_time = 1440 - machine_stop_time
+
+                stop_time_df_filtered_df.loc[len(stop_time_df_filtered_df)] = {'MES_MACHINE': '', 'Qty2': '',
+                                                       'Speed': '', 'LINE': '', 'CreationTime': '-Total-',
+                                                       'Stop_time': line_stop_time_df['Stop_time'].apply(
+                                                           lambda x: int(x) if str(x).isdigit() else 0).sum()}
+
                 # stop_time_df.loc[len(stop_time_df)] = {'WorkOrder': '', 'PartNo': '', 'ProductItem': '', 'InspecDate': '', 'Machine': '', 'Line': '', 'Runcard': '', 'Period': '-Total-', 'Stop_time': stop_time_df['Stop_time'].apply(lambda x: int(x) if str(x).isdigit() else 0).sum()}
                 activation = round((1440 - machine_stop_time) / 1440, 3) if machine_stop_time > 0 else 1
                 activation_text = f'{round(activation*100,1)}%'
 
+                # Stop Table
                 sstop_table = []
-                period_str_values = stop_time_df['Period'].values
+
+                line_stop_time_df['CreationTime'] = pd.to_datetime(line_stop_time_df['CreationTime'])
+                line_stop_time_df['Period'] = line_stop_time_df['CreationTime'].dt.hour
+                line_stop_time_df['Stop_time'] = line_stop_time_df['Stop_time'].replace('', 0).astype(int)
+                stop_time_summary = line_stop_time_df.groupby('Period')['Stop_time'].sum().reset_index()
+
+                period_str_values = stop_time_summary['Period'].values
 
                 for period in period_times:
-                    if str(period) in stop_time_df['Period'].values:
-                        stop_time_value = stop_time_df.loc[stop_time_df['Period'] == str(period), 'Stop_time'].iloc[0]
+                    if period in stop_time_summary['Period'].values:
+                        stop_time_value = stop_time_summary.loc[stop_time_summary['Period'] == period, 'Stop_time'].iloc[0]
                         sstop_table.append(stop_time_value)
                     else:
                         sstop_table.append(100)
 
                 stop_table = [period_times[:12], sstop_table[:12], period_times[12:], sstop_table[12:]]
 
-                speed_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'LowSpeed', 'UpSpeed', 'StdSpeed']].copy()
+                data_df['Period'] = data_df['Period'].astype(int)
+                stop_time_summary['Period'] = stop_time_summary['Period'].astype(int)
+                data_df = pd.merge(data_df, stop_time_summary, on=['Period'], how='left')
+                data_df['Run_time'] = 60 - data_df['Stop_time']
+                data_df['Target'] = data_df['Run_time'] * data_df['StdSpeed']
+
+                speed_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'LowSpeed', 'UpSpeed', 'StdSpeed', 'Run_time', 'Target']].copy()
                 speed = speed_df['StdSpeed'].sum()/len(speed_df['StdSpeed'])
+                speed_df.loc[len(speed_df)] = {'WorkOrder': '', 'PartNo': '',
+                                               'ProductItem': '', 'InspectDate': '',
+                                               'Machine': '', 'Line': '',
+                                               'Runcard': '', 'Period': '',
+                                               'LowSpeed': '', 'UpSpeed': '',
+                                               'StdSpeed': '', 'Run_time': '-Total-',
+                                               'Target': speed_df['Target'].sum()}
                 run_time = 1440 - machine_stop_time
                 # run_time = (60 - data_df['Stop_time']).sum()
                 # print('run_time: ', run_time)
@@ -1537,16 +1608,19 @@ def oee_report(request):
                 scrap_data = int(scrap_df['ScrapQuantity'].sum())
 
                 capacity = 0 if estimate_ouput == 0 else round((couting_data + second_data + scrap_data)/estimate_ouput, 3)
+                capacity_text = f'{round(capacity*100,1)}%'
 
-                sap_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'SAPQuantity', 'CoutingQuantity']].copy()
+                sap_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'PackingType', 'Period', 'SAPQuantity', 'CoutingQuantity']].copy()
                 sap_data = int(sap_df['SAPQuantity'].sum())
 
                 yield_data = round(sap_data/(couting_data + second_data + scrap_data), 3)
+                yield_data_text = f'{round(yield_data*100,1)}%'
 
                 oee_data = round(activation*capacity*yield_data, 3)
+                oee_data_text = f'{round(oee_data*100,1)}%'
 
                 main_df_list_item['line_name'] = line
-                main_df_list_item['stop_time_df'] = stop_time_df
+                main_df_list_item['stop_time_df'] = stop_time_df_filtered_df
                 main_df_list_item['speed_df'] = speed_df
                 main_df_list_item['counting_df'] = counting_df
                 main_df_list_item['second_df'] = second_df
@@ -1565,10 +1639,10 @@ def oee_report(request):
                 data["second_data"] = second_data
                 data["scrap_data"] = scrap_data
                 data["estimate_ouput"] = estimate_ouput
-                data["capacity"] = capacity
+                data["capacity"] = capacity_text
                 data["sap_data"] = sap_data
-                data["yield_data"] = yield_data
-                data["oee_data"] = oee_data
+                data["yield_data"] = yield_data_text
+                data["oee_data"] = oee_data_text
                 line_data.append(data)
 
             if request.is_ajax() or (request.method == 'POST' and form_type == 'method_2'):
