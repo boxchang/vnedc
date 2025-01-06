@@ -7,7 +7,6 @@ from mes.views import work_order_list, index, runcard_detail, ipqc_log, fast_che
 
 urlpatterns = [
     url(r'^config/layout', views.config_layout, name='config_layout'),
-    url(r'^update_stop_before/', views.update_stop_before, name='update_stop_before'),
     url(r'^config', views.spiderweb_config, name='spiderweb_config'),
     url(r'^toggle_device_status/', views.toggle_device_status, name='toggle_device_status'),
     url(r'^abnormal_recover/(?P<pk>\d+)', abnormal_recover, name='abnormal_recover'),

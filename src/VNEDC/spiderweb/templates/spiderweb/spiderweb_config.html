@@ -114,51 +114,6 @@
         });
 
 
-        setInterval(function() {
-            table.ajax.reload(null, false);  // Kiểm tra và làm mới bảng mỗi 10 giây
-        }, 10000);
-
-
-        // Kiểm tra mỗi phút và so sánh thời gian trong DateTime Picker với dữ liệu trong cơ sở dữ liệu
-        setInterval(function() {
-            $('.datetime-picker-btn').each(function() {
-                const deviceName = $(this).data('device-name');
-                const pickerValue = $(`#stopBefore_${deviceName}`).val();  // Lấy giá trị từ DateTime picker
-
-                // Kiểm tra giá trị pickerValue và đảm bảo nó hợp lệ
-                const stopBefore = pickerValue ? new Date(pickerValue) : '';
-                const formattedStopBefore = stopBefore instanceof Date && !isNaN(stopBefore.getTime())
-                    ? stopBefore.toISOString().slice(0, 19).replace('T', ' ')  // Nếu hợp lệ, định dạng lại
-                    : '';  // Nếu không hợp lệ, trả về chuỗi rỗng
-
-                $.ajax({
-                    url: "{% url 'update_stop_before' %}",  // URL để gọi view kiểm tra và so sánh
-                    method: "POST",
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                    data: JSON.stringify({
-                        device_name: deviceName,
-                        stop_before: formattedStopBefore
-                    }),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error("Error comparing times: ", xhr.statusText);
-                    }
-                });
-            });
-
-            // Thực hiện hành động khi thời gian đã qua
-            setTimeout(function() {
-                table.ajax.reload();  // Reload dữ liệu từ server một lần
-            }, 100);
-
-        }, 15000);  // 60000 ms = 1 phút
-
-
         // Sau khi DataTable load xong, áp dụng CSS cho các toggle switch
         table.on('draw', function() {
             $('.switch-container').each(function() {
@@ -188,29 +143,6 @@
                     onClose: function(selectedDates, dateStr, instance) {
 
                         const stopBefore = dateStr;
-
-                        // Gửi AJAX để cập nhật giá trị stop_before
-                        $.ajax({
-                            url: "{% url 'update_stop_before' %}",
-                            method: "POST",
-                            headers: { 'X-CSRFToken': '{{ csrf_token }}' },  // CSRF token để bảo mật
-                            data: JSON.stringify({
-                                device_name: deviceName,
-                                stop_before: stopBefore
-                            }),
-                            contentType: 'application/json',
-                            success: function(response) {
-                                setTimeout(function() {
-                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
-                                }, 100);
-                                {#alert(response.message);#}
-                            },
-                            error: function(xhr) {
-                                setTimeout(function() {
-                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
-                                }, 100);
-                            }
-                        });
 
                     },
 
@@ -250,10 +182,6 @@
                     left: '4px' // Đưa nút trở lại vị trí ban đầu
                 }, 300);
             }
-
-            setTimeout(function() {
-                table.ajax.reload();  // Reload dữ liệu từ server một lần
-            }, 100);
 
 
             // Gửi yêu cầu AJAX để cập nhật trạng thái
