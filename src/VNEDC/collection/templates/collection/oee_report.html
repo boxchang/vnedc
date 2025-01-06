@@ -289,7 +289,7 @@ Report Check
                                 {% csrf_token %}
                                 <input type="hidden" name="form_type" value="method_3" />
                                 <label>Stop mins limit: {{ stopLimit }}</label>
-                                <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="60" step="5"/>
+                                <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="1440" step="5"/>
                                 <button type="submit" class="btn btn-primary custom">Submit</button>
                             </form>
                         </div>

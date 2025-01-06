@@ -1390,18 +1390,16 @@ def oee_report(request):
     sData_date = request.session.get('data_date', datetime.today().strftime("%Y-%m-%d"))
     period_times = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5]
     sLimit = request.session.get('number1', 10)
-    stopLimit = request.session.get('number2', 0)
+    stopLimit = request.session.get('number2', 15)
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
-
         if form_type == 'method_1':
             sData_date = request.POST.get('data_date', datetime.today().strftime("%Y-%m-%d"))
             sPlant = request.POST.get('plant')
             sMach = request.POST.get('mach')
             sLimit = int(request.POST.get('number1', 10))
-            stopLimit = int(request.POST.get('number2', 5))
-
+            stopLimit = int(request.POST.get('number2', 15))
             request.session['data_date'] = sData_date
             request.session['plant'] = sPlant
             request.session['mach'] = sMach
@@ -1411,7 +1409,7 @@ def oee_report(request):
             sLimit = 10 if request.POST.get('number1', 10) == '' else int(request.POST.get('number1', 10))
             request.session['number1'] = sLimit
         elif form_type == 'method_3':
-            stopLimit = 0 if request.POST.get('number2', 0) == '' else int(request.POST.get('number2', 0))
+            stopLimit = 0 if request.POST.get('number2', 15) == '' else int(request.POST.get('number2', 15))
             request.session['number2'] = stopLimit
     if request.is_ajax():
         sData_date = request.GET.get('data_date')
@@ -1419,7 +1417,7 @@ def oee_report(request):
         sMach = request.GET.get('mach', datetime.today().strftime("%Y-%m-%d"))
         sButton = request.GET.get('button', '')
         sLimit = int(request.GET.get('limit', 10))
-        stopLimit = int(request.GET.get('stop', 5))
+        stopLimit = int(request.GET.get('stop', 15))
     vnedc_db = vnedc_database()
     mes_db = mes_database()
     if sPlant == 'LK':
@@ -1443,40 +1441,27 @@ def oee_report(request):
         mach = mach_list[0]['name']
         line_list = [item['Line'] for item in mach_list]
 
-        sql1 = f"""
-                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
-                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
-                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
-                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'A1' AND Qty2 is not null  --排除網路瞬斷的情況
-                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
-                                union all
-                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
-                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
-                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
-                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'B1' AND Qty2 is not null
-                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
-                                union all
-                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
-                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
-                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
-                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'A2' AND Qty2 is not null
-                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
-                                union all
-                                SELECT m.MES_MACHINE,Qty2,Speed,LINE,CONVERT(VARCHAR, CreationTime, 120) CreationTime 
-                                                  FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
-                                                  JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m on d.MachineName = m.COUNTING_MACHINE
-                                                  where m.MES_MACHINE = '{mach}' and m.LINE = 'B2' AND Qty2 is not null
-                                                  and CreationTime between CONVERT(DATETIME, '{sData_date} 06:00:00', 120) and DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))
-
-                            """
+        sql1 = f"""WITH ConsecutiveStops AS (
+                        SELECT MES_MACHINE, LINE, CAST(DATEPART(hour, CreationTime) AS INT) AS Period, Qty2 AS Qty, CreationTime AS Cdt,
+                            CASE WHEN Qty2 IS NULL OR Qty2 <= {sLimit} THEN 1 ELSE 0 END AS IsStop, --StopLimitHere!
+                            ROW_NUMBER() OVER (PARTITION BY MES_MACHINE, LINE ORDER BY CreationTime) 
+                            - ROW_NUMBER() OVER (PARTITION BY MES_MACHINE, LINE, CASE WHEN Qty2 IS NULL OR Qty2 <= {sLimit} THEN 1 ELSE 0 END ORDER BY CreationTime) AS StopGroup  --StopLimitHere!
+                        FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] d
+                        JOIN [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m 
+                            ON d.MachineName = m.COUNTING_MACHINE
+                        WHERE m.MES_MACHINE = '{mach}' AND CreationTime BETWEEN CONVERT(DATETIME, '{sData_date} 06:00:00', 120) AND DATEADD(DAY, 1, CONVERT(DATETIME, '{sData_date} 05:59:59', 120))),
+                    GroupStats AS (
+                        SELECT MES_MACHINE, LINE, StopGroup, COUNT(*) AS StopRowCount, MIN(Cdt) AS StartCdt, MAX(Cdt) AS EndCdt 
+                        FROM ConsecutiveStops
+                        WHERE IsStop = 1
+                        GROUP BY MES_MACHINE, LINE, StopGroup)
+                    SELECT cs.MES_MACHINE, cs.LINE, cast(cs.Period as int) as Period, cs.Qty as Qty2, cs.Cdt as CreationTime, CASE WHEN gs.StopRowCount >= {int(stopLimit/5)} THEN 5 ELSE 0 END AS Stop_time
+                    FROM ConsecutiveStops cs
+                    LEFT JOIN GroupStats gs
+                    ON cs.MES_MACHINE = gs.MES_MACHINE AND cs.LINE = gs.LINE AND cs.Cdt BETWEEN gs.StartCdt AND gs.EndCdt
+                    ORDER BY cs.MES_MACHINE, cs.LINE, cs.Cdt;"""
         detail_raws = mes_db.select_sql_dict(sql1)
         stop_time_df = pd.DataFrame(detail_raws)
-        stop_time_df['Stop_time'] = ''
-        stop_time_df.loc[
-            (stop_time_df['Qty2'] <= sLimit) | stop_time_df['Speed'].isna(),
-            'Stop_time'
-        ] = 5
-
         stop_time_df = stop_time_df.fillna('')
 
         sql = f"""
@@ -1544,7 +1529,7 @@ def oee_report(request):
 
                 line_stop_time_df['Qty2'] = pd.to_numeric(line_stop_time_df['Qty2'], errors='coerce')
 
-                stop_time_df_filtered_df = line_stop_time_df[~(line_stop_time_df['Qty2'] > sLimit)]
+                stop_time_df_filtered_df = line_stop_time_df[(line_stop_time_df['Stop_time'] == 5)]
 
                 machine_stop_time = len(stop_time_df_filtered_df) * 5
                 activation = round((1440 - machine_stop_time) / 1440, 2) if machine_stop_time > 0 else 1
