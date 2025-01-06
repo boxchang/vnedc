@@ -1570,8 +1570,14 @@ def oee_report(request):
                 data_df['Target'] = data_df['Run_time'] * data_df['StdSpeed']
 
                 speed_df = data_df[['WorkOrder', 'PartNo', 'ProductItem', 'InspecDate', 'Machine', 'Line', 'Runcard', 'Period', 'LowSpeed', 'UpSpeed', 'StdSpeed', 'Run_time', 'Target']].copy()
+                speed_df = speed_df.drop_duplicates(subset=[
+                    'WorkOrder', 'PartNo', 'ProductItem', 'InspecDate',
+                    'Machine', 'Line', 'Runcard', 'Period',
+                    'LowSpeed', 'UpSpeed', 'StdSpeed', 'Run_time', 'Target'
+                ])
+
                 speed = speed_df['StdSpeed'].sum()/len(speed_df['StdSpeed'])
-                speed_df.loc[len(speed_df)] = {'WorkOrder': '', 'PartNo': '',
+                speed_df.loc[len(speed_df)+1] = {'WorkOrder': '', 'PartNo': '',
                                                'ProductItem': '', 'InspectDate': '',
                                                'Machine': '', 'Line': '',
                                                'Runcard': '', 'Period': '',
