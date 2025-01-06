@@ -22,130 +22,122 @@
     });
 </script>
 <script>
-    $(document).ready(function () {
-        $('#raw-data-container').hide();
-        let activeButton = null;
+document.addEventListener('DOMContentLoaded', function () {
+    const clickableDivs = document.querySelectorAll('[id^="id-dom-"]');
 
-        $('.action-button').on('click', function () {
-            const $container = $('#raw-data-container');
-            const sButton = $(this).attr('id');
+    let currentVisibleDivs = [];
 
-            if ($container.is(':visible') && activeButton === sButton) {
-                $container.hide();
-                activeButton = null;
-            } else {
-                const sPlant = $('#id_plant').val();
-                const sMach = $('#id_mach').val();
-                const sData_date = $('#id_data_date').val();
+    clickableDivs.forEach(div => {
+        div.addEventListener('click', function () {
+            const targetClass = this.id;
+            const targetDivs = document.querySelectorAll(`.${targetClass}`);
 
-                $.ajax({
-                    url: '{% url "oee_report" %}',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        plant: sPlant,
-                        mach: sMach,
-                        data_date: sData_date,
-                        button: sButton
-                    },
-                    success: function (response) {
-                        $container.html(response.table).show();
-                        activeButton = sButton;
-
-                        if (sButton === 'id-machine-stop-time') {
-                            $container.find('tr').each(function () {
-                                const $row = $(this);
-                                const $td11 = $row.find('td:nth-child(11)');
-                                let highlightRow = false;
-
-                                [$td11].forEach($cell => {
-                                    const cellText = $cell.text().trim();
-                                    if (cellText == 5) {
-                                        highlightRow = true;
-                                    }
-                                });
-                                if (highlightRow) {
-                                    console.log('Highlighting row:', $row.html());
-                                    $row.css('background-color', 'yellow');
-                                }
-                            });
-                        } else {
-                             $container.find('tr').each(function () {
-                                 const $row = $(this);
-                                 const $td3 = $row.find('td:nth-child(3)');
-                                 const $td7 = $row.find('td:nth-child(7)');
-
-                                  [$td3, $td7].forEach($cell => {
-                                      $cell.css('background-color', '');
-                                  });
-                             });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error:", status, error);
-                    }
-                });
+            if (targetDivs.length > 0) {
+                if (currentVisibleDivs.length > 0 && Array.from(targetDivs).every(div => currentVisibleDivs.includes(div))) {
+                    targetDivs.forEach(div => div.classList.add('hidden'));
+                    currentVisibleDivs = [];
+                } else {
+                    currentVisibleDivs.forEach(div => div.classList.add('hidden'));
+                    currentVisibleDivs = [];
+                    targetDivs.forEach(div => {
+                        div.classList.remove('hidden');
+                        currentVisibleDivs.push(div);
+                    });
+                }
             }
         });
     });
+});
 </script>
 <script>
-     document.addEventListener("DOMContentLoaded", function () {
-        const countingMachineQty = document.getElementById("id-counting-machine-qty");
-        const secondHand = document.getElementById("id-second-hand");
-        const scrap = document.getElementById("id-scrap");
-        const appearanceInspect = document.getElementById("id-appearance-inspect");
-        const failProduct = document.getElementById("id-fail-product");
-        const estimatedOutput = document.getElementById("id-estimated-output");
-        const sapTicket = document.getElementById("id-sap-ticket-qty");
-        const activationValue = document.getElementById("id-activation");
+$(document).ready(function () {
+    $('[id^="raw-data-container"]').hide();
 
-        const outputValue1 = document.getElementById("id-output-value1");
-        const outputValue2 = document.getElementById("id-output-value2");
-        const outputValue3 = document.getElementById("id-output-value3");
-        const capacityEfficiency1 = document.getElementById("id-capacity-efficiency1");
-        const capacityEfficiency2 = document.getElementById("id-capacity-efficiency2");
-        const yieldField1 = document.getElementById("id-yield1");
-        const yieldField2 = document.getElementById("id-yield2");
-        const oee = document.getElementById("id-oee");
+    let activeButton = null;
 
-        function calculateOutput() {
-            const counting = parseFloat(countingMachineQty.textContent) || 0;
-            const second = parseFloat(secondHand.textContent) || 0;
-            const scrapValue = parseFloat(scrap.textContent) || 0;
-            const appearance = parseFloat(appearanceInspect.value) || 0;
-            const fail = parseFloat(failProduct.value) || 0;
-            const estimated = parseFloat(estimatedOutput.textContent) || 0;
-            const sap = parseFloat(sapTicket.textContent) || 0;
-            const activation = parseFloat(activationValue.textContent) || 0;
+    $('.action-button').on('click', function () {
+        const sButton = $(this).attr('id'); // Get the button ID
+        const parts = sButton.split('-'); // Split the ID to extract type and line name
+        const actionType = parts[1]; // Extract the action type (e.g., 'speed' or 'machine-stop')
+        const lineName = parts.slice(2).join('-'); // Extract the line name (e.g., 'A1', 'B1')
+        const containerId = `#raw-data-container-${actionType}-${lineName}`; // Construct the container ID dynamically
+        const $container = $(containerId); // Select the corresponding container
 
-            const total = counting + second + scrapValue + appearance + fail;
-            outputValue1.textContent = `${total}`;
-            outputValue2.textContent = `${total}`;
-            outputValue3.textContent = `${total}`;
+        $('[id^="raw-data-container"]').not($container).hide();
 
-            const efficiency = total/estimated;
-            capacityEfficiency1.textContent = `${efficiency.toFixed(6)}`;
-            capacityEfficiency2.textContent = `${efficiency.toFixed(6)}`;
+        if ($container.is(':visible') && activeButton === sButton) {
+            $container.hide();
+            activeButton = null;
+        } else {
+            const sPlant = $('#id_plant').val();
+            const sMach = $('#id_mach').val();
+            const sData_date = $('#id_data_date').val();
+            const sLimit = $('#number-input1').val();
+            const stopLimit = $('#number-input2').val();
 
-            const yieldRate = sap/total;
-            yieldField1.textContent = `${yieldRate.toFixed(6)}`;
-            yieldField2.textContent = `${yieldRate.toFixed(6)}`;
+            if (!sPlant || !sMach || !sData_date) {
+                alert('Please fill in all required fields.');
+                return;
+            }
 
-            const oee_rate = activation*efficiency*yieldRate;
-            oee.textContent = `${oee_rate.toFixed(6)}`;
+            $.ajax({
+                url: '{% url "oee_report" %}',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    plant: sPlant,
+                    mach: sMach,
+                    data_date: sData_date,
+                    button: sButton,
+                    limit: sLimit,
+                    stop: stopLimit
+                },
+                beforeSend: function () {
+                    $container.html('<div class="loading-spinner">Loading...</div>').show();
+                },
+                success: function (response) {
+                    $container.html(response.table).show();
+                    activeButton = sButton;
+
+                    if (actionType === 'id-machine-stop-time-A2') {
+                        $container.find('tr').each(function () {
+                            const $row = $(this);
+                            if ($row.find('td:nth-child(9)').text().trim() == '5') {
+                                $row.css('background-color', 'yellow');
+                            }
+                        });
+                    } else {
+                        $container.find('tr').each(function () {
+                            const $row = $(this);
+                            $row.find('td:nth-child(3), td:nth-child(7)').css('background-color', '');
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("An error occurred while fetching data. Please try again.");
+                }
+            });
         }
-
-        appearanceInspect.addEventListener("input", calculateOutput);
-        failProduct.addEventListener("input", calculateOutput);
     });
+});
 </script>
+
 {% endblock js %}
 {% block title %}
 Report Check
 {% endblock title %}
 {% block content %}
 <style>
+    .hidden {
+        display: none;
+    }
+    .table tr td{
+        border: solid 1px #BFBFBF;
+        padding: 0.35rem;
+    }
+    .table tr td:first-child {
+        width: 12vw;
+    }
     .block-item{
         display: flex;
         justify-content: center;
@@ -154,143 +146,398 @@ Report Check
         border: 1px solid #2C5493;
         border-radius: 5px;
     }
-    .block-color-green{
-        color: white;
-        background-color: green;
-    }
-    .block-color-light-green{
-        color: white;
-        background-color: #00B050;
-    }
-    .block-color-red{
-        color: white;
-        background-color: red;
-    }
-    .block-color-light-blue{
-        color: white;
-        background-color: #00B0F0;
-    }
-    .block-color-blue{
-        color: white;
-        background-color: #0070C0;
-    }
-    .block-color-orange{
-        color: white;
-        background-color: #C55A11;
-    }
-    .block-color-gold{
-        color: white;
-        background-color: #BF9000;
-    }
-    .block-color-gray{
-        color: white;
-        background-color: #3B3838;
-    }
     .raw-data {
         position: relative;
     }
     .raw-data-content {
         position: relative;
     }
-    #raw-data-container {
-        max-height: 44vh;
+    .raw-data-container {
+        max-height: 40vh;
         overflow-y: auto;
         overflow-x: auto;
         padding: 0px;
         background-color: #f9f9f9;
     }
-    #raw-data-container table {
+    .raw-data-container table {
         width: 100%;
         border-collapse: collapse;
     }
-    #raw-data-container thead {
+    .raw-data-container thead {
         position: sticky;
         top: 0;
         transform: translateY(-1%);
         background-color: #f1f1f1;
         z-index: 1;
     }
-    #raw-data-container th,
-    #raw-data-container td {
+    .raw-data-container th,
+    .raw-data-container td {
         padding: 8px;
         text-align: left;
         border: 1px solid #ddd;
     }
-    #raw-data-container tbody{
+    .raw-data-container tbody{
         margin-top: 10px;
     }
-    #raw-data-container tbody tr:nth-child(even) {
+    .raw-data-container tbody tr:nth-child(even) {
         background-color: #f9f9f9;
     }
-    input::placeholder {
+    .color-red{
+        background-color: red;
         color: white;
+    }
+    .color-green{
+        background-color: green;
+        color: white;
+    }
+    .custom{
+        height: 40px;
+        padding: 0 10px;
+        font-size: 16px;
+        border-radius: 4px;
+    }
+    .tooltip-table td {
+        position: relative;
+        width: 8.3%;
+        height: 27px;
+        text-align: center;
+        border: 1px solid white;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .tooltip-table td:hover::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.6);
+        z-index: 1;
+        transition: background-color 0.3s ease;
+        pointer-events: none;
+    }
+
+    .tooltip-table td:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 4px;
+        white-space: nowrap;
+        z-index: 2;
+        font-size: 12px;
+        display: block;
+    }
+
+    .tooltip-table td[data-tooltip] {
+        cursor: pointer;
+        position: relative;
     }
 </style>
 <div class="content-layout" style="margin-left: 0px">
-    <div class="row m-3" style="margin-left: 0px">
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-light-blue" id="id-activation">{% if activation is not None %}{{ activation }}{% else %}Activation{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green">1440</div>
-            <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">{% if machine_stop_time is not None %}{{ machine_stop_time }}{% else %}机器停止时间{% endif %}</div>{# Machine Stop Time #}
-            <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green">1440</div>
-        </div>
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-blue" id="id-estimated-output">{% if estimate_ouput is not None %}{{ estimate_ouput }}{% else %}Estimated Output{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green action-button" id="id-speed">{% if speed is not None %}{{ speed }}{% else %}速度{% endif %}</div>{# Speed #}
-            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-            <div class="col-md-3 block-item block-color-green" id="id-machine-stop-time">{% if machine_stop_time is not None %}{{ minus_machine_stop_time }}{% else %}1440 - 机器停止时间{% endif %}</div>{# 1440-Machine Stop Time #}
-            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green">{% if line_num is not None %}{{ line_num }}{% else %}lines{% endif %}</div>
-        </div>
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-green" id="id-output-value1">{% if output is not None %}{{ output }}{% else %}Output{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">{% if counting is not None %}{{ counting }}{% else %}计数机数量（IPQC){% endif %}</div>{# Counting Machine Qty (lPQc) Second #}
-            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green action-button" id="id-second-hand">{% if second_grade is not None %}{{ second_grade }}{% else %}二手{% endif %}</div>
-            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-            <div class="col-md-1 block-item block-color-green action-button" id="id-scrap">{% if scrap is not None %}{{ scrap }}{% else %}Scrap{% endif %}</div>
-            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-            <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
-            <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-            <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
-        </div>
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">{% if capacity is not None %}{{ capacity }}{% else %}Capacity Efficiency{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-green" id="id-output-value2">{% if output is not None %}{{ output }}{% else %}Output{% endif %}</div>
-            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-blue">{% if estimate_ouput %}{{ estimate_ouput }}{% else %}Estimated Output{% endif %}</div>
-        </div>
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-light-green" id="id-yield1">{% if yied is not None %}{{ yied }}{% else %}Yield{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">{% if sap is not None %}{{ sap }}{% else %}SAP數量{% endif %}</div>{# SAP Ticket Qty #}
-            <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-green" id="id-output-value3">{% if output is not None %}{{ output }}{% else %}Output{% endif %}</div>
-        </div>
-        <div class="col-md-12 d-flex mb-3">
-            <div class="col-md-2 block-item block-color-green" id="id-oee">{% if oee is not None %}{{ oee }}{% else %}OEE{% endif %}</div>
-            <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-light-blue">{% if activation is not None %}{{ activation }}{% else %}Activation{% endif %}</div>
-            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">{% if capacity is not None %}{{ capacity }}{% else %}Capacity Efficiency{% endif %}</div>
-            <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-            <div class="col-md-2 block-item block-color-light-green" id="id-yield2">{% if yied is not None %}{{ yied }}{% else %}Yield{% endif %}</div>
-        </div>
-    </div>
-    <div class="raw-data">
-        <div class="raw-data-content">
-            <div id="raw-data-container">
-
+    {% if sPlant != '' and sMach != '' %}
+        <div class="col-md-12 d-flex" style="margin-left: 0px">
+            <div class="col-md-7">
+                <table class="table table-striped" style="border: solid 1px #BFBFBF">
+                    <tr style="text-align: center;">
+                        {% if line_data %}<td></td>{% endif %}
+                        {% for data in line_data %}
+                            <td>{{ data.line_name }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% for parameter in parameters %}
+                        <tr>
+                            <td>{{ parameter }}</td>
+                            {% for data in line_data %}
+                                {% if forloop.parentloop.counter == 1 %}
+                                    <td style="text-align: center;" id="id-dom-activation-table-{{ data.line_name }}">{{ data.activation_text }}</td>
+                                {% elif forloop.parentloop.counter == 2 %}
+                                    <td style="text-align: center;" id="id-dom-estimate-output-table-{{ data.line_name }}">{{ data.estimate_ouput }}</td>
+                                {% elif forloop.parentloop.counter == 3 %}
+                                    <td style="text-align: center;" id="id-dom-capacity-effeciency-table-{{ data.line_name }}">{{ data.capacity }}</td>
+                                {% elif forloop.parentloop.counter == 4 %}
+                                    <td style="text-align: center;" id="id-dom-yield-table-{{ data.line_name }}">{{ data.yield_data }}</td>
+                                {% elif forloop.parentloop.counter == 5 %}
+                                    <td style="text-align: center;" id="id-dom-oee-table-{{ data.line_name }}">{{ data.oee_data }}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="col-md-5" style="margin: 0px; padding: 0px">
+                <div style="padding-left: 30px">
+                 {% if len_detail_raws %}
+                    <div class="col-md-12 d-flex mb-3">
+                        <div class="col-md-6 d-flex mb-3">
+                            <form method="POST" action="{% url 'oee_report' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="method_2" />
+                                <label>Quantity limit: {{ sLimit }}</label>
+                                <input type="number" name="number1" id="number-input1" placeholder="Enter value" value="{{ sLimit }}" class="col-md-6 custom" min="0" max="10000" step="10"/>
+                                <button type="submit" class="btn btn-primary custom">Submit</button>
+                            </form>
+                        </div>
+                        <div class="col-md-6 d-flex mb-3">
+                            <form method="POST" action="{% url 'oee_report' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="method_3" />
+                                <label>Stop mins limit: {{ stopLimit }}</label>
+                                <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="60" step="5"/>
+                                <button type="submit" class="btn btn-primary custom">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+                <div class="col-md-12">
+                    {% for data in line_data %}
+                        <div class="hidden id-dom-activation-table-{{ data.line_name }}">
+                            <table style="width: 100%; border-collapse: collapse;" class="tooltip-table">
+                                {% for row in data.stop_table %}
+                                    <tr>
+                                        {% for col in row %}
+                                            {% if forloop.parentloop.counter0|divisibleby:2 %}
+                                                {% if forloop.parentloop.counter0 == 0 %}
+                                                    <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
+                                                        {{ col }}
+                                                    </th>
+                                                {% else %}
+                                                    <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
+                                                        {{ col }}
+                                                    </th>
+                                                {% endif %}
+                                            {% else %}
+                                                <td style="background-color: {% if col == 0 %}#4CAF50;{% elif col == 60 %}#FF0000;{% elif 0 < col and col < 60 %}#FFC107;{% else %}{% if today_work_date == sData_date %}#F1F1F1;{% else %}#BFBFBF;{% endif %}{% endif %}" data-tooltip="{% if col == 0 %}Nonstop (0 mins){% elif col == 60 %}Allstop (60 mins){% elif 0 < col and col < 60 %}Stop in: {{ col }} mins{% else %}{% if today_work_date == sData_date %}Not time yet!{% else %}No runcard!{% endif %}{% endif %}"></td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
+        <div class="col-md-12">
+            {% for data in line_data %}
+                <div class="hidden id-dom-activation-table-{{ data.line_name }}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.line_name }} 稼動率</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                        <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.line_name }} 停機時間(分)</div>
+                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                    </div>
+                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">1440</div>
+                        <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-red" id="id-machine-stop-time-{{ data.line_name }}">{{ data.machine_stop_time }}</div>
+                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">1440</div>
+                    </div>
+                    <div class="raw-data">
+                        <div class="raw-data-content">
+                            <div id="raw-data-container-machine-stop-time-{{ data.line_name }}" class="raw-data-container"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden id-dom-estimate-output-table-{{ data.line_name }}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} 最適產能:定速</span>
+                        <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                        <span class="col-md-3 block-item">{{ data.line_name }} 扣除停機後可運轉時間(分)</span>
+                    </div>
+                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-green" id="id-speed-{{ data.line_name }}">{{ data.speed }}</div>
+                        <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">{{ data.run_time }}</div>
+                    </div>
+                    <div class="raw-data">
+                        <div class="raw-data-content">
+                            <div id="raw-data-container-speed-{{ data.line_name }}" class="raw-data-container"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden id-dom-capacity-effeciency-table-{{ data.line_name }}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
+                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
+                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
+                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
+                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                    </div>
+                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
+                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-green" id="id-second-hand-qty-{{ data.line_name }}">{{ data.second_data }}</div>
+                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-green" id="id-scrap-qty-{{ data.line_name }}">{{ data.scrap_data }}</div>
+                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                    </div>
+                    <div class="raw-data">
+                        <div class="raw-data-content">
+                            <div id="raw-data-container-counting-machine-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                            <div id="raw-data-container-second-hand-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                            <div id="raw-data-container-scrap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden id-dom-yield-table-{{ data.line_name }}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} SAP Quantity</span>
+                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
+                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
+                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
+                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                    </div>
+                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item action-button color-green" id="id-sap-qty-{{ data.line_name }}">{{ data.sap_data }}</div>
+                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.couting_data }}</div>
+                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.second_data }}</div>
+                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.scrap_data }}</div>
+                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                    </div>
+                    <div class="raw-data">
+                        <div class="raw-data-content">
+                            <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden id-dom-oee-table-{{ data.line_name }}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
+                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
+                        <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                        <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
+                        <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                        <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                    </div>
+                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                        <div class="col-md-2 block-item">{{ data.oee_data }}</div>
+                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                        <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                        <div class="col-md-3 block-item">{{ data.capacity }}</div>
+                        <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                        <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                    </div>
+                    <div class="raw-data">
+                        <div class="raw-data-content">
+                            <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row m-3" style="margin-left: 0px">
+            <div class="col-md-12 d-flex mb-3">
+                <span class="col-md-2 block-item block-color-light-blue" id="id-activation">Activation</span>
+                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green">1440</span>
+                <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">机器停止时间</span>{# Machine Stop Time #}
+                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green">1440</span>
+            </div>
+            <div class="col-md-12 d-flex mb-3">
+                <span class="col-md-2 block-item block-color-blue" id="id-estimated-output">Estimated Output</span>
+                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green action-button" id="id-speed">速度</span>{# Speed #}
+                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                <span class="col-md-3 block-item block-color-green" id="id-machine-stop-time">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
+                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green">lines</span>
+            </div>
+            <div class="col-md-12 d-flex mb-3">
+                <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">Capacity Efficiency</span>
+                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
+            </div>
+            <div class="col-md-12 d-flex mb-3">
+                <span class="col-md-2 block-item block-color-light-green" id="id-yield1">Yield</span>
+                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">SAP數量</span>{# SAP Ticket Qty #}
+                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+            </div>
+            <div class="col-md-12 d-flex mb-3">
+                <span class="col-md-2 block-item block-color-green" id="id-oee">OEE</span>
+                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-light-blue">Activation</span>
+                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">Capacity Efficiency</span>
+                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                <span class="col-md-2 block-item block-color-light-green" id="id-yield2">Yield</span>
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}
