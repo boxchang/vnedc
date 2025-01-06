@@ -1,5 +1,13 @@
+import json
+from datetime import datetime, timedelta
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 from spiderweb.models import Device_Type, Monitor_Device_List, Monitor_Device_Log, Monitor_Status
 from VNEDC.database import vnedc_database
@@ -56,6 +64,7 @@ def spiderweb(request):
 
     return render(request, 'spiderweb/spiderweb.html', locals())
 
+
 def abnormal_recover(request, pk):
     issue = get_object_or_404(Monitor_Device_Log, pk=pk)
 
@@ -70,4 +79,36 @@ def abnormal_recover(request, pk):
 
 def spiderweb_config(request):
 
-    return render(request, 'spiderweb/spiderweb_config.html', locals())
+    data = list(Monitor_Device_List.objects.values('device_group', 'device_name', 'update_at', 'update_by', 'enable'))
+
+    # Lấy model người dùng tùy chỉnh
+    User = get_user_model()
+
+    for monitor_list in data:
+        user = User.objects.get(id=monitor_list['update_by'])
+        monitor_list['update_by'] = user.username
+        monitor_list['update_at'] = monitor_list['update_at'].strftime('%Y-%m-%d %H:%M:%S')
+    return JsonResponse({'data': data}, safe=False)
+
+
+def config_layout(request):
+    return render(request, 'spiderweb/spiderweb_config.html')
+
+
+def toggle_device_status(request):
+    if request.method == 'POST':
+        device_name = request.POST.get('status')
+        is_active = request.POST.get('is_active') == 'true'
+        device = Monitor_Device_List.objects.get(device_name=device_name)
+
+        try:
+            device.enable = 'Y' if is_active else 'N'
+            device.update_at = timezone.now()
+            device.update_by = request.user
+            device.save()
+
+        except Monitor_Device_List.DoesNotExist:
+            return JsonResponse({'error': 'Device not found'}, status=404)
+
+    return JsonResponse({'message': 'Invalid request'})
+
