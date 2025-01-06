@@ -1,16 +1,307 @@
 {% extends 'mes/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block css %}
 {% load i18n %}
+{% block css %}
 
-{% endblock css %}
+    <style>
+        /* Container của switch */
+        .switch-container {
+            display: inline-block;
+            position: relative;
+            width: 60px;
+            height: 34px;
+            cursor: pointer;
+        }
+
+        /* Background của switch */
+        .switch-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 34px;
+            background-color: #ccc;
+            transition: background-color 0.3s;
+        }
+
+        /* Nút của switch */
+        .switch-btn {
+            position: absolute;
+            top: 50%;
+            left: 4px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: white;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+
+        /* Khi switch bật (active) */
+        .switch-container.active .switch-bg {
+            background-color: #4CAF50; /* Màu nền khi bật */
+        }
+
+        .switch-container.active .switch-btn {
+            transform: translateY(-50%) translateX(26px); /* Di chuyển nút sang phải */
+        }
+
+        /* Hover effect (tuỳ chọn) */
+        .switch-container:hover .switch-bg {
+            background-color: #aaa;
+        }
+
+    </style>
+{% endblock %}
 {% block js %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+    $(document).ready(function() {
+        var table = $('#device-table').DataTable({
+            "Loading...": true,  // Hiển thị thông báo đang tải dữ liệu
+            "ajax": {
+                "url": "{% url 'spiderweb_config' %}",  // URL để gọi view spiderweb_config
+                "type": "GET",
+                "dataSrc": function(json) {
+                    return json.data;  // Trả lại dữ liệu từ key 'data' để DataTable hiển thị
+                }
+            },
+            "columns": [
+                { "data": "device_group" },  // Cột Device Group
+                { "data": "device_name" },   // Cột Device Name
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                            <div class="switch-container ${row.enable === 'Y' ? 'active' : ''}" data-id="${row.device_name}">
+                                <div class="switch-bg"></div>
+                                <div class="switch-btn"></div>
+                            </div>`;
+                    }
+                },
+                {
+                    data: 'stop_before',
+                    render: function(data, type, row) {
+                        // Kiểm tra nếu data hợp lệ và chuyển đổi sang Date
+                        const stopBeforeValue = data ? new Date(data) : '';
+                        const formattedValue = stopBeforeValue instanceof Date && !isNaN(stopBeforeValue.getTime())
+                            ? stopBeforeValue.toISOString().slice(0, 19).replace('T', ' ')  // Nếu hợp lệ, định dạng lại
+                            : '';  // Nếu không hợp lệ, trả về chuỗi rỗng
+
+                        return `
+                            <input type="text" class="datetime-picker-btn" id="stopBefore_${row.device_name}"
+                                   data-device-name="${row.device_name}"
+                                   value="${formattedValue}"/>
+                        `;
+                    }
+                },
+                { "data": "update_by" },     // Cột Update By
+                { "data": "update_at" }      // Cột Update At
+            ],
+            "scrollY": "500px",  // Chiều cao tối đa của bảng, đơn vị px
+            "scrollCollapse": true,  // Bật/tắt thu gọn bảng nếu dữ liệu ít hơn chiều cao
+            "paging": false,  // Cho phép phân trang
+            "searching": true,  // Cho phép tìm kiếm
+            "ordering": true  // Cho phép sắp xếp các cột
+        });
+
+
+        setInterval(function() {
+            table.ajax.reload(null, false);  // Kiểm tra và làm mới bảng mỗi 10 giây
+        }, 10000);
+
+
+        // Kiểm tra mỗi phút và so sánh thời gian trong DateTime Picker với dữ liệu trong cơ sở dữ liệu
+        setInterval(function() {
+            $('.datetime-picker-btn').each(function() {
+                const deviceName = $(this).data('device-name');
+                const pickerValue = $(`#stopBefore_${deviceName}`).val();  // Lấy giá trị từ DateTime picker
+
+                // Kiểm tra giá trị pickerValue và đảm bảo nó hợp lệ
+                const stopBefore = pickerValue ? new Date(pickerValue) : '';
+                const formattedStopBefore = stopBefore instanceof Date && !isNaN(stopBefore.getTime())
+                    ? stopBefore.toISOString().slice(0, 19).replace('T', ' ')  // Nếu hợp lệ, định dạng lại
+                    : '';  // Nếu không hợp lệ, trả về chuỗi rỗng
+
+                $.ajax({
+                    url: "{% url 'update_stop_before' %}",  // URL để gọi view kiểm tra và so sánh
+                    method: "POST",
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                    data: JSON.stringify({
+                        device_name: deviceName,
+                        stop_before: formattedStopBefore
+                    }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Error comparing times: ", xhr.statusText);
+                    }
+                });
+            });
+
+            // Thực hiện hành động khi thời gian đã qua
+            setTimeout(function() {
+                table.ajax.reload();  // Reload dữ liệu từ server một lần
+            }, 100);
+
+        }, 15000);  // 60000 ms = 1 phút
+
+
+        // Sau khi DataTable load xong, áp dụng CSS cho các toggle switch
+        table.on('draw', function() {
+            $('.switch-container').each(function() {
+                const switchElement = $(this);
+                // Kiểm tra nếu toggle đang trong trạng thái active
+                if (switchElement.hasClass('active')) {
+                    switchElement.find('.switch-bg').css('background-color', '#4CAF50');  // Màu nền khi bật
+                    switchElement.find('.switch-btn').css('left', '4px');  // Di chuyển nút sang phải
+                } else {
+                    switchElement.find('.switch-bg').css('background-color', '#ccc');  // Màu nền khi tắt
+                    switchElement.find('.switch-btn').css('left', '4px');  // Đưa nút về vị trí ban đầu
+                }
+            });
+
+
+            $('.datetime-picker-btn').each(function() {
+                const deviceName = $(this).data('device-name');
+                let lastSelectedTime = null;
+
+                // Khởi tạo DateTime picker cho các input
+                flatpickr(this, {
+                    enableTime: true,
+                    dateFormat: "d-m-Y H:i",
+                    defaultDate: this.value || new Date(),  // Mặc định là ngày hiện tại nếu không có giá trị
+
+
+                    onClose: function(selectedDates, dateStr, instance) {
+
+                        const stopBefore = dateStr;
+
+                        // Gửi AJAX để cập nhật giá trị stop_before
+                        $.ajax({
+                            url: "{% url 'update_stop_before' %}",
+                            method: "POST",
+                            headers: { 'X-CSRFToken': '{{ csrf_token }}' },  // CSRF token để bảo mật
+                            data: JSON.stringify({
+                                device_name: deviceName,
+                                stop_before: stopBefore
+                            }),
+                            contentType: 'application/json',
+                            success: function(response) {
+                                setTimeout(function() {
+                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
+                                }, 100);
+                                {#alert(response.message);#}
+                            },
+                            error: function(xhr) {
+                                setTimeout(function() {
+                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
+                                }, 100);
+                            }
+                        });
+
+                    },
+
+
+                });
+            });
+
+
+
+        });
+
+
+        // Toggle switch khi click
+        $('#device-table').on('click', '.switch-container', function () {
+            const switchElement = $(this);
+            const isActive = switchElement.hasClass('active');
+            const status = switchElement.data('id');
+
+            // Đổi trạng thái nút chuyển đổi
+            switchElement.toggleClass('active');
+
+            // Sử dụng jQuery để áp dụng các hiệu ứng CSS
+            if (switchElement.hasClass('active')) {
+                switchElement.find('.switch-bg').stop(true).animate({
+                    backgroundColor: "#4CAF50" // Màu nền khi bật
+                }, 300);  // Thời gian hiệu ứng
+
+                switchElement.find('.switch-btn').stop(true).animate({
+                    left: '4px' // Di chuyển nút sang phải
+                }, 300);
+            } else {
+                switchElement.find('.switch-bg').stop(true).animate({
+                    backgroundColor: "#ccc" // Màu nền khi tắt
+                }, 300);
+
+                switchElement.find('.switch-btn').stop(true).animate({
+                    left: '4px' // Đưa nút trở lại vị trí ban đầu
+                }, 300);
+            }
+
+            setTimeout(function() {
+                table.ajax.reload();  // Reload dữ liệu từ server một lần
+            }, 100);
+
+
+            // Gửi yêu cầu AJAX để cập nhật trạng thái
+            $.ajax({
+                url: "{% url 'toggle_device_status' %}",
+                method: "POST",
+                data: {
+                    status: status,
+                    is_active: !isActive,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    console.log(response.message);
+
+                },
+                error: function (xhr) {
+                    alert("Có lỗi xảy ra!");
+                }
+            });
+
+
+
+        });
+
+
+    });
+</script>
 {% endblock js %}
-{% block title %}
-SpiderWeb Config
-{% endblock title %}
+{% block title %} SpiderWeb Config {% endblock title %}
 {% block content %}
+    <table id="device-table" class="display">
+        <thead>
+            <tr>
+                <th>device_group</th>
+                <th>device_name</th>
+                <th>Enable</th>
+                <th>Stop Before</th>
+                <th>Update by</th>
+                <th>Update at</th>
+            </tr>
+        </thead>
+    <tbody>
+    {% csrf_token %}
+    </tbody>
+    </table>
+  <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% endblock content %}
