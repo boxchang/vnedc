@@ -1,543 +1,626 @@
-{% extends 'collection/base.html' %}
-{% load crispy_forms_tags %}
 {% load static %}
-{% block css %}
 {% load i18n %}
-{% endblock css %}
-{% block js %}
-<script>
-    $(document).ready(function() {
-        $('#id_data_date').on('change', function () {
-            $('#session_form').attr('action', '{% url "oee_report" %}');
-            $('#session_form').submit();
-        });
-        $('#id_plant').on('change', function () {
-            $('#session_form').attr('action', '{% url "oee_report" %}');
-            $('#session_form').submit();
-        });
-        $('#id_mach').on('change', function () {
-            $('#session_form').attr('action', '{% url "oee_report" %}');
-            $('#session_form').submit();
-        });
-    });
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const clickableDivs = document.querySelectorAll('[id^="id-dom-"]');
+{% load user_groups %}
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ever Global - OEE Report Check</title>
+    <link rel="stylesheet" href="{% static 'jquery-ui\jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-4.1.3\css\bootstrap.min.css' %}">
+    <script src="{% static 'base\js\umd\popper.js' %}"></script>
+    <script src="{% static 'base\js\func.js' %}"></script>
+    <script src="{% static 'jquery\jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'jquery-ui\jquery-ui.min.js' %}"></script>
+    <script src="{% static 'bootstrap-4.1.3\js\bootstrap.min.js' %}"></script>
+    <!-- jquery-loading v1.3.0 -->
+    <link href="{% static 'jquery.loading\css\jquery.loading.min.css' %}" rel="stylesheet" />
+    <script src="{% static 'jquery.loading\js\jquery.loading.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'fontawesome-5.4.2\css\all.css' %}">
+    <link rel="stylesheet" href="{% static 'base\css\base.css' %}">
+    {% block head %}
+    {% endblock %}
+    {% block css %}
 
-    let currentVisibleDivs = [];
+    {% endblock css %}
+    {% block base_js %}
 
-    clickableDivs.forEach(div => {
-        div.addEventListener('click', function () {
-            const targetClass = this.id;
-            const targetDivs = document.querySelectorAll(`.${targetClass}`);
+    {% endblock base_js %}
+    {% block js %}
 
-            if (targetDivs.length > 0) {
-                if (currentVisibleDivs.length > 0 && Array.from(targetDivs).every(div => currentVisibleDivs.includes(div))) {
-                    targetDivs.forEach(div => div.classList.add('hidden'));
-                    currentVisibleDivs = [];
+    {% endblock js %}
+    <script>
+        $(document).ready(function() {
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const clickableDivs = document.querySelectorAll('[id^="id-dom-"]');
+
+                let currentVisibleDivs = [];
+
+                clickableDivs.forEach(div => {
+                    div.addEventListener('click', function () {
+                        const targetClass = this.id;
+                        const targetDivs = document.querySelectorAll(`.${targetClass}`);
+
+                        if (targetDivs.length > 0) {
+                            if (currentVisibleDivs.length > 0 && Array.from(targetDivs).every(div => currentVisibleDivs.includes(div))) {
+                                targetDivs.forEach(div => div.classList.add('hidden'));
+                                currentVisibleDivs = [];
+                            } else {
+                                currentVisibleDivs.forEach(div => div.classList.add('hidden'));
+                                currentVisibleDivs = [];
+                                targetDivs.forEach(div => {
+                                    div.classList.remove('hidden');
+                                    currentVisibleDivs.push(div);
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+
+            $('#id_data_date').on('change', function () {
+                $('#session_form').attr('action', '{% url "oee_report" %}');
+                $('#session_form').submit();
+            });
+            $('#id_plant').on('change', function () {
+                $('#session_form').attr('action', '{% url "oee_report" %}');
+                $('#session_form').submit();
+            });
+            $('#id_mach').on('change', function () {
+                $('#session_form').attr('action', '{% url "oee_report" %}');
+                $('#session_form').submit();
+            });
+
+            $('[id^="raw-data-container"]').hide();
+
+            let activeButton = null;
+
+            $('.action-button').on('click', function () {
+                const sButton = $(this).attr('id'); // Get the button ID
+                const parts = sButton.split('-'); // Split the ID to extract type and line name
+                const actionType = parts[1]; // Extract the action type (e.g., 'speed' or 'machine-stop')
+                const lineName = parts.slice(2).join('-'); // Extract the line name (e.g., 'A1', 'B1')
+                const containerId = `#raw-data-container-${actionType}-${lineName}`; // Construct the container ID dynamically
+                const $container = $(containerId); // Select the corresponding container
+
+                $('[id^="raw-data-container"]').not($container).hide();
+
+                if ($container.is(':visible') && activeButton === sButton) {
+                    $container.hide();
+                    activeButton = null;
                 } else {
-                    currentVisibleDivs.forEach(div => div.classList.add('hidden'));
-                    currentVisibleDivs = [];
-                    targetDivs.forEach(div => {
-                        div.classList.remove('hidden');
-                        currentVisibleDivs.push(div);
+                    const sPlant = $('#id_plant').val();
+                    const sMach = $('#id_mach').val();
+                    const sData_date = $('#id_data_date').val();
+                    const sLimit = $('#number-input1').val();
+                    const stopLimit = $('#number-input2').val();
+
+                    if (!sPlant || !sMach || !sData_date) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{% url "oee_report" %}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            plant: sPlant,
+                            mach: sMach,
+                            data_date: sData_date,
+                            button: sButton,
+                            limit: sLimit,
+                            stop: stopLimit
+                        },
+                        beforeSend: function () {
+                            $container.html('<div class="loading-spinner">Loading...</div>').show();
+                        },
+                        success: function (response) {
+                            $container.html(response.table).show();
+                            activeButton = sButton;
+
+                            if (actionType === 'id-machine-stop-time-A2') {
+                                $container.find('tr').each(function () {
+                                    const $row = $(this);
+                                    if ($row.find('td:nth-child(9)').text().trim() == '5') {
+                                        $row.css('background-color', 'yellow');
+                                    }
+                                });
+                            } else {
+                                $container.find('tr').each(function () {
+                                    const $row = $(this);
+                                    $row.find('td:nth-child(3), td:nth-child(7)').css('background-color', '');
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            alert("An error occurred while fetching data. Please try again.");
+                        }
                     });
                 }
-            }
-        });
-    });
-});
-</script>
-<script>
-$(document).ready(function () {
-    $('[id^="raw-data-container"]').hide();
-
-    let activeButton = null;
-
-    $('.action-button').on('click', function () {
-        const sButton = $(this).attr('id'); // Get the button ID
-        const parts = sButton.split('-'); // Split the ID to extract type and line name
-        const actionType = parts[1]; // Extract the action type (e.g., 'speed' or 'machine-stop')
-        const lineName = parts.slice(2).join('-'); // Extract the line name (e.g., 'A1', 'B1')
-        const containerId = `#raw-data-container-${actionType}-${lineName}`; // Construct the container ID dynamically
-        const $container = $(containerId); // Select the corresponding container
-
-        $('[id^="raw-data-container"]').not($container).hide();
-
-        if ($container.is(':visible') && activeButton === sButton) {
-            $container.hide();
-            activeButton = null;
-        } else {
-            const sPlant = $('#id_plant').val();
-            const sMach = $('#id_mach').val();
-            const sData_date = $('#id_data_date').val();
-            const sLimit = $('#number-input1').val();
-            const stopLimit = $('#number-input2').val();
-
-            if (!sPlant || !sMach || !sData_date) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            $.ajax({
-                url: '{% url "oee_report" %}',
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    plant: sPlant,
-                    mach: sMach,
-                    data_date: sData_date,
-                    button: sButton,
-                    limit: sLimit,
-                    stop: stopLimit
-                },
-                beforeSend: function () {
-                    $container.html('<div class="loading-spinner">Loading...</div>').show();
-                },
-                success: function (response) {
-                    $container.html(response.table).show();
-                    activeButton = sButton;
-
-                    if (actionType === 'id-machine-stop-time-A2') {
-                        $container.find('tr').each(function () {
-                            const $row = $(this);
-                            if ($row.find('td:nth-child(9)').text().trim() == '5') {
-                                $row.css('background-color', 'yellow');
-                            }
-                        });
-                    } else {
-                        $container.find('tr').each(function () {
-                            const $row = $(this);
-                            $row.find('td:nth-child(3), td:nth-child(7)').css('background-color', '');
-                        });
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert("An error occurred while fetching data. Please try again.");
-                }
             });
-        }
-    });
-});
-</script>
-
-{% endblock js %}
-{% block title %}
-Report Check
-{% endblock title %}
-{% block content %}
-<style>
-    .hidden {
-        display: none;
-    }
-    .table tr td{
-        border: solid 1px #BFBFBF;
-        padding: 0.35rem;
-    }
-    .table tr td:first-child {
-        width: 12vw;
-    }
-    .block-item{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        border: 1px solid #2C5493;
-        border-radius: 5px;
-    }
-    .raw-data {
-        position: relative;
-    }
-    .raw-data-content {
-        position: relative;
-    }
-    .raw-data-container {
-        max-height: 40vh;
-        overflow-y: auto;
-        overflow-x: auto;
-        padding: 0px;
-        background-color: #f9f9f9;
-    }
-    .raw-data-container table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .raw-data-container thead {
-        position: sticky;
-        top: 0;
-        transform: translateY(-1%);
-        background-color: #f1f1f1;
-        z-index: 1;
-    }
-    .raw-data-container th,
-    .raw-data-container td {
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-    .raw-data-container tbody{
-        margin-top: 10px;
-    }
-    .raw-data-container tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-    .color-red{
-        background-color: red;
-        color: white;
-    }
-    .color-green{
-        background-color: green;
-        color: white;
-    }
-    .custom{
-        height: 40px;
-        padding: 0 10px;
-        font-size: 16px;
-        border-radius: 4px;
-    }
-    .tooltip-table td {
-        position: relative;
-        width: 8.3%;
-        height: 27px;
-        text-align: center;
-        border: 1px solid white;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
-    }
-
-    .tooltip-table td:hover::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.6);
-        z-index: 1;
-        transition: background-color 0.3s ease;
-        pointer-events: none;
-    }
-
-    .tooltip-table td:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: #fff;
-        padding: 5px;
-        border-radius: 4px;
-        white-space: nowrap;
-        z-index: 2;
-        font-size: 12px;
-        display: block;
-    }
-
-    .tooltip-table td[data-tooltip] {
-        cursor: pointer;
-        position: relative;
-    }
-</style>
-<div class="content-layout" style="margin-left: 0px">
-    {% if sPlant != '' and sMach != '' %}
-        <div class="col-md-12 d-flex" style="margin-left: 0px">
-            <div class="col-md-7">
-                <table class="table table-striped" style="border: solid 1px #BFBFBF">
-                    <tr style="text-align: center;">
-                        {% if line_data %}<td></td>{% endif %}
-                        {% for data in line_data %}
-                            <td>{{ data.line_name }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% for parameter in parameters %}
-                        <tr>
-                            <td>{{ parameter }}</td>
-                            {% for data in line_data %}
-                                {% if forloop.parentloop.counter == 1 %}
-                                    <td style="text-align: center;" id="id-dom-activation-table-{{ data.line_name }}">{{ data.activation_text }}</td>
-                                {% elif forloop.parentloop.counter == 2 %}
-                                    <td style="text-align: center;" id="id-dom-estimate-output-table-{{ data.line_name }}">{{ data.estimate_ouput }}</td>
-                                {% elif forloop.parentloop.counter == 3 %}
-                                    <td style="text-align: center;" id="id-dom-capacity-effeciency-table-{{ data.line_name }}">{{ data.capacity }}</td>
-                                {% elif forloop.parentloop.counter == 4 %}
-                                    <td style="text-align: center;" id="id-dom-yield-table-{{ data.line_name }}">{{ data.yield_data }}</td>
-                                {% elif forloop.parentloop.counter == 5 %}
-                                    <td style="text-align: center;" id="id-dom-oee-table-{{ data.line_name }}">{{ data.oee_data }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="col-md-5" style="margin: 0px; padding: 0px">
-                <div style="padding-left: 30px">
-                 {% if len_detail_raws %}
-                    <div class="col-md-12 d-flex mb-3">
-                        <div class="col-md-6 d-flex mb-3">
-                            <form method="POST" action="{% url 'oee_report' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="form_type" value="method_2" />
-                                <label>Quantity limit: {{ sLimit }}</label>
-                                <input type="number" name="number1" id="number-input1" placeholder="Enter value" value="{{ sLimit }}" class="col-md-6 custom" min="0" max="10000" step="10"/>
-                                <button type="submit" class="btn btn-primary custom">Submit</button>
-                            </form>
-                        </div>
-                        <div class="col-md-6 d-flex mb-3">
-                            <form method="POST" action="{% url 'oee_report' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="form_type" value="method_3" />
-                                <label>Stop mins limit: {{ stopLimit }}</label>
-                                <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="1440" step="5"/>
-                                <button type="submit" class="btn btn-primary custom">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-                {% endif %}
-                </div>
-                <div class="col-md-12">
-                    {% for data in line_data %}
-                        <div class="hidden id-dom-activation-table-{{ data.line_name }}">
-                            <table style="width: 100%; border-collapse: collapse;" class="tooltip-table">
-                                {% for row in data.stop_table %}
-                                    <tr>
-                                        {% for col in row %}
-                                            {% if forloop.parentloop.counter0|divisibleby:2 %}
-                                                {% if forloop.parentloop.counter0 == 0 %}
-                                                    <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
-                                                        {{ col }}
-                                                    </th>
-                                                {% else %}
-                                                    <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
-                                                        {{ col }}
-                                                    </th>
-                                                {% endif %}
-                                            {% else %}
-                                                <td style="background-color: {% if col == 0 %}#4CAF50;{% elif col == 60 %}#FF0000;{% elif 0 < col and col < 60 %}#FFC107;{% else %}{% if today_work_date == sData_date %}#F1F1F1;{% else %}#BFBFBF;{% endif %}{% endif %}" data-tooltip="{% if col == 0 %}Nonstop (0 mins){% elif col == 60 %}Allstop (60 mins){% elif 0 < col and col < 60 %}Stop in: {{ col }} mins{% else %}{% if today_work_date == sData_date %}Not time yet!{% else %}No runcard!{% endif %}{% endif %}"></td>
-                                            {% endif %}
+        });
+    </script>
+</head>
+<body>
+    <div id="content" style="position: relative;">
+        <div class="container-fluid" style="padding-left: 0px;padding-right: 0px">
+            <div class="card-header">
+                {% if user.is_authenticated %}
+                <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="method_1" />
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div id="div_id_plant" class="form-group">
+                                <label for="id_plant" class=" requiredField">
+                                    {% trans "Plant" %}<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="plant" onchange="set_session();plant_change();" class="select custom-select" required="" id="id_plant">
+                                        <option value="">---------</option>
+                                        {% for plant in plants %}
+                                        <option value="{{ plant }}" {% if plant.plant_code == sPlant %} selected {% endif %}>{{ plant }}</option>
                                         {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </table>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    {% endfor %}
+                        <div class="col-md-3">
+                            <div id="div_id_mach" class="form-group">
+                                <label for="id_mach" class=" requiredField">
+                                        {% trans "Machine" %}<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="mach" onchange="set_session()" class="select custom-select" required="" id="id_mach">
+                                        <option value="">---------</option>
+                                        {% for mach in machs %}
+                                        <option value="{{ mach.mach_code }}" {% if mach.mach_code == sMach %} selected {% endif %}>{{ mach.mach_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="data_date">{% trans "Record Date" %}*</label>
+                            <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" max="{{ sData_date }}" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="data_date"></label>
+                            <div class="box-nav-container">
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <div class="content">
+                <div class="row m-3" style="height:500px">
+                    <div class="col-10">
+                       <!--Content-->
+                        <style>
+                            .hidden {
+                                display: none;
+                            }
+                            .table tr td{
+                                border: solid 1px #BFBFBF;
+                                padding: 0.35rem;
+                            }
+                            .table tr td:first-child {
+                                width: 12vw;
+                            }
+                            .block-item{
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                text-align: center;
+                                border: 1px solid #2C5493;
+                                border-radius: 5px;
+                            }
+                            .raw-data {
+                                position: relative;
+                            }
+                            .raw-data-content {
+                                position: relative;
+                            }
+                            .raw-data-container {
+                                max-height: 40vh;
+                                overflow-y: auto;
+                                overflow-x: auto;
+                                padding: 0px;
+                                background-color: #f9f9f9;
+                            }
+                            .raw-data-container table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+                            .raw-data-container thead {
+                                position: sticky;
+                                top: 0;
+                                transform: translateY(-1%);
+                                background-color: #f1f1f1;
+                                z-index: 1;
+                            }
+                            .raw-data-container th,
+                            .raw-data-container td {
+                                padding: 8px;
+                                text-align: left;
+                                border: 1px solid #ddd;
+                            }
+                            .raw-data-container tbody{
+                                margin-top: 10px;
+                            }
+                            .raw-data-container tbody tr:nth-child(even) {
+                                background-color: #f9f9f9;
+                            }
+                            .color-red{
+                                background-color: red;
+                                color: white;
+                            }
+                            .color-green{
+                                background-color: green;
+                                color: white;
+                            }
+                            .custom{
+                                height: 40px;
+                                padding: 0 10px;
+                                font-size: 16px;
+                                border-radius: 4px;
+                            }
+                            .tooltip-table td {
+                                position: relative;
+                                width: 8.3%;
+                                height: 27px;
+                                text-align: center;
+                                border: 1px solid white;
+                                font-weight: bold;
+                                transition: background-color 0.3s ease;
+                            }
+
+                            .tooltip-table td:hover::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: rgba(255, 255, 255, 0.6);
+                                z-index: 1;
+                                transition: background-color 0.3s ease;
+                                pointer-events: none;
+                            }
+
+                            .tooltip-table td:hover::after {
+                                content: attr(data-tooltip);
+                                position: absolute;
+                                top: 100%;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                background: #333;
+                                color: #fff;
+                                padding: 5px;
+                                border-radius: 4px;
+                                white-space: nowrap;
+                                z-index: 2;
+                                font-size: 12px;
+                                display: block;
+                            }
+
+                            .tooltip-table td[data-tooltip] {
+                                cursor: pointer;
+                                position: relative;
+                            }
+                        </style>
+                        <div class="content-layout" style="margin-left: 0px">
+                            {% if sPlant != '' and sMach != '' %}
+                                <div class="col-md-12 d-flex" style="margin-left: 0px">
+                                    <div class="col-md-7">
+                                        <table class="table table-striped" style="border: solid 1px #BFBFBF">
+                                            <tr style="text-align: center;">
+                                                {% if line_data %}<td></td>{% endif %}
+                                                {% for data in line_data %}
+                                                    <td>{{ data.line_name }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% for parameter in parameters %}
+                                                <tr>
+                                                    <td>{{ parameter }}</td>
+                                                    {% for data in line_data %}
+                                                        {% if forloop.parentloop.counter == 1 %}
+                                                            <td style="text-align: center;" id="id-dom-activation-table-{{ data.line_name }}">{{ data.activation_text }}</td>
+                                                        {% elif forloop.parentloop.counter == 2 %}
+                                                            <td style="text-align: center;" id="id-dom-estimate-output-table-{{ data.line_name }}">{{ data.estimate_ouput }}</td>
+                                                        {% elif forloop.parentloop.counter == 3 %}
+                                                            <td style="text-align: center;" id="id-dom-capacity-effeciency-table-{{ data.line_name }}">{{ data.capacity }}</td>
+                                                        {% elif forloop.parentloop.counter == 4 %}
+                                                            <td style="text-align: center;" id="id-dom-yield-table-{{ data.line_name }}">{{ data.yield_data }}</td>
+                                                        {% elif forloop.parentloop.counter == 5 %}
+                                                            <td style="text-align: center;" id="id-dom-oee-table-{{ data.line_name }}">{{ data.oee_data }}</td>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                    <div class="col-md-5" style="margin: 0px; padding: 0px">
+                                        <div style="padding-left: 30px">
+                                         {% if len_detail_raws %}
+                                            <div class="col-md-12 d-flex mb-3">
+                                                <div class="col-md-6 d-flex mb-3">
+                                                    <form method="POST" action="{% url 'oee_report' %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="method_2" />
+                                                        <label>Quantity limit: {{ sLimit }}</label>
+                                                        <input type="number" name="number1" id="number-input1" placeholder="Enter value" value="{{ sLimit }}" class="col-md-6 custom" min="0" max="10000" step="10"/>
+                                                        <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-6 d-flex mb-3">
+                                                    <form method="POST" action="{% url 'oee_report' %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="method_3" />
+                                                        <label>Stop mins limit: {{ stopLimit }}</label>
+                                                        <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="1440" step="5"/>
+                                                        <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="col-md-12">
+                                            {% for data in line_data %}
+                                                <div class="hidden id-dom-activation-table-{{ data.line_name }} id-dom-estimate-output-table-{{ data.line_name }} id-dom-capacity-effeciency-table-{{ data.line_name }} id-dom-yield-table-{{ data.line_name }} id-dom-oee-table-{{ data.line_name }}">
+                                                    <table style="width: 100%; border-collapse: collapse;" class="tooltip-table">
+                                                        {% for row in data.stop_table %}
+                                                            <tr>
+                                                                {% for col in row %}
+                                                                    {% if forloop.parentloop.counter0|divisibleby:2 %}
+                                                                        {% if forloop.parentloop.counter0 == 0 %}
+                                                                            <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
+                                                                                {{ col }}
+                                                                            </th>
+                                                                        {% else %}
+                                                                            <th style="width: 8.3%; text-align: center; border: 1px solid white; color: white; background-color: #0088AC">
+                                                                                {{ col }}
+                                                                            </th>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <td style="background-color: {% if col == 0 %}#4CAF50;{% elif col == 60 %}#FF0000;{% elif 0 < col and col < 60 %}#FFC107;{% else %}{% if today_work_date == sData_date %}#F1F1F1;{% else %}#BFBFBF;{% endif %}{% endif %}" data-tooltip="{% if col == 0 %}Nonstop (0 mins){% elif col == 60 %}Allstop (60 mins){% elif 0 < col and col < 60 %}Stop in: {{ col }} mins{% else %}{% if today_work_date == sData_date %}Not time yet!{% else %}No runcard!{% endif %}{% endif %}"></td>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </table>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    {% for data in line_data %}
+                                        <div class="hidden id-dom-activation-table-{{ data.line_name }}">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.line_name }} 稼動率</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                                                <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.line_name }} 停機時間(分)</div>
+                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                                            </div>
+                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">1440</div>
+                                                <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-red" id="id-machine-stop-time-{{ data.line_name }}">{{ data.machine_stop_time }}</div>
+                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">1440</div>
+                                            </div>
+                                            <div class="raw-data">
+                                                <div class="raw-data-content">
+                                                    <div id="raw-data-container-machine-stop-time-{{ data.line_name }}" class="raw-data-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hidden id-dom-estimate-output-table-{{ data.line_name }}">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} 最適產能:定速</span>
+                                                <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                                                <span class="col-md-3 block-item">{{ data.line_name }} 扣除停機後可運轉時間(分)</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-green" id="id-speed-{{ data.line_name }}">{{ data.speed }}</div>
+                                                <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">{{ data.run_time }}</div>
+                                            </div>
+                                            <div class="raw-data">
+                                                <div class="raw-data-content">
+                                                    <div id="raw-data-container-speed-{{ data.line_name }}" class="raw-data-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hidden id-dom-capacity-effeciency-table-{{ data.line_name }}">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
+                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
+                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
+                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
+                                                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
+                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-green" id="id-second-hand-qty-{{ data.line_name }}">{{ data.second_data }}</div>
+                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-green" id="id-scrap-qty-{{ data.line_name }}">{{ data.scrap_data }}</div>
+                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                                            </div>
+                                            <div class="raw-data">
+                                                <div class="raw-data-content">
+                                                    <div id="raw-data-container-counting-machine-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                                                    <div id="raw-data-container-second-hand-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                                                    <div id="raw-data-container-scrap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hidden id-dom-yield-table-{{ data.line_name }}">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} SAP Quantity</span>
+                                                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
+                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
+                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
+                                                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item action-button color-green" id="id-sap-qty-{{ data.line_name }}">{{ data.sap_data }}</div>
+                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.couting_data }}</div>
+                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.second_data }}</div>
+                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.scrap_data }}</div>
+                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                            </div>
+                                            <div class="raw-data">
+                                                <div class="raw-data-content">
+                                                    <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hidden id-dom-oee-table-{{ data.line_name }}">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
+                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
+                                                <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                                                <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
+                                                <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                                                <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                <div class="col-md-2 block-item">{{ data.oee_data }}</div>
+                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                                                <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                                                <div class="col-md-3 block-item">{{ data.capacity }}</div>
+                                                <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                                                <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                                            </div>
+                                            <div class="raw-data">
+                                                <div class="raw-data-content">
+                                                    <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="row m-3" style="margin-left: 0px">
+                                    <div class="col-md-12 d-flex mb-3">
+                                        <span class="col-md-2 block-item block-color-light-blue" id="id-activation">Activation</span>
+                                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green">1440</span>
+                                        <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">机器停止时间</span>{# Machine Stop Time #}
+                                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green">1440</span>
+                                    </div>
+                                    <div class="col-md-12 d-flex mb-3">
+                                        <span class="col-md-2 block-item block-color-blue" id="id-estimated-output">Estimated Output</span>
+                                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green action-button" id="id-speed">速度</span>{# Speed #}
+                                        <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                                        <span class="col-md-3 block-item block-color-green" id="id-machine-stop-time">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
+                                        <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green">lines</span>
+                                    </div>
+                                    <div class="col-md-12 d-flex mb-3">
+                                        <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">Capacity Efficiency</span>
+                                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
+                                    </div>
+                                    <div class="col-md-12 d-flex mb-3">
+                                        <span class="col-md-2 block-item block-color-light-green" id="id-yield1">Yield</span>
+                                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">SAP數量</span>{# SAP Ticket Qty #}
+                                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                        <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                    </div>
+                                    <div class="col-md-12 d-flex mb-3">
+                                        <span class="col-md-2 block-item block-color-green" id="id-oee">OEE</span>
+                                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-light-blue">Activation</span>
+                                        <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">Capacity Efficiency</span>
+                                        <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
+                                        <span class="col-md-2 block-item block-color-light-green" id="id-yield2">Yield</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-1">
+
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            {% for data in line_data %}
-                <div class="hidden id-dom-activation-table-{{ data.line_name }}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.line_name }} 稼動率</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
-                        <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.line_name }} 停機時間(分)</div>
-                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
-                    </div>
-                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.activation_text }}</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">1440</div>
-                        <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-red" id="id-machine-stop-time-{{ data.line_name }}">{{ data.machine_stop_time }}</div>
-                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">1440</div>
-                    </div>
-                    <div class="raw-data">
-                        <div class="raw-data-content">
-                            <div id="raw-data-container-machine-stop-time-{{ data.line_name }}" class="raw-data-container"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hidden id-dom-estimate-output-table-{{ data.line_name }}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px">
-                        <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
-                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} 最適產能:定速</span>
-                        <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
-                        <span class="col-md-3 block-item">{{ data.line_name }} 扣除停機後可運轉時間(分)</span>
-                    </div>
-                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-green" id="id-speed-{{ data.line_name }}">{{ data.speed }}</div>
-                        <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">{{ data.run_time }}</div>
-                    </div>
-                    <div class="raw-data">
-                        <div class="raw-data-content">
-                            <div id="raw-data-container-speed-{{ data.line_name }}" class="raw-data-container"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hidden id-dom-capacity-effeciency-table-{{ data.line_name }}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px">
-                        <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
-                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
-                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
-                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
-                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
-                    </div>
-                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
-                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-green" id="id-second-hand-qty-{{ data.line_name }}">{{ data.second_data }}</div>
-                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-green" id="id-scrap-qty-{{ data.line_name }}">{{ data.scrap_data }}</div>
-                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
-                    </div>
-                    <div class="raw-data">
-                        <div class="raw-data-content">
-                            <div id="raw-data-container-counting-machine-qty-{{ data.line_name }}" class="raw-data-container"></div>
-                            <div id="raw-data-container-second-hand-qty-{{ data.line_name }}" class="raw-data-container"></div>
-                            <div id="raw-data-container-scrap-qty-{{ data.line_name }}" class="raw-data-container"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hidden id-dom-yield-table-{{ data.line_name }}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px">
-                        <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
-                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} SAP Quantity</span>
-                        <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                        <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
-                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
-                        <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
-                        <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                    </div>
-                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.yield_data }}</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item action-button color-green" id="id-sap-qty-{{ data.line_name }}">{{ data.sap_data }}</div>
-                        <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                        <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.couting_data }}</div>
-                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.second_data }}</div>
-                        <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.scrap_data }}</div>
-                        <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                    </div>
-                    <div class="raw-data">
-                        <div class="raw-data-content">
-                            <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hidden id-dom-oee-table-{{ data.line_name }}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px">
-                        <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
-                        <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
-                        <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                        <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
-                        <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                        <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
-                    </div>
-                    <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                        <div class="col-md-2 block-item">{{ data.oee_data }}</div>
-                        <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.activation_text }}</div>
-                        <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
-                        <div class="col-md-3 block-item">{{ data.capacity }}</div>
-                        <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
-                        <div class="col-md-2 block-item">{{ data.yield_data }}</div>
-                    </div>
-                    <div class="raw-data">
-                        <div class="raw-data-content">
-                            <div id="raw-data-container-sap-qty-{{ data.line_name }}" class="raw-data-container"></div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="row m-3" style="margin-left: 0px">
-            <div class="col-md-12 d-flex mb-3">
-                <span class="col-md-2 block-item block-color-light-blue" id="id-activation">Activation</span>
-                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green">1440</span>
-                <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">机器停止时间</span>{# Machine Stop Time #}
-                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green">1440</span>
-            </div>
-            <div class="col-md-12 d-flex mb-3">
-                <span class="col-md-2 block-item block-color-blue" id="id-estimated-output">Estimated Output</span>
-                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green action-button" id="id-speed">速度</span>{# Speed #}
-                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                <span class="col-md-3 block-item block-color-green" id="id-machine-stop-time">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
-                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green">lines</span>
-            </div>
-            <div class="col-md-12 d-flex mb-3">
-                <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">Capacity Efficiency</span>
-                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
-                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
-            </div>
-            <div class="col-md-12 d-flex mb-3">
-                <span class="col-md-2 block-item block-color-light-green" id="id-yield1">Yield</span>
-                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">SAP數量</span>{# SAP Ticket Qty #}
-                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
-                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
-                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-            </div>
-            <div class="col-md-12 d-flex mb-3">
-                <span class="col-md-2 block-item block-color-green" id="id-oee">OEE</span>
-                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-light-blue">Activation</span>
-                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">Capacity Efficiency</span>
-                <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                <span class="col-md-2 block-item block-color-light-green" id="id-yield2">Yield</span>
-            </div>
-        </div>
-    {% endif %}
-</div>
-{% endblock content %}
+    </div>
+</body>
+</html>
