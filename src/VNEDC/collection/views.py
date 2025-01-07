@@ -1383,7 +1383,7 @@ def oee_report(request):
     line_data = []
     plants = Plant.objects.all()
     machs = Machine.objects.none()
-    today_work_date = (datetime.now() - timedelta(hours=5)).strftime('%Y-%m-%d')
+    today_work_date = (datetime.now() - timedelta(days=1) - timedelta(hours=5)).strftime('%Y-%m-%d')
     # Retrieve session variables or set defaults
     sPlant = request.session.get('plant', '')
     sMach = request.session.get('mach', '')
@@ -1455,7 +1455,7 @@ def oee_report(request):
                         FROM ConsecutiveStops
                         WHERE IsStop = 1
                         GROUP BY MES_MACHINE, LINE, StopGroup)
-                    SELECT cs.MES_MACHINE, cs.MachineName, cs.LINE, cast(cs.Period as int) as Period, cs.Qty as Qty2, cs.Cdt as CreationTime, CASE WHEN gs.StopRowCount >= {int(stopLimit/5)} THEN 5 ELSE 0 END AS Stop_time
+                    SELECT cs.MES_MACHINE, cs.MachineName, cs.LINE, cast(cs.Period as int) as Period, cs.Qty as Qty2, cs.Cdt as CreationTime, CASE WHEN gs.StopRowCount > {int(stopLimit/5)} THEN 5 ELSE 0 END AS Stop_time
                     FROM ConsecutiveStops cs
                     LEFT JOIN GroupStats gs
                     ON cs.MES_MACHINE = gs.MES_MACHINE AND cs.LINE = gs.LINE AND cs.Cdt BETWEEN gs.StartCdt AND gs.EndCdt
@@ -1498,7 +1498,7 @@ def oee_report(request):
                             SUM(CASE WHEN sp.ActualQty IS NOT NULL THEN sp.ActualQty ELSE 0 END) AS ScrapQuantity,
                             MAX(ipqc.InspectionValue) AS InspectionValue, MIN(wo.StartDate) AS StartDate, MAX(wo.EndDate) AS EndDate
                         FROM [PMGMES].[dbo].[PMG_MES_RunCard] rc
-                        LEFT JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
+                        JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
                             ON wo.id = rc.WorkOrderId AND wo.StartDate IS NOT NULL
                         LEFT JOIN [PMGMES].[dbo].[PMG_MES_NBR_SCADA_Std] nbr
                             ON nbr.PartNo = wo.PartNo
@@ -1684,6 +1684,7 @@ def oee_report(request):
             if request.is_ajax() or (request.method == 'POST' and form_type == 'method_2'):
                 try:
                     if 'id-dom' not in sButton:
+                        print('sButton: ', sButton)
                         for line in line_list:
                             if line in sButton:
                                 if 'id-machine-stop-time' in sButton:

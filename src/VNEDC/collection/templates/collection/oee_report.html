@@ -28,38 +28,8 @@
 
     {% endblock base_js %}
     {% block js %}
-
-    {% endblock js %}
     <script>
         $(document).ready(function() {
-
-            document.addEventListener('DOMContentLoaded', function () {
-                const clickableDivs = document.querySelectorAll('[id^="id-dom-"]');
-
-                let currentVisibleDivs = [];
-
-                clickableDivs.forEach(div => {
-                    div.addEventListener('click', function () {
-                        const targetClass = this.id;
-                        const targetDivs = document.querySelectorAll(`.${targetClass}`);
-
-                        if (targetDivs.length > 0) {
-                            if (currentVisibleDivs.length > 0 && Array.from(targetDivs).every(div => currentVisibleDivs.includes(div))) {
-                                targetDivs.forEach(div => div.classList.add('hidden'));
-                                currentVisibleDivs = [];
-                            } else {
-                                currentVisibleDivs.forEach(div => div.classList.add('hidden'));
-                                currentVisibleDivs = [];
-                                targetDivs.forEach(div => {
-                                    div.classList.remove('hidden');
-                                    currentVisibleDivs.push(div);
-                                });
-                            }
-                        }
-                    });
-                });
-            });
-
             $('#id_data_date').on('change', function () {
                 $('#session_form').attr('action', '{% url "oee_report" %}');
                 $('#session_form').submit();
@@ -72,7 +42,38 @@
                 $('#session_form').attr('action', '{% url "oee_report" %}');
                 $('#session_form').submit();
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const clickableDivs = document.querySelectorAll('[id^="id-dom-"]');
 
+            let currentVisibleDivs = [];
+
+            clickableDivs.forEach(div => {
+                div.addEventListener('click', function () {
+                    const targetClass = this.id;
+                    const targetDivs = document.querySelectorAll(`.${targetClass}`);
+
+                    if (targetDivs.length > 0) {
+                        if (currentVisibleDivs.length > 0 && Array.from(targetDivs).every(div => currentVisibleDivs.includes(div))) {
+                            targetDivs.forEach(div => div.classList.add('hidden'));
+                            currentVisibleDivs = [];
+                        } else {
+                            currentVisibleDivs.forEach(div => div.classList.add('hidden'));
+                            currentVisibleDivs = [];
+                            targetDivs.forEach(div => {
+                                div.classList.remove('hidden');
+                                currentVisibleDivs.push(div);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
             $('[id^="raw-data-container"]').hide();
 
             let activeButton = null;
@@ -143,6 +144,7 @@
             });
         });
     </script>
+    {% endblock js %}
 </head>
 <body>
     <div id="content" style="position: relative;">
@@ -185,7 +187,7 @@
                         </div>
                         <div class="col-md-3">
                             <label for="data_date">{% trans "Record Date" %}*</label>
-                            <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" max="{{ sData_date }}" />
+                            <input id="id_data_date" class="form-control" name="data_date" type="date" value="{{ sData_date }}" required="" max="{{ today_work_date }}" />
                         </div>
                         <div class="col-md-3">
                             <label for="data_date"></label>
@@ -354,8 +356,10 @@
                                                         {% csrf_token %}
                                                         <input type="hidden" name="form_type" value="method_2" />
                                                         <label>Quantity limit: {{ sLimit }}</label>
-                                                        <input type="number" name="number1" id="number-input1" placeholder="Enter value" value="{{ sLimit }}" class="col-md-6 custom" min="0" max="10000" step="10"/>
-                                                        <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                        <div class="col-md-12 d-flex" style="padding: 0; gap: 6px">
+                                                            <input type="number" name="number1" id="number-input1" placeholder="Enter value" value="{{ sLimit }}" class="col-md-6 custom" min="0" max="10000" step="10"/>
+                                                            <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                        </div>
                                                     </form>
                                                 </div>
                                                 <div class="col-md-6 d-flex mb-3">
@@ -363,8 +367,10 @@
                                                         {% csrf_token %}
                                                         <input type="hidden" name="form_type" value="method_3" />
                                                         <label>Stop mins limit: {{ stopLimit }}</label>
-                                                        <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="1440" step="5"/>
-                                                        <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                        <div class="col-md-12 d-flex" style="padding: 0; gap: 6px">
+                                                            <input type="number" name="number2" id="number-input2" placeholder="Enter value" value="{{ stopLimit }}" class="col-md-6 custom" min="0" max="1440" step="5"/>
+                                                            <button type="submit" class="btn btn-primary custom">Submit</button>
+                                                        </div>
                                                     </form>
                                                 </div>
                                             </div>
