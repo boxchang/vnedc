@@ -1391,6 +1391,9 @@ def oee_report(request):
     period_times = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5]
     sLimit = request.session.get('number1', 10)
     stopLimit = request.session.get('number2', 15)
+    standard_table = ''
+    standar_lower_speed = ''
+    standar_upper_speed = ''
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -1425,6 +1428,14 @@ def oee_report(request):
         sPlant2 = 'NBR'
     elif sPlant == 'GDNBR':
         sPlant2 = 'NBR'
+        standard_table = '[PMGMES].[dbo].[PMG_MES_NBR_SCADA_Std]'
+        standar_lower_speed = 'LowerLineSpeed_Min'
+        standar_upper_speed = 'UpperLineSpeed_Min'
+    elif sPlant == 'GDPVC':
+        sPlant2 = 'PVC'
+        standard_table = '[PMGMES].[dbo].[PMG_MES_PVC_SCADA_Std]'
+        standar_lower_speed = 'LowerSpeed'
+        standar_upper_speed = 'UpperSpeed'
     machs = Machine.objects.filter(plant=sPlant)
     if sMach is not '':
         # try:
@@ -1467,7 +1478,7 @@ def oee_report(request):
 
 
         sap_sql = f"""
-                SELECT wo.Id WorkOrder, wo.PartNo, ProductItem, rc.InspectionDate, rc.LineName Line, rc.Id Runcard, Period, CustomerName, AQL, PackingType, ActualQty SAPQuantity
+                SELECT wo.Id WorkOrder, wo.PartNo, ProductItem, rc.InspectionDate, rc.LineName Line, rc.Id Runcard, Period, CustomerName, AQL, InspectedAQL, PackingType, ActualQty SAPQuantity
                 FROM [dbo].[PMG_MES_WorkInProcess] wi
                 JOIN [PMGMES].[dbo].[PMG_MES_RunCard] rc on rc.Id = wi.RunCardId
                 JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] wo on wi.WorkOrderId = wo.Id
@@ -1492,16 +1503,16 @@ def oee_report(request):
                         )
                         SELECT 
                             wo.Id AS WorkOrder, wo.PartNo, wo.ProductItem, rc.InspectionDate AS InspectDate, rc.MachineName AS Machine, rc.LineName AS Line,
-                            rc.Id as Runcard, rc.period AS Period,  cd.Qty as CoutingQuantity, nbr.LowerLineSpeed_Min AS LowSpeed, nbr.UpperLineSpeed_Min AS UpSpeed,
-                            CAST(ROUND((nbr.LowerLineSpeed_Min + nbr.UpperLineSpeed_Min) / 2, 1) AS FLOAT) AS StdSpeed,
+                            rc.Id as Runcard, rc.period AS Period,  cd.Qty as CoutingQuantity, std.{standar_lower_speed} AS LowSpeed, std.{standar_upper_speed} AS UpSpeed,
+                            CAST(ROUND((std.{standar_lower_speed} + std.{standar_upper_speed}) / 2, 1) AS FLOAT) AS StdSpeed,
                             SUM(CASE WHEN ft.ActualQty IS NOT NULL THEN ft.ActualQty ELSE 0 END) AS FaultyQuantity,
                             SUM(CASE WHEN sp.ActualQty IS NOT NULL THEN sp.ActualQty ELSE 0 END) AS ScrapQuantity,
                             MAX(ipqc.InspectionValue) AS InspectionValue, MIN(wo.StartDate) AS StartDate, MAX(wo.EndDate) AS EndDate
                         FROM [PMGMES].[dbo].[PMG_MES_RunCard] rc
                         JOIN [PMGMES].[dbo].[PMG_MES_WorkOrder] wo
                             ON wo.id = rc.WorkOrderId AND wo.StartDate IS NOT NULL
-                        LEFT JOIN [PMGMES].[dbo].[PMG_MES_NBR_SCADA_Std] nbr
-                            ON nbr.PartNo = wo.PartNo
+                        LEFT JOIN {standard_table} std
+                            ON std.PartNo = wo.PartNo
                         LEFT JOIN [PMGMES].[dbo].[PMG_MES_Faulty] ft
                             ON ft.RunCardId = rc.id AND ft.WorkOrderId = wo.id
                         LEFT JOIN [PMGMES].[dbo].[PMG_MES_Scrap] sp
@@ -1517,7 +1528,7 @@ def oee_report(request):
                             AND (cd.Cdt < wo.EndDate OR wo.EndDate IS NULL)
                         GROUP BY wo.Id, wo.PartNo,
                             wo.ProductItem, rc.InspectionDate, rc.MachineName, rc.LineName, rc.Id, rc.period, cd.Qty,
-                            nbr.LowerLineSpeed_Min, nbr.UpperLineSpeed_Min 
+                            std.{standar_lower_speed}, std.{standar_upper_speed} 
                         ORDER BY rc.LineName, rc.InspectionDate, CAST(rc.Period AS INT)
 
                 """
@@ -1646,7 +1657,7 @@ def oee_report(request):
                 sap_df.loc[len(counting_df) + 2] = {'WorkOrder': '', 'PartNo': '',
                                                          'ProductItem': '', 'InspectionDate': '',
                                                          'Line': '', 'Runcard': '', 'Period': '',
-                                                         'CustomerName': '', 'AQL': '',
+                                                         'CustomerName': '', 'AQL': '', 'InspectedAQL': '',
                                                          'PackingType': '-Total-', 'SAPQuantity': sap_data}
 
                 yield_data = round(sap_data/(couting_data + second_data + scrap_data), 3)
