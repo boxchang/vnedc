@@ -1441,7 +1441,7 @@ def oee_report(request):
         # try:
         split_sMach = [sMach[:2], sMach[2:5], sMach[5:]]
         sql = f"""
-                    SELECT dml.name, cdm.Line
+                    SELECT distinct(dml.name) name, cdm.Line
                     FROM [PMGMES].[dbo].[PMG_DML_DataModelList] dml 
                     join [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] cdm
                     on cdm.MES_MACHINE = dml.name
