@@ -150,7 +150,6 @@
     <div id="content" style="position: relative;">
         <div class="container-fluid" style="padding-left: 0px;padding-right: 0px">
             <div class="card-header">
-                {% if user.is_authenticated %}
                 <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
                     {% csrf_token %}
                     <input type="hidden" name="form_type" value="method_1" />
@@ -197,7 +196,6 @@
                         </div>
                     </div>
                 </form>
-                {% endif %}
             </div>
             <div class="content">
                 <div class="row m-3" style="height:500px">
