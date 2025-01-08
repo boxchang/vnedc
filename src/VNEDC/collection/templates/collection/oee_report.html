@@ -150,6 +150,7 @@
     <div id="content" style="position: relative;">
         <div class="container-fluid" style="padding-left: 0px;padding-right: 0px">
             <div class="card-header">
+                {% if user.is_authenticated %}
                 <form action="{% url 'prod_info_save' %}" method="POST" id="session_form">
                     {% csrf_token %}
                     <input type="hidden" name="form_type" value="method_1" />
@@ -196,12 +197,21 @@
                         </div>
                     </div>
                 </form>
+                {% endif %}
             </div>
             <div class="content">
                 <div class="row m-3" style="height:500px">
-                    <div class="col-11">
+                    <div class="col-12">
                        <!--Content-->
                         <style>
+                            body {
+                                overflow-x: hidden;
+                                overflow-y: hidden;
+                                -webkit-user-select: none;
+                                -moz-user-select: none;
+                                -ms-user-select: none;
+                                user-select: none;
+                            }
                             .hidden {
                                 display: none;
                             }
@@ -315,8 +325,8 @@
                             }
                         </style>
                         <div class="content-layout" style="margin-left: 0px">
-                            {% if sPlant != '' and sMach != '' %}
-                                <div class="col-md-12 d-flex" style="margin-left: 0px">
+                            {% if sPlant != '' and sMach != '' and sPlant in sMach %}
+                                <div class="col-md-10 d-flex" style="padding-left: 0px">
                                     <div class="col-md-7">
                                         <table class="table table-striped" style="border: solid 1px #BFBFBF">
                                             <tr style="text-align: center;">
@@ -406,27 +416,29 @@
                                 <div class="col-md-12">
                                     {% for data in line_data %}
                                         <div class="hidden id-dom-activation-table-{{ data.line_name }}">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.line_name }} 稼動率</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
-                                                <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.line_name }} 停機時間(分)</div>
-                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
-                                            </div>
-                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.activation_text }}</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">1440</div>
-                                                <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-red" id="id-machine-stop-time-{{ data.line_name }}">{{ data.machine_stop_time }}</div>
-                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">1440</div>
+                                            <div class="col-md-10" style="padding-left: 0px">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.line_name }} 稼動率</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                                                    <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.line_name }} 停機時間(分)</div>
+                                                    <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">{{ data.line_name }} 每天可運轉時間(分)</div>
+                                                </div>
+                                                <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">1440</div>
+                                                    <div>&nbsp;&nbsp;-&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-red" id="id-machine-stop-time-{{ data.line_name }}">{{ data.machine_stop_time }}</div>
+                                                    <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">1440</div>
+                                                </div>
                                             </div>
                                             <div class="raw-data">
                                                 <div class="raw-data-content">
@@ -435,19 +447,21 @@
                                             </div>
                                         </div>
                                         <div class="hidden id-dom-estimate-output-table-{{ data.line_name }}">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
-                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} 最適產能:定速</span>
-                                                <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
-                                                <span class="col-md-3 block-item">{{ data.line_name }} 扣除停機後可運轉時間(分)</span>
-                                            </div>
-                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-green" id="id-speed-{{ data.line_name }}">{{ data.speed }}</div>
-                                                <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">{{ data.run_time }}</div>
+                                            <div class="col-md-10" style="padding-left: 0px">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                                                    <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 最適產能:定速</span>
+                                                    <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                                                    <span class="col-md-3 block-item">{{ data.line_name }} 扣除停機後可運轉時間(分)</span>
+                                                </div>
+                                                <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-green" id="id-speed-{{ data.line_name }}">{{ data.speed }}</div>
+                                                    <div>&nbsp;&nbsp;x&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">{{ data.run_time }}</div>
+                                                </div>
                                             </div>
                                             <div class="raw-data">
                                                 <div class="raw-data-content">
@@ -456,31 +470,33 @@
                                             </div>
                                         </div>
                                         <div class="hidden id-dom-capacity-effeciency-table-{{ data.line_name }}">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
-                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
-                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
-                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
-                                                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                                                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
-                                            </div>
-                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
-                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-green" id="id-second-hand-qty-{{ data.line_name }}">{{ data.second_data }}</div>
-                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-green" id="id-scrap-qty-{{ data.line_name }}">{{ data.scrap_data }}</div>
-                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                                            <div class="col-md-10" style="padding-left: 0px">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
+                                                    <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                    <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 计数机数量</span>
+                                                    <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二手</span>
+                                                    <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Scrap</span>
+                                                    <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                                    <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
+                                                </div>
+                                                <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
+                                                    <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-green" id="id-second-hand-qty-{{ data.line_name }}">{{ data.second_data }}</div>
+                                                    <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-green" id="id-scrap-qty-{{ data.line_name }}">{{ data.scrap_data }}</div>
+                                                    <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.estimate_ouput }}</div>
+                                                </div>
                                             </div>
                                             <div class="raw-data">
                                                 <div class="raw-data-content">
@@ -491,31 +507,33 @@
                                             </div>
                                         </div>
                                         <div class="hidden id-dom-yield-table-{{ data.line_name }}">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
-                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} SAP Quantity</span>
-                                                <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                                                <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Couting Machine</span>
-                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Second hand</span>
-                                                <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Scrap hand</span>
-                                                <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
-                                            </div>
-                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.yield_data }}</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item action-button color-green" id="id-sap-qty-{{ data.line_name }}">{{ data.sap_data }}</div>
-                                                <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
-                                                <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.couting_data }}</div>
-                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.second_data }}</div>
-                                                <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.scrap_data }}</div>
-                                                <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                            <div class="col-md-10" style="padding-left: 0px">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                                    <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} SAP數量</span>
+                                                    <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+                                                    <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 计数机数量</span>
+                                                    <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二手</span>
+                                                    <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Scrap</span>
+                                                    <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
+                                                </div>
+                                                <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item action-button color-green" id="id-sap-qty-{{ data.line_name }}">{{ data.sap_data }}</div>
+                                                    <div>&nbsp;&nbsp;/&nbsp;&nbsp;</div>
+                                                    <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.couting_data }}</div>
+                                                    <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.second_data }}</div>
+                                                    <div>&nbsp;&nbsp;+&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.scrap_data }}</div>
+                                                    <div>&nbsp;&nbsp;)&nbsp;&nbsp;</div>
+                                                </div>
                                             </div>
                                             <div class="raw-data">
                                                 <div class="raw-data-content">
@@ -524,23 +542,25 @@
                                             </div>
                                         </div>
                                         <div class="hidden id-dom-oee-table-{{ data.line_name }}">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
-                                                <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
-                                                <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                                                <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
-                                                <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                                                <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
-                                            </div>
-                                            <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                <div class="col-md-2 block-item">{{ data.oee_data }}</div>
-                                                <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.activation_text }}</div>
-                                                <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
-                                                <div class="col-md-3 block-item">{{ data.capacity }}</div>
-                                                <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
-                                                <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                                            <div class="col-md-10" style="padding-left: 0px">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px">
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
+                                                    <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
+                                                    <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                                                    <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
+                                                    <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                                </div>
+                                                <div style="display: flex; align-items: center;  margin-bottom: 10px">
+                                                    <div class="col-md-2 block-item">{{ data.oee_data }}</div>
+                                                    <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.activation_text }}</div>
+                                                    <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                                                    <div class="col-md-3 block-item">{{ data.capacity }}</div>
+                                                    <div>&nbsp;&nbsp;*&nbsp;&nbsp;</div>
+                                                    <div class="col-md-2 block-item">{{ data.yield_data }}</div>
+                                                </div>
                                             </div>
                                             <div class="raw-data">
                                                 <div class="raw-data-content">
@@ -551,69 +571,67 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                <div class="row m-3" style="margin-left: 0px">
+                                <div class="row m-3 col-md-10" style="margin-left: 0px">
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-light-blue" id="id-activation">Activation</span>
+                                        <span class="col-md-2 block-item block-color-light-blue">Activation</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                         <span class="col-md-1 block-item block-color-green">1440</span>
                                         <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-red action-button" id="id-machine-stop-time">机器停止时间</span>{# Machine Stop Time #}
+                                        <span class="col-md-2 block-item block-color-red action-button">机器停止时间</span>{# Machine Stop Time #}
                                         <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                         <span class="col-md-1 block-item block-color-green">1440</span>
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-blue" id="id-estimated-output">Estimated Output</span>
+                                        <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button" id="id-speed">速度</span>{# Speed #}
+                                        <span class="col-md-1 block-item block-color-green action-button">速度</span>{# Speed #}
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-3 block-item block-color-green" id="id-machine-stop-time">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
-                                        <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green">lines</span>
+                                        <span class="col-md-3 block-item block-color-green">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency1">Capacity Efficiency</span>
+                                        <span class="col-md-2 block-item block-color-orange">Capacity Efficiency</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                                        <span class="col-md-2 block-item block-color-green action-button">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">二手</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">Scrap</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                                        <span class="col-md-2 block-item block-color-gold">外观检查</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                                        <span class="col-md-2 block-item block-color-gray">離型不良</span>
                                         <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-light-green" id="id-yield1">Yield</span>
+                                        <span class="col-md-2 block-item block-color-light-green">Yield</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-green action-button" id="id-sap-ticket-qty">SAP數量</span>{# SAP Ticket Qty #}
+                                        <span class="col-md-2 block-item block-color-green action-button">SAP數量</span>{# SAP Ticket Qty #}
                                         <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-green action-button" id="id-counting-machine-qty">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
+                                        <span class="col-md-2 block-item block-color-green action-button">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button" id="id-second-hand">二手</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">二手</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button" id="id-scrap">Scrap</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">Scrap</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <input type="number" class="col-md-2 block-item block-color-gold" id="id-appearance-inspect" placeholder="外观检查">
+                                        <span class="col-md-2 block-item block-color-gold">外观检查</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <input type="number" class="col-md-2 block-item block-color-gray" id="id-fail-product" placeholder="離型不良">
+                                        <span class="col-md-2 block-item block-color-gray">離型不良</span>
                                         <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-green" id="id-oee">OEE</span>
+                                        <span class="col-md-2 block-item block-color-green">OEE</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-light-blue">Activation</span>
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-orange" id="id-capacity-efficiency2">Capacity Efficiency</span>
+                                        <span class="col-md-2 block-item block-color-orange">Capacity Efficiency</span>
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-light-green" id="id-yield2">Yield</span>
+                                        <span class="col-md-2 block-item block-color-light-green">Yield</span>
                                     </div>
                                 </div>
                             {% endif %}
