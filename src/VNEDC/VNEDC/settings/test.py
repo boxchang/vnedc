@@ -15,7 +15,7 @@ DATABASES = {
         'NAME': 'VNEDC',
         'USER': 'vnedc',
         'PASSWORD': 'vnedc#2024',
-        'HOST': '192.168.11.31',
+        'HOST': '10.13.104.181',
         'PORT': '1433',
 
         'OPTIONS': {
@@ -27,7 +27,7 @@ DATABASES = {
         'NAME': 'PMG_DEVICE',
         'USER': 'scadauser',
         'PASSWORD': 'pmgscada+123',
-        'HOST': '192.168.11.31',
+        'HOST': '10.13.104.181',
         'PORT': '1433',
 
         'OPTIONS': {
@@ -63,7 +63,7 @@ DATABASES = {
         'NAME': 'VNEDC',
         'USER': 'vnedc',
         'PASSWORD': 'vnedc#2024',
-        'HOST': '192.168.11.31',
+        'HOST': '10.13.104.181',
         'PORT': '1433',
 
         'OPTIONS': {
