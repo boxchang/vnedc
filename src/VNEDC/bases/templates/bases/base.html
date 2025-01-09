@@ -20,7 +20,9 @@
     <link rel="stylesheet" href="{% static 'fontawesome-5.4.2\css\all.css' %}">
     <link rel="stylesheet" href="{% static 'base\css\base.css' %}">
     {% block head %}
+
     {% endblock %}
+
     {% block css %}
 
     {% endblock css %}
@@ -59,9 +61,6 @@
             {% if user|has_group:"Warehouse倉管系統" %}
             <li><a href="{% url 'warehouse_index' %}"><i class="fa fa-truck"></i> <span>{% trans "Warehouse倉管系統" %}</span></a></li>
             {% endif %}
-            <!--<li><a href="#home"><i class="fas fa-home"></i> <span>關鍵參數</span></a></li>
-            <li><a href="#contact"><i class="fas fa-envelope"></i> <span>{% trans "Contact" %}</span></a></li>
-            <li><a href="#about"><i class="fas fa-info-circle"></i> <span>{% trans "About" %}</span></a></li>-->
         </ul>
         <div class="bottom-links">
             <div class="user-info">

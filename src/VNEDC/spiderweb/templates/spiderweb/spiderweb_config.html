@@ -3,9 +3,10 @@
 {% load static %}
 {% load i18n %}
 {% block css %}
-
     <style>
-        /* Container của switch */
+
+
+         /* Container của switch */
         .switch-container {
             display: inline-block;
             position: relative;
@@ -21,9 +22,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 34px;
-            background-color: #ccc;
-            transition: background-color 0.3s;
+            border-radius: 34px; /* Tạo hình tròn cho phần background */
+            background-color: #ccc; /* Màu nền khi tắt */
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
         }
 
         /* Nút của switch */
@@ -33,32 +34,62 @@
             left: 4px;
             width: 26px;
             height: 26px;
-            border-radius: 50%;
-            background-color: white;
-            transform: translateY(-50%);
-            transition: transform 0.3s;
+            border-radius: 50%; /* Tạo nút tròn */
+            background-color: white; /* Màu nền của nút */
+            transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+            transition: left 0.3s; /* Hiệu ứng chuyển động của nút */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Tạo hiệu ứng đổ bóng */
         }
 
-        /* Khi switch bật (active) */
-        .switch-container.active .switch-bg {
-            background-color: #4CAF50; /* Màu nền khi bật */
-        }
+        {#/* Khi switch bật (active) */#}
+        {#.switch-container.active .switch-bg {#}
+        {#    background-color: #4CAF50; /* Màu nền khi bật */#}
+        {#}#}
+        {##}
+        {#.switch-container.active .switch-btn {#}
+        {#    left: 30px; /* Di chuyển nút sang phải khi bật */#}
+        {#}#}
+        {##}
+        {#/* Khi hover lên switch */#}
+        {#.switch-container:hover .switch-bg {#}
+        {#    background-color: #aaa; /* Màu nền khi hover */#}
+        {#}#}
+        {##}
+        {#.switch-container.active:hover .switch-bg {#}
+        {#    background-color: #3e8e41; /* Màu nền khi bật và hover */#}
+        {#}#}
 
-        .switch-container.active .switch-btn {
-            transform: translateY(-50%) translateX(26px); /* Di chuyển nút sang phải */
-        }
+{#    /* Chỉ áp dụng khi DataTable đã tải xong */#}
+{##device-table.datatable-loaded .switch-container {#}
+{#    cursor: pointer;#}
+{#    opacity: 1; /* Hiển thị đầy đủ khi đã tải */#}
+{#    transition: opacity 0.3s;#}
+{#}#}
+{##}
+{##device-table.datatable-loaded .switch-container .switch-bg {#}
+{#    background-color: #ccc; /* Màu mặc định */#}
+{#}#}
+{##}
+{##device-table.datatable-loaded .switch-container.active .switch-bg {#}
+{#    background-color: #4CAF50; /* Màu khi bật */#}
+{#}#}
+{##}
+{##device-table.datatable-loaded .switch-container:hover .switch-bg {#}
+{#    background-color: #aaa; /* Màu khi hover */#}
+{#}#}
+{##}
+{##device-table.datatable-loaded .switch-container.active:hover .switch-bg {#}
+{#    background-color: #3e8e41; /* Màu khi hover và bật */#}
+{#}#}
 
-        /* Hover effect (tuỳ chọn) */
-        .switch-container:hover .switch-bg {
-            background-color: #aaa;
-        }
+
 
     </style>
 {% endblock %}
 {% block js %}
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -80,11 +111,13 @@
                 {
                     "data": null,
                     "render": function (data, type, row) {
+                        const isActive = row.enable === 'N';
                         return `
-                            <div class="switch-container ${row.enable === 'Y' ? 'active' : ''}" data-id="${row.device_name}">
+                            <div class="switch-container ${isActive ? 'active' : ''}" data-id="${row.device_name}">
                                 <div class="switch-bg"></div>
                                 <div class="switch-btn"></div>
-                            </div>`;
+                            </div>
+                            `;
                     }
                 },
                 {
@@ -99,7 +132,8 @@
                         return `
                             <input type="text" class="datetime-picker-btn" id="stopBefore_${row.device_name}"
                                    data-device-name="${row.device_name}"
-                                   value="${formattedValue}"/>
+                                   value="${data || ''}"/>
+                           <button class="save-datetime-btn" data-device-name="${row.device_name}">Save</button>
                         `;
                     }
                 },
@@ -113,116 +147,6 @@
             "ordering": true  // Cho phép sắp xếp các cột
         });
 
-
-        setInterval(function() {
-            table.ajax.reload(null, false);  // Kiểm tra và làm mới bảng mỗi 10 giây
-        }, 10000);
-
-
-        // Kiểm tra mỗi phút và so sánh thời gian trong DateTime Picker với dữ liệu trong cơ sở dữ liệu
-        setInterval(function() {
-            $('.datetime-picker-btn').each(function() {
-                const deviceName = $(this).data('device-name');
-                const pickerValue = $(`#stopBefore_${deviceName}`).val();  // Lấy giá trị từ DateTime picker
-
-                // Kiểm tra giá trị pickerValue và đảm bảo nó hợp lệ
-                const stopBefore = pickerValue ? new Date(pickerValue) : '';
-                const formattedStopBefore = stopBefore instanceof Date && !isNaN(stopBefore.getTime())
-                    ? stopBefore.toISOString().slice(0, 19).replace('T', ' ')  // Nếu hợp lệ, định dạng lại
-                    : '';  // Nếu không hợp lệ, trả về chuỗi rỗng
-
-                $.ajax({
-                    url: "{% url 'update_stop_before' %}",  // URL để gọi view kiểm tra và so sánh
-                    method: "POST",
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                    data: JSON.stringify({
-                        device_name: deviceName,
-                        stop_before: formattedStopBefore
-                    }),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error("Error comparing times: ", xhr.statusText);
-                    }
-                });
-            });
-
-            // Thực hiện hành động khi thời gian đã qua
-            setTimeout(function() {
-                table.ajax.reload();  // Reload dữ liệu từ server một lần
-            }, 100);
-
-        }, 15000);  // 60000 ms = 1 phút
-
-
-        // Sau khi DataTable load xong, áp dụng CSS cho các toggle switch
-        table.on('draw', function() {
-            $('.switch-container').each(function() {
-                const switchElement = $(this);
-                // Kiểm tra nếu toggle đang trong trạng thái active
-                if (switchElement.hasClass('active')) {
-                    switchElement.find('.switch-bg').css('background-color', '#4CAF50');  // Màu nền khi bật
-                    switchElement.find('.switch-btn').css('left', '4px');  // Di chuyển nút sang phải
-                } else {
-                    switchElement.find('.switch-bg').css('background-color', '#ccc');  // Màu nền khi tắt
-                    switchElement.find('.switch-btn').css('left', '4px');  // Đưa nút về vị trí ban đầu
-                }
-            });
-
-
-            $('.datetime-picker-btn').each(function() {
-                const deviceName = $(this).data('device-name');
-                let lastSelectedTime = null;
-
-                // Khởi tạo DateTime picker cho các input
-                flatpickr(this, {
-                    enableTime: true,
-                    dateFormat: "d-m-Y H:i",
-                    defaultDate: this.value || new Date(),  // Mặc định là ngày hiện tại nếu không có giá trị
-
-
-                    onClose: function(selectedDates, dateStr, instance) {
-
-                        const stopBefore = dateStr;
-
-                        // Gửi AJAX để cập nhật giá trị stop_before
-                        $.ajax({
-                            url: "{% url 'update_stop_before' %}",
-                            method: "POST",
-                            headers: { 'X-CSRFToken': '{{ csrf_token }}' },  // CSRF token để bảo mật
-                            data: JSON.stringify({
-                                device_name: deviceName,
-                                stop_before: stopBefore
-                            }),
-                            contentType: 'application/json',
-                            success: function(response) {
-                                setTimeout(function() {
-                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
-                                }, 100);
-                                {#alert(response.message);#}
-                            },
-                            error: function(xhr) {
-                                setTimeout(function() {
-                                    table.ajax.reload();  // Reload dữ liệu từ server một lần
-                                }, 100);
-                            }
-                        });
-
-                    },
-
-
-                });
-            });
-
-
-
-        });
-
-
         // Toggle switch khi click
         $('#device-table').on('click', '.switch-container', function () {
             const switchElement = $(this);
@@ -232,28 +156,14 @@
             // Đổi trạng thái nút chuyển đổi
             switchElement.toggleClass('active');
 
-            // Sử dụng jQuery để áp dụng các hiệu ứng CSS
+            // Cập nhật hiệu ứng CSS
             if (switchElement.hasClass('active')) {
-                switchElement.find('.switch-bg').stop(true).animate({
-                    backgroundColor: "#4CAF50" // Màu nền khi bật
-                }, 300);  // Thời gian hiệu ứng
-
-                switchElement.find('.switch-btn').stop(true).animate({
-                    left: '4px' // Di chuyển nút sang phải
-                }, 300);
+                switchElement.find('.switch-bg').css('background-color', '#4CAF50');
+                switchElement.find('.switch-btn').css('left', '26px');
             } else {
-                switchElement.find('.switch-bg').stop(true).animate({
-                    backgroundColor: "#ccc" // Màu nền khi tắt
-                }, 300);
-
-                switchElement.find('.switch-btn').stop(true).animate({
-                    left: '4px' // Đưa nút trở lại vị trí ban đầu
-                }, 300);
+                switchElement.find('.switch-bg').css('background-color', '#ccc');
+                switchElement.find('.switch-btn').css('left', '4px');
             }
-
-            setTimeout(function() {
-                table.ajax.reload();  // Reload dữ liệu từ server một lần
-            }, 100);
 
 
             // Gửi yêu cầu AJAX để cập nhật trạng thái
@@ -273,10 +183,89 @@
                     alert("Có lỗi xảy ra!");
                 }
             });
+        });
+
+
+
+        $('#device-table').on('click', '.save-datetime-btn', function() {
+            // Lấy tên thiết bị từ button
+
+            const deviceName = $(this).data('device-name');
+            console.log("Device Name: ", deviceName);  // Debug deviceName
+
+            // Tìm datetime picker tương ứng với deviceName
+            const datetimeInput = $(`#stopBefore_${deviceName}`);
+            console.log("Datetime Input Element: ", datetimeInput);  // Debug datetimeInput element
+
+            // Lấy giá trị datetime từ datetime picker
+            const selectedDateTime = datetimeInput.val();
+            console.log("Selected DateTime: ", selectedDateTime);  // Debug selectedDateTime
+
+            if (!selectedDateTime) {
+                alert("Please select a valid datetime.");
+                return;
+            }
+
+            // Gửi dữ liệu về server qua AJAX
+            $.ajax({
+                url: "{% url 'save_datetime' %}",
+                method: "POST",
+                data: JSON.stringify({  // Dùng JSON.stringify để chuyển data thành JSON hợp lệ
+                    device_name: deviceName,
+                    stop_before: selectedDateTime
+                }),
+                contentType: "application/json", // Đảm bảo contentType là application/json
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    alert(response.message); // Hiển thị thông báo thành công
+                },
+                error: function(xhr) {
+                    alert("An error occurred while saving the datetime.");
+                }
+            });
+        });
+
+
+
+        // Sau khi DataTable load xong, áp dụng CSS cho các toggle switch
+        table.on('draw', function() {
+
+            console.log("DataTable draw event triggered.");
+            {#$('#device-table').addClass('datatable-loaded');#}
+
+            $('.switch-container').each(function() {
+                const switchElement = $(this);
+
+            // Đổi trạng thái nút chuyển đổi
+            switchElement.toggleClass('active');
+                // Kiểm tra nếu toggle đang trong trạng thái active
+                if (switchElement.hasClass('active')) {
+                    switchElement.find('.switch-bg').css('background-color', '#4CAF50');  // Màu nền khi bật
+                    switchElement.find('.switch-btn').css('left', '26px');  // Di chuyển nút sang phải
+                } else {
+                    switchElement.find('.switch-bg').css('background-color', '#ccc');  // Màu nền khi tắt
+                    switchElement.find('.switch-btn').css('left', '4px');  // Đưa nút về vị trí ban đầu
+                }
+
+            });
+
+
+            $('.datetime-picker-btn').each(function() {
+                const defaultDate = this.value; // Lấy giá trị từ trường value
+                flatpickr(this, {
+                    enableTime: true,
+                    dateFormat: "d-m-Y H:i",
+                    defaultDate: defaultDate || null,  // Mặc định là ngày giờ hiện tại
+                    allowInput: true,  // Cho phép nhập thủ công
+                });
+            });
 
 
 
         });
+
 
 
     });
