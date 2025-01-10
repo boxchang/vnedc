@@ -201,11 +201,6 @@
             const selectedDateTime = datetimeInput.val();
             console.log("Selected DateTime: ", selectedDateTime);  // Debug selectedDateTime
 
-            if (!selectedDateTime) {
-                alert("Please select a valid datetime.");
-                return;
-            }
-
             // Gửi dữ liệu về server qua AJAX
             $.ajax({
                 url: "{% url 'save_datetime' %}",
