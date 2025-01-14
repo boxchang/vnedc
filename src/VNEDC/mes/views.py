@@ -940,8 +940,8 @@ def insert_parameter(request):
             process_type = data.get('process_type')
             parameter_name = data.get('parameter_name')
             parameter_value = float(data.get('parameter_value'))
-            create_at = data.get('create_at')
-            create_id = data.get('user_id')
+            create_at = data.get('create_date')
+            create_id = data.get('create_id')
             if any(value is None for value in [data_date, plant_id, mach_id, process_type, parameter_name, parameter_value, create_at, create_id]):
                 status = False
                 pass
