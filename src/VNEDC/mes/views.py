@@ -945,7 +945,7 @@ def insert_parameter(request):
             create_at = data.get('create_date')
             emp_no = data.get('create_id')
 
-            create_id = CustomUser.objects.get(emp_no==emp_no).id
+            create_id = CustomUser.objects.get(emp_no=emp_no).id
 
             if any(value is None for value in [data_date, plant_id, mach_id, process_type, parameter_name, parameter_value, create_at, create_id]):
                 status = False
