@@ -973,13 +973,12 @@ def insert_parameter(request):
                                                                   'create_by': user,
                                                                   'update_by': user})
                 status = True
-                print(f'insert_parameter status: {status}')
         except Exception as e:
             print("Exception:", e)
             status = False
     else:
         status = False
-    print(f'insert_parameter status: {status}')
+    print(f'insert_parameter status: {str(status).lower()}')
     return JsonResponse({'success': str(status).lower()})
 
 def general_status(request):
