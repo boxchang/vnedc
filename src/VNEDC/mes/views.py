@@ -973,6 +973,7 @@ def insert_parameter(request):
                                                                   'create_by': user,
                                                                   'update_by': user})
                 status = True
+                print(f'insert_parameter status: {status}')
         except Exception as e:
             print("Exception:", e)
             status = False
