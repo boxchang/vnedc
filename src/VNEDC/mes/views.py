@@ -979,7 +979,7 @@ def insert_parameter(request):
             status = False
     else:
         status = False
-    return JsonResponse({'success': status})
+    return JsonResponse({'success': str(status).lower()})
 
 def general_status(request):
     start_time = time.time()
