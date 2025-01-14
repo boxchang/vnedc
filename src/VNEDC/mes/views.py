@@ -838,6 +838,7 @@ def parameter_define_master_data_format(request):
                 parameter_cn, parameter_vn, show_order, base_line, control_range_high, 
                 control_range_low, sampling_frequency, unit, side
                 from [VNEDC].[dbo].[collection_parameterdefine]
+                where text_color is null and auto_value = 0
                 order by plant_id, mach_id, show_order
                """
 
