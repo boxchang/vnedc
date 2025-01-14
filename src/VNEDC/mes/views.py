@@ -979,6 +979,7 @@ def insert_parameter(request):
             status = False
     else:
         status = False
+    print(f'insert_parameter status: {status}')
     return JsonResponse({'success': str(status).lower()})
 
 def general_status(request):
