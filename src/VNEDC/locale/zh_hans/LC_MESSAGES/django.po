@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-10 10:31+0700\n"
-"PO-Revision-Date: 2024-08-03 15:35+0700\n"
+"PO-Revision-Date: 2025-01-15 16:56+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -37,7 +37,7 @@ msgstr ""
 #: .\collection\templates\collection\daily_info_create.html:116
 #: .\users\forms.py:61 .\users\templates\users\info.html:17
 msgid "save"
-msgstr "节省"
+msgstr "储存"
 
 #: .\bases\templates\bases\base.html:54
 #: .\collection\templates\collection\product_info_report.html:84
@@ -120,7 +120,7 @@ msgstr "控制下限"
 #: .\users\templates\users\login.html:193
 #: .\warehouse\templates\warehouse\bin\create_bin.html:58
 msgid "Submit"
-msgstr "创造"
+msgstr "送出"
 
 #: .\chart\forms.py:86 .\chart\forms.py:150
 #: .\collection\templates\collection\daily_info_create.html:96
@@ -311,7 +311,7 @@ msgstr ""
 #: .\warehouse\templates\warehouse\area\create_area.html:33
 #: .\warehouse\templates\warehouse\create_warehouse.html:39
 msgid "Save"
-msgstr "节省"
+msgstr "储存"
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -1963,14 +1963,12 @@ msgid "Bin Name"
 msgstr "姓名斌"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:80
-#, fuzzy
-#| msgid "Warehouse Code"
 msgid "No bins found."
-msgstr "沒有找到垃圾桶。"
+msgstr "沒有找到儲位。"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:96
 msgid "Are you sure you want to delete the bin "
-msgstr "您确定要删除垃圾箱吗"
+msgstr "您确定要删除儲位吗"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:5
 #: .\warehouse\templates\warehouse\create_warehouse.html:5
@@ -1980,7 +1978,7 @@ msgstr "建立倉庫"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:14
 msgid "Create Bin"
-msgstr "创建容器"
+msgstr "创建儲位"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:35
 #: .\warehouse\templates\warehouse\bin\edit_bin.html:46
