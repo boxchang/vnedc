@@ -958,13 +958,13 @@ def insert_parameter(request):
             else:
                 data_time = (str(create_at).split(' '))[-1].split(':')[0]
                 if 0 <= int(data_time) < 6:
-                    data_time = '06'
-                elif 6 <= int(data_time) < 12:
-                    data_time = '12'
-                elif 12 <= int(data_time) < 18:
-                    data_time = '18'
-                else:
                     data_time = '00'
+                elif 6 <= int(data_time) < 12:
+                    data_time = '06'
+                elif 12 <= int(data_time) < 18:
+                    data_time = '12'
+                else:
+                    data_time = '18'
 
                 ParameterValue.objects.update_or_create(plant=plant, mach=mach,
                                                         data_date=data_date,
