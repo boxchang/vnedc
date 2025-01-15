@@ -945,11 +945,11 @@ def insert_parameter(request):
             parameter_name = data.get('parameter_name')
             parameter_value = float(data.get('parameter_value'))
             create_at = data.get('create_date')
-            create_id = data.get('create_id')
+            emp_no = data.get('create_id')
 
             plant = Plant.objects.get(plant_code=plant_id)
             mach = Machine.objects.get(mach_code=mach_id)
-            user = CustomUser.objects.get(id=create_id)
+            user = CustomUser.objects.get(emp_no=emp_no)
 
             if any(value is None for value in [data_date, plant, mach, process_type, parameter_name, parameter_value, create_at, user]):
                 status = False
