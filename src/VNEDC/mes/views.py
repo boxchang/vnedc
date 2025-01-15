@@ -804,6 +804,7 @@ def process_type_master_data_format(request):
         sql1 = """
                SELECT process_code, process_name, process_tw, process_cn, process_vn, show_order
                FROM [VNEDC].[dbo].[collection_process_type]
+               WHERE process_code in ('ACID','ALKALINE','CHLORINE','COOLING','NBR_BOILER','PRELEACH')
                order by show_order
                """
 
