@@ -3,7 +3,6 @@
 {% load static %}
 {% load i18n %}
 {% block title %} {% trans "Stock Out" %} {% endblock %}
-
 {% block css %}
 <style>
 .item_list {
@@ -12,147 +11,488 @@
     border-width: 1px;
     border-style: dashed solid;
 }
+
+.jsgrid-button.jsgrid-mode-button.jsgrid-insert-mode-button {
+    display: none !important;
+}
+
+/* Hình ảnh trong popup */
+#zoneImage {
+  width: auto;
+  height: 100%;
+  position: relative;
+
+}
+
+.zone {
+    position: absolute; /* Cần để các zone có thể được định vị chính xác */
+
+}
+/* Overlay che toàn màn hình */
+#popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+/* Nội dung popup */
+#popupContent {
+  position: fixed;
+  top: 50%;
+  left: 53%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 20px;
+  z-index: 9999;
+  border-radius: 8px;
+  text-align: center;
+  width: auto; /* Điều chỉnh phần rộng tối đa của popup */
+  height: 100%; /* Điều chỉnh chiều cao tối đa của popup */
+  overflow: auto; /* Nếu cần cuộn, nếu hình ảnh quá lớn */
+}
+
+
+
+/* Nút đóng */
+#closePopup {
+  display: inline-block;
+  padding: 5px 10px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.green{
+            border: 2px solid rgba(0, 255, 0, 0.7);  /* Màu xanh lá cây với độ trong suốt 70% */
+            background-color: rgba(0, 255, 0, 0.3);  /* Màu xanh lá cây với độ trong suốt 30% */
+}
+
+
+.input-custom {
+    --bs-gutter-x: 0;
+}
 </style>
 
 {% endblock css %}
-
 {% block base_js %}
 {{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
 <script>
-    //送出時驗證
-    function validation() {
-        if(list.length == 0) {
-            alert("請輸入品項");
-            return false;
-        }
+    $(document).ready(function() {
+        let isInputClicked = false;
 
-        return confirm('確認資料是否正確')
-    }
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' || e.which === 27) {  // Kiểm tra phím ESC
+                {#console.log("Phím ESC đã được nhấn");#}
+                const updateButton = $(".jsgrid-button.jsgrid-cancel-edit-button");
 
-    function stock_item_popup() {
-        x = window.open("/stock/item_stock_search_popup/","popup_page","location=1,status=1,scrollbars=1,  width=1000,height=1000")
-        x.moveTo(0, 0);
-    }
-
-    //Return Item
-    return_item = function(item_code) {
-        $("#id_item_code").val(item_code);
-    }
-
-    //Return Bin
-    return_bin = function(bin_code) {
-        $("#id_bin_code").val(bin_code);
-    }
-
-    var list = [];
-
-    refresh_table = function(list) {
-        $("#item_list").html('');
-        var tmp_btn = "<button type='button' class='btn btn-danger' onclick=\"remove_item('{0}')\">移除</button>";
-        var row = "<tr><td>{0}</td><td>{1}</td><td style='text-align:center'>{2}</td><td style='text-align:center'>{3}</td><td style='text-align:center'>{4}</td><td>{5}</td><td>{6}</td></tr>";
-        $.each(list, function(index, item){
-            remove_btn = String.format(tmp_btn, item.spec);
-            tmp_row = String.format(row, item.item_code, item.spec, item.qty, item.unit, item.bin_name, item.comment, remove_btn);
-            $("#item_list").append(tmp_row);
-        })
-        $("#hidItem_list").val(JSON.stringify(list));
-    }
-
-    //Get Item Info
-    get_item_info = function() {
-        var item = "";
-        var item_code = $("#id_item_code").val();
-        $.ajax({
-            url: '{% url '' %}', type: 'post',
-            dataType: 'json',
-            async: false,
-            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "item_code": item_code},
-            success: function(data) {
-                if(data.length > 0){
-                    item = data[0];
+                if (updateButton.length) {
+                    updateButton.click();  // Mô phỏng click vào nút cập nhật
                 }
             }
         });
-        return item;
-    }
 
-    //Get Item Info
-    get_bin_info = function() {
-        var bin = "";
-        var bin_code = $("#id_bin_code").val();
-        $.ajax({
-            url: '{% url 'stock_out' %}', type: 'post',
-            dataType: 'json',
-            async: false,
-            data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "bin_code": bin_code},
-            success: function(data) {
-                if(data.length > 0){
-                    bin = data[0];
+        $(document).on('keydown', (event) => {
+          if (event.which === 13) {  // Kiểm tra nếu phím Enter (key code 13) được nhấn
+            {#console.log('Enter key pressed:', event);#}
+            const updateButton = $(".jsgrid-button.jsgrid-update-button");
+
+            // Nếu nút "Cập nhật" tồn tại, mô phỏng sự kiện click
+            if (updateButton.length) {
+                updateButton.click();  // Mô phỏng click vào nút cập nhật
+            }
+          }
+        });
+
+
+        $("#create").on("click", function() {
+            add_item();
+        });
+
+        function add_item() {
+            const order_qty =$("#id_order_qty").val();
+            const order_bin =$("#id_order_bin").val();
+            const desc =$("#id_desc").val();
+            const product_order =$("#id_product_order").val();
+            const version_no =$("#id_version_no").val();
+            const lot_no =$("#id_lot_no").val();
+            const item_type =$("#id_item_type").val();
+            const packing_type =$("#id_packing_type").val();
+            const purchase_no =$("#id_purchase_no").val();
+            const purchase_qty =$("#id_purchase_qty").val();
+            const size =$("#id_size").val();
+            const purchase_unit =$("#id_purchase_unit").val();
+            const post_date =$("#id_post_date").val();
+            const supplier =$("#id_supplier").val();
+            const sap_mtr_no =$("#id_sap_mtr_no").val();
+            const customer_no =$("#id_customer_no").val();
+            const version_seq = $("#id_version_seq").val();
+
+            const newItem = {
+                order_qty: order_qty,
+                order_bin: order_bin,
+                desc: desc,
+                customer_no: customer_no,
+                product_order: product_order,
+                version_no: version_no,
+                version_seq: version_seq,
+                lot_no: lot_no,
+                item_type: item_type,
+                packing_type: packing_type,
+                purchase_no: purchase_no,
+                purchase_qty: purchase_qty,
+                size: size,
+                purchase_unit: purchase_unit,
+                post_date: post_date,
+                supplier: supplier,
+                sap_mtr_no: sap_mtr_no
+            };
+
+            // Lấy dữ liệu hiện tại của jsGrid
+            var gridData = $("#jsGrid").jsGrid("option", "data");
+
+            // Thêm mục mới vào dữ liệu grid
+            gridData.push(newItem);
+
+            // Cập nhật lại dữ liệu cho jsGrid
+            $("#jsGrid").jsGrid("option", "data", gridData);
+            $("#jsGrid").jsGrid("refresh");
+            $('html, body').animate({
+                scrollTop: $(document).height()
+            }, 1000);
+
+            alert("New item added successfully!");
+        }
+
+
+        $("#id_product_order").on("change", function() {
+            get_order_info();
+        });
+
+
+        get_order_info = function() {
+
+            var product_order = $("#id_product_order").val();
+            {#alert(product_order);#}
+            $.ajax({
+                url: '{% url 'get_product_order_stout' %}', type: 'post',
+                dataType: 'json',
+                async: false,
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "product_order": product_order},
+                success: function(data) {
+                    if (data.status === 'no_change'){
+                        console.log("Keep the data table");
+                    } else {
+                        $("#jsGrid").jsGrid("option", "data", data);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("資料加載失敗：", error);
+                }
+            });
+        };
+
+
+        $("#id_purchase_no").on("change", function() {
+
+            get_no_info();
+        });
+
+
+        get_no_info = function() {
+
+            var purchase_no = $("#id_purchase_no").val();
+            {#alert(purchase_no);#}
+            $.ajax({
+                url: '{% url 'get_purchase_no_info' %}', type: 'post',
+                dataType: 'json',
+                async: false,
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "purchase_no": purchase_no},
+                success: function(data) {
+                    if (data.status === 'no_change'){
+                        console.log("Keep the data table");
+                    } else {
+                        $("#jsGrid").jsGrid("option", "data", data);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error("資料加載失敗：", error);
+                }
+            });
+        };
+
+
+        data: [], // 初始為空，將透過 AJAX 加載資料
+
+        // 初始化 jsGrid
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "400px",
+
+            inserting: true,  // 啟用新增功能
+            editing: true,    // 啟用編輯功能
+            sorting: true,    // 啟用排序功能
+            paging: true,     // 啟用分頁功能
+
+
+
+            rowClick: function (args) {
+                // 禁止點擊行進入編輯模式
+                console.log("行被點擊，但不進入編輯模式", args.item);
+            },
+
+            data: [],   // 將 JSON 資料導入表格
+
+            fields: [
+                { type: "control" }, // 控制欄位 (編輯/刪除按鈕)
+                { name: "id", type: "number", width: 50, title: "ID", align: "center", readOnly: true, visible: false },
+                { name: "order_qty", type: "text", width: 100, title: "Order Qty" },
+                {
+                    name: "order_bin",
+                    type: "text",
+                    width: 120,
+                    title: "Order Bin",
+                    itemTemplate: function (value) {
+                        return value; // Hiển thị nội dung
+                    },
+                    editTemplate: function (value, item) {
+
+
+
+                        const $input = $("<input>").val(value).addClass("form-control input-custom").css({
+                                            "padding-right": "1px"
+                                       });
+
+                        var $button = $("<button>")
+                                       .addClass("btn btn-primary")
+                                       .css({
+                                           width: "auto",
+                                           height: "40px"
+                                       });
+
+
+                        var $container = $("<div>").addClass("row").css({
+                                            "--bs-gutter-x": "0"
+                                        })
+                                       .append($("<div>")
+                                       .addClass("col-md-10")
+                                       .css({
+                                           "margin-right": "2px",
+                                           "width": "78px"
+                                       })
+                                       .append($input))
+                                       .append($("<div>").addClass("col-md-2").append($button)); // Button chiếm col-2
+
+                        // pass this data to jsgrid
+                        this._input = $input;
+                        {#this._input = $button;#}
+
+
+                        $button.on("click", function () {
+
+                            $("#zonePopup").fadeIn(); // Hiển thị pop-up
+
+                            $("#zonePopup").data("updateInput", (newValue) => {
+                                $input.val(newValue); // 更新輸入框的值
+                            });
+
+                        });
+
+
+                        // Đóng popup khi click bên ngoài nội dung
+                        $(document).on('click', function(event) {
+                            if (
+                                !$(event.target).closest('#popupContent').length &&
+                                !$(event.target).closest('#id_order_bin').length
+                            ) {
+                                // Kiểm tra nếu không click vào #popupContent và #id_order_bin
+                                if (!isInputClicked) {
+                                    $('#zonePopup').fadeOut(); // Đóng popup
+                                }
+
+                                if ($(event.target).closest('#popupOverlay').length) {
+                                    isInputClicked = false; // Đặt giá trị false nếu nhấp vào popupOverlay
+                                    $('#zonePopup').fadeOut();
+                                    console.log('Clicked on popupOverlay. isInputClicked =', isInputClicked);
+                                }
+                            }
+                        });
+
+
+                            {#// Remember position of current page#}
+                            {#var scrollPosition = $(window).scrollTop();#}
+                            {##}
+                            {#//Restore position of current page#}
+                            {#$(window).scrollTop(scrollPosition);#}
+
+                        // Hiển thị pop-up khi click vào $button
+                        $button.on("click", function (event) {
+                            event.preventDefault();
+
+                            isInputClicked = true;
+                            $("#zonePopup").fadeIn();
+
+                            console.log(isInputClicked)
+
+                        });
+
+                        return $container;
+                    },
+                    insertValue: function () {
+                        return this._input.val(); // Trả về giá trị khi chèn
+                    },
+                    editValue: function () {
+                        return this._input.val(); // Trả về giá trị khi chỉnh sửa
+                    }
+                },
+
+                {#{ name: "desc", type: "text", width: 200, title: "Comment", align: "center", editing: true },#}
+                { name: "product_order", type: "text", width: 150, title: "Product Order", validate: "required", editing: false },
+                {#{ name: "customer_no", type: "text", width: 100, title: "Customer No", validate: "required", editing: false },#}
+                { name: "version_no", type: "text", width: 120, title: "Version No", align: "center", editing: false },
+                { name: "version_seq", type: "number", width: 120, title: "Version Seq", editing: false },
+                {#{ name: "lot_no", type: "text", width: 130, title: "Lot No", editing: false },#}
+                { name: "size", type: "text", width: 50, title: "Size", editing: false },
+                {#{ name: "purchase_qty", type: "text", width: 100, title: "Purchase Qty", editing: false },#}
+                {#{ name: "purchase_unit", type: "text", width: 100, title: "Purchase Unit", editing: false },#}
+                {#{ name: "packing_type", type: "text", width: 100, title: "Packing Type", editing: false },#}
+                {#{ name: "item_type", type: "text", width: 120, title: "Item Type", editing: false },#}
+                {#{ name: "post_date", type: "text", width: 100, title: "Post Date", editing: false },#}
+                {#{ name: "supplier", type: "text", width: 100, title: "Supplier", editing: false },#}
+                { name: "purchase_no", type: "text", width: 130, title: "Purchase No", editing: false },
+                {#{ name: "sap_mtr_no", type: "text", width: 100, title: "Mtr No", editing: false },#}
+                {
+                    name: "copy", // 自定義控制欄欄位名稱
+                    title: "操作", // 欄位標題
+                    align: "center", // 置中對齊
+                    width: 150, // 欄位寬度
+                    itemTemplate: function (_, item) {
+                        // 自定義「複製」按鈕
+                        const $copyButton = $("<button>")
+                            .text("複製")
+                            .addClass("btn btn-info")
+                            .on("click", (e) => {
+                                {#e.preventDefault();#}
+                                {#e.stopPropagation();#}
+
+                                // 獲取當前行的索引
+                                const gridData = $("#jsGrid").jsGrid("option", "data");
+                                const index = gridData.indexOf(item);
+
+                                // 複製行並修改內容
+                                const newItem = { ...item };
+                                newItem.id = Date.now(); // 新的唯一 ID
+                                newItem.order_bin = "";
+                                newItem.order_qty = "";
+
+                                // 插入到當前行的下方
+                                gridData.splice(index + 1, 0, newItem);
+
+                                // 重新載入數據
+                                $("#jsGrid").jsGrid("option", "data", gridData);
+
+                                alert("複製並插入到該行下方成功！");
+                            });
+
+                        return $copyButton;
+                    }
+                },
+            ]
+        });
+
+        $(".jsgrid-grid-body").on("click", ".jsgrid-button", function(e) {
+            // Cách để kiểm soát hành động sao chép
+            if ($(this).text() === "複製") {
+                // Ngừng sự kiện nếu không muốn thông báo khi Enter được nhấn
+                e.stopPropagation();
+                e.preventDefault();
+
+            }
+        });
+
+
+        // Khi click vào một zone (div chứa bin_id)
+        $(".zone").on("click", function() {
+            // Lấy giá trị của bin_id từ data-value của div
+            var bin_id = $(this).data("value");
+            const updateInput = $("#zonePopup").data("updateInput"); // 取得回調函數
+            if (updateInput) {
+                updateInput(bin_id); // 更新輸入框的值
+            }
+            // Đóng popup
+            $("#zonePopup").fadeOut();
+        });
+
+
+        // 關閉彈窗
+        $("#closePopup").on("click", function () {
+            $("#zonePopup").fadeOut();
+        });
+
+        // Reset data input
+        $("#button-id-bin_clear").on("click", function() {
+            // Reset form
+            $("#myForm")[0].reset();
+
+        });
+
+        // 當按下過帳按鈕時
+        $('#postDataButton').click(function(event) {
+            event.preventDefault();
+            // 獲取 jsGrid 的所有數據
+            var gridData = $("#jsGrid").data("JSGrid").data;
+
+            if (!gridData || gridData.length === 0) {
+                alert("No data in the table! Please enter at least one row.");
+                return; // Dừng xử lý nếu không có dữ liệu
+            }
+
+            // 檢查 order_qty 是否都有值
+            for (var i = 0; i < gridData.length; i++) {
+                if (!gridData[i].order_bin || gridData[i].order_bin.trim() === "") {
+                    alert("第 " + (i + 1) + " 行的 'order_bin' 欄位不可為空！");
+                    return; // 阻止繼續執行
                 }
             }
+
+            // 將數據轉換為 JSON 格式
+            var jsonData = JSON.stringify(gridData);
+
+            // 使用 Ajax 發送數據到後端
+            $.ajax({
+                url: '{% url 'stock_in_post' %}',  // 設置後端接收數據的 URL
+                type: 'POST',
+                contentType: 'application/json',
+                data: jsonData,
+                success: function(response) {
+
+                    //Reset all input
+                    $("#myForm")[0].reset();
+
+                    $("#jsGrid").jsGrid("option", "data", []);
+                    $("#jsGrid").jsGrid("refresh");
+
+
+                    alert("Success！");
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    alert("Fail！");
+                    console.log(error);
+                }
+            });
         });
-        return bin;
-    }
 
-    //刪除品項
-    remove_item = function(spec) {
-        var tmp_list = [];
-        list.forEach(function(item) {
-            if(item.spec != spec){
-                tmp_list.push(item);
-            }
-        });
-        list = tmp_list;
-        refresh_table(list);
-    }
-
-    //新增品項
-    add_item = function() {
-        var item_code = $("#id_item_code").val();
-        var valid = true;
-
-        list.forEach(function(list_item) {
-            if(list_item.item_code == item_code){
-                valid = false;
-            }
-        });
-
-        if(valid){
-            item = get_item_info();
-            if(item.item_code == undefined) {
-                valid = false;
-                alert("找不到料號");
-                return false;
-            }
-        }
-
-        if(valid){
-            bin = get_bin_info();
-            if(bin.bin_code == undefined) {
-                valid = false;
-                alert("找不到儲格");
-                return false;
-            }
-        }
-
-        if(valid){
-            item.qty = $("#id_qty").val();
-            item.comment = $("#id_comment").val();
-            item.bin_code = bin.bin_code;
-            item.bin_name = bin.bin_name;
-            list.push(item);
-
-            $("#id_item_code").val('');
-            $("#id_qty").val('1');
-            $("#id_bin_code").val('');
-            $("#id_comment").val('');
-
-        }else{
-            alert("清單已存在");
-        }
-        refresh_table(list);
-    }
-
+    });
 
 </script>
 {% endblock %}
@@ -162,40 +502,57 @@
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row">
-            <div class="col p-3" style="font-size: 1.5em;text-align: center;">出庫單</div>
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">包裝材料倉庫出貨單</div>
         </div>
-        <form id="form" action="{% url 'stock_out' %}" method="post">
-            {% csrf_token %}
-            {% crispy form %}
-            <div class="item_list">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-info">
-                        <tr>
-                            <th style="width: 10%;text-align: center;">物品類別</th>
-                            <th style="width: 45%">品名</th>
-                            <th style="width: 10%;text-align: center;">數量</th>
-                            <th style="width: 10%;text-align: center;">單位</th>
-                            <th style="width: 10%;text-align: center;">儲格</th>
-                            <th style="width: 20%">備註</th>
-                            <th style="width: 5%"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="item_list">
+    <form id="myForm">
+        {% crispy form %}
+        <div id="jsGrid"></div>
+            <div id="numberPicker" style="display:none; position:fixed; top:20%; left:30%; width:300px; padding:20px; background:#fff; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
+            <h3>選擇儲格</h3>
+            {% for bin in bins %}
+            <button class="number-btn" data-value="{{ bin.bin_id }}" style="{% if bin.has_stock %}background-color: #d2e8b9{% else %}; background-color: #fff{% endif %}">{{ bin.bin_id }}</button>
+            {% endfor %}
+            <br><br>
+            <button id="closePicker">關閉</button>
+        </div>
 
-                    </tbody>
-                </table>
+          <!-- Popup -->
+          <div id="zonePopup" style="display: none;">
+            <div id="popupOverlay"></div>
+            <div id="popupContent">
+              <img src="/media/warehouse_images/warehouse_2.jpg" id="zoneImage" alt="Zone Map" usemap="#zoneMap">
+              <map name="zoneMap">
+                <area shape="rect" coords="50,50,150,150" href="#" data-zone="Zone 1">
+                <area shape="rect" coords="200,50,300,150" href="#" data-zone="Zone 2">
+                <!-- Thêm nhiều vùng khác -->
+              </map>
+            {% for bin in bins %}
+
+            <div class="zone" data-value="{{ bin.bin_id }}" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;
+                    {% if bin.has_stock %}
+                        border: 2px solid rgba(255, 0, 0, 0.7);
+                        background-color: rgba(255, 0, 0, 0.3);
+                    {% else %};
+                        border: 2px solid rgba(0, 255, 0, 0.7);
+                        background-color: rgba(0, 255, 0, 0.3);
+                    {% endif %}">{{ bin.bin_id }}</div>
+
+            {% endfor %}
+                <br>
+              <button id="closePopup">Đóng</button>
             </div>
-            <hr />
-            <div style="text-align: center" class="p-3">
-                <input type="hidden" id="hidItem_list" name="hidItem_list" />
-                <input type="submit" value="過帳" class='btn btn-info' onclick="return validation()" />
-            </div>
-        </form>
-    </div>
+          </div>
+        <hr />
+        <div style="text-align: center" class="p-3">
+            <button id="postDataButton">過帳</button>
+        </div>
+    </form>
+
     <div class="col-1"></div>
+</div>
 </div>
 {% endblock %}
 
 {% block alert %}
-        
+
 {% endblock %}

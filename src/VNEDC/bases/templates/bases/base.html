@@ -59,7 +59,7 @@
             <li><a href="{% url 'fast_check' %}"><i class="fas fa-wrench"></i> <span>{% trans "MES Tools" %}</span></a></li>
             {% endif %}
             {% if user|has_group:"Warehouse倉管系統" %}
-            <li><a href="{% url 'warehouse_index' %}"><i class="fa fa-truck"></i> <span>{% trans "Warehouse倉管系統" %}</span></a></li>
+            <li><a href="{% url 'warehouse_dashboard' %}"><i class="fa fa-truck"></i> <span>{% trans "Warehouse倉管系統" %}</span></a></li>
             {% endif %}
         </ul>
         <div class="bottom-links">
