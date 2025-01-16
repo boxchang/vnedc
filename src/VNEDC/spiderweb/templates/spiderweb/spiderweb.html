@@ -180,6 +180,11 @@
             Last checked time: <span id="last-reload">{{ last_update_time }}</span>
         </div>
         <div style="margin-right: 5%">
+            <a href="{% url 'config_layout' %}" target="_blank">
+                <button type="button" style="color: white; background-color: blue; padding: 15px 20px; border-radius: 8px; border: none;">
+                    <i class="fas fa-cog fa-lg"></i>
+                </button>
+            </a>
             <a href="{% url 'runcard_info' %}" style="text-decoration: none;">
                 <button type="button" style="color: white; background-color: blue; padding: 15px 20px; border-radius: 8px; border: none;">Return</button>
             </a>

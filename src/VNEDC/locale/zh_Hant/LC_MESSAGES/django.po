@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-10 10:31+0700\n"
-"PO-Revision-Date: 2024-08-03 15:35+0700\n"
+"PO-Revision-Date: 2025-01-15 16:58+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -36,7 +36,7 @@ msgstr "描述"
 #: .\collection\templates\collection\daily_info_create.html:116
 #: .\users\forms.py:61 .\users\templates\users\info.html:17
 msgid "save"
-msgstr "貯存"
+msgstr "儲存"
 
 #: .\bases\templates\bases\base.html:54
 #: .\collection\templates\collection\product_info_report.html:84
@@ -312,7 +312,7 @@ msgstr ""
 #: .\warehouse\templates\warehouse\area\create_area.html:33
 #: .\warehouse\templates\warehouse\create_warehouse.html:39
 msgid "Save"
-msgstr "貯存"
+msgstr "儲存"
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -2080,13 +2080,13 @@ msgstr "手模倉"
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:5
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:33
 msgid "Bin List By Area"
-msgstr "按區域分類的垃圾箱列表"
+msgstr "按區域分類的儲位列表"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:42
 #: .\warehouse\templates\warehouse\bin\create_bin.html:16
 #: .\warehouse\templates\warehouse\bin\edit_bin.html:27
 msgid "Bin Id"
-msgstr "垃圾箱編號"
+msgstr "儲位編號"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:43
 #: .\warehouse\templates\warehouse\bin\create_bin.html:23
@@ -2095,14 +2095,12 @@ msgid "Bin Name"
 msgstr "箱名稱"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:80
-#, fuzzy
-#| msgid "No warehouses found."
 msgid "No bins found."
-msgstr "沒有找到垃圾箱。"
+msgstr "沒有找到儲位。"
 
 #: .\warehouse\templates\warehouse\bin\bin_by_area.html:96
 msgid "Are you sure you want to delete the bin "
-msgstr "您確定要刪除垃圾箱嗎"
+msgstr "您確定要刪除儲位嗎"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:5
 #: .\warehouse\templates\warehouse\create_warehouse.html:5
@@ -2112,7 +2110,7 @@ msgstr "建立倉庫"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:14
 msgid "Create Bin"
-msgstr "創建垃圾箱"
+msgstr "創建儲位"
 
 #: .\warehouse\templates\warehouse\bin\create_bin.html:35
 #: .\warehouse\templates\warehouse\bin\edit_bin.html:46

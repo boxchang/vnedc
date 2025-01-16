@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from collections import defaultdict
 from jobs.database import scada_database
 from django.shortcuts import render
+
+from collection.models import ParameterValue, Plant, Machine
+from users.models import CustomUser
 from .forms import DateRangeForm
 from datetime import datetime
 import calendar
@@ -801,6 +804,7 @@ def process_type_master_data_format(request):
         sql1 = """
                SELECT process_code, process_name, process_tw, process_cn, process_vn, show_order
                FROM [VNEDC].[dbo].[collection_process_type]
+               WHERE process_code in ('ACID','ALKALINE','CHLORINE','COOLING','NBR_BOILER','PRELEACH')
                order by show_order
                """
 
@@ -835,6 +839,7 @@ def parameter_define_master_data_format(request):
                 parameter_cn, parameter_vn, show_order, base_line, control_range_high, 
                 control_range_low, sampling_frequency, unit, side
                 from [VNEDC].[dbo].[collection_parameterdefine]
+                where text_color is null and auto_value = 0
                 order by plant_id, mach_id, show_order
                """
 
@@ -940,34 +945,42 @@ def insert_parameter(request):
             process_type = data.get('process_type')
             parameter_name = data.get('parameter_name')
             parameter_value = float(data.get('parameter_value'))
-            create_at = data.get('create_at')
-            create_id = data.get('user_id')
-            if any(value is None for value in [data_date, plant_id, mach_id, process_type, parameter_name, parameter_value, create_at, create_id]):
+            create_at = data.get('create_date')
+            emp_no = data.get('create_id')
+
+            plant = Plant.objects.get(plant_code=plant_id)
+            mach = Machine.objects.get(mach_code=mach_id)
+            user = CustomUser.objects.get(emp_no=emp_no)
+
+            if any(value is None for value in [data_date, plant, mach, process_type, parameter_name, parameter_value, create_at, user]):
                 status = False
                 pass
             else:
                 data_time = (str(create_at).split(' '))[-1].split(':')[0]
                 if 0 <= int(data_time) < 6:
-                    data_time = '06'
-                elif 6 <= int(data_time) < 12:
-                    data_time = '12'
-                elif 12 <= int(data_time) < 18:
-                    data_time = '18'
-                else:
                     data_time = '00'
-                db = vnedc_database()
-                sql = f"""
-                    INSERT INTO [VNEDC].[dbo].[collection_parametervalue]
-                    (data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, update_at, create_by_id, update_by_id)
-                    VALUES ('{data_date}', '{plant_id}', '{mach_id}', '{process_type}', '{data_time}', '{parameter_name}', {parameter_value}, Cast('{create_at}' as datetime2), Cast('{create_at}' as datetime2), Cast('{create_id}' as int), Cast('{create_id}' as int))
-                """
-                db.execute_sql(sql)
+                elif 6 <= int(data_time) < 12:
+                    data_time = '06'
+                elif 12 <= int(data_time) < 18:
+                    data_time = '12'
+                else:
+                    data_time = '18'
+
+                ParameterValue.objects.update_or_create(plant=plant, mach=mach,
+                                                        data_date=data_date,
+                                                        process_type=process_type,
+                                                        data_time=data_time,
+                                                        parameter_name=parameter_name,
+                                                        defaults={'parameter_value': parameter_value,
+                                                                  'create_by': user,
+                                                                  'update_by': user})
                 status = True
         except Exception as e:
             print("Exception:", e)
             status = False
     else:
         status = False
+    print(f'insert_parameter status: {status}')
     return JsonResponse({'success': status})
 
 def general_status(request):

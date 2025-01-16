@@ -125,10 +125,6 @@ def save_datetime(request):
             device_name = data.get("device_name")
             stop_before = data.get("stop_before")
 
-            # Kiểm tra dữ liệu hợp lệ
-            if not device_name or not stop_before:
-                return JsonResponse({"message": "Missing required fields."}, status=400)
-
             device = Monitor_Device_List.objects.get(device_name=device_name)
             device.stop_before = stop_before  # Lưu giá trị chuỗi "d-m-Y H:i"
             device.save()
