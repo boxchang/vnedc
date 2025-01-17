@@ -1,0 +1,116 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Bin Transfer" %} {% endblock %}
+{% block css %}
+
+    <script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
+
+    <style>
+        form {
+            margin-top: 3%;
+        }
+
+        .container {
+            margin-top: 2%;
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+        }
+
+        #jsGrid {
+            margin-top: 3%;
+            font-size: 16px;
+        }
+
+    </style>
+
+    <script>
+    $(document).ready(function() {
+        {#let tempData = JSON.parse(document.getElementById('item_data').textContent);#}
+        {#console.log(tempData);#}
+
+        // Parse URL parameters
+        let params = new URLSearchParams(window.location.search);
+        let warehouse = params.get("warehouse");
+        let productOrder = params.get("product_order");
+        let purchaseNo = params.get("purchase_no");
+        let versionNo = params.get("version_no");
+        let versionSeq = params.get("version_seq");
+        let size = params.get("size");
+        let bin = params.get("bin");
+        let qty = params.get("qty");
+
+        // Prepare data for transfer
+        let itemData = {
+            warehouse,
+            productOrder,
+            purchaseNo,
+            versionNo,
+            versionSeq,
+            size,
+            bin,
+            qty
+        };
+
+        console.log("Loaded Data:", {
+            warehouse, productOrder, purchaseNo, versionNo, versionSeq, size, bin, qty
+        });
+
+        $.ajax({
+            url: '{% url "bin_transfer" %}',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // Initialize jsGrid with fetched data
+                $("#jsGrid").jsGrid({
+                    width: "100%",
+                    height: "auto",
+                    data: [data],
+                    fields: [
+                        { name: "bin__area__warehouse__wh_code", title: "Warehouse", type: "text" },
+                        { name: "product_order", title: "Product Order", type: "text" },
+                        { name: "purchase_no", title: "Purchase No", type: "text" },
+                        { name: "version_no", title: "Version No", type: "text" },
+                        { name: "version_seq", title: "Version Seq", type: "text" },
+                        { name: "size", title: "Size", type: "text" },
+                        { name: "bin", title: "Bin", type: "text" },
+                        { name: "qty", title: "Quantity", type: "number" }
+                    ]
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: ", error);
+            }
+        });
+
+
+    });
+
+</script>
+{% endblock %}
+{% block container %}
+    <div class="container">
+        <h3>Bin Transfer</h3>
+        <div id="jsGrid"></div>
+        <form method="post">
+            {% crispy form %}
+
+{#            <button type="submit" action="{% url "bin_transfer_page" %}"  class="btn btn-primary col-md-1" id="test" style="height: 50%; margin-top: 2.5%; padding-right: 10px;">#}
+{#                Confirm#}
+{#            </button>#}
+        </form>
+    </div>
+
+
+{% endblock %}

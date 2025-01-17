@@ -1,0 +1,145 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Search Work Order" %} {% endblock %}
+{% block css %}
+
+    <script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
+
+    <style>
+        h3 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 2% !important;
+            margin-bottom: 10px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+        }
+
+        #jsGrid {
+            font-size: 16px;
+            margin-left: 2%;
+        }
+
+        #workOrder {
+            font-size: 16px;
+            padding: 6px 8px 8px 8px;
+            width: 300px;
+            margin-left: 2%;
+
+        }
+
+        #searchBtn {
+            font-size: 16px;
+            padding: 8px;
+            margin-bottom: 1%;
+            margin-top: 1%;
+            margin-left: 1px;
+        }
+    </style>
+
+    <script>
+    $(document).ready(function() {
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const workOrder = searchParams.get("product_order");
+
+        if (workOrder) {
+            // Tự động điền vào thanh tìm kiếm
+            $("#workOrder").val(workOrder);
+
+            $.ajax({
+            url: `{% url 'work_order_search' %}`,
+            method: 'GET',
+            data: {
+                search: workOrder,
+                product_order: searchParams.get('product_order'),
+            },
+            success: function(response) {
+                // Cập nhật dữ liệu cho jsGrid
+                $("#jsGrid").jsGrid("option", "data", response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+        }
+
+        $("#jsGrid").jsGrid({
+            width: "95%",
+            height: "550px",
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+            fields: [
+                { name: "bin__area__warehouse__wh_code", title: "Warehouse", type: "text", width: 30 },
+                { name: "product_order", title: "Product Order", type: "text", width: 40 },
+                { name: "purchase_no", title: "Purchase No", type: "text", width: 40 },
+                { name: "version_no", title: "Version No", type: "text", width: 40 },
+                { name: "version_seq", title: "Version Seq", type: "text", width: 25 },
+                { name: "size", title: "Size", type: "text", width: 25 },
+                { name: "bin", title: "Bin", type: "text", width: 25 },
+                { name: "qty", title: "Qty", type: "number", width: 25 },
+                {
+                    type: "control",
+                    itemTemplate: function(_, item) {
+                        return $("<button>").text("Transfer")
+                            .addClass("btn btn-warning")
+                            .on("click", function() {
+                            {#window.location.href = `?product_order=${item.product_order}`;#}
+                                let queryParams = $.param({
+                                    warehouse: item.bin__area__warehouse__wh_code,
+                                    product_order: item.product_order,
+                                    purchase_no: item.purchase_no,
+                                    version_no: item.version_no,
+                                    version_seq: item.version_seq,
+                                    size: item.size,
+                                    bin: item.bin,
+                                    qty: item.qty,
+                                    search: $("#workOrder").val()
+                                });
+
+                                window.open("/warehouse/bin_transfer_page?" + queryParams, "_blank");
+                        });
+                    }
+                }
+            ]
+        });
+
+
+        $("#searchBtn").on("click", function() {
+            const workOrder = $("#workOrder").val();
+
+            $.ajax({
+                url: '{% url "work_order_search" %}?product_order=' + encodeURIComponent(workOrder),
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#jsGrid").jsGrid("option", "data", response);
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error: ' + error);
+                }
+            });
+
+        });
+    });
+
+</script>
+{% endblock %}
+{% block container %}
+    <h3>Search Work Order</h3>
+    <input type="text" id="workOrder" placeholder="Work Order">
+    <button id="searchBtn" class="btn btn-primary">Search</button>
+    <div id="jsGrid"></div>
+
+
+
+{% endblock %}
