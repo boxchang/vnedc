@@ -1,0 +1,109 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block title %} {% trans "Transaction" %} {% endblock %}
+
+{% block css %}
+
+    <script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
+
+    <style>
+        h3 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 2% !important;
+            margin-bottom: 10px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+        }
+
+        #jsGrid {
+            font-size: 16px;
+            margin-left: 3%;
+
+        }
+
+        {##workOrder {#}
+        {#    font-size: 16px;#}
+        {#    padding: 6px 8px 8px 8px;#}
+        {#    width: 300px;#}
+        {##}
+        {#}#}
+
+        #searchBtn {
+            align-items: center;
+            bottom: 1px;
+
+        }
+    </style>
+
+    <script>
+    $(document).ready(function() {
+
+
+        $("#jsGrid").jsGrid({
+            width: "95%",
+            height: "540px",
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+            fields: [
+                { name: "product_order", title: "Work Order", type: "text", width: 30, css: "text-center" },
+                { name: "purchase_no", title: "Purchase", type: "text", width: 25, css: "text-center" },
+                { name: "mvt_id", title: "Mvt", type: "text", width: 25, css: "text-center" },
+                { name: "bin_id", title: "Bin", type: "text", width: 25, css: "text-center" },
+                { name: "plus_qty", title: "+", type: "text", width: 25, css: "text-center" },
+                { name: "minus_qty", title: "-", type: "text", width: 25, css: "text-center" },
+                { name: "remain_qty", title: "Qty", type: "text", width: 25, css: "text-center" },
+                { name: "create_at", title: "Create at", type: "number", width: 40, css: "text-center" },
+            ]
+        });
+
+
+        $("#searchBtn").on("click", function() {
+            const workOrder = $("#workOrder").val();
+            const bin = $("#bin").val();
+
+            $.ajax({
+                url: '{% url "work_order_hist_data" %}?product_order=' + workOrder + '&bin_id=' + bin,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#jsGrid").jsGrid("option", "data", response);
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error: ' + error);
+                }
+            });
+
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block content %}
+    <h3 class="mb-4">Search Work Order & Bin</h3>
+    <div class="row" style="padding-left: 60px;padding-bottom: 30px;">
+        <div class="col-md-5">
+                <label for="workOrder" class="mr-2">Work Order:</label>
+                <input type="text" id="workOrder" class="form-control" placeholder="Enter Work Order">
+        </div>
+        <div class="col-md-5">
+                <label for="Bin" class="mr-2">Bin:</label>
+                <input type="text" id="bin" class="form-control" placeholder="Enter Bin">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+                <button id="searchBtn" class="btn btn-primary">Search</button>
+
+        </div>
+    </div>
+    <div id="jsGrid"></div>
+{% endblock %}

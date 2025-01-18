@@ -25,12 +25,10 @@
 
 {% endblock %}
 
-{% block container %}
+{% block content %}
     <div class="container mt-5">
         <div class="row">
-            {% block sidebar %} {{ block.super }} {% endblock %}
-            {% block content %}
-            <div class="col-sm-9" style="border: 1px #6c757d solid; height: 90vh;">
+            <div class="col-12">
                 <h2 class="mb-4">{% trans "Area List By Warehouse" %}</h2>
                 <div class="row d-flex justify-content-center">
                     <a class="btn btn-primary mb-3" style="width: 80px" href="{% url 'area_create' wh_code %}" role="button">{% trans "Add" %}</a>
@@ -52,7 +50,7 @@
                         <!-- Lặp qua danh sách warehouse -->
                         {% for area in areas %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
+                            <td style="text-align: center">{{ forloop.counter }}</td>
                             <td onclick="redirectToPage('{% url 'bin_by_area' area_code=area.area_id %}')">{{ area.area_id }}</td>
                             <td onclick="redirectToPage('{% url 'bin_by_area' area_code=area.area_id %}')">{{ area.area_name }}</td>
                             <td onclick="redirectToPage('{% url 'bin_by_area' area_code=area.area_id %}')">{{ area.warehouse }}</td>
@@ -80,7 +78,6 @@
             </div>
         </div>
     </div>
-{% endblock %}
 
 {#    Modal#}
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

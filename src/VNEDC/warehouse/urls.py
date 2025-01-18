@@ -3,7 +3,7 @@ from django.urls import re_path as url
 
 from warehouse.views import index, stock_in, stockin_detail, get_product_order_info, \
     stock_in_post, stock_out, dashboard, get_purchase_no_info, work_order_search, work_order_page, bin_transfer, \
-    bin_transfer_page, get_product_order_stout
+    bin_transfer_page, get_product_order_stout, work_order_bin_search, work_order_hist_data
 from . import views
 
 
@@ -30,8 +30,8 @@ urlpatterns = [
     url(r'^bin/delete/(?P<pk>[^/]+)/$', views.bin_delete, name='bin-delete'),
     url(r'^$', views.warehouse_list, name='warehouse_list'),
 
-    url(r'^stock_in/', stock_in, name='stock_in'),
-    url(r'^stock_out/', stock_out, name='stock_out'),
+    url(r'^stock_in/', stock_in, name='packing_material_stock_in'),
+    url(r'^stock_out/', stock_out, name='packing_material_stock_out'),
     url(r'^stockin_detail/(?P<pk>\w+)/$', stockin_detail, name='stockin_detail'),
     url(r'^get_product_order_info/', get_product_order_info, name='get_product_order_info'),
     url(r'^get_product_order_stout/', get_product_order_stout, name='get_product_order_stout'),
@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^dashboard/', dashboard, name='warehouse_dashboard'),
 
     url(r'^work_order_search/$', work_order_search, name='work_order_search'),
+    url(r'^work_order_hist_data/$', work_order_hist_data, name='work_order_hist_data'),
+    url(r'^work_order_bin_search/$', work_order_bin_search, name='work_order_bin_search'),
     url(r'^work_order_page/$', work_order_page, name='work_order_page'),
     url(r'^bin_transfer_page/$', bin_transfer_page, name='bin_transfer_page'),
     url(r'^bin/transfer/$', bin_transfer, name='bin_transfer'),

@@ -3,66 +3,60 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 {% block title %} {% trans "Create Warehouse" %} {% endblock %}
-{% block container %}
+{% block content %}
     <div class="container mt-5">
         <div class="row">
-            {% block sidebar %} {{ block.super }} {% endblock %}
-            {% block content %}
-                        <form method="post" enctype="multipart/form-data" class="col-sm-9">
-                        {% csrf_token %}
-                        <div class="card p-4">
-                            <h3 class="card-title">{% trans "Create Bin" %}</h3>
-                            <div class="mb-3">
-                                <label for="bin_id" class="form-label">{% trans "Bin Id" %}</label>
-                                {{ form.bin_id }}
-                                <div class="text-danger">{{ form.bin_id.errors }}</div>
+            <form method="post" enctype="multipart/form-data" class="col-sm-9">
+                {% csrf_token %}
+                <div class="card p-4">
+                    <h3 class="card-title">{% trans "Create Bin" %}</h3>
+                    <div class="mb-3">
+                        <label for="bin_id" class="form-label">{% trans "Bin Id" %}</label>
+                        {{ form.bin_id }}
+                        <div class="text-danger">{{ form.bin_id.errors }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bin_name" class="form-label">{% trans "Bin Name" %}</label>
+                        {{ form.bin_name }}
+                        <div class="text-danger">{{ form.bin_name.errors }}</div>
+                    </div>
 
-                            </div>
+                    <div class="mb-3">
+                        <label for="area_id" class="form-label">{% trans "Area Id" %}</label>
+                        {{ form.area }}
+                        <div class="text-danger">{{ form.area.errors }}</div>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="bin_name" class="form-label">{% trans "Bin Name" %}</label>
-                                {{ form.bin_name }}
-                                <div class="text-danger">{{ form.bin_name.errors }}</div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="pos_x" class="form-label">{% trans "Position X" %}</label>
+                        {{ form.pos_x }}
+                        <div class="text-danger">{{ form.pos_x.errors }}</div>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="area_id" class="form-label">{% trans "Area Id" %}</label>
-                                {{ form.area }}
-                                <div class="text-danger">{{ form.area.errors }}</div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="pos_y" class="form-label">{% trans "Position Y" %}</label>
+                        {{ form.pos_y }}
+                        <div class="text-danger">{{ form.pos_y.errors }}</div>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="pos_x" class="form-label">{% trans "Position X" %}</label>
-                                {{ form.pos_x }}
-                                <div class="text-danger">{{ form.pos_x.errors }}</div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="pos_y" class="form-label">{% trans "Bin Width" %}</label>
+                        {{ form.bin_w }}
+                        <div class="text-danger">{{ form.bin_w.errors }}</div>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="pos_y" class="form-label">{% trans "Position Y" %}</label>
-                                {{ form.pos_y }}
-                                <div class="text-danger">{{ form.pos_y.errors }}</div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="pos_y" class="form-label">{% trans "Bin Length" %}</label>
+                        {{ form.bin_l }}
+                        <div class="text-danger">{{ form.bin_l.errors }}</div>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="pos_y" class="form-label">{% trans "Bin Width" %}</label>
-                                {{ form.bin_w }}
-                                <div class="text-danger">{{ form.bin_w.errors }}</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="pos_y" class="form-label">{% trans "Bin Length" %}</label>
-                                {{ form.bin_l }}
-                                <div class="text-danger">{{ form.bin_l.errors }}</div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
-                        </div>
-                    </form>
+                    <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
                 </div>
-            </div>
-
+            </form>
+        </div>
+    </div>
 {% endblock %}
-{% endblock %}
 
-    {% block js %} {{ block.super }} {% endblock %}
+{% block js %} {{ block.super }} {% endblock %}
 

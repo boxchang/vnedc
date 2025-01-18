@@ -3,47 +3,45 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 {% block title %} {% trans "Create Warehouse" %} {% endblock %}
-{% block container %}
+{% block content %}
     <div class="container mt-5">
         <div class="row">
-            {% block sidebar %} {{ block.super }} {% endblock %}
-            {% block content %}
-                <form method="post" enctype="multipart/form-data" class="col-sm-9">
-                    {% csrf_token %}
-                    <div class="card p-4">
-                        <h3 class="card-title">{% trans "Create Warehouse" %}</h3>
-                        <div class="mb-3">
-                            <label for="wh_code" class="form-label">{% trans "Warehouse Code" %}</label>
-                            {{ form.wh_code }}
-                            <div class="text-danger">{{ form.wh_code.errors }}</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="wh_name" class="form-label">{% trans "Warehouse Name" %}</label>
-                            {{ form.wh_name }}
-                            <div class="text-danger">{{ form.wh_name.errors }}</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="wh_comment" class="form-label">{% trans "Comment" %}</label>
-                            {{ form.wh_comment }}
-                            <div class="text-danger">{{ form.wh_comment.errors }}</div>
-                        </div>
-
-                        <div class="mb-3" style="border: 1px gray solid">
-                            <label for="wh_bg" class="form-label">{% trans "Background Image" %}</label>
-                            {{ form.wh_bg }}
-                            <div class="text-danger">{{ form.wh_bg.errors }}</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <form method="post" enctype="multipart/form-data" class="col-sm-9">
+                {% csrf_token %}
+                <div class="card p-4">
+                    <h3 class="card-title">{% trans "Create Warehouse" %}</h3>
+                    <div class="mb-3">
+                        <label for="wh_code" class="form-label">{% trans "Warehouse Code" %}</label>
+                        {{ form.wh_code }}
+                        <div class="text-danger">{{ form.wh_code.errors }}</div>
                     </div>
-                </form>
+                    <div class="mb-3">
+                        <label for="wh_name" class="form-label">{% trans "Warehouse Name" %}</label>
+                        {{ form.wh_name }}
+                        <div class="text-danger">{{ form.wh_name.errors }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="wh_comment" class="form-label">{% trans "Comment" %}</label>
+                        {{ form.wh_comment }}
+                        <div class="text-danger">{{ form.wh_comment.errors }}</div>
+                    </div>
+
+                    <div class="mb-3" style="border: 1px gray solid">
+                        <label for="wh_bg" class="form-label">{% trans "Background Image" %}</label>
+                        {{ form.wh_bg }}
+                        <div class="text-danger">{{ form.wh_bg.errors }}</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
+
 {% endblock %}
-{% endblock %}
-    {% block js %} {{ block.super }} {% endblock %}
+
+{% block js %} {{ block.super }} {% endblock %}
 
 
 

@@ -3,58 +3,42 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 {% block title %} {% trans "Edit Area" %} {% endblock %}
-{% block container %}
+{% block content %}
 
-    <div class="container mt-5">
-        <div class="row">
-            {% block sidebar %} {{ block.super }} {% endblock %}
-{#        <!-- Hiển thị thông báo thành công hoặc lỗi -->#}
-{#        {% if messages %}#}
-{#            {% for message in messages %}#}
-{#                <div class="alert alert-{{ message.tags }}">#}
-{#                    {{ message }}#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        {% endif %}#}
-
-        <!-- Form để chỉnh sửa kho -->
-            {% block content %}
-            <form method="post" enctype="multipart/form-data" class="col-sm-9">
-                {% csrf_token %}
-                <div class="card p-4">
-                    <h3 class="card-title">{% trans "Edit Area" %}</h3>
-                    <div class="mb-3">
-                        <label for="wh_code" class="form-label" disabled=""></label>
-    {#                    {% if is_readonly %}#}
-    {#                        {{ form.wh_code|add_attr:"readonly:readonly" }}#}
-    {#                    {% else %}#}
-    {#                    {% endif %}#}
-                                            {{ form.area_id }}
-    {#                    {{ form.wh_code|attr:"readonly:readonly" }}#}
-                        <div class="text-danger">{{ form.area_id.errors }}</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="wh_name" class="form-label">{% trans "Area Name" %}</label>
-                        {{ form.area_name }}
-                        <div class="text-danger">{{ form.area_name.errors }}</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="wh_bg" class="form-label">{% trans "Warehouse Id" %}</label>
-                        {{ form.warehouse }}
-                        <div class="text-danger">{{ form.warehouse.errors }}</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-success">{% trans "Save Changes" %}</button>
+<div class="container mt-5">
+    <div class="row">
+        <form method="post" enctype="multipart/form-data" class="col-sm-9">
+            {% csrf_token %}
+            <div class="card p-4">
+                <h3 class="card-title">{% trans "Edit Area" %}</h3>
+                <div class="mb-3">
+                    <label for="wh_code" class="form-label" disabled=""></label>
+{#                    {% if is_readonly %}#}
+{#                        {{ form.wh_code|add_attr:"readonly:readonly" }}#}
+{#                    {% else %}#}
+{#                    {% endif %}#}
+                                        {{ form.area_id }}
+{#                    {{ form.wh_code|attr:"readonly:readonly" }}#}
+                    <div class="text-danger">{{ form.area_id.errors }}</div>
                 </div>
-            </form>
 
-            {% endblock %}
-            <a href="{% url 'area_by_warehouse' wh_code %}" class="btn btn-secondary mt-3">{% trans "Back to List" %}</a>
+                <div class="mb-3">
+                    <label for="wh_name" class="form-label">{% trans "Area Name" %}</label>
+                    {{ form.area_name }}
+                    <div class="text-danger">{{ form.area_name.errors }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="wh_bg" class="form-label">{% trans "Warehouse Id" %}</label>
+                    {{ form.warehouse }}
+                    <div class="text-danger">{{ form.warehouse.errors }}</div>
+                </div>
+
+                <button type="submit" class="btn btn-success">{% trans "Save Changes" %}</button>
+                <a href="{% url 'area_by_warehouse' wh_code %}" class="btn btn-secondary mt-3">{% trans "Back to List" %}</a>
+            </div>
+        </form>
     </div>
 </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
 

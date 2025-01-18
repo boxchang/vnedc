@@ -16,7 +16,7 @@ from .forms import WarehouseForm, AreaForm, BinForm, BinValueForm, BinSearchForm
     BinTransferForm
 from .models import Warehouse, Area, Bin, Bin_Value, Bin_Value_History, StockInForm, Series, StockInFormDetail, \
     MovementType, ItemType, StockOutForm
-from django.db.models import Case, When, Value, BooleanField
+from django.db.models import Case, When, Value, BooleanField, Q
 
 
 
@@ -596,7 +596,7 @@ def get_purchase_no_info(request):
             sql = f"""
                     SELECT VBELN, ZZVERSION, ZZVERSION_SEQ, LOTNO, WGBEZ, EBELN, MENGE_PO, ZSIZE, MEINS, BUDAT, MENGE,
                     NAME1, MBLNR
-                    FROM [PMG_SAP_Test].[dbo].[ZMMT4001] WHERE EBELN = '{purchase_no}'
+                    FROM [PMG_SAP].[dbo].[ZMMT4001] WHERE EBELN = '{purchase_no}'
                     """
 
         raws = db.select_sql_dict(sql)
@@ -828,4 +828,34 @@ def bin_transfer_page(request):
     return render(request, 'warehouse/bin/bin_transfer.html', locals())
     # return JsonResponse(item_data, safe=False)
 
+def work_order_hist_data(request):
+    product_order = request.GET.get('product_order')
+    bin_id = request.GET.get('bin_id')
 
+    if not (product_order or bin_id):
+        return JsonResponse({"status": "blank"}, status=200)
+
+    bin_values = Bin_Value_History.objects.filter(
+        (Q(product_order__icontains=product_order) if product_order else Q()) &
+        (Q(bin__bin_id__icontains=bin_id) if bin_id else Q())
+    ).values(
+        'product_order',
+        'purchase_no',
+        'mvt_id',
+        'bin_id',
+        'plus_qty',
+        'minus_qty',
+        'remain_qty',
+        'create_at'
+    )
+
+    data = list(bin_values)
+
+    if not data:
+        return JsonResponse({"status": "blank"}, status=200)
+
+    return JsonResponse(data, safe=False)
+
+
+def work_order_bin_search(request):
+    return render(request, 'warehouse/work_order_bin_search.html')

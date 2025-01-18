@@ -27,12 +27,10 @@
 </style>
 {% endblock %}
 
-{% block container %}
+{% block content %}
     <div class="container mt-5">
         <div class="row">
-            {% block sidebar %} {{ block.super }} {% endblock %}
-            {% block content %}
-            <div class="col-sm-9" style="border: 1px #6c757d solid; height: 90vh;">
+            <div class="col-12">
                 <h2 class="mb-4">{% trans "Warehouse List" %}</h2>
                 <a class="btn btn-primary mb-3" style="width: 70px" href="{% url 'warehouse_create' %}" role="button">{% trans "Add" %}</a>
     {#            <a class="btn btn-info mb-3 ms-3"  href="{% url 'area_list' %}" role="button">Area List</a>#}
@@ -50,7 +48,7 @@
                         <!-- Lặp qua danh sách warehouse -->
                         {% for warehouse in warehouses %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
+                            <td style="text-align: center">{{ forloop.counter }}</td>
                             <td onclick="redirectToPage('{% url 'area_by_warehouse' wh_code=warehouse.wh_code %}')">{{ warehouse.wh_code }}</td>
                             <td onclick="redirectToPage('{% url 'area_by_warehouse' wh_code=warehouse.wh_code %}')">{{ warehouse.wh_name }}</td>
         {#                    <td>{{ warehouse.wh_comment }}</td>#}
@@ -78,7 +76,6 @@
                 <p>{% trans "No warehouses found." %}</p>
                 {% endif %}
             </div>
-            {% endblock %}
         </div>
     </div>
 

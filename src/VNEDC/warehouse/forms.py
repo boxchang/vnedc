@@ -411,29 +411,7 @@ class StockInPForm2(forms.Form):
 
 class StockOutPForm(forms.Form):
     product_order = forms.CharField(max_length=20, label="訂單", required=False, )  # VBELN 收貨單號
-    # customer_no = forms.CharField(max_length=20, label="客戶", required=False,)  # 無
-    # version_no = forms.CharField(max_length=20, label="包裝版本號", required=False,)  # ZZVERSION
-    # version_seq = forms.CharField(max_length=20, label="版次", required=False, )  # ZZVERSION_SEQ
-    # lot_no = forms.CharField(max_length=20, label="LOT NUMBER", required=False, )  # LOTNO
-    # item_type = forms.ModelChoiceField(queryset=ItemType.objects.all(), label="收貨類型", required=True)
-    # item_type = forms.CharField(max_length=20, label="收貨類型", required=False, )  # WGBEZ 物料群組說明
-    # packing_type = forms.CharField(max_length=20, label="包裝方式", required=False, )  # 包裝方式
-    # packing_type = forms.ModelChoiceField(queryset=PackMethod.objects.all(), label="包裝方式")
     purchase_no = forms.CharField(max_length=20, label="採購單號", required=False, )  # EBELN 採購單號
-    # purchase_qty = forms.CharField(max_length=20, label="採購數量", required=False, )  # MENGE_PO 採購數量
-    # size = forms.CharField(max_length=20, label="SIZE", required=False, )  # ZSIZE 尺寸
-    # purchase_unit = forms.CharField(max_length=20, label="採購單位", required=False, )  # MEINS 數量單位
-    # purchase_unit = forms.ModelChoiceField(queryset=UnitType.objects.all(), label="單位")
-    # post_date = forms.DateField(label="過帳日期")  # BUDAT收貨日期
-    # order_qty = forms.CharField(max_length=20, label="收貨數量", required=False, initial=0)  # MENGE
-    # order_bin = forms.CharField(max_length=20, label="訂單儲格", required=False, )
-    # order_bin = forms.ModelChoiceField(queryset=Bin.objects.all(), label="訂單儲格")
-    # gift_qty = forms.CharField(max_length=20, label="贈品數量", required=False, initial=0)
-    # gift_bin = forms.CharField(max_length=20, label="贈品儲格", required=False, )
-    # supplier = forms.CharField(max_length=10, label="供應商", required=False)  # NAME1
-    # sap_mtr_no = forms.CharField(max_length=20, label="物料文件", required=False, )  # MBLNR
-    # desc = forms.CharField(max_length=2000, label="備註", required=False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 15}))
-    # comment = forms.CharField(max_length=200, label="備註", required=False, )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
