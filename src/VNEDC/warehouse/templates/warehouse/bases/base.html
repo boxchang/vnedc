@@ -23,32 +23,32 @@
             <div>
                 <div class="btn-group">
                     <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    作業功能
+                    {% trans "Transaction Function" %}
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'packing_material_stock_in' %}">包材倉入庫單</a></li>
-                        <li><a class="dropdown-item" href="{% url 'packing_material_stock_out' %}">包材倉出庫單</a></li>
-                        <li><a class="dropdown-item" href="{% url 'bin_transfer_page' %}">調撥作業</a></li>
+                        <li><a class="dropdown-item" href="{% url 'packing_material_stock_in' %}">{% trans "Packing Material Stock In" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'packing_material_stock_out' %}">{% trans "Packing Material Stock Out" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'bin_transfer_page' %}">{% trans "Quantity Transfer" %}</a></li>
                         <hr />
-                        <li><a class="dropdown-item" href="#">調帳作業</a></li>
+                        <li><a class="dropdown-item" href="#">{% trans "Quantity Adjust" %}</a></li>
                     </ul>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    查詢功能
+                    {% trans "Search Function" %}
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'bin_search' %}">庫存查詢</a></li>
-                        <li><a class="dropdown-item" href="{% url 'work_order_page' %}">訂單查詢</a></li>
-                        <li><a class="dropdown-item" href="{% url 'work_order_bin_search' %}">交易紀錄</a></li>
+                        <li><a class="dropdown-item" href="{% url 'bin_search' %}">{% trans "Inventory Search" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'work_order_page' %}">{% trans "Search by Product Order" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'work_order_bin_search' %}">{% trans "Transaction History" %}</a></li>
                     </ul>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    基本資料
+                    {% trans "Basic Data" %}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">儲位設定</a></li>
+                        <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">{% trans "Storage Setting" %}</a></li>
                     </ul>
                 </div>
             </div>

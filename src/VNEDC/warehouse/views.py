@@ -514,7 +514,7 @@ def stock_in(request):
 
         return redirect(stock_in.get_absolute_url())
     form = StockInPForm()
-    return render(request, 'warehouse/stock_in.html', locals())
+    return render(request, 'warehouse/packing_material_stock_in.html', locals())
 
 
 @login_required
@@ -699,7 +699,7 @@ def stock_out(request):
             pass
     else:
         form = StockOutPForm()
-    return render(request, 'warehouse/stock_out.html', {'form': form})
+    return render(request, 'warehouse/packing_material_stock_out.html', {'form': form})
 
 
 def work_order_search(request):

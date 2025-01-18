@@ -246,20 +246,71 @@
 
 
             rowClick: function (args) {
-                // 禁止點擊行進入編輯模式
-                console.log("行被點擊，但不進入編輯模式", args.item);
+                this.editItem(args.item);
             },
 
             data: [],   // 將 JSON 資料導入表格
 
             fields: [
-                { type: "control" }, // 控制欄位 (編輯/刪除按鈕)
+                {
+                    name: "copy", // 自定義控制欄欄位名稱
+                    title: "", // 欄位標題
+                    align: "center", // 置中對齊
+                    width: 80, // 欄位寬度
+                    itemTemplate: function (_, item) {
+                        // 自定義「複製」按鈕
+                        const $copyButton = $("<button>")
+                            .text("{% trans "Copy" %}")
+                            .addClass("btn btn-info btn-sm")
+                            .on("click", (e) => {
+                                {#e.preventDefault();#}
+                                {#e.stopPropagation();#}
+
+                                // 獲取當前行的索引
+                                const gridData = $("#jsGrid").jsGrid("option", "data");
+                                const index = gridData.indexOf(item);
+
+                                // 複製行並修改內容
+                                const newItem = { ...item };
+                                newItem.id = Date.now(); // 新的唯一 ID
+                                newItem.order_bin = "";
+                                newItem.order_qty = "";
+
+                                // 插入到當前行的下方
+                                gridData.splice(index + 1, 0, newItem);
+
+                                // 重新載入數據
+                                $("#jsGrid").jsGrid("option", "data", gridData);
+
+                                alert("複製並插入到該行下方成功！");
+                            });
+
+                        return $copyButton;
+                    }
+                },
+                {
+                    type: "control",
+                    width: 80,
+                    itemTemplate: function(_, item) {
+                        // 建立刪除按鈕
+                        var deleteButton = $("<button>")
+                            .addClass("btn btn-danger btn-sm") // Bootstrap 樣式（可選）
+                            .text("Delete")
+                            .on("click", function(e) {
+                                e.stopPropagation(); // 防止觸發行點擊事件
+                                $("#jsGrid").jsGrid("deleteItem", item);
+
+                            });
+
+                        return deleteButton;
+                    }
+                },
                 { name: "id", type: "number", width: 50, title: "ID", align: "center", readOnly: true, visible: false },
                 { name: "order_qty", type: "text", width: 100, title: "Order Qty" },
                 {
                     name: "order_bin",
                     type: "text",
-                    width: 120,
+                    width: 180,
                     title: "Order Bin",
                     itemTemplate: function (value) {
                         return value; // Hiển thị nội dung
@@ -276,21 +327,20 @@
                                        .addClass("btn btn-primary")
                                        .css({
                                            width: "auto",
-                                           height: "40px"
+                                           height: "40px",
+                                           marginLeft: "20px"
                                        })
 
 
-                        var $container = $("<div>").addClass("row").css({
-                                            "--bs-gutter-x": "0"
+                        var $container = $("<div>").css({
+                                            "--bs-gutter-x": "0", "display": "flex", "flex-wrap": "wrap"
                                         })
                                        .append($("<div>")
-                                       .addClass("col-md-10")
                                        .css({
-                                           "margin-right": "2px",
-                                           "width": "78px"
+                                           "width": "100px"
                                        })
                                        .append($input))
-                                       .append($("<div>").addClass("col-md-2").append($button)); // Button chiếm col-2
+                                       .append($button); // Button chiếm col-2
 
                         // pass this data to jsgrid
                         this._input = $input;
@@ -370,48 +420,12 @@
                 { name: "supplier", type: "text", width: 100, title: "Supplier", editing: false },
                 { name: "purchase_no", type: "text", width: 130, title: "Purchase No", editing: false },
                 { name: "sap_mtr_no", type: "text", width: 100, title: "Mtr No", editing: false },
-                {
-                    name: "copy", // 自定義控制欄欄位名稱
-                    title: "操作", // 欄位標題
-                    align: "center", // 置中對齊
-                    width: 250, // 欄位寬度
-                    itemTemplate: function (_, item) {
-                        // 自定義「複製」按鈕
-                        const $copyButton = $("<button>")
-                            .text("複製")
-                            .addClass("btn btn-info")
-                            .on("click", (e) => {
-                                {#e.preventDefault();#}
-                                {#e.stopPropagation();#}
-
-                                // 獲取當前行的索引
-                                const gridData = $("#jsGrid").jsGrid("option", "data");
-                                const index = gridData.indexOf(item);
-
-                                // 複製行並修改內容
-                                const newItem = { ...item };
-                                newItem.id = Date.now(); // 新的唯一 ID
-                                newItem.order_bin = "";
-                                newItem.order_qty = "";
-
-                                // 插入到當前行的下方
-                                gridData.splice(index + 1, 0, newItem);
-
-                                // 重新載入數據
-                                $("#jsGrid").jsGrid("option", "data", gridData);
-
-                                alert("複製並插入到該行下方成功！");
-                            });
-
-                        return $copyButton;
-                    }
-                },
             ]
         });
 
         $(".jsgrid-grid-body").on("click", ".jsgrid-button", function(e) {
             // Cách để kiểm soát hành động sao chép
-            if ($(this).text() === "複製") {
+            if ($(this).text() === "Copy") {
                 // Ngừng sự kiện nếu không muốn thông báo khi Enter được nhấn
                 e.stopPropagation();
                 e.preventDefault();
@@ -502,18 +516,18 @@
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row">
-            <div class="col p-3" style="font-size: 1.5em;text-align: center;">包材倉入庫單</div>
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">{% trans "Packing Material Stock In" %}</div>
         </div>
     <form id="myForm">
         {% crispy form %}
         <div id="jsGrid"></div>
             <div id="numberPicker" style="display:none; position:fixed; top:20%; left:30%; width:300px; padding:20px; background:#fff; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
-            <h3>選擇儲格</h3>
+            <h3>{% trans "Choose Location" %}</h3>
             {% for bin in bins %}
             <button class="number-btn" data-value="{{ bin.bin_id }}" style="{% if bin.has_stock %}background-color: #d2e8b9{% else %}; background-color: #fff{% endif %}">{{ bin.bin_id }}</button>
             {% endfor %}
             <br><br>
-            <button id="closePicker">關閉</button>
+            <button id="closePicker">{% trans "Close" %}</button>
         </div>
 
           <!-- Popup -->
@@ -544,7 +558,7 @@
           </div>
         <hr />
         <div style="text-align: center" class="p-3">
-            <button id="postDataButton">過帳</button>
+            <button id="postDataButton">{% trans "Post" %}</button>
         </div>
     </form>
 
