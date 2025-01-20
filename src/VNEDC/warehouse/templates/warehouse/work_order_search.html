@@ -2,13 +2,8 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% load i18n %}
-{% block title %} {% trans "Search Work Order" %} {% endblock %}
+{% block title %} {% trans "Search Product Order" %} {% endblock %}
 {% block css %}
-
-    <script src="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsgrid/dist/jsgrid-theme.min.css" />
-
     <style>
         h3 {
             text-align: center;
@@ -79,21 +74,21 @@
             sorting: true,
             paging: true,
             fields: [
-                { name: "bin__area__warehouse__wh_code", title: "Warehouse", type: "text", width: 30 },
-                { name: "product_order", title: "Product Order", type: "text", width: 40 },
-                { name: "purchase_no", title: "Purchase No", type: "text", width: 40 },
-                { name: "version_no", title: "Version No", type: "text", width: 40 },
-                { name: "version_seq", title: "Version Seq", type: "text", width: 25 },
-                { name: "size", title: "Size", type: "text", width: 25 },
-                { name: "bin", title: "Bin", type: "text", width: 25 },
+                { name: "bin__area__warehouse__wh_code", title: "Warehouse", type: "text", css: "text-center", width: 30 },
+                { name: "product_order", title: "Product Order", type: "text", css: "text-center", width: 40 },
+                { name: "purchase_no", title: "Purchase No", type: "text", css: "text-center", width: 40 },
+                { name: "version_no", title: "Version No", type: "text", css: "text-center", width: 40 },
+                { name: "version_seq", title: "Version Seq", type: "text", css: "text-center", width: 25 },
+                { name: "size", title: "Size", type: "text", css: "text-center", width: 25 },
+                { name: "bin", title: "Bin", type: "text", css: "text-center", width: 25 },
                 { name: "qty", title: "Qty", type: "number", width: 25 },
                 {
                     type: "control",
+                    width: 20,
                     itemTemplate: function(_, item) {
                         return $("<button>").text("Transfer")
                             .addClass("btn btn-warning")
                             .on("click", function() {
-                            {#window.location.href = `?product_order=${item.product_order}`;#}
                                 let queryParams = $.param({
                                     warehouse: item.bin__area__warehouse__wh_code,
                                     product_order: item.product_order,
@@ -106,7 +101,30 @@
                                     search: $("#workOrder").val()
                                 });
 
-                                window.open("/warehouse/bin_transfer_page?" + queryParams, "_blank");
+                                window.open("/warehouse/bin_transfer_page?" + queryParams, "");
+                        });
+                    }
+                },
+                {
+                    type: "control",
+                    width: 20,
+                    itemTemplate: function(_, item) {
+                        return $("<button>").text("Adjust")
+                            .addClass("btn btn-warning")
+                            .on("click", function() {
+                                let queryParams = $.param({
+                                    warehouse: item.bin__area__warehouse__wh_code,
+                                    product_order: item.product_order,
+                                    purchase_no: item.purchase_no,
+                                    version_no: item.version_no,
+                                    version_seq: item.version_seq,
+                                    size: item.size,
+                                    bin: item.bin,
+                                    qty: item.qty,
+                                    search: $("#workOrder").val()
+                                });
+
+                                window.open("/warehouse/bin_adjust_page?" + queryParams, "");
                         });
                     }
                 }
@@ -135,8 +153,8 @@
 </script>
 {% endblock %}
 {% block content %}
-    <h3>Search Work Order</h3>
-    <input type="text" id="workOrder" placeholder="Work Order">
+    <h3>Search Product Order</h3>
+    <input type="text" id="workOrder" placeholder="{% trans "Product Order" %}">
     <button id="searchBtn" class="btn btn-primary">Search</button>
     <div id="jsGrid"></div>
 

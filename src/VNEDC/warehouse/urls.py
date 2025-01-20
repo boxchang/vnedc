@@ -1,9 +1,12 @@
 from django.urls import path
 from django.urls import re_path as url
 
-from warehouse.views import index, stock_in, stockin_detail, get_product_order_info, \
-    stock_in_post, stock_out, dashboard, get_purchase_no_info, work_order_search, work_order_page, bin_transfer, \
-    bin_transfer_page, get_product_order_stout, work_order_bin_search, work_order_hist_data
+from warehouse.views import index, packing_material_stock_in, packing_material_stock_out, stockin_detail, \
+    get_product_order_info, \
+    packing_material_stock_in_post, packing_material_stock_out_post, dashboard, get_purchase_no_info, work_order_search, \
+    work_order_page, bin_transfer, \
+    bin_transfer_page, get_product_order_stout, work_order_bin_search, work_order_hist_data, get_purchase_no_stout, \
+    bin_adjust_page, bin_adjust
 from . import views
 
 
@@ -30,13 +33,15 @@ urlpatterns = [
     url(r'^bin/delete/(?P<pk>[^/]+)/$', views.bin_delete, name='bin-delete'),
     url(r'^$', views.warehouse_list, name='warehouse_list'),
 
-    url(r'^stock_in/', stock_in, name='packing_material_stock_in'),
-    url(r'^stock_out/', stock_out, name='packing_material_stock_out'),
+    url(r'^packing_material_stock_in/', packing_material_stock_in, name='packing_material_stock_in'),
+    url(r'^packing_material_stock_out/', packing_material_stock_out, name='packing_material_stock_out'),
     url(r'^stockin_detail/(?P<pk>\w+)/$', stockin_detail, name='stockin_detail'),
     url(r'^get_product_order_info/', get_product_order_info, name='get_product_order_info'),
     url(r'^get_product_order_stout/', get_product_order_stout, name='get_product_order_stout'),
+    url(r'^get_purchase_no_stout/', get_purchase_no_stout, name='get_purchase_no_stout'),
     url(r'^get_purchase_no_info/', get_purchase_no_info, name='get_purchase_no_info'),
-    url(r'^stock_in_post/', stock_in_post, name='stock_in_post'),
+    url(r'^packing_material_stock_in_post/', packing_material_stock_in_post, name='packing_material_stock_in_post'),
+    url(r'^packing_material_stock_out_post/', packing_material_stock_out_post, name='packing_material_stock_out_post'),
     url(r'^dashboard/', dashboard, name='warehouse_dashboard'),
 
     url(r'^work_order_search/$', work_order_search, name='work_order_search'),
@@ -45,7 +50,8 @@ urlpatterns = [
     url(r'^work_order_page/$', work_order_page, name='work_order_page'),
     url(r'^bin_transfer_page/$', bin_transfer_page, name='bin_transfer_page'),
     url(r'^bin/transfer/$', bin_transfer, name='bin_transfer'),
-
+    url(r'^bin_adjust_page/$', bin_adjust_page, name='bin_adjust_page'),
+    url(r'^bin/adjust/$', bin_adjust, name='bin_adjust'),
     url(r'^$', views.index, name='warehouse_index'),
 ]
 

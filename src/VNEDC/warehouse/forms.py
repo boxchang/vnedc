@@ -171,11 +171,11 @@ class BinValueForm(forms.Form):
 class BinSearchForm(forms.Form):
     bin = forms.CharField(
         required=False,
-        label="Bin:",
+        label="Location:",
         widget=forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-left: 4vh'}))
     po_no = forms.CharField(
         required=False,
-        label="PO:",
+        label="Product Oorder:",
         widget=forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-left: 4vh'}))
     size = forms.CharField(
         required=False,
@@ -202,36 +202,12 @@ class BinSearchForm(forms.Form):
 
 
 class BinTransferForm(forms.Form):
-    bin = forms.ChoiceField(
-        choices=[(bin['bin_id'], bin['bin_id']) for bin in Bin_Value.objects.values('bin_id').distinct()],
-        label="Bin:",
+    bin = forms.ModelChoiceField(
+        queryset=Bin.objects.all().order_by('bin_id'),
+        label="Location:",
         required=True,
     )
-    # po = forms.ChoiceField(
-    #     choices=[(po['product_order'], po['product_order']) for po in Bin_Value.objects.values('product_order').distinct()],
-    #     label="Product Order:",
-    #     required=True,
-    # )
-    # pn = forms.ChoiceField(
-    #     choices=[(pn['purchase_no'], pn['purchase_no']) for pn in Bin_Value.objects.values('purchase_no').distinct()],
-    #     label="Purchase No:",
-    #     required=True,
-    # )
-    # vn = forms.ChoiceField(
-    #     choices=[(vn['version_no'], vn['version_no']) for vn in Bin_Value.objects.values('version_no').distinct()],
-    #     label="Version No:",
-    #     required=True,
-    # )
-    # vs = forms.ChoiceField(
-    #     choices=[(vs['version_seq'], vs['version_seq']) for vs in Bin_Value.objects.values('version_seq').distinct()],
-    #     label="Version Seq:",
-    #     required=True,
-    # )
-    # size = forms.ChoiceField(
-    #     choices=[(size['size'], size['size']) for size in Bin_Value.objects.values('size').distinct()],
-    #     label="Size:",
-    #     required=True,
-    # )
+
     qty = forms.IntegerField(label="Quantity", required=True)
 
     def __init__(self, *args, **kwargs):
@@ -243,36 +219,46 @@ class BinTransferForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 Div('bin', css_class='col-md-6'),
-                # Div('size', css_class='col-md-3'),
                 Div('qty', css_class='col-md-5'),
                 Submit('submit', 'Confirm', css_class='btn btn-primary col-md-1', style='height: 50%; margin-top: 2.5%;'
                                                                                         'padding-right: 10px'),
                 css_class='row'
             ),
-            # Div(
-            #     Div('po', css_class='col-md-3'),
-            #     Div('pn', css_class='col-md-3'),
-            #     Div('vn', css_class='col-md-3'),
-            #     Div('vs', css_class='col-md-2'),
-            #     css_class='row'
-            # ),
-
         )
 
+class QuantityAdjustForm(forms.Form):
+
+    qty = forms.IntegerField(label="Quantity", required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_errors = True
+        self.helper.layout = Layout(
+            Div(
+                Div('', css_class='col-md-5'),
+                Div('qty', css_class='col-md-5'),
+                Submit('submit', 'Confirm', css_class='btn btn-primary col-md-1', style='height: 50%; margin-top: 2.5%;'
+                                                                                        'padding-right: 10px'),
+                css_class='row'
+            ),
+        )
 
 class StockInPForm(forms.Form):
-    product_order = forms.CharField(max_length=20, label=_("Product Order"), required=False, )  # VBELN 收貨單號
+    product_order = forms.CharField(max_length=20, label=_("Product Order"), required=True, )  # VBELN 收貨單號
     customer_no = forms.CharField(max_length=20, label=_("Customer"), required=False,)  # 無
-    version_no = forms.CharField(max_length=20, label=_("Version No"), required=False,)  # ZZVERSION
-    version_seq = forms.CharField(max_length=20, label=_("Version Sequence"), required=False, )  # ZZVERSION_SEQ
+    version_no = forms.CharField(max_length=20, label=_("Version No"), required=True,)  # ZZVERSION
+    version_seq = forms.CharField(max_length=20, label=_("Version Sequence"), required=True, )  # ZZVERSION_SEQ
     lot_no = forms.CharField(max_length=20, label=_("Lot Number"), required=False, )  # LOTNO
-    item_type = forms.ModelChoiceField(queryset=ItemType.objects.all(), label=_("Receive Type"), required=True)
-    packing_type = forms.ModelChoiceField(queryset=PackMethod.objects.all(), label=_("Packing Type"))
-    purchase_no = forms.CharField(max_length=20, label=_("Purchase Order"), required=False, )  # EBELN 採購單號
+    item_type = forms.ModelChoiceField(queryset=ItemType.objects.all(), label=_("Receive Type"), required=False)
+    packing_type = forms.ModelChoiceField(queryset=PackMethod.objects.all(), label=_("Packing Type"), required=False)
+    purchase_no = forms.CharField(max_length=20, label=_("Purchase Order"), required=True, )  # EBELN 採購單號
     purchase_qty = forms.CharField(max_length=20, label=_("Purchase Quantity"), required=False, )  # MENGE_PO 採購數量
-    size = forms.CharField(max_length=20, label=_("Size"), required=False, )  # ZSIZE 尺寸
-    purchase_unit = forms.ModelChoiceField(queryset=UnitType.objects.all(), label=_("Unit"))
-    post_date = forms.DateField(label=_("Post Date"))  # BUDAT收貨日期
+    size = forms.CharField(max_length=20, label=_("Size"), required=True, )  # ZSIZE 尺寸
+    purchase_unit = forms.ModelChoiceField(queryset=UnitType.objects.all(), label=_("Unit"), required=False)
+    post_date = forms.DateField(label=_("Post Date"), required=False)  # BUDAT收貨日期
     order_qty = forms.CharField(max_length=20, label=_("Quantity"), required=False, initial=0)  # MENGE
     order_bin = forms.ModelChoiceField(queryset=Bin.objects.all(), label=_("Location"))
     gift_qty = forms.CharField(max_length=20, label="Complimentary Quantity", required=False, initial=0)
@@ -304,19 +290,15 @@ class StockInPForm(forms.Form):
             Div(
                 Div('post_date', css_class='col-md-3'),
                 Div('supplier', css_class='col-md-3'),
-                Div('lot_no', css_class='col-md-2'),
-                Div('size', css_class='col-md-2'),
-                Div(Button('bin_clear', _('Delete'), css_class='btn btn-light'),
-                    css_class='col-md-1 d-flex align-items-center pt-3'),
+                Div('lot_no', css_class='col-md-3'),
+                Div('size', css_class='col-md-3'),
                 Div('purchase_qty', css_class='col-md-3'),
                 Div('purchase_unit', css_class='col-md-3'),
-                Div('order_qty', css_class='col-md-2'),
-                Div('order_bin', css_class='col-md-2'),
-                Div(Button('bin_search', _('Search'), css_class='btn btn-light'),
-                    css_class='col-md-1 d-flex align-items-center pt-3'),
+                Div('order_qty', css_class='col-md-3'),
+                Div('order_bin', css_class='col-md-3'),
                 Div('desc', css_class='col-md-10'),
                 Div(HTML(
-                    '<a href="#" class="btn btn-info" id="create""><i class="fas fa-plus-circle"></i> 加入</a>'),
+                    '<a href="#" class="btn btn-info" id="create""><i class="fas fa-plus-circle"></i> '+_('Add')+'</a>'),
                     css_class='col-md-2 d-flex align-items-center pt-3'),
                 css_class='row'),
         )
@@ -388,7 +370,7 @@ class StockInPForm2(forms.Form):
                     css_class='col-md-1 d-flex align-items-center pt-3'),
                 Div('comment', css_class='col-md-10'),
                 Div(HTML(
-                    '<a href="#" class="btn btn-info" onclick="add_item();"><i class="fas fa-plus-circle"></i> 加入</a>'),
+                    '<a href="#" class="btn btn-info" onclick="add_item();"><i class="fas fa-plus-circle"></i> '+_('Add')+'</a>'),
                     css_class='col-md-2 d-flex align-items-center pt-3'),
                 css_class='row'),
         )

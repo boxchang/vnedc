@@ -150,6 +150,7 @@ class Bin_Value(models.Model):
     version_seq = models.CharField(max_length=50, null=True, blank=True)
     size = models.CharField(max_length=5, null=False, blank=False)
     qty = models.IntegerField(blank=True, null=True)
+    purchase_unit = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=5, null=False, blank=False)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
@@ -174,6 +175,7 @@ class Bin_Value_History(models.Model):
     plus_qty = models.IntegerField()
     minus_qty = models.IntegerField()
     remain_qty = models.IntegerField()
+    purchase_unit = models.CharField(max_length=20, blank=True, null=True)
     comment = models.CharField(max_length=200, null=True, blank=True)
     create_at = models.DateTimeField(default=timezone.now)  # Create_at
     create_by = models.ForeignKey(
@@ -239,11 +241,11 @@ class StockInFormDetail(models.Model):
     item_type = models.ForeignKey('ItemType', related_name='stockin_itemtype', on_delete=models.DO_NOTHING)
     packing_type = models.CharField(max_length=20, blank=True, null=True)
     purchase_no = models.CharField(max_length=20, blank=True, null=True)
-    purchase_qty = models.CharField(max_length=20, blank=True, null=True)
+    purchase_qty = models.IntegerField(default=0, blank=True, null=True)
     size = models.CharField(max_length=20, blank=True, null=True)
     purchase_unit = models.CharField(max_length=20, blank=True, null=True)
     post_date = models.CharField(max_length=20, blank=True, null=True)
-    order_qty = models.CharField(max_length=20, blank=True, null=True)
+    order_qty = models.IntegerField(default=0, blank=True, null=True)
     order_bin = models.ForeignKey('Bin', related_name='stockin_order_bin', on_delete=models.DO_NOTHING)
     supplier = models.CharField(max_length=20, blank=True, null=True)
     sap_mtr_no = models.CharField(max_length=20, blank=True, null=True)
@@ -258,25 +260,14 @@ class StockOutForm(models.Model):
 
 
 class StockOutFormDetail(models.Model):
-    form_no = models.CharField(max_length=20, primary_key=True)
+    form_no = models.ForeignKey('StockOutForm', related_name='stockout_detail_form', on_delete=models.CASCADE)
     product_order = models.CharField(max_length=20, blank=True, null=True)
-    customer_no = models.CharField(max_length=20, blank=True, null=True)
     version_no = models.CharField(max_length=20, blank=True, null=True)
     version_seq = models.CharField(max_length=20, blank=True, null=True)
-    lot_no = models.CharField(max_length=20, blank=True, null=True)
-    item_type = models.ForeignKey('ItemType', related_name='stockout_itemtype', on_delete=models.DO_NOTHING)
-    packing_type = models.CharField(max_length=20, blank=True, null=True)
     purchase_no = models.CharField(max_length=20, blank=True, null=True)
-    purchase_qty = models.CharField(max_length=20, blank=True, null=True)
     size = models.CharField(max_length=20, blank=True, null=True)
     purchase_unit = models.CharField(max_length=20, blank=False, null=True)
-    post_date = models.CharField(max_length=20, blank=True, null=True)
-    order_qty = models.CharField(max_length=20, blank=True, null=True)
     order_bin = models.ForeignKey('Bin', related_name='stockout_order_bin', on_delete=models.DO_NOTHING)
-    gift_qty = models.CharField(max_length=20, blank=True, null=True)
-    gift_bin = models.ForeignKey('Bin', related_name='stockout_gift_bin', on_delete=models.DO_NOTHING)
-    supplier = models.CharField(max_length=20, blank=True, null=True)
-    sap_mtr_no = models.CharField(max_length=20, blank=True, null=True)
     desc = models.CharField(max_length=2000, blank=True, null=True)
 
     def get_absolute_url(self):

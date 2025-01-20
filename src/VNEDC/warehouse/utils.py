@@ -4,7 +4,7 @@ import uuid
 from warehouse.models import MovementType, Bin, Bin_Value, Bin_Value_History
 
 
-def Do_Transaction(request, form_no, product_order, purchase_no, version_no, version_seq, size, mvt, bin_code, qty, desc):
+def Do_Transaction(request, form_no, product_order, purchase_no, version_no, version_seq, size, mvt, bin_code, qty, purchase_unit, desc):
     try:
         qty = float(qty)
         bin = Bin.objects.get(bin_id=bin_code)
@@ -19,22 +19,29 @@ def Do_Transaction(request, form_no, product_order, purchase_no, version_no, ver
                 remain_qty = qty
 
             if remain_qty >= 0:
-                Bin_Value.objects.update_or_create(product_order=product_order, purchase_no=purchase_no,
-                                                   version_no=version_no,
-                                                   version_seq=version_seq, size=size, bin=bin,
-                                                   defaults={'qty': remain_qty, 'update_by': request.user})
+                if remain_qty == 0:
+                    Bin_Value.objects.filter(product_order=product_order, purchase_no=purchase_no,
+                                                       version_no=version_no,
+                                                       version_seq=version_seq, size=size, bin=bin).delete()
+                else:
+                    Bin_Value.objects.update_or_create(product_order=product_order, purchase_no=purchase_no,
+                                                       version_no=version_no,
+                                                       version_seq=version_seq, size=size, bin=bin,
+                                                       defaults={'qty': remain_qty, 'purchase_unit': purchase_unit, 'update_by': request.user})
 
                 if qty > 0:
                     Bin_Value_History.objects.create(batch_no=form_no, product_order=product_order,
                                                      purchase_no=purchase_no, version_no=version_no,
                                                      version_seq=version_seq, size=size, bin=bin, mvt=mvt, plus_qty=qty,
                                                      minus_qty=0, remain_qty=remain_qty, comment=desc,
+                                                     purchase_unit=purchase_unit,
                                                      create_by=request.user)
                 else:
                     Bin_Value_History.objects.create(batch_no=form_no, product_order=product_order,
                                                      purchase_no=purchase_no, version_no=version_no,
                                                      version_seq=version_seq, size=size, bin=bin, mvt=mvt, plus_qty=0,
                                                      minus_qty=-qty, remain_qty=remain_qty,
+                                                     purchase_unit=purchase_unit,
                                                      comment=desc, create_by=request.user)
                 result = "DONE"
             else:

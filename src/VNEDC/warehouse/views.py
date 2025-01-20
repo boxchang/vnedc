@@ -10,12 +10,12 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from VNEDC.database import sap_database
+from VNEDC.database import sap_database, vnedc_database
 from warehouse.utils import Do_Transaction, transfer_stock
 from .forms import WarehouseForm, AreaForm, BinForm, BinValueForm, BinSearchForm, StockInPForm, StockOutPForm, \
-    BinTransferForm
+    BinTransferForm, QuantityAdjustForm
 from .models import Warehouse, Area, Bin, Bin_Value, Bin_Value_History, StockInForm, Series, StockInFormDetail, \
-    MovementType, ItemType, StockOutForm
+    MovementType, ItemType, StockOutForm, StockOutFormDetail
 from django.db.models import Case, When, Value, BooleanField, Q
 
 
@@ -288,8 +288,8 @@ def bin_search(request):
                 bin_hists = bin_hists.filter(bin__bin_id=query_bin)  # Lọc chính xác mã `bin`
                 bin_values = bin_values.filter(bin__bin_id=query_bin)
             if query_po_no:
-                bin_hists = bin_hists.filter(po_no=query_po_no)
-                bin_values = bin_values.filter(po_no=query_po_no)
+                bin_hists = bin_hists.filter(product_order=query_po_no)
+                bin_values = bin_values.filter(product_order=query_po_no)
             if query_size:
                 bin_hists = bin_hists.filter(size=query_size)
                 bin_values = bin_values.filter(size=query_size)
@@ -310,7 +310,7 @@ def bin_search(request):
             range_pages = []
 
             if result_history or result_value:
-                result_history = result_history.order_by('-create_at')
+                result_history = result_history.order_by('create_at')
                 paginator = Paginator(result_history, 15)
                 page_number = request.GET.get('page')
                 page_obj = paginator.get_page(page_number)
@@ -473,7 +473,7 @@ def dashboard(request):
 # 入庫作業
 @transaction.atomic
 @login_required
-def stock_in(request):
+def packing_material_stock_in(request):
     bins = Bin.objects.filter(area__warehouse__wh_code='W001').annotate(
         has_stock=Case(
             When(value_bin__isnull=False, then=Value(True)),
@@ -506,7 +506,7 @@ def stock_in(request):
 
             for item in items:
                 Do_Transaction(request, stock_in.form_no, 'STIN', item['item_code'], item['bin_code'], int(item['qty']),
-                               item['comment'])
+                               item['purchase_unit'], item['comment'])
 
         except Exception as e:
             transaction.savepoint_rollback(save_tag)
@@ -527,39 +527,11 @@ def stockin_detail(request, pk):
 
     return render(request, 'stock/stockin_detail.html', locals())
 
-
-def get_product_order_info(request):
-    data_list = []
-    if request.method == 'POST':
-        product_order = request.POST.get('product_order')
-        db = sap_database()
-
-        if product_order == '':
-            return JsonResponse({"status": "no_change"}, status=200)
-        else:
-            sql = f"""
-            SELECT VBELN, ZZVERSION, ZZVERSION_SEQ, LOTNO, WGBEZ, EBELN, MENGE_PO, ZSIZE, MEINS, BUDAT, MENGE,
-            NAME1, MBLNR
-            FROM [PMG_SAP_Test].[dbo].[ZMMT4001] WHERE VBELN = '{product_order}'
-            """
-
-        raws = db.select_sql_dict(sql)
-        for raw in raws:
-            data_list.append({'product_order': raw['VBELN'], 'customer_no': '', 'version_no': raw['ZZVERSION'],
-                              'version_seq': raw['ZZVERSION_SEQ'], 'lot_no': raw['LOTNO'], 'item_type': raw['WGBEZ'],
-                              'packing_type': '', 'purchase_no': raw['EBELN'], 'purchase_qty': raw['MENGE_PO'],
-                              'size': raw['ZSIZE'], 'purchase_unit': raw['MEINS'], 'post_date': raw['BUDAT'],
-                              'order_qty': raw['MENGE'], 'supplier': raw['NAME1'], 'sap_mtr_no': raw['MBLNR']
-                              })
-
-    return JsonResponse(data_list, safe=False)
-
-
 def get_product_order_stout(request):
     data_list = []
     if request.method == 'POST':
         product_order = request.POST.get('product_order')
-        db = sap_database()
+        db = vnedc_database()
 
         if product_order == '':
             return JsonResponse({"status": "no_change"}, status=200)
@@ -572,15 +544,100 @@ def get_product_order_stout(request):
                   ,[purchase_no]
                   ,[version_no]
                   ,[version_seq]
+                  ,[purchase_unit]
             FROM [VNEDC].[dbo].[warehouse_bin_value] WHERE product_order = '{product_order}'
+            AND qty > 0
             """
         raws = db.select_sql_dict(sql)
         for raw in raws:
             data_list.append({'product_order': raw['product_order'], 'size': raw['size'], 'order_qty': raw['qty'],
                               'version_no': raw['version_no'], 'order_bin': raw['bin_id'],
                               'version_seq': raw['version_seq'], 'purchase_no': raw['purchase_no'],
+                              'purchase_unit': raw['purchase_unit'],
+                              })
+    return JsonResponse(data_list, safe=False)
+
+def get_purchase_no_stout(request):
+    data_list = []
+    if request.method == 'POST':
+        purchase_no = request.POST.get('purchase_no')
+        db = vnedc_database()
+
+        if purchase_no == '':
+            return JsonResponse({"status": "no_change"}, status=200)
+        else:
+            sql = f"""
+            SELECT [product_order]
+                  ,[size]
+                  ,[qty]
+                  ,[bin_id]
+                  ,[purchase_no]
+                  ,[version_no]
+                  ,[version_seq]
+                  ,[purchase_unit]
+            FROM [VNEDC].[dbo].[warehouse_bin_value] WHERE purchase_no = '{purchase_no}'
+            AND qty > 0
+            """
+        raws = db.select_sql_dict(sql)
+        for raw in raws:
+            data_list.append({'product_order': raw['product_order'], 'size': raw['size'], 'order_qty': int(raw['qty']),
+                              'version_no': raw['version_no'], 'order_bin': raw['bin_id'],
+                              'version_seq': raw['version_seq'], 'purchase_no': raw['purchase_no'],
 
                               })
+    return JsonResponse(data_list, safe=False)
+
+def stockin_filter(raws):
+    vnedc_db = vnedc_database()
+    data_list = []
+    for raw in raws:
+        product_order = raw['VBELN']
+        purchase_no = raw['EBELN']
+        version_no = raw['ZZVERSION']
+        version_seq = raw['ZZVERSION_SEQ']
+        size = raw['ZSIZE']
+        order_qty = raw['MENGE']
+
+        sql2 = f"""
+        SELECT sum(order_qty) order_qty FROM [VNEDC].[dbo].[warehouse_stockinformdetail]
+        WHERE product_order='{product_order}' and purchase_no='{purchase_no}'
+        and version_no='{version_no}' and version_seq='{version_seq}' and size='{size}'
+        """
+        stocks = vnedc_db.select_sql_dict(sql2)
+
+        if stocks[0]["order_qty"]:
+            qty = int(order_qty) - stocks[0]["order_qty"]
+        else:
+            qty = int(order_qty)
+
+        if qty > 0:
+            data_list.append({'product_order': product_order, 'customer_no': '', 'version_no': version_no,
+                              'version_seq': version_seq, 'lot_no': raw['LOTNO'], 'item_type': raw['WGBEZ'],
+                              'packing_type': '', 'purchase_no': purchase_no, 'purchase_qty': raw['MENGE_PO'],
+                              'size': size, 'purchase_unit': raw['MEINS'], 'post_date': raw['BUDAT'],
+                              'order_qty': qty, 'supplier': raw['NAME1'], 'sap_mtr_no': raw['MBLNR']
+                              })
+    return data_list
+
+def get_product_order_info(request):
+    data_list = []
+    if request.method == 'POST':
+        product_order = request.POST.get('product_order')
+        sap_db = sap_database()
+
+        if product_order == '':
+            return JsonResponse({"status": "no_change"}, status=200)
+        else:
+            sql = f"""
+            SELECT VBELN, ZZVERSION, ZZVERSION_SEQ, LOTNO, WGBEZ, EBELN, MENGE_PO, ZSIZE, MEINS, BUDAT, MENGE,
+            NAME1, MBLNR
+            FROM [PMG_SAP].[dbo].[ZMMT4001] WHERE VBELN = '{product_order}'
+            """
+
+        raws = sap_db.select_sql_dict(sql)
+
+        data_list = stockin_filter(raws)
+
     return JsonResponse(data_list, safe=False)
 
 
@@ -601,13 +658,7 @@ def get_purchase_no_info(request):
 
         raws = db.select_sql_dict(sql)
 
-        for raw in raws:
-            data_list.append({'product_order': raw['VBELN'], 'customer_no': '', 'version_no': raw['ZZVERSION'],
-                              'version_seq': raw['ZZVERSION_SEQ'], 'lot_no': raw['LOTNO'], 'item_type': raw['WGBEZ'],
-                              'packing_type': '', 'purchase_no': raw['EBELN'], 'purchase_qty': raw['MENGE_PO'],
-                              'size': raw['ZSIZE'], 'purchase_unit': raw['MEINS'], 'post_date': raw['BUDAT'],
-                              'order_qty': raw['MENGE'], 'supplier': raw['NAME1'], 'sap_mtr_no': raw['MBLNR']
-                              })
+        data_list = stockin_filter(raws)
 
     return JsonResponse(data_list, safe=False)
 
@@ -624,7 +675,7 @@ def get_series_number(_key, _key_name):
 
 
 @csrf_exempt
-def stock_in_post(request):
+def packing_material_stock_in_post(request):
     if request.method == "POST":
         try:
             # 解析 JSON 資料
@@ -662,11 +713,11 @@ def stock_in_post(request):
                             item_type=item_type,
                             packing_type=item['packing_type'],
                             purchase_no=item['purchase_no'],
-                            purchase_qty=item['purchase_qty'],
+                            purchase_qty=int(float(item['purchase_qty'])),
                             size=item['size'],
                             purchase_unit=item['purchase_unit'],
                             post_date=item['post_date'],
-                            order_qty=item['order_qty'],
+                            order_qty=int(float(item['order_qty'])),
                             order_bin=bin,
                             supplier=item['supplier'],
                             sap_mtr_no=item['sap_mtr_no'],
@@ -677,10 +728,11 @@ def stock_in_post(request):
                         result = Do_Transaction(request, form_no, item['product_order'],
                                                 item['purchase_no'], item['version_no'], item['version_seq'],
                                                 item['size'], mvt,
-                                                item['order_bin'], item['order_qty'], item['desc'])
+                                                item['order_bin'], item['order_qty'], item['purchase_unit'], item['desc'])
 
-                    except ItemType.DoesNotExist:
-                        raise ValueError(f"Invalid item_type: {item['item_type']}")
+                    except Exception as e:
+                        raise ValueError(f"{e}")
+                        print(e)
 
             return JsonResponse({'status': 'success'}, status=200)
 
@@ -692,7 +744,7 @@ def stock_in_post(request):
 
 # @transaction.atomic
 # @login_required
-def stock_out(request):
+def packing_material_stock_out(request):
     if request.method == 'POST':
         form = StockOutPForm(request.POST)
         if form.is_valid():
@@ -700,6 +752,63 @@ def stock_out(request):
     else:
         form = StockOutPForm()
     return render(request, 'warehouse/packing_material_stock_out.html', {'form': form})
+
+
+@csrf_exempt
+def packing_material_stock_out_post(request):
+    if request.method == "POST":
+        try:
+            # 解析 JSON 資料
+            data = json.loads(request.body)
+
+            # STIN-202412310001
+            YYYYMM = datetime.now().strftime("%Y%m")
+            key = "STOU" + YYYYMM
+            form_no = key + str(get_series_number(key, "STOCKOUT")).zfill(3)
+
+            mvt = MovementType.objects.get(mvt_code="STOU")
+
+            stockout_form = StockOutForm.objects.create(
+                form_no=form_no,
+                create_at=timezone.now(),
+                create_by_id=request.user.id
+            )
+
+            for item in data:
+                bin = Bin.objects.get(bin_id=item['order_bin'])
+                comment = item['desc'] if 'desc' in item else ""
+
+                try:
+                    stockout_form_detail = StockOutFormDetail(
+                        form_no=stockout_form,
+                        product_order=item['product_order'],
+                        version_no=item['version_no'],
+                        version_seq=item['version_seq'],
+                        purchase_no=item['purchase_no'],
+                        size=item['size'],
+                        purchase_unit=item['purchase_unit'],
+                        order_bin=bin,
+                        desc=comment,
+                    )
+                    stockout_form_detail.save()
+
+                    qty = int(item['order_qty']) * -1
+
+                    result = Do_Transaction(request, form_no, item['product_order'],
+                                            item['purchase_no'], item['version_no'], item['version_seq'],
+                                            item['size'], mvt,
+                                            item['order_bin'], qty, item['purchase_unit'], comment)
+
+                except Exception as e:
+                    raise ValueError(f"{e}")
+                    print(e)
+
+            return JsonResponse({'status': 'success'}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
 
 def work_order_search(request):
@@ -783,7 +892,7 @@ def bin_transfer_page(request):
         request.session['size'] = request.GET.get('size', '')
         request.session['bin'] = request.GET.get('bin', '')
         request.session['qty'] = request.GET.get('qty', '')
-        request.session['qty'] = request.GET.get('qty', '')
+        request.session['purchase_unit'] = request.GET.get('purchase_unit', '')
 
         # Lấy dữ liệu từ session nếu không có GET request
     warehouse = request.session.get('warehouse', '')
@@ -794,6 +903,7 @@ def bin_transfer_page(request):
     size = request.session.get('size', '')
     bin = request.session.get('bin', '')
     qty = request.session.get('qty', '')
+    purchase_unit = request.session.get('purchase_unit', '')
 
     mvt = MovementType.objects.get(mvt_code="TRNS")
 
@@ -808,9 +918,9 @@ def bin_transfer_page(request):
             qty = form.cleaned_data['qty']
 
             Do_Transaction(request, form_no, product_order, purchase_no, version_no, version_seq, size, mvt,
-                           bin_selected, qty, desc=None)
+                           bin_selected, qty, purchase_unit, desc=None)
             Do_Transaction(request, form_no, product_order, purchase_no, version_no, version_seq, size, mvt,
-                           bin, -qty, desc=None)
+                           bin, -qty, purchase_unit, desc=None)
 
             item_data = {
                 'bin__area__warehouse__wh_code': warehouse,
@@ -828,6 +938,96 @@ def bin_transfer_page(request):
     return render(request, 'warehouse/bin/bin_transfer.html', locals())
     # return JsonResponse(item_data, safe=False)
 
+def bin_adjust(request):
+    if request.GET:
+        request.session['warehouse'] = request.GET.get('warehouse', '')
+        request.session['product_order'] = request.GET.get('product_order', '')
+        request.session['purchase_no'] = request.GET.get('purchase_no', '')
+        request.session['version_no'] = request.GET.get('version_no', '')
+        request.session['version_seq'] = request.GET.get('version_seq', '')
+        request.session['size'] = request.GET.get('size', '')
+        request.session['bin'] = request.GET.get('bin', '')
+        request.session['qty'] = request.GET.get('qty', '')
+
+        # Lấy dữ liệu từ session nếu không có GET request
+    warehouse = request.session.get('warehouse', '')
+    product_order = request.session.get('product_order', '')
+    purchase_no = request.session.get('purchase_no', '')
+    version_no = request.session.get('version_no', '')
+    version_seq = request.session.get('version_seq', '')
+    size = request.session.get('size', '')
+    bin = request.session.get('bin', '')
+    qty = request.session.get('qty', '')
+
+    item_data = {
+        'bin__area__warehouse__wh_code': warehouse,
+        'product_order': product_order,
+        'purchase_no': purchase_no,
+        'version_no': version_no,
+        'version_seq': version_seq,
+        'size': size,
+        'bin': bin,
+        'qty': qty
+    }
+
+    return JsonResponse(item_data, safe=False)
+
+
+# When click 'Transfer' button, execute this one
+def bin_adjust_page(request):
+
+    if request.GET:
+        request.session['warehouse'] = request.GET.get('warehouse', '')
+        request.session['product_order'] = request.GET.get('product_order', '')
+        request.session['purchase_no'] = request.GET.get('purchase_no', '')
+        request.session['version_no'] = request.GET.get('version_no', '')
+        request.session['version_seq'] = request.GET.get('version_seq', '')
+        request.session['size'] = request.GET.get('size', '')
+        request.session['bin'] = request.GET.get('bin', '')
+        request.session['qty'] = request.GET.get('qty', '')
+        request.session['purchase_unit'] = request.GET.get('purchase_unit', '')
+
+        # Lấy dữ liệu từ session nếu không có GET request
+    warehouse = request.session.get('warehouse', '')
+    product_order = request.session.get('product_order', '')
+    purchase_no = request.session.get('purchase_no', '')
+    version_no = request.session.get('version_no', '')
+    version_seq = request.session.get('version_seq', '')
+    size = request.session.get('size', '')
+    bin = request.session.get('bin', '')
+    qty = request.session.get('qty', '')
+    purchase_unit = request.session.get('purchase_unit', '')
+
+    mvt = MovementType.objects.get(mvt_code="ADJS")
+
+    YYYYMM = datetime.now().strftime("%Y%m")
+    key = "ADJS" + YYYYMM
+    form_no = key + str(get_series_number(key, "ADJUST")).zfill(3)
+
+    if request.method == 'POST':
+        form = QuantityAdjustForm(request.POST)
+        if form.is_valid():
+            qty = int(form.cleaned_data['qty']) - int(qty)
+
+            Do_Transaction(request, form_no, product_order, purchase_no, version_no, version_seq, size, mvt,
+                           bin, qty, purchase_unit, desc=None)
+
+            item_data = {
+                'bin__area__warehouse__wh_code': warehouse,
+                'product_order': product_order,
+                'purchase_no': purchase_no,
+                'version_no': version_no,
+                'version_seq': version_seq,
+                'size': size,
+                'bin': bin,
+                'qty': qty
+            }
+            return render(request, 'warehouse/work_order_search.html', locals())
+    form = QuantityAdjustForm()
+
+    return render(request, 'warehouse/bin/bin_adjust.html', locals())
+
+
 def work_order_hist_data(request):
     product_order = request.GET.get('product_order')
     bin_id = request.GET.get('bin_id')
@@ -841,12 +1041,16 @@ def work_order_hist_data(request):
     ).values(
         'product_order',
         'purchase_no',
+        'version_no',
+        'version_seq',
+        'size',
         'mvt_id',
         'bin_id',
         'plus_qty',
         'minus_qty',
         'remain_qty',
-        'create_at'
+        'create_at',
+        'create_by__username'
     )
 
     data = list(bin_values)
