@@ -1729,7 +1729,7 @@ def oee_report(request):
                     except Exception as e:
                         print(e)
                         pass
-                parameters = ['Activation', 'Estimated Output', 'Capacity Efficiency', 'Yield', 'OEE']
+                parameters = ['稼動率', '預估產能', '產能效率', '良率', 'OEE']
             # for line, data in zip(line_list, line_data):
             #     print(f"{line}: {data}")
     except Exception as e:

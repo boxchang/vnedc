@@ -472,20 +472,20 @@
                                         <div class="hidden id-dom-capacity-effeciency-table-{{ data.line_name }}">
                                             <div class="col-md-10" style="padding-left: 0px">
                                                 <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Capacity</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 產能效率</span>
                                                     <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                                     <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                                     <span class="col-md-2 block-item">{{ data.line_name }} 计数机数量</span>
                                                     <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二手</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二級品</span>
                                                     <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Scrap</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 廢品</span>
                                                     <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                                     <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                                     <span class="col-md-2 block-item">{{ data.line_name }} 預估產能(Pcs)</span>
                                                 </div>
                                                 <div style="display: flex; align-items: center;  margin-bottom: 10px">
-                                                    <div class="col-md-2 block-item">{{ data.line_name }} Capacity</div>
+                                                    <div class="col-md-2 block-item">{{ data.capacity }}</div>
                                                     <div>&nbsp;&nbsp;=&nbsp;&nbsp;</div>
                                                     <div>&nbsp;&nbsp;(&nbsp;&nbsp;</div>
                                                     <div class="col-md-2 block-item action-button color-green" id="id-counting-machine-qty-{{ data.line_name }}">{{ data.couting_data }}</div>
@@ -509,16 +509,16 @@
                                         <div class="hidden id-dom-yield-table-{{ data.line_name }}">
                                             <div class="col-md-10" style="padding-left: 0px">
                                                 <div style="display: flex; align-items: center; margin-bottom: 10px">
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 良率</span>
                                                     <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                                     <span class="col-md-2 block-item">{{ data.line_name }} SAP數量</span>
                                                     <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                                     <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                                     <span class="col-md-2 block-item">{{ data.line_name }} 计数机数量</span>
                                                     <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二手</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 二級品</span>
                                                     <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Scrap</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 廢品</span>
                                                     <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                                 </div>
                                                 <div style="display: flex; align-items: center;  margin-bottom: 10px">
@@ -546,11 +546,11 @@
                                                 <div style="display: flex; align-items: center; margin-bottom: 10px">
                                                     <span class="col-md-2 block-item">{{ data.line_name }} OEE</span>
                                                     <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Activation</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 稼動率</span>
                                                     <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                                                    <span class="col-md-3 block-item">{{ data.line_name }} Capacity Efficiency</span>
+                                                    <span class="col-md-3 block-item">{{ data.line_name }} 產能效率</span>
                                                     <span>&nbsp;&nbsp;*&nbsp;&nbsp;</span>
-                                                    <span class="col-md-2 block-item">{{ data.line_name }} Yield</span>
+                                                    <span class="col-md-2 block-item">{{ data.line_name }} 良率</span>
                                                 </div>
                                                 <div style="display: flex; align-items: center;  margin-bottom: 10px">
                                                     <div class="col-md-2 block-item">{{ data.oee_data }}</div>
@@ -573,7 +573,7 @@
                             {% else %}
                                 <div class="row m-3 col-md-10" style="margin-left: 0px">
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-light-blue">Activation</span>
+                                        <span class="col-md-2 block-item block-color-light-blue">稼動率</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                         <span class="col-md-1 block-item block-color-green">1440</span>
@@ -584,40 +584,40 @@
                                         <span class="col-md-1 block-item block-color-green">1440</span>
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
+                                        <span class="col-md-2 block-item block-color-blue">預估產出量</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span class="col-md-1 block-item block-color-green action-button">速度</span>{# Speed #}
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
                                         <span class="col-md-3 block-item block-color-green">1440 - 机器停止时间</span>{# 1440-Machine Stop Time #}
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-orange">Capacity Efficiency</span>
+                                        <span class="col-md-2 block-item block-color-orange">產能效率</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-green action-button">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button">二手</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">二級品</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button">Scrap</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">廢品</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-gold">外观检查</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-gray">離型不良</span>
                                         <span>&nbsp;&nbsp;)&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-blue">Estimated Output</span>
+                                        <span class="col-md-2 block-item block-color-blue">預估生產量</span>
                                     </div>
                                     <div class="col-md-12 d-flex mb-3">
-                                        <span class="col-md-2 block-item block-color-light-green">Yield</span>
+                                        <span class="col-md-2 block-item block-color-light-green">良率</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-green action-button">SAP數量</span>{# SAP Ticket Qty #}
                                         <span>&nbsp;&nbsp;/&nbsp;&nbsp;</span>
                                         <span>&nbsp;&nbsp;(&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-green action-button">计数机数量（IPQC)</span>{# Counting Machine Qty (lPQc) Second #}
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button">二手</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">二級品</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
-                                        <span class="col-md-1 block-item block-color-green action-button">Scrap</span>
+                                        <span class="col-md-1 block-item block-color-green action-button">廢品</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
                                         <span class="col-md-2 block-item block-color-gold">外观检查</span>
                                         <span>&nbsp;&nbsp;+&nbsp;&nbsp;</span>
@@ -627,11 +627,11 @@
                                     <div class="col-md-12 d-flex mb-3">
                                         <span class="col-md-2 block-item block-color-green">OEE</span>
                                         <span>&nbsp;&nbsp;=&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-light-blue">Activation</span>
+                                        <span class="col-md-2 block-item block-color-light-blue">稼動率</span>
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-orange">Capacity Efficiency</span>
+                                        <span class="col-md-2 block-item block-color-orange">產能效率</span>
                                         <span>&nbsp;&nbsp;x&nbsp;&nbsp;</span>
-                                        <span class="col-md-2 block-item block-color-light-green">Yield</span>
+                                        <span class="col-md-2 block-item block-color-light-green">良率</span>
                                     </div>
                                 </div>
                             {% endif %}
