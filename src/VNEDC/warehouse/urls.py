@@ -6,7 +6,7 @@ from warehouse.views import index, packing_material_stock_in, packing_material_s
     packing_material_stock_in_post, packing_material_stock_out_post, dashboard, get_purchase_no_info, work_order_search, \
     work_order_page, bin_transfer, \
     bin_transfer_page, get_product_order_stout, work_order_bin_search, work_order_hist_data, get_purchase_no_stout, \
-    bin_adjust_page, bin_adjust, upload_excel, bin_value_import, search_bin_value
+    bin_adjust_page, bin_adjust, upload_excel, bin_value_import, search_bin_value, warehouse_map
 from . import views
 
 
@@ -59,6 +59,7 @@ urlpatterns = [
     url(r'^bin/transfer/$', bin_transfer, name='bin_transfer'),
     url(r'^bin_adjust_page/$', bin_adjust_page, name='bin_adjust_page'),
     url(r'^bin/adjust/$', bin_adjust, name='bin_adjust'),
+    url(r'^map/(?P<pk>\w+)/$', warehouse_map, name='warehouse_map'),
     url(r'^$', views.index, name='warehouse_index'),
 ]
 

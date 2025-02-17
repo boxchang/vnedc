@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子頁面</title>
+</head>
+<body>
+    <div style="background-image: url('{{ bg }}');">
+        <h2>這是子頁面</h2>
+        <p>bin_id: <span id="binIdDisplay"></span></p>
+
+        <button onclick="sendValue('按鈕A')">按鈕 A</button>
+        <button onclick="sendValue('按鈕B')">按鈕 B</button>
+    </div>
+
+    <script>
+        function sendValue(value) {
+            if (window.opener) {
+                window.opener.postMessage(value, window.location.origin); // 傳值給母視窗
+                window.close();
+            }
+        }
+    </script>
+
+</body>
+</html>

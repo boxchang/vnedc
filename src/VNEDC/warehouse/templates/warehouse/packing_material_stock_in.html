@@ -83,6 +83,22 @@
 {% block base_js %}
 {{ block.super }}
 <script>
+    function openMapPage(warehouse_id, obj) {
+
+        let childWindow = window.open('{% url 'warehouse_map' warehouse_code %}', "Warehouse Map", "width=1400,height=800");
+
+        // 監聽來自子頁面的回傳數據
+        window.addEventListener("message", function(event) {
+            if (event.origin !== window.location.origin) {
+                return;  // 確保安全性，只接受同源的消息
+            }
+            //document.getElementById("AAA").value = event.data;  // 設置回傳值
+            alert(obj);
+            obj.val(event.data);
+        }, false);
+
+    }
+
     $(document).ready(function() {
         let isInputClicked = false;
 
@@ -346,33 +362,35 @@
 
                         $button.on("click", function () {
 
-                            $("#zonePopup").fadeIn(); // Hiển thị pop-up
+                            //$("#zonePopup").fadeIn(); // Hiển thị pop-up
 
-                            $("#zonePopup").data("updateInput", (newValue) => {
-                                $input.val(newValue); // 更新輸入框的值
-                            });
+                            //$("#zonePopup").data("updateInput", (newValue) => {
+                            //    $input.val(newValue); // 更新輸入框的值
+                            //});
+                            obj = $input;
+                            openMapPage('PKG', obj);
 
                         });
 
 
                         // Đóng popup khi click bên ngoài nội dung
-                        $(document).on('click', function(event) {
-                            if (
-                                !$(event.target).closest('#popupContent').length &&
-                                !$(event.target).closest('#id_order_bin').length
-                            ) {
+                        //$(document).on('click', function(event) {
+                        //    if (
+                        //        !$(event.target).closest('#popupContent').length &&
+                        //        !$(event.target).closest('#id_order_bin').length
+                        //    ) {
                                 // Kiểm tra nếu không click vào #popupContent và #id_order_bin
-                                if (!isInputClicked) {
-                                    $('#zonePopup').fadeOut(); // Đóng popup
-                                }
+                        //        if (!isInputClicked) {
+                        //            $('#zonePopup').fadeOut(); // Đóng popup
+                        //        }
 
-                                if ($(event.target).closest('#popupOverlay').length) {
-                                    isInputClicked = false; // Đặt giá trị false nếu nhấp vào popupOverlay
-                                    $('#zonePopup').fadeOut();
-                                    console.log('Clicked on popupOverlay. isInputClicked =', isInputClicked);
-                                }
-                            }
-                        });
+                        //        if ($(event.target).closest('#popupOverlay').length) {
+                        //            isInputClicked = false; // Đặt giá trị false nếu nhấp vào popupOverlay
+                        //            $('#zonePopup').fadeOut();
+                        //            console.log('Clicked on popupOverlay. isInputClicked =', isInputClicked);
+                        //        }
+                        //    }
+                        //});
 
 
                             {#// Remember position of current page#}
@@ -382,15 +400,15 @@
                             {#$(window).scrollTop(scrollPosition);#}
 
                         // Hiển thị pop-up khi click vào $button
-                        $button.on("click", function (event) {
-                            event.preventDefault();
+                        //$button.on("click", function (event) {
+                        //    event.preventDefault();
 
-                            isInputClicked = true;
-                            $("#zonePopup").fadeIn();
+                        //    isInputClicked = true;
+                        //    $("#zonePopup").fadeIn();
 
-                            console.log(isInputClicked)
+                        //    console.log(isInputClicked)
 
-                        });
+                        //});
 
                         return $container;
                     },

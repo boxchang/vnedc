@@ -469,10 +469,19 @@ def dashboard(request):
     return render(request, 'warehouse/dashboard.html', locals())
 
 
+def warehouse_map(request, pk):
+    warehouse = Warehouse.objects.get(wh_code=pk)
+    bg = warehouse.wh_bg
+    print(pk)
+
+    return render(request, 'warehouse/warehouse_map.html', locals())
+
 # 入庫作業
 @transaction.atomic
 @login_required
 def packing_material_stock_in(request):
+
+    warehouse_code = 'PKG'
 
     bins = Bin.objects.filter(area__warehouse__wh_code='PKG').annotate(
         has_stock=Case(
@@ -1367,3 +1376,5 @@ def get_bin_data(request):
         )
         return JsonResponse(list(products), safe=False)
     return JsonResponse([], safe=False)
+
+
