@@ -4,10 +4,25 @@ from django.conf import settings
 from django.urls import reverse
 
 
+class Plant(models.Model):
+    plant_code = models.CharField(primary_key=True, max_length=20)  # Primary key with varchar(20)
+    plant_name = models.CharField(max_length=100)  # Name with varchar(100)
+    create_at = models.DateTimeField(default=timezone.now)  # Creation timestamp
+    create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='warehouse_plant_create_by')
+    update_at = models.DateTimeField(default=timezone.now)  # Last updated timestamp
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
+                                  related_name='warehouse_plant_update_by')
+
+    def __str__(self):
+        return self.plant_name
+
+
 class Warehouse(models.Model):
     wh_code = models.CharField(primary_key=True, max_length=20)  # Primary key with varchar(20)
     wh_name = models.CharField(max_length=100)  # Name with varchar(100)
     wh_comment = models.CharField(max_length=500, null=True, blank=True)  # Comment, nullable
+    wh_plant = models.CharField(max_length=20, null=True, blank=True)
     wh_bg = models.ImageField(upload_to='warehouse_images/', null=True, blank=True)
     create_at = models.DateTimeField(default=timezone.now)  # Creation timestamp
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,

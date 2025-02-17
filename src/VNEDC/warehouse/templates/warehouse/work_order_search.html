@@ -69,24 +69,24 @@
         $("#jsGrid").jsGrid({
             width: "95%",
             height: "550px",
+            noDataContent: "{% trans "Not found" %}",
             inserting: false,
             editing: false,
             sorting: true,
             paging: true,
             fields: [
-                { name: "bin__area__warehouse__wh_code", title: "Warehouse", type: "text", css: "text-center", width: 30 },
-                { name: "product_order", title: "Product Order", type: "text", css: "text-center", width: 40 },
-                { name: "purchase_no", title: "Purchase No", type: "text", css: "text-center", width: 40 },
-                { name: "version_no", title: "Version No", type: "text", css: "text-center", width: 40 },
-                { name: "version_seq", title: "Version Seq", type: "text", css: "text-center", width: 25 },
-                { name: "size", title: "Size", type: "text", css: "text-center", width: 25 },
-                { name: "bin", title: "Bin", type: "text", css: "text-center", width: 25 },
-                { name: "qty", title: "Qty", type: "number", width: 25 },
+                { name: "bin__area__warehouse__wh_code", title: "{% trans "Warehouse" %}", type: "text", css: "text-center", width: 20 },
+                { name: "product_order", title: "{% trans "Product Order" %}", type: "text", css: "text-center", width: 30 },
+                { name: "purchase_no", title: "{% trans "Purchase No" %}", type: "text", css: "text-center", width: 40 },
+                { name: "version_no", title: "{% trans "Version No" %}", type: "text", css: "text-center", width: 25 },
+                { name: "version_seq", title: "{% trans "Version Seq" %}", type: "text", css: "text-center", width: 25 },
+                { name: "size", title: "{% trans "Size" %}", type: "text", css: "text-center", width: 25 },
+                { name: "bin", title: "{% trans "Bin" %}", type: "text", css: "text-center", width: 25 },
+                { name: "qty", title: "{% trans "Qty" %}", type: "number", width: 25 },
                 {
                     type: "control",
-                    width: 20,
                     itemTemplate: function(_, item) {
-                        return $("<button>").text("Transfer")
+                        return $("<button>").text("{% trans "Transfer" %}")
                             .addClass("btn btn-warning")
                             .on("click", function() {
                                 let queryParams = $.param({
@@ -107,9 +107,9 @@
                 },
                 {
                     type: "control",
-                    width: 20,
+                    width: 30,
                     itemTemplate: function(_, item) {
-                        return $("<button>").text("Adjust")
+                        return $("<button>").text("{% trans "Adjust" %}")
                             .addClass("btn btn-warning")
                             .on("click", function() {
                                 let queryParams = $.param({
@@ -153,9 +153,9 @@
 </script>
 {% endblock %}
 {% block content %}
-    <h3>Search Product Order</h3>
-    <input type="text" id="workOrder" placeholder="{% trans "Product Order" %}">
-    <button id="searchBtn" class="btn btn-primary">Search</button>
+    <h3>{% trans "Search By Work Order" %}</h3>
+    <input type="text" id="workOrder" placeholder="{% trans "Work Order Id" %}">
+    <button id="searchBtn" class="btn btn-primary">{% trans "Search" %}</button>
     <div id="jsGrid"></div>
 
 

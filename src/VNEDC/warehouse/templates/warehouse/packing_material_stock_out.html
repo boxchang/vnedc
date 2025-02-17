@@ -173,6 +173,7 @@
         $("#jsGrid").jsGrid({
             width: "100%",
             height: "400px",
+            noDataContent: "{% trans "Not found" %}",
 
             inserting: true,  // 啟用新增功能
             editing: true,    // 啟用編輯功能
@@ -193,7 +194,7 @@
                         // 建立刪除按鈕
                         var deleteButton = $("<button>")
                             .addClass("btn btn-danger btn-sm") // Bootstrap 樣式（可選）
-                            .text("Delete")
+                            .text("{% trans "Delete" %}")
                             .on("click", function(e) {
                                 e.stopPropagation(); // 防止觸發行點擊事件
                                 $("#jsGrid").jsGrid("deleteItem", item);
@@ -203,16 +204,16 @@
                         return deleteButton;
                     }
                 },
-                { name: "id", type: "number", width: 50, title: "ID", align: "center", readOnly: true, visible: false },
-                { name: "order_qty", type: "text", width: 100, title: "Order Qty", align: "right" },
-                { name: "order_bin", type: "text", width: 120, title: "Order Bin", editing: false },
-                { name: "desc", type: "text", width: 200, title: "Comment", align: "center", editing: true },
+                { name: "id", type: "number", width: 50, title: "{% trans "ID" %}", align: "center", readOnly: true, visible: false },
+                { name: "order_qty", type: "text", width: 120, title: "{% trans "Order Qty" %}", align: "center" },
+                { name: "order_bin", type: "text", width: 120, title: "{% trans "Order Bin" %}", align: "center", editing: false },
+                { name: "desc", type: "text", width: 200, title: "{% trans "Comment" %}", align: "center", editing: true },
                 { name: "product_order", type: "text", width: 150, title: "{% trans "Product Order" %}", validate: "required", editing: false, align: "center" },
-                { name: "purchase_no", type: "text", width: 130, title: "Purchase No", editing: false, align: "center" },
-                { name: "version_no", type: "text", width: 80, title: "Version No", align: "center", editing: false },
-                { name: "version_seq", type: "number", width: 80, title: "Version Seq", editing: false, align: "center" },
-                { name: "size", type: "text", width: 50, title: "Size", editing: false, align: "center" },
-                { name: "purchase_unit", type: "text", width: 100, title: "Purchase Unit", editing: false },
+                { name: "purchase_no", type: "text", width: 170, title: "{% trans "Purchase No" %}", editing: false, align: "center" },
+                { name: "version_no", type: "text", width: 170, title: "{% trans "Version No" %}", align: "center", editing: false },
+                { name: "version_seq", type: "number", width: 120, title: "{% trans "Version Seq" %}", editing: false, align: "center" },
+                { name: "size", type: "text", width: 55, title: "{% trans "Size" %}", editing: false, align: "center" },
+                { name: "purchase_unit", type: "text", width: 100, title: "{% trans "Purchase Unit" %}", align: "center", editing: false },
             ]
         });
 
@@ -249,7 +250,6 @@
         $("#button-id-bin_clear").on("click", function() {
             // Reset form
             $("#myForm")[0].reset();
-
         });
 
         // 當按下過帳按鈕時
@@ -259,7 +259,7 @@
             var gridData = $("#jsGrid").data("JSGrid").data;
 
             if (!gridData || gridData.length === 0) {
-                alert("No data in the table! Please enter at least one row.");
+                alert("{% trans "No data in the table! Please enter at least one row." %}");
                 return; // Dừng xử lý nếu không có dữ liệu
             }
 
@@ -309,19 +309,21 @@
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row">
-            <div class="col p-3" style="font-size: 1.5em;text-align: center;">{% trans "Packing Material Stock Out" %}</div>
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">{% trans "Warehouse Outgoing Form" %}</div>
         </div>
     <form id="myForm">
         {% crispy form %}
         <div id="jsGrid"></div>
             <div id="numberPicker" style="display:none; position:fixed; top:20%; left:30%; width:300px; padding:20px; background:#fff; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
             <h3>{% trans "Choose Location" %}</h3>
+
+
             {% for bin in bins %}
-            <button class="number-btn" data-value="{{ bin.bin_id }}" style="{% if bin.has_stock %}background-color: #d2e8b9{% else %}; background-color: #fff{% endif %}">{{ bin.bin_id }}</button>
-            {% endfor %}
-            <br><br>
-            <button id="closePicker">{% trans "Close" %}</button>
-        </div>
+                <button class="number-btn" data-value="{{ bin.bin_id }}" style="{% if bin.has_stock %}background-color: #d2e8b9{% else %}; background-color: #fff{% endif %}">{{ bin.bin_id }}</button>
+                {% endfor %}
+                <br><br>
+                <button id="closePicker">{% trans "Close" %}</button>
+            </div>
 
           <!-- Popup -->
           <div id="zonePopup" style="display: none;">

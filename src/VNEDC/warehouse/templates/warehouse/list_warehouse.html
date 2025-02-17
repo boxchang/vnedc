@@ -33,13 +33,12 @@
             <div class="col-12">
                 <h2 class="mb-4">{% trans "Warehouse List" %}</h2>
                 <a class="btn btn-primary mb-3" style="width: 70px" href="{% url 'warehouse_create' %}" role="button">{% trans "Add" %}</a>
-    {#            <a class="btn btn-info mb-3 ms-3"  href="{% url 'area_list' %}" role="button">Area List</a>#}
                 <!-- Kiểm tra nếu có dữ liệu -->
                 {% if warehouses %}
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th>{% trans "Plant" %}</th>
                             <th>{% trans "Warehouse Id" %}</th>
                             <th>{% trans "Warehouse Name" %}</th>
                         </tr>
@@ -48,17 +47,9 @@
                         <!-- Lặp qua danh sách warehouse -->
                         {% for warehouse in warehouses %}
                         <tr>
-                            <td style="text-align: center">{{ forloop.counter }}</td>
+                            <td onclick="redirectToPage('{% url 'area_by_warehouse' wh_code=warehouse.wh_code %}')">{{ warehouse.wh_plant|default_if_none:"" }}</td>
                             <td onclick="redirectToPage('{% url 'area_by_warehouse' wh_code=warehouse.wh_code %}')">{{ warehouse.wh_code }}</td>
                             <td onclick="redirectToPage('{% url 'area_by_warehouse' wh_code=warehouse.wh_code %}')">{{ warehouse.wh_name }}</td>
-        {#                    <td>{{ warehouse.wh_comment }}</td>#}
-        {#                    <td>#}
-        {#                        {% if warehouse.wh_bg %}#}
-        {#                        <img src="{{ warehouse.wh_bg.url }}" alt="Background Image" style="max-width: 100px;">#}
-        {#                        {% else %}#}
-        {#                        <em>No Image</em>#}
-        {#                        {% endif %}#}
-        {#                    </td>#}
                             <td>
                                 {% if warehouse.wh_code %}
                                     <a class="btn btn-primary" style="width: 70px" href="{% url 'edit_warehouse' warehouse_code=warehouse.wh_code %}" role="button">{% trans "Edit" %}</a>

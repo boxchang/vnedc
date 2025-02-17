@@ -45,23 +45,24 @@
         $("#jsGrid").jsGrid({
             width: "95%",
             height: "540px",
+            noDataContent: "{% trans "Not found" %}",
             inserting: false,
             editing: false,
             sorting: true,
             paging: true,
             fields: [
-                { name: "product_order", title: "Product Order", type: "text", width: 30, css: "text-center" },
-                { name: "purchase_no", title: "Purchase Order", type: "text", width: 25, css: "text-center" },
-                { name: "version_no", title: "Version No.", type: "text", width: 25, css: "text-center" },
-                { name: "version_seq", title: "Version Seq.", type: "text", width: 25, css: "text-center" },
-                { name: "size", title: "Size", type: "text", width: 25, css: "text-center" },
-                { name: "bin_id", title: "Bin", type: "text", width: 25, css: "text-center" },
-                { name: "mvt_id", title: "Mvt", type: "text", width: 25, css: "text-center" },
-                { name: "plus_qty", title: "+", type: "text", width: 25, css: "text-center" },
+                { name: "product_order", title: "{% trans "Product Order" %}", type: "text", width: 30, css: "text-center" },
+                { name: "purchase_no", title: "{% trans "Purchase Order" %}", type: "text", width: 25, css: "text-center" },
+                { name: "version_no", title: "{% trans "Version No" %}.", type: "text", width: 25, css: "text-center" },
+                { name: "version_seq", title: "{% trans "Version Seq" %}.", type: "text", width: 25, css: "text-center" },
+                { name: "size", title: "{% trans "Size" %}", type: "text", width: 25, css: "text-center" },
+                { name: "bin_id", title: "{% trans "Bin" %}", type: "text", width: 25, css: "text-center" },
+                { name: "mvt_id", title: "{% trans "Mvt" %}", type: "text", width: 25, css: "text-center" },
                 { name: "minus_qty", title: "-", type: "text", width: 25, css: "text-center" },
-                { name: "remain_qty", title: "Qty", type: "text", width: 25, css: "text-center" },
-                { name: "create_at", title: "Create at", type: "text", width: 40, css: "text-center" },
-                { name: "create_by__username", title: "Create by", type: "text", width: 40, css: "text-center" },
+                { name: "plus_qty", title: "+", type: "text", width: 25, css: "text-center" },
+                { name: "remain_qty", title: "{% trans "Qty" %}", type: "text", width: 25, css: "text-center" },
+                { name: "create_at", title: "{% trans "Create at" %}", type: "text", width: 40, css: "text-center" },
+                { name: "create_by__username", title: "{% trans "Create by" %}", type: "text", width: 40, css: "text-center" },
             ]
         });
 
@@ -89,18 +90,18 @@
 {% endblock %}
 
 {% block content %}
-    <h3 class="mb-4">Search Product Order & Location</h3>
+    <h3 class="mb-4">{% trans "Search Product Order & Location" %}</h3>
     <div class="row" style="padding-left: 60px;padding-bottom: 30px;">
         <div class="col-md-5">
-                <label for="workOrder" class="mr-2">Product Order:</label>
-                <input type="text" id="workOrder" class="form-control" placeholder="Enter Product Order">
+                <label for="workOrder" class="mr-2">{% trans "Product Order" %}:</label>
+                <input type="text" id="workOrder" class="form-control" placeholder="{% trans "Enter Product Order" %}">
         </div>
         <div class="col-md-5">
-                <label for="Bin" class="mr-2">Location:</label>
-                <input type="text" id="bin" class="form-control" placeholder="Enter Location">
+                <label for="Bin" class="mr-2">{% trans "Location" %}:</label>
+                <input type="text" id="bin" class="form-control" placeholder="{% trans "Enter Location" %}">
         </div>
         <div class="col-md-2 d-flex align-items-end">
-                <button id="searchBtn" class="btn btn-primary">Search</button>
+                <button id="searchBtn" class="btn btn-primary">{% trans "Search" %}</button>
 
         </div>
     </div>

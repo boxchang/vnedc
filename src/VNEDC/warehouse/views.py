@@ -1,7 +1,11 @@
 import json
+import os
+
+import pandas as pd
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -13,12 +17,10 @@ from django.views.decorators.csrf import csrf_exempt
 from VNEDC.database import sap_database, vnedc_database
 from warehouse.utils import Do_Transaction, transfer_stock
 from .forms import WarehouseForm, AreaForm, BinForm, BinValueForm, BinSearchForm, StockInPForm, StockOutPForm, \
-    BinTransferForm, QuantityAdjustForm
+    BinTransferForm, QuantityAdjustForm, ExcelUploadForm, BinValueSearchForm
 from .models import Warehouse, Area, Bin, Bin_Value, Bin_Value_History, StockInForm, Series, StockInFormDetail, \
     MovementType, ItemType, StockOutForm, StockOutFormDetail
 from django.db.models import Case, When, Value, BooleanField, Q
-
-
 
 
 # Warehouse
@@ -45,7 +47,6 @@ def create_warehouse(request):
 def warehouse_list(request):
     # Lấy toàn bộ danh sách warehouse từ cơ sở dữ liệu
     warehouses = Warehouse.objects.all()
-    x = warehouses
 
     return render(request, 'warehouse/list_warehouse.html', locals())
 
@@ -145,7 +146,6 @@ def area_by_warehouse(request, wh_code):
     else:
         areas = []
 
-    # Truyền dữ liệu vào context
     return render(request, 'warehouse/area/area_by_warehouse.html', locals())
 
 
@@ -464,7 +464,6 @@ def index(request):
     return render(request, 'warehouse/index.html', locals())
 
 
-
 def dashboard(request):
 
     return render(request, 'warehouse/dashboard.html', locals())
@@ -474,13 +473,16 @@ def dashboard(request):
 @transaction.atomic
 @login_required
 def packing_material_stock_in(request):
-    bins = Bin.objects.filter(area__warehouse__wh_code='W001').annotate(
+
+    bins = Bin.objects.filter(area__warehouse__wh_code='PKG').annotate(
         has_stock=Case(
             When(value_bin__isnull=False, then=Value(True)),
             default=Value(False),
             output_field=BooleanField()
         )
     )
+
+    warehouses = Warehouse.objects.all()
 
     if request.method == 'POST':
         hidItem_list = request.POST.get('hidItem_list')
@@ -527,6 +529,7 @@ def stockin_detail(request, pk):
 
     return render(request, 'stock/stockin_detail.html', locals())
 
+
 def get_product_order_stout(request):
     data_list = []
     if request.method == 'POST':
@@ -557,6 +560,7 @@ def get_product_order_stout(request):
                               })
     return JsonResponse(data_list, safe=False)
 
+
 def get_purchase_no_stout(request):
     data_list = []
     if request.method == 'POST':
@@ -586,6 +590,7 @@ def get_purchase_no_stout(request):
 
                               })
     return JsonResponse(data_list, safe=False)
+
 
 def stockin_filter(raws):
     vnedc_db = vnedc_database()
@@ -618,6 +623,7 @@ def stockin_filter(raws):
                               'order_qty': qty, 'supplier': raw['NAME1'], 'sap_mtr_no': raw['MBLNR']
                               })
     return data_list
+
 
 def get_product_order_info(request):
     data_list = []
@@ -676,6 +682,7 @@ def get_series_number(_key, _key_name):
 
 @csrf_exempt
 def packing_material_stock_in_post(request):
+
     if request.method == "POST":
         try:
             # 解析 JSON 資料
@@ -938,6 +945,7 @@ def bin_transfer_page(request):
     return render(request, 'warehouse/bin/bin_transfer.html', locals())
     # return JsonResponse(item_data, safe=False)
 
+
 def bin_adjust(request):
     if request.GET:
         request.session['warehouse'] = request.GET.get('warehouse', '')
@@ -1053,7 +1061,25 @@ def work_order_hist_data(request):
         'create_by__username'
     )
 
-    data = list(bin_values)
+    # data = list(bin_values)
+    data = [
+        {
+            "product_order": item["product_order"],
+            "purchase_no": item["purchase_no"],
+            "version_no": item["version_no"],
+            "version_seq": item["version_seq"],
+            "size": item["size"],
+            "mvt_id": item["mvt_id"],
+            "bin_id": item["bin_id"],
+            "plus_qty": intcomma(item["plus_qty"]),
+            "minus_qty": intcomma(item["minus_qty"]),
+            "remain_qty": intcomma(item["remain_qty"]),
+            "create_at": item["create_at"].strftime("%d/%m/%Y %H:%M") if isinstance(item["create_at"], datetime) else
+            item["create_at"],
+            "create_by__username": item["create_by__username"]
+        }
+        for item in bin_values
+    ]
 
     if not data:
         return JsonResponse({"status": "blank"}, status=200)
@@ -1063,3 +1089,281 @@ def work_order_hist_data(request):
 
 def work_order_bin_search(request):
     return render(request, 'warehouse/work_order_bin_search.html')
+
+
+def work_order_bin(request):
+    return render(request, 'warehouse/work_order_search.html')
+
+
+def upload_excel(request):
+    if request.method == "POST":
+        form = ExcelUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES["file"]
+            df_dict = pd.read_excel(excel_file, sheet_name=None)  # Đọc tất cả các sheet
+
+            for sheet_name, df in df_dict.items():
+                # Warehouse (Sheet Warehouse)
+                if sheet_name == "Warehouse":
+                    warehouse_codes = df["Warehouse Code"].unique()
+                    warehouse_dict = {w.wh_code: w for w in Warehouse.objects.filter(wh_code__in=warehouse_codes)}
+
+                    warehouses_to_update = []
+                    warehouses_to_create = []
+
+                    for _, row in df.iterrows():
+                        wh_code = row["Warehouse Code"]
+                        wh_name = to_string_or_none(row["Warehouse"])
+                        wh_plant = to_string_or_none(row["Plant"])
+                        wh_comment = to_string_or_none(row["Warehouse comment"])
+
+                        if wh_code in warehouse_dict:
+                            obj = warehouse_dict[wh_code]
+                            if obj.wh_name != wh_name or obj.wh_comment != wh_comment or obj.wh_plant != wh_plant:
+                                obj.wh_name = wh_name
+                                obj.wh_plant = wh_plant
+                                obj.wh_comment = wh_comment
+                                obj.update_at = timezone.now()
+                                obj.update_by = request.user
+                                warehouses_to_update.append(obj)
+                        else:
+                            warehouses_to_create.append(Warehouse(
+                                wh_code=wh_code,
+                                wh_name=wh_name,
+                                wh_plant=wh_plant,
+                                wh_comment=wh_comment,
+                                create_at=timezone.now(),
+                                create_by=request.user,
+                                update_at=timezone.now(),
+                                update_by=request.user
+                            ))
+
+                    # Dùng transaction để đảm bảo tính toàn vẹn
+                    with transaction.atomic():
+                        if warehouses_to_update:
+                            Warehouse.objects.bulk_update(warehouses_to_update,
+                                                          ["wh_name", "wh_comment", "wh_plant", "update_at", "update_by"])
+                        if warehouses_to_create:
+                            Warehouse.objects.bulk_create(warehouses_to_create)
+
+                # Area (Sheet Area)
+                if sheet_name == "Area":
+                    warehouse_codes = df["Warehouse Code"].unique()
+                    warehouses = {w.wh_code: w for w in Warehouse.objects.filter(wh_code__in=warehouse_codes)}
+
+                    area_ids = df["Area Id"].unique()
+                    existing_areas = {a.area_id: a for a in Area.objects.filter(area_id__in=area_ids)}
+
+                    areas_to_update = []
+                    areas_to_create = []
+
+                    for _, row in df.iterrows():
+                        area_id = row["Area Id"]
+                        area_name = to_string_or_none(row["Area Name"])
+                        warehouse_instance = warehouses.get(row["Warehouse Code"])  # Lấy warehouse từ cache
+
+                        if area_id in existing_areas:
+                            obj = existing_areas[area_id]
+                            if obj.warehouse != warehouse_instance or obj.area_name != area_name:
+                                obj.warehouse = warehouse_instance
+                                obj.area_name = area_name
+                                obj.update_at = timezone.now()
+                                obj.update_by = request.user
+                                areas_to_update.append(obj)
+                        else:
+                            areas_to_create.append(Area(
+                                area_id=area_id,
+                                warehouse=warehouse_instance,
+                                area_name=area_name,
+                                create_at=timezone.now(),
+                                create_by=request.user,
+                                update_at=timezone.now(),
+                                update_by=request.user
+                            ))
+
+                    with transaction.atomic():
+                        if areas_to_update:
+                            Area.objects.bulk_update(areas_to_update,
+                                                     ["warehouse", "area_name", "update_at", "update_by"])
+                        if areas_to_create:
+                            Area.objects.bulk_create(areas_to_create)
+
+                # Bin (Sheet Location)
+                if sheet_name == "Location":
+                    with transaction.atomic():  # 🔹 Đảm bảo tính toàn vẹn dữ liệu
+
+                        # 🔹 Tạo mapping warehouse và area để giảm số lượng truy vấn
+                        warehouse_map = {
+                            w.wh_code: w for w in Warehouse.objects.filter(wh_code__in=df["Warehouse"])
+                        }
+
+                        area_map = {
+                            a.area_id: a for a in Area.objects.filter(area_id__in=df["Area"])
+                        }
+
+                        existing_bins = {
+                            b.bin_id: b for b in Bin.objects.filter(bin_id__in=df["Bin Id"])
+                        }
+
+                        bin_instances = []  # Lưu danh sách để bulk_create
+
+                        for _, row in df.iterrows():
+                            warehouse_instance = warehouse_map.get(row["Warehouse"])
+                            if not warehouse_instance:
+                                continue  # 🔹 Bỏ qua nếu Warehouse không tồn tại
+
+                            area_instance = area_map.get(row["Area"])
+                            if not area_instance:
+                                continue  # 🔹 Bỏ qua nếu Area không tồn tại
+
+                            bin_id = row["Bin Id"]
+                            bin_name = to_string_or_none(row["Bin Name"])
+                            bin_w = to_int_or_none(row["bin_w"])
+                            bin_l = to_int_or_none(row["bin_l"])
+                            pos_x = to_int_or_none(row["pos_x"])
+                            pos_y = to_int_or_none(row["pos_y"])
+
+                            if bin_id in existing_bins:
+                                obj = existing_bins[bin_id]
+                                if obj.bin_name != bin_name or obj.area != area_instance or obj.bin_l != bin_l or \
+                                        obj.bin_w != bin_w or obj.pos_x != pos_x or obj.pos_y != pos_y:
+                                    obj.bin_name = bin_name
+                                    obj.area = area_instance
+                                    obj.bin_l = bin_l
+                                    obj.bin_w = bin_w
+                                    obj.pos_x = pos_x
+                                    obj.pos_y = pos_y
+                                    obj.update_at = timezone.now()
+                                    obj.update_by = request.user
+                                    obj.save(update_fields=["bin_name", "area", "bin_l", "bin_w", "pos_x", "pos_y",
+                                                            "update_at", "update_by"])
+                            else:
+                                bin_instances.append(Bin(
+                                    bin_id=bin_id,
+                                    bin_name=bin_name,
+                                    area=area_instance,
+                                    bin_w=bin_w,
+                                    bin_l=bin_l,
+                                    pos_x=pos_x,
+                                    pos_y=pos_y,
+                                    create_at=timezone.now(),
+                                    create_by=request.user,
+                                    update_at=timezone.now(),
+                                    update_by=request.user,
+                                ))
+
+                        if bin_instances:
+                            Bin.objects.bulk_create(bin_instances)  # 🔹 Chèn nhiều dòng một lần
+
+            return render(request, "warehouse/upload.html", {"form": form, "message": "Upload successfully!"})
+
+    else:
+        form = ExcelUploadForm()
+
+    return render(request, "warehouse/upload.html", locals())
+
+
+def to_int_or_none(value):
+    """Chuyển đổi giá trị thành int nếu không phải NaN, ngược lại trả về None"""
+    return int(value) if pd.notna(value) else None
+
+
+def to_string_or_none(value):
+    return "" if pd.isna(value) else value
+
+
+def bin_value_import(request):
+    form = ExcelUploadForm()
+
+    if request.method == "POST":
+        form = ExcelUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            excel_file = request.FILES["file"]
+            df_dict = pd.read_excel(excel_file, sheet_name=None, dtype=str)  # Đọc tất cả các sheet, ép kiểu về str
+
+            Bin_Value.objects.all().delete()
+
+            for sheet_name, df in df_dict.items():
+                if sheet_name == "Sheet1":
+                    try:
+                        # Chuẩn hóa dữ liệu về chuỗi, loại bỏ khoảng trắng
+                        df["Product Order"] = df["Product Order"].astype(str).str.strip()
+                        df["Purchase Order"] = df["Purchase Order"].astype(str).str.strip()
+                        df["Version No"] = df["Version No"].astype(str).str.strip()
+                        df["Version Seq"] = df["Version Seq"].astype(str).str.strip()
+                        df["Location"] = df["Location"].astype(str).str.strip()
+                        df["Unit"] = df["Unit"].astype(str).str.strip()
+                        df["Size"] = df["Size"].astype(str).str.strip()
+
+                        # Chuyển Qty về số nguyên, giữ 0 nếu không hợp lệ
+                        df["Qty"] = pd.to_numeric(df["Qty"], errors="coerce").fillna(0).astype(int)
+
+                        locations = list(df["Location"].dropna().unique())
+
+                        # Lấy danh sách bin_id hợp lệ từ database
+                        bin_map = {b.bin_id: b for b in Bin.objects.filter(bin_id__in=locations)}
+
+                        stock_in = StockInForm()
+                        YYYYMM = datetime.now().strftime("%Y%m")
+                        key = "STIN" + YYYYMM
+                        stock_in.form_no = key + str(get_series_number(key, "STIN")).zfill(3)
+
+                        mvt = MovementType.objects.get(mvt_code="OPEN")
+
+                        for _, row in df.iterrows():
+                            bin_id = row["Location"]
+
+                            Do_Transaction(request, stock_in.form_no, row["Product Order"], row['Purchase Order'],
+                                           row["Version No"], row["Version Seq"], row["Size"], mvt, bin_map[bin_id],
+                                           row["Qty"], row["Unit"], desc="")
+
+                        if hasattr(excel_file, 'temporary_file_path'):
+                            os.remove(excel_file.temporary_file_path())
+
+                        return render(request, "warehouse/bin/bin_value_import.html",
+                                      {"form": form, "message": "Upload successfully!"})
+                    except Exception as e:
+                        return render(request, "warehouse/bin/bin_value_import.html",
+                                      {"form": form, "error": f"Lỗi khi xử lý file: {str(e)}"})
+
+    return render(request, "warehouse/bin/bin_value_import.html", {"form": form})
+
+
+def search_bin_value(request):
+    form = BinValueSearchForm(request.GET)
+    results = []
+    warehouses = Warehouse.objects.all()
+
+    if form.is_valid():
+        bin_id = form.cleaned_data.get('bin')
+        if bin_id:
+            results = Bin_Value.objects.filter(bin__bin_id=bin_id)
+
+    return render(request, 'warehouse/bin/search_bin_value.html', {'form': form, 'results': results, 'warehouses': warehouses})
+
+
+def get_areas(request):
+    warehouse_id = request.GET.get('warehouse')
+    areas = Area.objects.filter(warehouse_id=warehouse_id).values('area_id', 'area_name')
+    return JsonResponse(list(areas), safe=False)
+
+
+def get_bins(request):
+    area_id = request.GET.get('area')
+    bins = Bin.objects.filter(area_id=area_id).values('bin_id', 'bin_name')
+    return JsonResponse(list(bins), safe=False)
+
+
+def get_bin_data(request):
+    bin_id = request.GET.get("bin")  # Lấy bin_id từ request
+    if bin_id:
+        products = Bin_Value.objects.filter(bin_id=bin_id).select_related(
+            "bin__area__warehouse"
+        ).values(
+            "bin__area__warehouse__wh_name",
+            "bin__area__warehouse__wh_plant",
+            "product_order", "purchase_no", "version_no", "version_seq", "size", "bin_id", "qty", "purchase_unit"
+        )
+        return JsonResponse(list(products), safe=False)
+    return JsonResponse([], safe=False)

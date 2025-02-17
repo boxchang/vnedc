@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-20 14:27+0700\n"
-"PO-Revision-Date: 2025-01-20 14:30+0700\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: vi_VN\n"
+"POT-Creation-Date: 2024-12-10 08:30+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.5\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: .\bases\templates\bases\attach_form.html:9
 msgid "attachment"
@@ -24,7 +24,6 @@ msgstr ""
 
 #: .\bases\templates\bases\attach_form.html:12
 #: .\bases\templates\bases\attach_form.html:23
-#: .\venv\Lib\site-packages\click\types.py:826
 msgid "file"
 msgstr ""
 
@@ -37,34 +36,44 @@ msgstr ""
 #: .\collection\templates\collection\daily_info_create.html:116
 #: .\users\forms.py:61 .\users\templates\users\info.html:17
 msgid "save"
-msgstr "lưu trữ"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:59
+#: .\bases\templates\bases\base.html:54
 #: .\collection\templates\collection\product_info_report.html:84
 #: .\collection\templates\collection\rd_report.html:491
 msgid "Key Parameter"
-msgstr "Thông số chính"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:62
+#: .\bases\templates\bases\base.html:57
 msgid "MES Tools"
 msgstr ""
 
-#: .\bases\templates\bases\base.html:65
+#: .\bases\templates\bases\base.html:60
 msgid "Warehouse倉管系統"
-msgstr "Kho"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:75
+#: .\bases\templates\bases\base.html:63
+#: .\collection\templates\collection\test.html:150
+msgid "Contact"
+msgstr ""
+
+#: .\bases\templates\bases\base.html:64
+#: .\collection\templates\collection\test.html:151
+msgid "About"
+msgstr ""
+
+#: .\bases\templates\bases\base.html:73
 #: .\collection\templates\collection\product_info_report.html:93
 #: .\collection\templates\collection\rd_report.html:500
 msgid "Personal Setting"
-msgstr "Cài đặt cá nhân"
+msgstr ""
 
-#: .\bases\templates\bases\base.html:76
+#: .\bases\templates\bases\base.html:74
 #: .\collection\templates\collection\product_info_report.html:94
 #: .\collection\templates\collection\rd_report.html:501
 #: .\collection\templates\collection\test.html:157
 msgid "Logout"
-msgstr "Đăng xuất"
+msgstr ""
 
 #: .\bases\utils.py:61
 msgid "Update Status"
@@ -74,235 +83,215 @@ msgstr ""
 #: .\collection\templates\collection\product_info_report.html:136
 #: .\collection\templates\collection\rd_report.html:543
 msgid "Start Date"
-msgstr "Ngày bắt đầu"
+msgstr ""
 
 #: .\chart\forms.py:14 .\chart\forms.py:85 .\chart\forms.py:145
 #: .\collection\templates\collection\product_info_report.html:140
 #: .\collection\templates\collection\rd_report.html:558
 msgid "End Date"
-msgstr "Ngày cuối"
+msgstr ""
 
 #: .\chart\forms.py:15 .\collection\forms.py:12
 msgid "plant"
-msgstr "Thực vật"
+msgstr ""
 
 #: .\chart\forms.py:16 .\collection\forms.py:13
 msgid "mach_name"
-msgstr "Tên may moc"
+msgstr ""
 
 #: .\chart\forms.py:17 .\chart\forms.py:87
 msgid "process_type"
-msgstr "Loại quy trình"
+msgstr ""
 
 #: .\chart\forms.py:18
 msgid "param_define"
-msgstr "Xác định tham số"
+msgstr ""
 
 #: .\chart\forms.py:19
 msgid "control_high"
-msgstr "Kiểm soát cao"
+msgstr ""
 
 #: .\chart\forms.py:20
 msgid "control_low"
-msgstr "Kiểm soát mức thấp"
+msgstr ""
 
 #: .\chart\forms.py:76 .\chart\forms.py:131 .\chart\forms.py:190
 #: .\users\templates\users\login.html:193
-#: .\warehouse\templates\warehouse\bin\create_bin.html:54
 msgid "Submit"
-msgstr "Tạo"
+msgstr ""
 
 #: .\chart\forms.py:86 .\chart\forms.py:150
 #: .\collection\templates\collection\daily_info_create.html:96
 #: .\collection\templates\collection\index.html:35
 #: .\collection\templates\collection\index2.html:31
 msgid "Product"
-msgstr "Sản xuất"
+msgstr ""
 
 #: .\chart\forms.py:88
 msgid "param_code"
-msgstr "Loại tham số"
+msgstr ""
 
 #: .\chart\templates\chart\param_value.html:260
 #: .\chart\templates\chart\param_value_product.html:244
 msgid "Record"
-msgstr "Ghi"
+msgstr ""
 
 #: .\collection\forms.py:11
 msgid "record_date"
-msgstr "Ngày ghi"
+msgstr ""
 
 #: .\collection\forms.py:53
 msgid "Chlorine Free"
-msgstr "Không chứa clo"
+msgstr ""
 
 #: .\collection\forms.py:53
 msgid "Polymer Free"
-msgstr "Không sử dụng liệu 2( cấp điện tử)"
+msgstr ""
 
 #: .\collection\forms.py:53
 msgid "Alkaline Tank pH Test"
-msgstr "Kiểm tra pH bể kiềm"
+msgstr ""
 
 #: .\collection\forms.py:53
 msgid "Machine Shutdown"
-msgstr "Tắt máy"
+msgstr ""
 
 #: .\collection\forms.py:58
 msgid "A1 Production"
-msgstr "A1 Sản xuất"
+msgstr ""
 
 #: .\collection\forms.py:59
 msgid "A1 Size"
-msgstr "A1 Kích cỡ"
+msgstr ""
 
 #: .\collection\forms.py:60
 msgid "A2 Production"
-msgstr "A2 Sản xuất"
+msgstr ""
 
 #: .\collection\forms.py:61
 msgid "A2 Size"
-msgstr "A2 Kích cỡ"
+msgstr ""
 
 #: .\collection\forms.py:62
 msgid "B1 Production"
-msgstr "B1 Sản xuất"
+msgstr ""
 
 #: .\collection\forms.py:63
 msgid "B1 Size"
-msgstr "B1 Kích cỡ"
+msgstr ""
 
 #: .\collection\forms.py:64
 msgid "B2 Production"
-msgstr "B2 Sản xuất"
+msgstr ""
 
 #: .\collection\forms.py:65
 msgid "B2 Size"
-msgstr "B2 Kích cỡ"
+msgstr ""
 
 #: .\collection\forms.py:66
 msgid "Remark"
-msgstr "Nhận xét"
+msgstr ""
 
 #: .\collection\forms.py:68
 msgid "Change Coagulant Time(Hour)"
-msgstr "Thời gian thay đổi coagulant  (Số Giờ)"
+msgstr ""
 
 #: .\collection\forms.py:69
 msgid "Change Coagulant Time(Minute)"
-msgstr "Thời gian thay đổi coagulant  (Phút)"
+msgstr ""
 
 #: .\collection\forms.py:70
 msgid "Change Latex Time(Hour)"
-msgstr "Thời gian thay đổi  Cao Su  (Số Giờ)"
+msgstr ""
 
 #: .\collection\forms.py:71
 msgid "Change Latex Time(Minute)"
-msgstr "Thời gian thay đổi  Cao Su  (Phút)"
+msgstr ""
 
 #: .\collection\forms.py:72
 msgid "Change Tooling Time(Hour)"
-msgstr "Thời gian thay đổi  khuôn tay  (Số Giờ)"
+msgstr ""
 
 #: .\collection\forms.py:73
 msgid "Change Tooling Time(Minute)"
-msgstr "Thời gian thay đổi  khuôn tay  (Phút)"
+msgstr ""
 
-#: .\collection\forms.py:74 .\collection\templates\collection\base.html:110
-#: .\collection\templates\collection\oee_report.html:161
+#: .\collection\forms.py:74 .\collection\templates\collection\base.html:109
 #: .\collection\templates\collection\product_info_report.html:108
 #: .\collection\templates\collection\rd_report.html:515
 msgid "Plant"
-msgstr "Xưởng"
+msgstr ""
 
-#: .\collection\templates\collection\base.html:125
+#: .\collection\templates\collection\base.html:124
 #: .\collection\templates\collection\daily_info_create.html:94
 #: .\collection\templates\collection\index.html:24
 #: .\collection\templates\collection\index2.html:20
-#: .\collection\templates\collection\oee_report.html:176
 #: .\collection\templates\collection\product_info_report.html:123
 #: .\collection\templates\collection\rd_report.html:530
 msgid "Machine"
-msgstr "Máy móc"
+msgstr ""
 
-#: .\collection\templates\collection\base.html:138
-#: .\collection\templates\collection\oee_report.html:189
+#: .\collection\templates\collection\base.html:137
 msgid "Record Date"
-msgstr "Ngày ghi"
+msgstr ""
 
-#: .\collection\templates\collection\base.html:144
-#: .\collection\templates\collection\base.html:147
-#: .\collection\templates\collection\base.html:150
+#: .\collection\templates\collection\base.html:143
+#: .\collection\templates\collection\base.html:146
+#: .\collection\templates\collection\base.html:149
 #: .\collection\templates\collection\product_info_report.html:146
 #: .\collection\templates\collection\product_info_report.html:149
 msgid "Chart"
-msgstr "Đồ thị"
+msgstr ""
 
-#: .\collection\templates\collection\base.html:153
-#: .\collection\templates\collection\base.html:156
-#: .\collection\templates\collection\base.html:159
+#: .\collection\templates\collection\base.html:152
+#: .\collection\templates\collection\base.html:155
 #: .\collection\templates\collection\product_info_report.html:152
 #: .\collection\templates\collection\product_info_report.html:155
-#, fuzzy
-#| msgid "export"
 msgid "Report"
-msgstr "xuất khẩu"
+msgstr ""
 
-#: .\collection\templates\collection\base.html:177
+#: .\collection\templates\collection\base.html:173
 #: .\collection\templates\collection\product_info_report.html:200
 msgid "Production Data"
-msgstr "Dữ liệu sản xuất"
+msgstr ""
 
 #: .\collection\templates\collection\daily_info_create.html:95
 #: .\collection\templates\collection\index.html:34
 #: .\collection\templates\collection\index2.html:30
 msgid "Line"
-msgstr "Đường kẻ"
+msgstr ""
 
 #: .\collection\templates\collection\daily_info_create.html:97
 #: .\collection\templates\collection\index.html:36
-#: .\collection\templates\collection\index2.html:32 .\warehouse\forms.py:138
-#: .\warehouse\forms.py:182 .\warehouse\forms.py:259 .\warehouse\forms.py:327
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:410
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:215
-#: .\warehouse\templates\warehouse\search_bin_history.html:103
-#: .\warehouse\templates\warehouse\search_bin_history.html:140
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:58
-#: .\warehouse\templates\warehouse\work_order_search.html:83
+#: .\collection\templates\collection\index2.html:32
 msgid "Size"
-msgstr "Size"
+msgstr ""
 
 #: .\collection\templates\collection\daily_info_create.html:98
 #: .\collection\templates\collection\index.html:37
 #: .\collection\templates\collection\index2.html:33
 msgid "create_at"
-msgstr "Ngày thành lập"
+msgstr ""
 
 #: .\collection\templates\collection\daily_info_create.html:99
 #: .\venv\Lib\site-packages\django\forms\formsets.py:417
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:62
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:67
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:68
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:72
-#: .\warehouse\templates\warehouse\list_warehouse.html:65
-#: .\warehouse\templates\warehouse\list_warehouse.html:68
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:295
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:197
+#: .\warehouse\templates\warehouse\list_warehouse.html:64
+#: .\warehouse\templates\warehouse\list_warehouse.html:67
 msgid "Delete"
-msgstr "Xóa"
+msgstr ""
 
 #: .\collection\templates\collection\daily_info_create.html:109
 msgid "Are you sure?"
-msgstr "Bạn có chắc không?"
+msgstr ""
 
 #: .\collection\templates\collection\index.html:25
 msgid "Production Information"
-msgstr "Thông tin sản xuất"
+msgstr ""
 
 #: .\collection\templates\collection\index.html:26
 #: .\collection\templates\collection\index2.html:22
 msgid "Completed Rate"
-msgstr "Tỷ lệ hoàn thành"
+msgstr ""
 
 #: .\collection\templates\collection\rd_report.html:547
 msgid "Limit"
@@ -313,10 +302,9 @@ msgid "- - - - - -"
 msgstr ""
 
 #: .\collection\templates\collection\record.html:51
-#: .\warehouse\templates\warehouse\area\create_area.html:33
-#: .\warehouse\templates\warehouse\create_warehouse.html:36
+#: .\warehouse\templates\warehouse\create_warehouse.html:39
 msgid "Save"
-msgstr "Lưu"
+msgstr ""
 
 #: .\collection\templates\collection\test.html:148
 msgid "Home"
@@ -326,25 +314,17 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-#: .\collection\templates\collection\test.html:150
-msgid "Contact"
-msgstr ""
-
-#: .\collection\templates\collection\test.html:151
-msgid "About"
-msgstr ""
-
 #: .\collection\templates\collection\test.html:156 .\users\forms.py:153
 msgid "Change Password"
-msgstr "Đổi mật khẩu"
+msgstr ""
 
-#: .\collection\views.py:209 .\collection\views.py:410
+#: .\collection\views.py:208 .\collection\views.py:409
 msgid "Update Done"
-msgstr "hoàn thành cập nhật"
+msgstr ""
 
 #: .\users\admin.py:29
 msgid "Personal info"
-msgstr "Thông tin cá nhân"
+msgstr ""
 
 #: .\users\admin.py:31
 msgid "Permissions"
@@ -356,72 +336,72 @@ msgstr ""
 
 #: .\users\forms.py:45
 msgid "user_type"
-msgstr "loại người dùng"
+msgstr ""
 
 #: .\users\forms.py:47 .\users\models.py:118
 msgid "active"
-msgstr "Cho dù để kích hoạt"
+msgstr ""
 
 #: .\users\forms.py:48
 msgid "password"
-msgstr "mật khẩu"
+msgstr ""
 
 #: .\users\forms.py:48
 msgid "Please type the password"
-msgstr "Vui lòng nhập mật khẩu"
+msgstr ""
 
 #: .\users\forms.py:49 .\users\forms.py:115
 msgid "confirm_password"
-msgstr "Xác nhận mật khẩu"
+msgstr ""
 
 #: .\users\forms.py:49
 msgid "Please type the login password again"
-msgstr "Vui lòng nhập lại mật khẩu đăng nhập"
+msgstr ""
 
 #: .\users\forms.py:50 .\users\models.py:100
 #: .\users\templates\users\login.html:168
 msgid "emp_no"
-msgstr "Mã hiệu công nhân"
+msgstr ""
 
 #: .\users\forms.py:51 .\users\models.py:101
 msgid "sap_emp_no"
-msgstr "SAP Mã hiệu công nhân"
+msgstr ""
 
 #: .\users\forms.py:52
 msgid "name"
-msgstr "Tên"
+msgstr ""
 
 #: .\users\forms.py:53
 msgid "dept"
-msgstr "phòng"
+msgstr ""
 
 #: .\users\forms.py:105 .\users\forms.py:176
 msgid "The password is not same with the confirm password"
-msgstr "Mật khẩu không giống với mật khẩu xác nhận"
+msgstr ""
 
 #: .\users\forms.py:110
 msgid "login_account"
-msgstr "đăng nhập tài khoản"
+msgstr ""
 
 #: .\users\forms.py:111
 msgid "old_password"
-msgstr "Mật khẩu cũ"
+msgstr ""
 
 #: .\users\forms.py:112
 msgid "Please type the login password"
-msgstr "Vui lòng nhập mật khẩu đăng nhập"
+msgstr ""
 
 #: .\users\forms.py:113
 msgid "new_password"
-msgstr "mật khẩu mới"
+msgstr ""
 
 #: .\users\forms.py:114
 msgid "Please type the new password"
-msgstr "Vui lòng nhập mật khẩu mới"
+msgstr ""
 
 #: .\users\forms.py:116
 msgid "Please type the confirm password"
-msgstr "Vui lòng nhập mật khẩu xác nhận"
+msgstr ""
 
 #: .\users\forms.py:117
 msgid "Default Homepage"
@@ -429,11 +409,11 @@ msgstr ""
 
 #: .\users\forms.py:138
 msgid "base_information"
-msgstr "thông tin cơ sở"
+msgstr ""
 
 #: .\users\forms.py:181
 msgid "The password is not correct"
-msgstr "Mật khẩu không chính xác"
+msgstr ""
 
 #: .\users\models.py:52
 msgid "類別"
@@ -441,23 +421,23 @@ msgstr ""
 
 #: .\users\models.py:102
 msgid "username"
-msgstr "tên tài khoản"
+msgstr ""
 
 #: .\users\models.py:103
 msgid "email address"
-msgstr "địa chỉ email"
+msgstr ""
 
 #: .\users\models.py:105
 msgid "first name"
-msgstr "tên đầu tiên"
+msgstr ""
 
 #: .\users\models.py:106
 msgid "last name"
-msgstr "họ"
+msgstr ""
 
 #: .\users\models.py:108
 msgid "mobile number"
-msgstr "Số điện thoại"
+msgstr ""
 
 #: .\users\models.py:110
 msgid "Required. digits and +-() only."
@@ -495,288 +475,15 @@ msgstr ""
 
 #: .\users\templates\users\base.html:15
 msgid "Add User"
-msgstr "Thêm người dùng mới"
+msgstr ""
 
 #: .\users\templates\users\base.html:16
 msgid "User List"
-msgstr "Danh sách người dùng"
+msgstr ""
 
 #: .\users\templates\users\info.html:5
 msgid "User Information"
-msgstr "Thông tin người dùng"
-
-#: .\venv\Lib\site-packages\click\_termui_impl.py:556
-#, python-brace-format
-msgid "{editor}: Editing failed"
 msgstr ""
-
-#: .\venv\Lib\site-packages\click\_termui_impl.py:560
-#, python-brace-format
-msgid "{editor}: Editing failed: {e}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1124
-msgid "Aborted!"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1349
-#: .\venv\Lib\site-packages\click\core.py:1379
-#, python-brace-format
-msgid "(Deprecated) {text}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1396
-msgid "Options"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1422
-#, python-brace-format
-msgid "Got unexpected extra argument ({args})"
-msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\core.py:1438
-msgid "DeprecationWarning: The command {name!r} is deprecated."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1645
-#, fuzzy
-#| msgid "Comment"
-msgid "Commands"
-msgstr "Ghi chú"
-
-#: .\venv\Lib\site-packages\click\core.py:1677
-msgid "Missing command."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:1755
-msgid "No such command {name!r}."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:2313
-msgid "Value must be an iterable."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:2334
-#, python-brace-format
-msgid "Takes {nargs} values but 1 was given."
-msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\core.py:2783
-#, python-brace-format
-msgid "env var: {var}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:2813
-msgid "(dynamic)"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:2828
-#, python-brace-format
-msgid "default: {default}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\core.py:2841
-msgid "required"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\decorators.py:457
-#, python-format
-msgid "%(prog)s, version %(version)s"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\decorators.py:520
-msgid "Show the version and exit."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\decorators.py:541
-msgid "Show this message and exit."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:49
-#: .\venv\Lib\site-packages\click\exceptions.py:88
-#, python-brace-format
-msgid "Error: {message}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:80
-#, python-brace-format
-msgid "Try '{command} {option}' for help."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:129
-#, python-brace-format
-msgid "Invalid value: {message}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:131
-#, python-brace-format
-msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:187
-msgid "Missing argument"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:189
-msgid "Missing option"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:191
-#, fuzzy
-#| msgid "Key Parameter"
-msgid "Missing parameter"
-msgstr "Thông số chính"
-
-#: .\venv\Lib\site-packages\click\exceptions.py:193
-#, python-brace-format
-msgid "Missing {param_type}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:200
-#, python-brace-format
-msgid "Missing parameter: {param_name}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:220
-#, python-brace-format
-msgid "No such option: {name}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:232
-#, python-brace-format
-msgid "Did you mean {possibility}?"
-msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:270
-msgid "unknown error"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\exceptions.py:277
-msgid "Could not open file {filename!r}: {message}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\parser.py:233
-msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\parser.py:415
-msgid "Option {name!r} does not take a value."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\parser.py:476
-msgid "Option {name!r} requires an argument."
-msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\shell_completion.py:326
-msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\shell_completion.py:333
-msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\termui.py:158
-#, fuzzy
-#| msgid "User Information"
-msgid "Repeat for confirmation"
-msgstr "Thông tin người dùng"
-
-#: .\venv\Lib\site-packages\click\termui.py:174
-msgid "Error: The value you entered was invalid."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\termui.py:176
-#, python-brace-format
-msgid "Error: {e.message}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\termui.py:187
-msgid "Error: The two entered values do not match."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\termui.py:243
-msgid "Error: invalid input"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\termui.py:773
-msgid "Press any key to continue..."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:267
-#, python-brace-format
-msgid ""
-"Choose from:\n"
-"\t{choices}"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:299
-msgid "{value!r} is not {choice}."
-msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\types.py:393
-msgid "{value!r} does not match the format {format}."
-msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-
-#: .\venv\Lib\site-packages\click\types.py:415
-msgid "{value!r} is not a valid {number_type}."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:471
-#, python-brace-format
-msgid "{value} is not in the range {range}."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:612
-msgid "{value!r} is not a valid boolean."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:636
-msgid "{value!r} is not a valid UUID."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:828
-msgid "directory"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:830
-msgid "path"
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:881
-msgid "{name} {filename!r} does not exist."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:890
-msgid "{name} {filename!r} is a file."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:898
-msgid "{name} {filename!r} is a directory."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:907
-msgid "{name} {filename!r} is not readable."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:916
-msgid "{name} {filename!r} is not writable."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:925
-msgid "{name} {filename!r} is not executable."
-msgstr ""
-
-#: .\venv\Lib\site-packages\click\types.py:992
-#, python-brace-format
-msgid "{len_type} values are required, but {len_value} was given."
-msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
 
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:130
 #: .\venv\Lib\site-packages\crispy_forms\tests\test_form_helper.py:140
@@ -900,6 +607,7 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\core\validators.py:416
 #, python-format
@@ -910,6 +618,7 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\core\validators.py:435
 #: .\venv\Lib\site-packages\django\forms\fields.py:292
@@ -922,12 +631,14 @@ msgstr ""
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\core\validators.py:442
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\core\validators.py:447
 #, python-format
@@ -936,6 +647,7 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\core\validators.py:509
 #, python-format
@@ -1271,6 +983,7 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\forms\fields.py:559
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -1329,12 +1042,14 @@ msgstr ""
 msgid "Please submit at most %d form."
 msgid_plural "Please submit at most %d forms."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\forms\formsets.py:377
 #, python-format
 msgid "Please submit at least %d form."
 msgid_plural "Please submit at least %d forms."
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\forms\formsets.py:405
 #: .\venv\Lib\site-packages\django\forms\formsets.py:412
@@ -1383,7 +1098,6 @@ msgid ""
 msgstr ""
 
 #: .\venv\Lib\site-packages\django\forms\widgets.py:427
-#: .\warehouse\templates\warehouse\test.html:106
 msgid "Clear"
 msgstr ""
 
@@ -1418,6 +1132,7 @@ msgstr ""
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\template\defaultfilters.py:865
 #, python-format
@@ -1765,36 +1480,42 @@ msgstr ""
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\utils\timesince.py:10
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\utils\timesince.py:11
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\utils\timesince.py:12
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\utils\timesince.py:13
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\utils\timesince.py:14
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
+msgstr[1] ""
 
 #: .\venv\Lib\site-packages\django\views\csrf.py:110
 msgid "Forbidden"
@@ -2111,740 +1832,79 @@ msgstr ""
 msgid "%s: error: %s\n"
 msgstr ""
 
-#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1309
-#, python-format
-msgid "Attempting to connect to qpid with SASL mechanism %s"
-msgstr ""
-
-#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1314
-#, python-format
-msgid "Connected to qpid with SASL mechanism %s"
-msgstr ""
-
-#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1332
-#, python-format
-msgid "Unable to connect to qpid with SASL mechanism %s"
-msgstr ""
-
-#: .\warehouse\forms.py:133
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:59
-#: .\warehouse\templates\warehouse\work_order_search.html:84
-msgid "Bin"
-msgstr "Vị trí"
-
-#: .\warehouse\forms.py:137 .\warehouse\forms.py:250 .\warehouse\forms.py:318
-#: .\warehouse\forms.py:390
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:406
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:211
-#: .\warehouse\templates\warehouse\search_bin_history.html:99
-#: .\warehouse\templates\warehouse\search_bin_history.html:138
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:54
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:96
-#: .\warehouse\templates\warehouse\work_order_search.html:79
-msgid "Product Order"
-msgstr "Đơn hàng"
-
-#: .\warehouse\forms.py:139
-#: .\warehouse\templates\warehouse\search_bin_history.html:104
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:63
-#: .\warehouse\templates\warehouse\work_order_search.html:85
-msgid "Qty"
-msgstr "Số lượng"
-
-#: .\warehouse\forms.py:174
-msgid "Location:"
-msgstr "Vị trí"
-
-#: .\warehouse\forms.py:178
-msgid "Product Order:"
-msgstr "Đơn hàng"
-
-#: .\warehouse\forms.py:187
-msgid "From"
-msgstr "Từ ngày"
-
-#: .\warehouse\forms.py:192
-msgid "To"
-msgstr "Đến ngày"
-
-#: .\warehouse\forms.py:251 .\warehouse\forms.py:319
-msgid "Customer"
-msgstr "Tên khách hàng"
-
-#: .\warehouse\forms.py:252 .\warehouse\forms.py:320
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:408
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:213
-#: .\warehouse\templates\warehouse\search_bin_history.html:101
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:56
-#: .\warehouse\templates\warehouse\work_order_search.html:81
-msgid "Version No"
-msgstr "Bản In"
-
-#: .\warehouse\forms.py:253 .\warehouse\forms.py:321
-#: .\warehouse\templates\warehouse\search_bin_history.html:102
-msgid "Version Sequence"
-msgstr "Phiên bản"
-
-#: .\warehouse\forms.py:254 .\warehouse\forms.py:322
-msgid "Lot Number"
-msgstr "Lot"
-
-#: .\warehouse\forms.py:255 .\warehouse\forms.py:323
-msgid "Receive Type"
-msgstr "Phương thức đóng gói"
-
-#: .\warehouse\forms.py:256 .\warehouse\forms.py:324
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:416
-msgid "Packing Type"
-msgstr "Phương thức đóng gói"
-
-#: .\warehouse\forms.py:257 .\warehouse\forms.py:325 .\warehouse\forms.py:391
-#: .\warehouse\templates\warehouse\search_bin_history.html:100
-#: .\warehouse\templates\warehouse\search_bin_history.html:139
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:55
-msgid "Purchase Order"
-msgstr "Chứng từ mua hàng"
-
-#: .\warehouse\forms.py:258 .\warehouse\forms.py:326
-msgid "Purchase Quantity"
-msgstr "Số lượng đặt hàng"
-
-#: .\warehouse\forms.py:260 .\warehouse\forms.py:328
-#: .\warehouse\templates\warehouse\search_bin_history.html:145
-msgid "Unit"
-msgstr "Đơn vị"
-
-#: .\warehouse\forms.py:261 .\warehouse\forms.py:329
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:415
-msgid "Post Date"
-msgstr "Ngày nhận hàng"
-
-#: .\warehouse\forms.py:262 .\warehouse\forms.py:330
-msgid "Quantity"
-msgstr "Số lượng nhập thực tế"
-
-#: .\warehouse\forms.py:263 .\warehouse\forms.py:331
-#: .\warehouse\templates\warehouse\search_bin_history.html:98
-#: .\warehouse\templates\warehouse\search_bin_history.html:137
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:100
-msgid "Location"
-msgstr "Vị trí"
-
-#: .\warehouse\forms.py:265 .\warehouse\forms.py:333
-msgid "Complimentary Location"
-msgstr ""
-
-#: .\warehouse\forms.py:266 .\warehouse\forms.py:334
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:417
-msgid "Supplier"
-msgstr "Nhà cung cấp"
-
-#: .\warehouse\forms.py:267 .\warehouse\forms.py:335
-msgid "SAP Material Number"
-msgstr "Chứng từ ghi sổ"
-
-#: .\warehouse\forms.py:268 .\warehouse\forms.py:336 .\warehouse\forms.py:337
-#: .\warehouse\templates\warehouse\create_warehouse.html:25
-#: .\warehouse\templates\warehouse\edit_warehouse.html:31
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:405
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:210
-msgid "Comment"
-msgstr "Ghi chú"
-
-#: .\warehouse\forms.py:301 .\warehouse\forms.py:373
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:34
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:33
-#: .\warehouse\templates\warehouse\list_warehouse.html:35
-msgid "Add"
-msgstr "Thêm"
-
-#: .\warehouse\forms.py:332
-msgid "Complimentary Quantity"
-msgstr ""
-
-#: .\warehouse\forms.py:369
-#: .\warehouse\templates\warehouse\search_bin_history.html:69
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:104
-#: .\warehouse\templates\warehouse\work_order_search.html:158
-#, fuzzy
-#| msgid "search"
-msgid "Search"
-msgstr "Hỏi thăm"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:5
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:32
-msgid "Area List By Warehouse"
-msgstr "Danh sách khu vực theo kho"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:35
-#: .\warehouse\templates\warehouse\area\edit_area.html:38
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:34
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:58
-#: .\warehouse\templates\warehouse\edit_warehouse.html:43
-msgid "Back to List"
-msgstr "Trở về danh sách"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:43
-#: .\warehouse\templates\warehouse\area\create_area.html:16
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:44
-#: .\warehouse\templates\warehouse\bin\create_bin.html:25
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:28
-msgid "Area Id"
-msgstr "Mã khu vực"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:44
-#: .\warehouse\templates\warehouse\area\create_area.html:22
-#: .\warehouse\templates\warehouse\area\edit_area.html:26
-msgid "Area Name"
-msgstr "Tên khu vực"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:45
-#: .\warehouse\templates\warehouse\area\create_area.html:28
-#: .\warehouse\templates\warehouse\area\edit_area.html:32
-#: .\warehouse\templates\warehouse\edit_warehouse.html:14
-#: .\warehouse\templates\warehouse\list_warehouse.html:43
-msgid "Warehouse Id"
-msgstr "Mã Kho"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:59
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:66
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:65
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:71
-#: .\warehouse\templates\warehouse\list_warehouse.html:64
-#: .\warehouse\templates\warehouse\list_warehouse.html:67
-msgid "Edit"
-msgstr "Sửa"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:76
-#, fuzzy
-#| msgid "No warehouses found."
-msgid "No area found."
-msgstr "Mã Kho"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:87
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:91
-#: .\warehouse\templates\warehouse\list_warehouse.html:87
-msgid "Confirm Delete"
-msgstr "Xác nhận xoá"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:91
-msgid "Are you sure you want to delete the area"
-msgstr "Bạn chắc chắn muốn xoá kho"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:96
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:100
-#: .\warehouse\templates\warehouse\list_warehouse.html:96
-msgid "Yes, Delete"
-msgstr "Có, xoá nó"
-
-#: .\warehouse\templates\warehouse\area\area_by_warehouse.html:98
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:102
-#: .\warehouse\templates\warehouse\list_warehouse.html:98
-#: .\warehouse\templates\warehouse\test.html:105
-msgid "Cancel"
-msgstr "Huỷ bỏ"
-
-#: .\warehouse\templates\warehouse\area\create_area.html:5
-#, fuzzy
-#| msgid "Create Warehouse"
-msgid "reate Warehouse"
-msgstr "Thêm mới Kho"
-
-#: .\warehouse\templates\warehouse\area\create_area.html:14
-msgid "Create Area"
-msgstr "Thêm mới khu vực"
-
-#: .\warehouse\templates\warehouse\area\edit_area.html:5
-#: .\warehouse\templates\warehouse\area\edit_area.html:13
-#, fuzzy
-#| msgid "Edit"
-msgid "Edit Area"
-msgstr "Sửa"
-
-#: .\warehouse\templates\warehouse\area\edit_area.html:37
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:57
-#: .\warehouse\templates\warehouse\edit_warehouse.html:42
-msgid "Save Changes"
-msgstr "Lưu thay đổi"
-
-#: .\warehouse\templates\warehouse\bases\base.html:26
-msgid "Transaction Function"
-msgstr "Giao dịch"
-
-#: .\warehouse\templates\warehouse\bases\base.html:29
-msgid "Packing Material Stock In"
-msgstr "Nhập hàng"
-
-#: .\warehouse\templates\warehouse\bases\base.html:30
-msgid "Packing Material Stock Out"
-msgstr "Xuất hàng"
-
-#: .\warehouse\templates\warehouse\bases\base.html:32
-msgid "Quantity Transfer & Adjust Form"
-msgstr "Chuyển hàng & Điều chỉnh tồn kho"
-
-#: .\warehouse\templates\warehouse\bases\base.html:37
-msgid "Search Function"
-msgstr "Tìm kiếm"
-
-#: .\warehouse\templates\warehouse\bases\base.html:40
-msgid "Inventory Search"
-msgstr "Hàng tồn kho"
-
-#: .\warehouse\templates\warehouse\bases\base.html:41
-msgid "Transaction History"
-msgstr "Lịch sử chuyển hàng"
-
-#: .\warehouse\templates\warehouse\bases\base.html:46
-msgid "Basic Data"
-msgstr "Cơ sở dữ liệu"
-
-#: .\warehouse\templates\warehouse\bases\base.html:49
-msgid "Storage Setting"
-msgstr "Thiết lập lưu trữ"
-
-#: .\warehouse\templates\warehouse\bin\bin_adjust.html:5
-msgid "Quantity Adjust"
-msgstr ""
-
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:5
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:31
-msgid "Bin List By Area"
-msgstr "Danh sách Bin theo khu vực"
-
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:42
-#: .\warehouse\templates\warehouse\bin\create_bin.html:14
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:15
-msgid "Bin Id"
-msgstr "Mã Bin"
-
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:43
-#: .\warehouse\templates\warehouse\bin\create_bin.html:19
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:22
-msgid "Bin Name"
-msgstr "Tên Bin"
-
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:80
-msgid "No bins found."
-msgstr "Không tìm thấy bất kỳ Bin nào"
-
-#: .\warehouse\templates\warehouse\bin\bin_by_area.html:95
-msgid "Are you sure you want to delete the bin "
-msgstr "Bạn chắc chắn muốn xoá Bin"
-
-#: .\warehouse\templates\warehouse\bin\bin_transfer.html:5
-#, fuzzy
-#| msgid "Bin Name"
-msgid "Location Transfer"
-msgstr "Tên Bin"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:5
 #: .\warehouse\templates\warehouse\create_warehouse.html:5
-#: .\warehouse\templates\warehouse\create_warehouse.html:12
-msgid "Create Warehouse"
-msgstr "Thêm mới Kho"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:12
-msgid "Create Bin"
-msgstr "Tạo Bin mới"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:31
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:34
-msgid "Position X"
-msgstr "Vị trí X"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:37
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:40
-msgid "Position Y"
-msgstr "Vị trí Y"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:43
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:46
-msgid "Bin Width"
-msgstr "Chiều rộng Bin"
-
-#: .\warehouse\templates\warehouse\bin\create_bin.html:49
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:52
-msgid "Bin Length"
-msgstr "Chiều cao Bin"
-
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:5
-#: .\warehouse\templates\warehouse\bin\edit_bin.html:13
-msgid "Edit Bin"
-msgstr "Cập nhật Bin"
-
 #: .\warehouse\templates\warehouse\create_warehouse.html:14
-msgid "Warehouse Code"
-msgstr "Mã Kho"
-
-#: .\warehouse\templates\warehouse\create_warehouse.html:19
-#: .\warehouse\templates\warehouse\edit_warehouse.html:25
-#: .\warehouse\templates\warehouse\list_warehouse.html:44
-msgid "Warehouse Name"
-msgstr "Tên Kho"
-
-#: .\warehouse\templates\warehouse\create_warehouse.html:31
-#: .\warehouse\templates\warehouse\edit_warehouse.html:37
-msgid "Background Image"
-msgstr "Hình ảnh"
-
-#: .\warehouse\templates\warehouse\dashboard.html:5
-msgid "Dashboard"
+msgid "Create Warehouse"
 msgstr ""
 
-#: .\warehouse\templates\warehouse\dashboard.html:10
-msgid "Warehouse Dashboard"
-msgstr "Bảng điều khiển nhà kho"
+#: .\warehouse\templates\warehouse\create_warehouse.html:16
+msgid "Warehouse Code"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:22
+#: .\warehouse\templates\warehouse\edit_warehouse.html:38
+#: .\warehouse\templates\warehouse\list_warehouse.html:43
+msgid "Warehouse Name"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:28
+#: .\warehouse\templates\warehouse\edit_warehouse.html:44
+msgid "Comment"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\create_warehouse.html:34
+#: .\warehouse\templates\warehouse\edit_warehouse.html:50
+msgid "Background Image"
+msgstr ""
 
 #: .\warehouse\templates\warehouse\edit_warehouse.html:5
-#: .\warehouse\templates\warehouse\edit_warehouse.html:12
+#: .\warehouse\templates\warehouse\edit_warehouse.html:25
 msgid "Edit Warehouse"
-msgstr "Thêm mới Kho"
+msgstr ""
 
-#: .\warehouse\templates\warehouse\index.html:75
-#: .\warehouse\templates\warehouse\list_warehouse.html:76
-msgid "No warehouses found."
-msgstr "Mã Kho"
+#: .\warehouse\templates\warehouse\edit_warehouse.html:27
+#: .\warehouse\templates\warehouse\list_warehouse.html:42
+msgid "Warehouse Id"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\edit_warehouse.html:55
+msgid "Save Changes"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\edit_warehouse.html:61
+msgid "Back to List"
+msgstr ""
 
 #: .\warehouse\templates\warehouse\list_warehouse.html:5
-#: .\warehouse\templates\warehouse\list_warehouse.html:34
+#: .\warehouse\templates\warehouse\list_warehouse.html:33
 msgid "Warehouse List"
-msgstr "Danh sách Kho"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:34
+msgid "Add"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:63
+#: .\warehouse\templates\warehouse\list_warehouse.html:66
+msgid "Edit"
+msgstr ""
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:75
+msgid "No warehouses found."
+msgstr ""
+
+#: .\warehouse\templates\warehouse\list_warehouse.html:87
+msgid "Confirm Delete"
+msgstr ""
 
 #: .\warehouse\templates\warehouse\list_warehouse.html:91
 msgid "Are you sure you want to delete the warehouse"
-msgstr "Bạn chắc chắn muốn xoá kho"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:5
-msgid "Stock In"
 msgstr ""
 
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:169
-msgid "New item added successfully!"
-msgstr "Sao chép và chèn bên dưới hàng này Thành công!"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:242
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:176
-#: .\warehouse\templates\warehouse\search_bin_history.html:122
-#: .\warehouse\templates\warehouse\search_bin_history.html:169
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:48
-#: .\warehouse\templates\warehouse\work_order_search.html:72
-msgid "Not found"
-msgstr "Không có dữ liệu"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:260
-msgid "Copy"
-msgstr "Sao chép"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:282
-msgid "Copy and insert below this row Success!"
-msgstr "Sao chép và chèn bên dưới hàng này Thành công!"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:306
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:208
-msgid "Order Qty"
-msgstr "Số lượng nhập thực tế"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:311
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:209
-msgid "Order Bin"
-msgstr "Vị trí"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:407
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:212
-#: .\warehouse\templates\warehouse\work_order_search.html:80
-msgid "Purchase No"
-msgstr "Chứng từ mua hàng"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:409
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:214
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:57
-#: .\warehouse\templates\warehouse\work_order_search.html:82
-msgid "Version Seq"
-msgstr "Phiên bản"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:411
-msgid "Lot No"
-msgstr "Lot"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:412
-msgid "Purchase Qty"
-msgstr "Số lượng đặt hàng"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:413
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:216
-msgid "Purchase Unit"
-msgstr "Đơn vị"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:414
-msgid "Item Type"
-msgstr "Loại hàng"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:418
-msgid "Customer No"
-msgstr "Tên khách hàng"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:419
-msgid "Mtr No"
-msgstr "Chứng từ ghi sổ"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:466
-msgid "No data in the table! Please enter at least one row."
-msgstr "Không có dữ liệu trong bảng! Vui lòng nhập ít nhất một hàng."
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:474
-msgid "\"The 'location' field in row \" + (i + 1) + \" cannot be empty!\""
-msgstr "\"Trường 'vị trí' ở dòng thứ \" + (i + 1) + \" không được để trống!\""
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:497
-msgid "Form submitted successfully!"
-msgstr "Đã gửi biểu mẫu thành công!"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:501
-msgid "Form submission failed!"
-msgstr "Không thể gửi biểu mẫu!"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:517
-msgid "Warehouse Receiving Form"
-msgstr "Biểu mẫu tiếp nhận hàng vào kho"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:523
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:319
-msgid "Choose Location"
+#: .\warehouse\templates\warehouse\list_warehouse.html:96
+msgid "Yes, Delete"
 msgstr ""
 
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:528
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:554
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:324
-msgid "Close"
-msgstr "Đóng"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_in.html:559
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:355
-msgid "Post"
-msgstr "Gửi"
-
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:5
-msgid "Stock Out"
+#: .\warehouse\templates\warehouse\list_warehouse.html:98
+msgid "Cancel"
 msgstr ""
-
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:207
-msgid "ID"
-msgstr ""
-
-#: .\warehouse\templates\warehouse\packing_material_stock_out.html:313
-msgid "Warehouse Outgoing Form"
-msgstr "Biểu mẫu hàng xuất kho"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:91
-msgid "Current Inventory"
-msgstr "Hàng tồn kho hiện tại"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:131
-msgid "History"
-msgstr "Lịch sử bản ghi"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:143
-msgid "Remain Qty"
-msgstr "Số lượng còn lại"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:144
-#, fuzzy
-#| msgid "Location"
-msgid "Action"
-msgstr "Vị trí"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:146
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:64
-msgid "Create at"
-msgstr "Ngày tạo"
-
-#: .\warehouse\templates\warehouse\search_bin_history.html:147
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:65
-msgid "Create by"
-msgstr "Tạo bởi"
-
-#: .\warehouse\templates\warehouse\stockin_detail.html:5
-#: .\warehouse\templates\warehouse\stockout_detail.html:5
-msgid "Stock In Detail"
-msgstr ""
-
-#: .\warehouse\templates\warehouse\test.html:104
-msgid "Confirm"
-msgstr "Vận chuyển"
-
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:5
-msgid "Transaction"
-msgstr ""
-
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:60
-msgid "Mvt"
-msgstr "Trạng thái"
-
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:93
-msgid "Search Product Order & Location"
-msgstr "Tìm kiếm theo đơn hàng & vị trí"
-
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:97
-msgid "Enter Product Order"
-msgstr "Mã Đơn hàng"
-
-#: .\warehouse\templates\warehouse\work_order_bin_search.html:101
-msgid "Enter Location"
-msgstr "Mã Bin"
-
-#: .\warehouse\templates\warehouse\work_order_search.html:5
-msgid "Search Product Order"
-msgstr ""
-
-#: .\warehouse\templates\warehouse\work_order_search.html:78
-msgid "Warehouse"
-msgstr "Kho"
-
-#: .\warehouse\templates\warehouse\work_order_search.html:89
-msgid "Transfer"
-msgstr "Chuyển hàng"
-
-#: .\warehouse\templates\warehouse\work_order_search.html:112
-msgid "Adjust"
-msgstr "Điều chỉnh"
-
-#: .\warehouse\templates\warehouse\work_order_search.html:156
-msgid "Search By Work Order"
-msgstr "Tìm kiếm theo đơn hàng"
-
-#: .\warehouse\templates\warehouse\work_order_search.html:157
-msgid "Work Order Id"
-msgstr "Mã Đơn hàng"
-
-#, fuzzy
-#~| msgid "Version No"
-#~ msgid "Version No."
-#~ msgstr "Bản In"
-
-#, fuzzy
-#~| msgid "Version Seq"
-#~ msgid "Version Seq."
-#~ msgstr "Phiên bản"
-
-#~ msgid "Type"
-#~ msgstr "Phương thức đóng gói"
-
-#~ msgid "New Qty"
-#~ msgstr "Số lượng mới"
-
-#, fuzzy
-#~| msgid "Purchase No"
-#~ msgid "Purchase"
-#~ msgstr "Chứng từ mua hàng"
-
-#, fuzzy
-#~| msgid "Product Order"
-#~ msgid "Enter Work Order"
-#~ msgstr "Đơn hàng"
-
-#, fuzzy
-#~| msgid "Edit Bin"
-#~ msgid "Enter Bin"
-#~ msgstr "Cập nhật Bin"
-
-#~ msgid "PO:"
-#~ msgstr "Chứng từ mua hàng"
-
-#~ msgid "Finished Product WH"
-#~ msgstr "Kho thành phẩm"
-
-#~ msgid "Semi-finished Product WH"
-#~ msgstr "Kho bán thành phẩm"
-
-#~ msgid "Temokura"
-#~ msgstr "Kho khuôn tay"
-
-#~ msgid "logout"
-#~ msgstr "Đăng xuất"
-
-#~ msgid "Project Management System"
-#~ msgstr "Hệ thống quản lý dự án"
-
-#~ msgid "Asset Management System"
-#~ msgstr "Hệ thống quản lý tài sản"
-
-#~ msgid "IT Equipment Borrow Application"
-#~ msgstr "Ứng dụng mượn thiết bị CNTT"
-
-#~ msgid "General Supply Application"
-#~ msgstr "Ứng dụng cung cấp chung"
-
-#~ msgid "Authority Management"
-#~ msgstr "Quản lý cơ quan"
-
-#~ msgid "login"
-#~ msgstr "đăng nhập"
-
-#~ msgid "prod_order"
-#~ msgstr "trình tự công việc"
-
-#~ msgid "worked_labor_time"
-#~ msgstr "Số giờ làm việc tích lũy"
-
-#~ msgid "item_no"
-#~ msgstr "Phần Không"
-
-#~ msgid "spec"
-#~ msgstr "mô tả vật liệu"
-
-#~ msgid "confirm_code"
-#~ msgstr "mã xác nhận"
-
-#~ msgid "step_code"
-#~ msgstr "mã trang web"
-
-#~ msgid "step_name"
-#~ msgstr "Tên trang web"
-
-#~ msgid "labor_time"
-#~ msgstr "giờ làm việc"
-
-#~ msgid "mach_time"
-#~ msgstr "giờ máy"
-
-#~ msgid "good_qty"
-#~ msgstr "Sản phẩm tốt"
-
-#~ msgid "ng_qty"
-#~ msgstr "sản phẩm xấu"
-
-#~ msgid "SAP employee number is not correct or no data"
-#~ msgstr "Mã số nhân viên SAP không chính xác hoặc không có dữ liệu"
-
-#~ msgid "The first step has been not finished yet"
-#~ msgstr "Bước đầu tiên vẫn chưa kết thúc"
-
-#~ msgid "There is no this confirmation code information."
-#~ msgstr "Không có thông tin mã xác nhận này"
-
-#~ msgid "Please select the working machine."
-#~ msgstr "vui lòng chọn máy làm việc"
-
-#~ msgid "The operation quantity cannot over the production order quantity."
-#~ msgstr "Số lượng hoạt động không thể vượt quá số lượng đặt hàng sản xuất."
-
-#, python-format, python-brace-format
-#~ msgid ""
-#~ "Remind that total recorded time {labor_time} already over 10%% of the "
-#~ "standard time({standard_time})."
-#~ msgstr ""
-#~ "Nhắc rằng tổng thời gian ghi lại {labor_time} đã vượt quá 10%% so với "
-#~ "thời gian tiêu chuẩn({standard_time})."
-
-#~ msgid "This record is existed"
-#~ msgstr "dữ liệu đã tồn tại"
-
-#~ msgid "New"
-#~ msgstr "Thêm vào"
-
-#~ msgid "total_labor_time"
-#~ msgstr "tổng thời gian làm việc"
-
-#~ msgid "remain_labor_time"
-#~ msgstr "thời gian chưa hoàn thành"

@@ -1,0 +1,57 @@
+{% extends 'warehouse/bases/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Warehouse List" %} {% endblock %}
+{% block js %}
+
+<style>
+    .alert-align{
+        width: 15%;
+    }
+
+    .col-md-2{
+        padding-left: 0px;
+        margin-top: 32px;
+        height: 51%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+        <div class="alert-align d-flex justify-content-start">
+        {% if message %}
+            <div id="alert-message" class="alert alert-success fade show position-absolute top-0 start-50 translate-middle-x mt-1 ml-1" role="alert">
+            {{ message }}
+            </div>
+
+            <script>
+                setTimeout(function() {
+                    var alert = document.getElementById("alert-message");
+                    if (alert) {
+                        alert.classList.remove("show");
+                        setTimeout(() => alert.remove(), 500);  // Xóa khỏi DOM sau khi ẩn
+                    }
+                }, 3000);
+
+                sessionStorage.removeItem('message');
+            </script>
+
+        {% endif %}
+        </div>
+
+
+        <h2 class="col p-3" style="font-size: 1.5em;text-align: center;">Upload File Excel</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6">
+                    {% crispy form %}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success">Upload</button>
+                </div>
+            </div>
+        </form>
+
+
+{% endblock %}

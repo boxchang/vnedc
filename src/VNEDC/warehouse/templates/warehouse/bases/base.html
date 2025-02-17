@@ -11,7 +11,9 @@
     .custom-edit{
 
     }
+
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 {% endblock %}
 
@@ -29,7 +31,7 @@
                         <li><a class="dropdown-item" href="{% url 'packing_material_stock_in' %}">{% trans "Packing Material Stock In" %}</a></li>
                         <li><a class="dropdown-item" href="{% url 'packing_material_stock_out' %}">{% trans "Packing Material Stock Out" %}</a></li>
                         <hr />
-                        <li><a class="dropdown-item" href="{% url 'work_order_page' %}">{% trans "Quantity Transfer And Adjust" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'work_order_page' %}">{% trans "Quantity Transfer & Adjust Form" %}</a></li>
                     </ul>
                 </div>
                 <div class="btn-group">
@@ -39,6 +41,7 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'bin_search' %}">{% trans "Inventory Search" %}</a></li>
                         <li><a class="dropdown-item" href="{% url 'work_order_bin_search' %}">{% trans "Transaction History" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'search_bin_value' %}">{% trans "Bin Value Search" %}</a></li>
                     </ul>
                 </div>
                 <div class="btn-group">
@@ -47,6 +50,8 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">{% trans "Storage Setting" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'upload_excel' %}">{% trans "Input Data" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'bin_value_import' %}">{% trans "Input Bin Value Data" %}</a></li>
                     </ul>
                 </div>
             </div>

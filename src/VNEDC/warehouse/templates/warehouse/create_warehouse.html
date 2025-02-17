@@ -20,6 +20,11 @@
                         {{ form.wh_name }}
                         <div class="text-danger">{{ form.wh_name.errors }}</div>
                     </div>
+                    <div class="mb-3">
+                        <label for="wh_plant" class="form-label">{% trans "Plant" %}</label>
+                        {{ form.wh_plant }}
+                        <div class="text-danger">{{ form.wh_plant.errors }}</div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="wh_comment" class="form-label">{% trans "Comment" %}</label>

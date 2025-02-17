@@ -115,23 +115,23 @@
         });
 
         function add_item() {
-            const order_qty =$("#id_order_qty").val()
-            const order_bin =$("#id_order_bin").val()
-            const desc =$("#id_desc").val()
-            const product_order =$("#id_product_order").val()
-            const version_no =$("#id_version_no").val()
-            const lot_no =$("#id_lot_no").val()
-            const item_type =$("#id_item_type").val()
-            const packing_type =$("#id_packing_type").val()
-            const purchase_no =$("#id_purchase_no").val()
-            const purchase_qty =$("#id_purchase_qty").val()
-            const size =$("#id_size").val()
-            const purchase_unit =$("#id_purchase_unit").val()
-            const post_date =$("#id_post_date").val()
-            const supplier =$("#id_supplier").val()
-            const sap_mtr_no =$("#id_sap_mtr_no").val()
-            const customer_no =$("#id_customer_no").val()
-            const version_seq = $("#id_version_seq").val()
+            const order_qty =$("#id_order_qty").val();
+            const order_bin =$("#id_order_bin").val();
+            const desc =$("#id_desc").val();
+            const product_order =$("#id_product_order").val();
+            const version_no =$("#id_version_no").val();
+            const lot_no =$("#id_lot_no").val();
+            const item_type =$("#id_item_type").val();
+            const packing_type =$("#id_packing_type").val();
+            const purchase_no =$("#id_purchase_no").val();
+            const purchase_qty =$("#id_purchase_qty").val();
+            const size =$("#id_size").val();
+            const purchase_unit =$("#id_purchase_unit").val();
+            const post_date =$("#id_post_date").val();
+            const supplier =$("#id_supplier").val();
+            const sap_mtr_no =$("#id_sap_mtr_no").val();
+            const customer_no =$("#id_customer_no").val();
+            const version_seq = $("#id_version_seq").val();
 
             const newItem = {
                 order_qty: order_qty,
@@ -166,7 +166,7 @@
                 scrollTop: $(document).height()
             }, 1000);
 
-            alert("New item added successfully!");
+            alert("{% trans "New item added successfully!" %}");
         }
 
 
@@ -195,7 +195,7 @@
                     console.error("資料加載失敗：", error);
                 }
             });
-        }
+        };
 
 
         $("#id_purchase_no").on("change", function() {
@@ -225,7 +225,7 @@
                     console.error("資料加載失敗：", error);
                 }
             });
-        }
+        };
 
 
         data: [], // 初始為空，將透過 AJAX 加載資料
@@ -239,7 +239,7 @@
             editing: true,    // 啟用編輯功能
             sorting: true,    // 啟用排序功能
             paging: true,     // 啟用分頁功能
-
+            noDataContent: "{% trans "Not found" %}",
 
 
             rowClick: function (args) {
@@ -253,7 +253,6 @@
                     name: "copy", // 自定義控制欄欄位名稱
                     title: "", // 欄位標題
                     align: "center", // 置中對齊
-                    width: 80, // 欄位寬度
                     itemTemplate: function (_, item) {
                         // 自定義「複製」按鈕
                         const $copyButton = $("<button>")
@@ -279,7 +278,7 @@
                                 // 重新載入數據
                                 $("#jsGrid").jsGrid("option", "data", gridData);
 
-                                alert("複製並插入到該行下方成功！");
+                                alert("{% trans "Copy and insert below this row Success!" %}");
                             });
 
                         return $copyButton;
@@ -292,7 +291,7 @@
                         // 建立刪除按鈕
                         var deleteButton = $("<button>")
                             .addClass("btn btn-danger btn-sm") // Bootstrap 樣式（可選）
-                            .text("Delete")
+                            .text("{% trans "Delete" %}")
                             .on("click", function(e) {
                                 e.stopPropagation(); // 防止觸發行點擊事件
                                 $("#jsGrid").jsGrid("deleteItem", item);
@@ -303,12 +302,13 @@
                     }
                 },
                 { name: "id", type: "number", width: 50, title: "ID", align: "center", readOnly: true, visible: false },
-                { name: "order_qty", type: "text", width: 100, title: "Order Qty", align: "right" },
+                { name: "order_qty", type: "text", width: 125, title: "{% trans "Order Qty" %}", align: "center" },
                 {
                     name: "order_bin",
                     type: "text",
-                    width: 180,
-                    title: "Order Bin",
+                    width: 170,
+                    align: "center",
+                    title: "{% trans "Order Bin" %}",
                     itemTemplate: function (value) {
                         return value; // Hiển thị nội dung
                     },
@@ -318,7 +318,7 @@
 
                         const $input = $("<input>").val(value).addClass("form-control input-custom").css({
                                             "padding-right": "1px"
-                                       })
+                                       });
 
                         var $button = $("<button>")
                                        .addClass("btn btn-primary")
@@ -326,7 +326,7 @@
                                            width: "auto",
                                            height: "40px",
                                            marginLeft: "20px"
-                                       })
+                                       });
 
 
                         var $container = $("<div>").css({
@@ -402,21 +402,21 @@
                     }
                 },
 
-                { name: "desc", type: "text", width: 200, title: "Comment", align: "center", editing: true },
-                { name: "product_order", type: "text", width: 100, title: "Product Order", validate: "required", editing: false },
-                { name: "purchase_no", type: "text", width: 130, title: "Purchase No", validate: "required", editing: false },
-                { name: "version_no", type: "text", width: 120, title: "Version No", validate: "required", align: "center", editing: false },
-                { name: "version_seq", type: "number", width: 70, title: "Version Seq", validate: "required", editing: false },
-                { name: "size", type: "text", width: 50, title: "Size", validate: "required", editing: false },
-                { name: "lot_no", type: "text", width: 130, title: "Lot No", editing: false },
-                { name: "purchase_qty", type: "text", width: 100, title: "Purchase Qty", editing: false },
-                { name: "purchase_unit", type: "text", width: 100, title: "Purchase Unit", editing: false },
-                { name: "item_type", type: "text", width: 120, title: "Item Type", editing: false },
-                { name: "post_date", type: "text", width: 100, title: "Post Date", editing: false },
-                { name: "packing_type", type: "text", width: 100, title: "Packing Type", editing: false },
-                { name: "supplier", type: "text", width: 100, title: "Supplier", editing: false },
-                { name: "customer_no", type: "text", width: 100, title: "Customer No", editing: false },
-                { name: "sap_mtr_no", type: "text", width: 100, title: "Mtr No", editing: false },
+                { name: "desc", type: "text", width: 225, title: "{% trans "Comment" %}", align: "center", editing: true },
+                { name: "product_order", type: "text", width: 135, title: "{% trans "Product Order" %}", align: "center", validate: "required", editing: false },
+                { name: "purchase_no", type: "text", width: 125, title: "{% trans "Purchase No" %}", align: "center", validate: "required", editing: false },
+                { name: "version_no", type: "text", width: 120, title: "{% trans "Version No" %}", validate: "required", align: "center", editing: false },
+                { name: "version_seq", type: "number", width: 120, title: "{% trans "Version Seq" %}", align: "center", validate: "required", editing: false },
+                { name: "size", type: "text", width: 50, title: "{% trans "Size" %}", align: "center", validate: "required", editing: false },
+                { name: "lot_no", type: "text", width: 130, title: "{% trans "Lot No" %}", align: "center", editing: false },
+                { name: "purchase_qty", type: "text", width: 120, title: "{% trans "Purchase Qty" %}", align: "center", editing: false },
+                { name: "purchase_unit", type: "text", width: 130, title: "{% trans "Purchase Unit" %}", align: "center", editing: false },
+                { name: "item_type", type: "text", width: 120, title: "{% trans "Item Type" %}", align: "center", editing: false },
+                { name: "post_date", type: "text", width: 150, title: "{% trans "Post Date" %}", align: "center", editing: false },
+                { name: "packing_type", type: "text", width: 150, title: "{% trans "Packing Type" %}", align: "center", editing: false },
+                { name: "supplier", type: "text", width: 120, title: "{% trans "Supplier" %}", align: "center", editing: false },
+                { name: "customer_no", type: "text", width: 120, title: "{% trans "Customer No" %}", align: "center", editing: false },
+                { name: "sap_mtr_no", type: "text", width: 120, title: "{% trans "Mtr No" %}", align: "center", editing: false },
             ]
         });
 
@@ -463,14 +463,15 @@
             var gridData = $("#jsGrid").data("JSGrid").data;
 
             if (!gridData || gridData.length === 0) {
-                alert("No data in the table! Please enter at least one row.");
+                alert("{% trans "No data in the table! Please enter at least one row." %}");
                 return; // Dừng xử lý nếu không có dữ liệu
             }
 
             // 檢查 order_qty 是否都有值
             for (var i = 0; i < gridData.length; i++) {
                 if (!gridData[i].order_bin || gridData[i].order_bin.trim() === "") {
-                    alert("第 " + (i + 1) + " 行的 'order_bin' 欄位不可為空！");
+                    {#alert({% blocktrans %}"第 " + (i + 1) + " 行的 'order_bin' 欄位不可為空！"{% endblocktrans %});#}
+                    alert({% blocktrans %}"The 'location' field in row " + (i + 1) + " cannot be empty!"{% endblocktrans %});
                     return; // 阻止繼續執行
                 }
             }
@@ -493,17 +494,19 @@
                     $("#jsGrid").jsGrid("refresh");
 
 
-                    alert("Success！");
+                    alert("{% trans "Form submitted successfully!" %}");
                     console.log(response);
                 },
                 error: function(xhr, status, error) {
-                    alert("Fail！");
+                    alert("{% trans "Form submission failed!" %}");
                     console.log(error);
                 }
             });
         });
 
     });
+
+
 
 </script>
 {% endblock %}
@@ -513,7 +516,7 @@
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row">
-            <div class="col p-3" style="font-size: 1.5em;text-align: center;">{% trans "Packing Material Stock In" %}</div>
+            <div class="col p-3" style="font-size: 1.5em;text-align: center;">{% trans "Warehouse Receiving Form" %}</div>
         </div>
     <form id="myForm">
         {% crispy form %}
@@ -527,32 +530,66 @@
             <button id="closePicker">{% trans "Close" %}</button>
         </div>
 
+
+{#<!-- Đưa col-2 vào trong popupContent -->#}
+{#                <div class="col-2" id="dropdownContainer">#}
+{#                    <select id="warehouseDropdown" class="form-control">#}
+{#                        {% for wh in warehouses %}#}
+{#                            <button class="btn btn-warning wh-button" data-wh-code="{{ wh.wh_code }}" style="width: 200px">#}
+{#                                {{ wh.wh_code }}#}
+{#                            </button>#}
+{#                            <option value="{{ wh.id }}">{{ wh.wh_name }}</option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                </div>#}
           <!-- Popup -->
+
           <div id="zonePopup" style="display: none;">
-            <div id="popupOverlay"></div>
-            <div id="popupContent">
-              <img src="/media/warehouse_images/warehouse_2.jpg" id="zoneImage" alt="Zone Map" usemap="#zoneMap">
-              <map name="zoneMap">
-                <area shape="rect" coords="50,50,150,150" href="#" data-zone="Zone 1">
-                <area shape="rect" coords="200,50,300,150" href="#" data-zone="Zone 2">
-                <!-- Thêm nhiều vùng khác -->
-              </map>
-            {% for bin in bins %}
+            <div id="popupOverlay">
+            <div class="row">
 
-            <div class="zone" data-value="{{ bin.bin_id }}" style="top: {{ bin.pos_y }}px; left: {{ bin.pos_x }}px; width: {{ bin.bin_w }}px; height: {{ bin.bin_l }}px;
-                    {% if bin.has_stock %}
-                        border: 2px solid rgba(255, 0, 0, 0.7);
-                        background-color: rgba(255, 0, 0, 0.3);
-                    {% else %};
-                        border: 2px solid rgba(0, 255, 0, 0.7);
-                        background-color: rgba(0, 255, 0, 0.3);
-                    {% endif %}">{{ bin.bin_id }}</div>
 
-            {% endfor %}
-                <br>
-              <button id="closePopup">Đóng</button>
+
+                <div id="popupContent" class="col-8">
+                    <img src="/media/warehouse_images/warehouse_2.jpg" id="zoneImage" alt="Zone Map" usemap="#zoneMap">
+
+                    <div id="binData">
+                        <map name="zoneMap">
+                            <area shape="rect" coords="50,50,150,150" href="#" data-zone="Zone 1">
+                            <area shape="rect" coords="200,50,300,150" href="#" data-zone="Zone 2">
+                        </map>
+
+                        {% for bin in bins %}
+                        <div class="zone"
+                            data-value="{{ bin.bin_id }}"
+                            style="
+                                top: {{ bin.pos_y }}px;
+                                left: {{ bin.pos_x }}px;
+                                width: {{ bin.bin_w }}px;
+                                height: {{ bin.bin_l }}px;
+                                {% if bin.has_stock %}
+                                    border: 2px solid rgba(255, 0, 0, 0.7);
+                                    background-color: rgba(255, 0, 0, 0.3);
+                                {% else %}
+                                    border: 2px solid rgba(0, 255, 0, 0.7);
+                                    background-color: rgba(0, 255, 0, 0.3);
+                                {% endif %}
+                            ">
+                            {{ bin.bin_id }}
+                        </div>
+                    {% endfor %}
+
+                    </div>
+
+
+                </div>
+
+
             </div>
+
           </div>
+        </div>
+
         <hr />
         <div style="text-align: center" class="p-3">
             <button id="postDataButton" class="btn btn-info btn-lg">{% trans "Post" %}</button>
