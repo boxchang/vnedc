@@ -92,6 +92,7 @@ class ParameterDefine(models.Model):
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_update_by')
+    pda_value = models.BooleanField(default=False)
 
     def __str__(self):
         from django.utils.translation import get_language

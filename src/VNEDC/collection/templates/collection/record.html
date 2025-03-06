@@ -36,7 +36,7 @@ Electric Data Collection
                                        class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}"
                                        value="{% get_param_value define time %}"  onkeypress="validate(event)" oninput="checkValue(this, '{{ define.parameter_name }}')"
                                        onblur="checkValue(this, '{{ define.parameter_name }}')"
-                                       {% if define.auto_value %}readonly{% endif %}
+                                       {% if define.auto_value or define.pda_value %}readonly{% endif %}
                                        data-initial-value="{% get_param_value define time %}" data-alert-shown="true">
                             {% endif %}
                         </div>
