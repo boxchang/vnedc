@@ -34,9 +34,13 @@ Electric Data Collection
                                 <input type="text" name="{{ define.parameter_name }}_{{ time }}"
                                        {% if define.text_color %}style="background-color: {{ define.text_color }}"{% endif %}
                                        class="textinput textInput form-control" id="id_{{ define.parameter_name }}_{{ time }}"
-                                       value="{% get_param_value define time %}"  onkeypress="validate(event)" oninput="checkValue(this, '{{ define.parameter_name }}')"
+                                       value="{% get_param_value define time %}"
+                                        {% if define.auto_value or define.pda_value %}
+                                       readonly
+                                       {% else %}
+                                       onkeypress="validate(event)" oninput="checkValue(this, '{{ define.parameter_name }}')"
                                        onblur="checkValue(this, '{{ define.parameter_name }}')"
-                                       {% if define.auto_value or define.pda_value %}readonly{% endif %}
+                                       {% endif %}
                                        data-initial-value="{% get_param_value define time %}" data-alert-shown="true">
                             {% endif %}
                         </div>
