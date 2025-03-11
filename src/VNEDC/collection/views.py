@@ -564,7 +564,7 @@ def rd_report(request):
         result02 = db.select_sql_dict(sql_No)
         result = '/'.join(item['product'] for item in result02)
         itemNo_display = ' ,'.join(sorted(list(set([result['product'] for result in result02]))))
-        itemNo = re.findall(r'\d+', result)[0] if len(result) > 0 else 0
+        itemNo = re.findall(r'\d+', result)[-1] if len(result) > 0 else 0
 
         sql = f"""
                     SELECT pd.process_type_id, pd.parameter_name, pc.control_range_low, pc.control_range_high,
