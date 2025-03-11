@@ -2,7 +2,7 @@ from django.urls import re_path as url
 
 from collection.views import record, daily_info_create, prod_info_save, prod_info_reset, index, raw_data_api, \
     get_mach_api, test, daily_info_head_delete, rd_report, generate_excel_file_big, rd_message, send_message, \
-    product_info_report, oee_report
+    product_info_report, oee_report, import_excel_data
 
 urlpatterns = [
     url(r'^oee_report/', oee_report, name='oee_report'),
@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^test/', test, name='test'),
     url('download-excel2/', generate_excel_file_big, name='download_excel2'),
     url(r'^product_info_report/', product_info_report, name='product_info_report'),
+    url(r'^import-excel-data/', import_excel_data, name='import_excel_data'),
 ]

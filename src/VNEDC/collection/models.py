@@ -65,6 +65,7 @@ class Parameter_Type(models.Model):
     def __str__(self):
         return str(self.process_type.process_code) + "_" + str(self.param_code)
 
+
 class ParameterDefine(models.Model):
     plant = models.ForeignKey(Plant, related_name='param_plant', on_delete=models.CASCADE)
     mach = models.ForeignKey(Machine, related_name='param_mach', on_delete=models.CASCADE)
@@ -92,6 +93,7 @@ class ParameterDefine(models.Model):
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_update_by')
+    pda_value = models.BooleanField(default=False)
 
     def __str__(self):
         from django.utils.translation import get_language

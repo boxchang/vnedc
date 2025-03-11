@@ -80,19 +80,19 @@ def abnormal_recover(request, pk):
 
 def spiderweb_config(request):
 
-    data = list(Monitor_Device_List.objects.values('device_group', 'device_name', 'update_at', 'update_by', 'enable',
+    datas = list(Monitor_Device_List.objects.values('device_group', 'device_name', 'update_at', 'update_by', 'enable',
                                                    'stop_before'))
 
     # Lấy model người dùng tùy chỉnh
     User = get_user_model()
 
-    for monitor_list in data:
-        user = User.objects.get(id=monitor_list['update_by'])
-        monitor_list['update_by'] = user.username
-        monitor_list['update_at'] = monitor_list['update_at'].strftime('%Y-%m-%d %H:%M:%S')
+    for data in datas:
+        user = User.objects.get(id=data['update_by'])
+        data['update_by'] = user.username
+        data['update_at'] = data['update_at'].strftime('%Y-%m-%d %H:%M:%S')
         # Đảm bảo rằng 'enable' là một chuỗi 'Y' hoặc 'N'
-        monitor_list['enable'] = 'Y' if monitor_list['enable'] == 'Y' else 'N'
-    return JsonResponse({'data': data}, safe=False)
+        # data['enable'] = 'Y' if data['enable'] == 'Y' else 'N'
+    return JsonResponse({'data': datas}, safe=False)
 
 
 def config_layout(request):
@@ -107,7 +107,11 @@ def toggle_device_status(request):
 
         try:
             device = Monitor_Device_List.objects.get(device_name=device_name)
-            device.enable = 'Y' if is_active else 'N'
+            if is_active:
+                device.enable = 'N'
+            elif not is_active:
+                device.enable = 'Y'
+
             device.update_at = timezone.now()
             device.update_by = request.user
             device.save()

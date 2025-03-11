@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 from VNEDC.database import vnedc_database
-from collection.forms import DailyInfoForm
+from collection.forms import DailyInfoForm, ExcelUploadForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
-    Daily_Prod_Info_Head, Lab_Parameter_Control
+    Daily_Prod_Info_Head, Lab_Parameter_Control, Parameter_Type
 from jobs.database import mes_database, scada_database
 from django.http import HttpResponse
 from openpyxl import Workbook
@@ -1735,3 +1737,474 @@ def oee_report(request):
     except Exception as e:
         print(e)
     return render(request, 'collection/oee_report.html', locals())
+
+
+# DATA_IMPORT
+
+def to_int_or_none(value):
+    """Chuyển đổi giá trị thành int nếu không phải NaN, ngược lại trả về None"""
+    return int(value) if pd.notna(value) else None
+
+
+def to_float_or_none(value):
+    return float(value) if pd.notna(value) else None
+
+
+def to_boolean_or_none(value):
+    if pd.isna(value):  # Nếu là NaN thì trả về None
+        return None
+
+    if isinstance(value, (int, float)):  # Nếu là số
+        return bool(value)  # 0 -> False, 1 -> True
+
+    str_value = str(value).strip().lower()  # Chuyển đổi thành chuỗi, loại bỏ khoảng trắng
+
+    if str_value in ["true", "1", "yes"]:
+        return True
+    elif str_value in ["false", "0", "no"]:
+        return False
+
+    return None  # Nếu không khớp, trả về None
+
+
+def to_string_or_none(value):
+    return "" if pd.isna(value) else str(value)
+
+
+def to_string_or_null(value):
+    return None if pd.isna(value) else str(value)
+
+
+def plant_sheet(df, request):
+    plant_codes = df["Plant Code"].unique()
+    plant_dict = {p.plant_code: p for p in Plant.objects.filter(plant_code__in=plant_codes)}
+
+    plants_to_update = []
+    plants_to_create = []
+
+    for _, row in df.iterrows():
+        plant_code = to_string_or_none(row["Plant Code"])
+        plant_name = to_string_or_none(row["Plant Name"])
+
+        if plant_code in plant_dict:
+            obj = plant_dict[plant_code]
+            if obj.plant_code != plant_code or obj.plant_name != plant_name:
+                obj.plant_code = plant_code
+                obj.plant_name = plant_name
+                obj.update_at = timezone.now()
+                obj.update_by = request.user
+                plants_to_update.append(obj)
+        else:
+            plants_to_create.append(Plant(
+                plant_code=plant_code,
+                plant_name=plant_name,
+                update_at=timezone.now(),
+                update_by=request.user
+            ))
+
+    with transaction.atomic():
+        if plants_to_update:
+            Plant.objects.bulk_update(plants_to_update, ["plant_name", "update_at", "update_by"])
+        if plants_to_create:
+            Plant.objects.bulk_create(plants_to_create)
+
+
+def machine_sheet(df, request):
+    mach_codes = df["Mach Code"].unique()
+    mach_dict = {m.mach_code: m for m in Machine.objects.filter(mach_code__in=mach_codes)}
+
+    machines_to_update = []
+    machines_to_create = []
+
+    for _, row in df.iterrows():
+        mach_code = to_string_or_none(row["Mach Code"])
+        mach_name = to_string_or_none(row["Mach Name"])
+        mold_type = to_string_or_none(row["Mold Type"])
+        plant_code = to_string_or_none(row["Plant"])
+
+        if mach_code in mach_dict:
+            obj = mach_dict[mach_code]
+            if obj.mach_code != mach_code or obj.mach_name != mach_name or obj.mold_type != mold_type \
+                    or str(obj.plant) != plant_code:
+                obj.mach_code = mach_code
+                obj.mach_name = mach_name
+                obj.mold_type = mold_type
+                obj.plant = Plant.objects.get(plant_code=plant_code)
+                obj.update_at = timezone.now()
+                obj.update_by = request.user
+                machines_to_update.append(obj)
+        else:
+            plant_instance = Plant.objects.filter(plant_code=plant_code).first()
+
+            machines_to_create.append(Machine(
+                mach_code=mach_code,
+                mach_name=mach_name,
+                mold_type=mold_type,
+                plant=plant_instance,
+                update_at=timezone.now(),
+                update_by=request.user
+            ))
+
+    with transaction.atomic():
+        if machines_to_update:
+            Machine.objects.bulk_update(machines_to_update, ["mach_name", "mold_type", "plant",
+                                                             "update_at", "update_by"])
+        if machines_to_create:
+            Machine.objects.bulk_create(machines_to_create)
+
+
+def process_type_sheet(df, request):
+    process_type_codes = df["Process Code"].unique()
+    process_type_dict = {p.process_code: p for p in Process_Type.objects.filter(process_code__in=process_type_codes)}
+
+    process_types_to_update = []
+    process_types_to_create = []
+
+    for _, row in df.iterrows():
+        process_code = to_string_or_none(row["Process Code"])
+        process_name = to_string_or_none(row["Process Name"])
+        process_tw = to_string_or_none(row["Traditional Chinese Name"])
+        process_cn = to_string_or_none(row["Simple Chinese Name"])
+        process_vn = to_string_or_none(row["Vietnamese Name"])
+        show_order = to_int_or_none(row["Order"])
+
+        if process_code in process_type_dict:
+            obj = process_type_dict[process_code]
+            if obj.process_code != process_code or obj.process_name != process_name or obj.process_tw != process_tw \
+                    or obj.process_cn != process_cn or obj.process_vn != process_vn or obj.show_order != show_order:
+                obj.process_code = process_code
+                obj.process_name = process_name
+                obj.process_tw = process_tw
+                obj.process_cn = process_cn
+                obj.process_vn = process_vn
+                obj.show_order = show_order
+                obj.update_at = timezone.now()
+                obj.update_by = request.user
+                process_types_to_update.append(obj)
+        else:
+            process_types_to_create.append(Process_Type(
+                process_code=process_code,
+                process_name=process_name,
+                process_tw=process_tw,
+                process_cn=process_cn,
+                process_vn=process_vn,
+                show_order=show_order,
+                update_at=timezone.now(),
+                update_by=request.user
+            ))
+
+    with transaction.atomic():
+        if process_types_to_update:
+            Process_Type.objects.bulk_update(process_types_to_update, ["process_name", "process_tw",
+                                                                       "process_cn", "process_vn", "show_order",
+                                                                       "update_at", "update_by"])
+        if process_types_to_create:
+            Process_Type.objects.bulk_create(process_types_to_create)
+
+
+def parameter_type_sheet(df, request):
+    param_type_codes = df["Parameter Type Code"].unique()
+    process_type_codes = df["Process Type"].unique()
+
+    # Lấy danh sách Process_Type theo process_code
+    process_type_dict = {
+        p.process_code: p for p in Process_Type.objects.filter(process_code__in=process_type_codes)
+    }
+
+    # Tạo dictionary chứa Parameter_Type
+    param_type_dict = {
+        (p.param_type_code, p.process_type.process_code): p
+        for p in Parameter_Type.objects.filter(
+            param_type_code__in=param_type_codes,
+            process_type__in=process_type_dict.values()
+        )
+    }
+
+    param_types_to_update = []
+    param_types_to_create = []
+
+    for _, row in df.iterrows():
+        param_type_code = to_string_or_none(row["Parameter Type Code"])
+        process_type_code = to_string_or_none(row["Process Type"])
+        control_table = to_string_or_none(row["Control Table"])
+        control_high_column = to_string_or_none(row["Control High Column"])
+        control_low_column = to_string_or_none(row["Control Low Column"])
+
+        # Lấy object process_type từ dictionary
+        process_type_ = process_type_dict.get(process_type_code)
+        if not process_type_:
+            continue  # Bỏ qua nếu không tìm thấy process_type
+
+        key = (param_type_code, process_type_code)  # Dùng process_code thay vì id
+
+        if key in param_type_dict:
+            obj = param_type_dict[key]
+            if (obj.control_table != control_table or
+                    obj.control_high_column != control_high_column or
+                    obj.control_low_column != control_low_column):
+                obj.control_table = control_table
+                obj.control_high_column = control_high_column
+                obj.control_low_column = control_low_column
+                obj.update_at = timezone.now()
+                obj.update_by = request.user
+                param_types_to_update.append(obj)
+        else:
+            param_types_to_create.append(Parameter_Type(
+                param_type_code=param_type_code,
+                process_type=process_type_,
+                control_table=control_table,
+                control_high_column=control_high_column,
+                control_low_column=control_low_column,
+                update_at=timezone.now(),
+                update_by=request.user
+            ))
+
+    # Cập nhật dữ liệu vào database
+    with transaction.atomic():
+        if param_types_to_update:
+            Parameter_Type.objects.bulk_update(param_types_to_update, [
+                "control_table", "control_high_column", "control_low_column", "update_at", "update_by"
+            ])
+        if param_types_to_create:
+            Parameter_Type.objects.bulk_create(param_types_to_create)
+
+
+def param_define_sheet(df, request):
+    plant_codes = df["Plant"].unique()
+    machine_codes = df["Machine"].unique()
+    process_type_codes = df["Process Type"].unique()
+    param_type_codes = df["Param Type"].unique()
+    param_name_codes = df["Parameter Name"].unique()
+
+    plant_dict = {p.plant_code: p for p in Plant.objects.filter(plant_code__in=plant_codes)}
+    machine_dict = {m.mach_code: m for m in Machine.objects.filter(mach_code__in=machine_codes)}
+    process_type_dict = {p.process_code: p for p in Process_Type.objects.filter(process_code__in=process_type_codes)}
+
+    param_define_dict = {
+        (p.plant.plant_code, p.mach.mach_code, p.process_type.process_code, p.param_type, p.parameter_name): p
+        for p in ParameterDefine.objects.filter(
+            plant__in=plant_dict.values(),
+            mach__in=machine_dict.values(),
+            process_type__in=process_type_dict.values(),
+            param_type__in=param_type_codes,
+            parameter_name__in=param_name_codes
+        )
+    }
+
+    param_define_to_update = []
+    param_define_to_create = []
+
+    for _, row in df.iterrows():
+        plant_code = to_string_or_none(row["Plant"])
+        machine_code = to_string_or_none(row["Machine"])
+        process_type_code = to_string_or_none(row["Process Type"])
+        param_type_code = to_string_or_none(row["Param Type"])
+        parameter_name_code = to_string_or_none(row["Parameter Name"])
+
+        if not all([plant_code, machine_code, process_type_code, param_type_code, parameter_name_code]):
+            continue
+
+        parameter_tw = to_string_or_null(row["Traditional Chinese Name"])
+        parameter_cn = to_string_or_null(row["Simple Chinese Name"])
+        parameter_vn = to_string_or_null(row["Vietnamese Name"])
+
+        show_order = to_int_or_none(row["Order"])
+        base_line = to_float_or_none(row["Base Line"])
+        control_range_high = to_float_or_none(row["Control Range High"])
+        control_range_low = to_float_or_none(row["Control Range Low"])
+        sampling_frequency = to_string_or_null(row["Sampling Frequency"])
+        unit = to_string_or_null(row["Unit"])
+        auto_value = to_boolean_or_none(row["Auto Value"])
+        pda_value = to_boolean_or_none(row["PDA Value"])
+        side = to_string_or_null(row["Side"])
+        scada_column = to_string_or_null(row["Scada Column"])
+        scada_table = to_string_or_null(row["Scada Table"])
+        input_time = to_string_or_null(row["Input Time"])
+        text_color = to_string_or_null(row["Text Color"])
+
+        plant = plant_dict.get(plant_code)
+        machine = machine_dict.get(machine_code)
+        process_type = process_type_dict.get(process_type_code)
+
+        if not plant or not machine or not process_type:
+            continue
+
+        key = (plant_code, machine_code, process_type_code, param_type_code, parameter_name_code)
+
+        if key in param_define_dict:
+            obj = param_define_dict[key]
+            if (obj.parameter_tw != parameter_tw or obj.parameter_cn != parameter_cn or
+                    obj.parameter_vn != parameter_vn or obj.show_order != show_order or obj.base_line != base_line or
+                    obj.control_range_high != control_range_high or obj.control_range_low != control_range_low or
+                    obj.sampling_frequency != sampling_frequency or obj.unit != unit or obj.auto_value != auto_value or
+                    obj.pda_value != pda_value or obj.side != side or obj.scada_column != scada_column or
+                    obj.scada_table != scada_table or obj.input_time != input_time or obj.text_color != text_color):
+                obj.parameter_tw = parameter_tw
+                obj.parameter_cn = parameter_cn
+                obj.parameter_vn = parameter_vn
+                obj.show_order = show_order
+                obj.base_line = base_line
+                obj.control_range_high = control_range_high
+                obj.control_range_low = control_range_low
+                obj.sampling_frequency = sampling_frequency
+                obj.unit = unit
+                obj.auto_value = auto_value
+                obj.pda_value = pda_value
+                obj.side = side
+                obj.scada_column = scada_column
+                obj.scada_table = scada_table
+                obj.input_time = input_time
+                obj.text_color = text_color
+                obj.update_at = timezone.now()
+                obj.update_by = request.user
+
+                param_define_to_update.append(obj)
+        else:
+            param_define_to_create.append(ParameterDefine(
+                plant=plant,
+                mach=machine,
+                process_type=process_type,
+                param_type=param_type_code,
+                side=side,
+                parameter_name=parameter_name_code,
+                parameter_tw=parameter_tw,
+                parameter_cn=parameter_cn,
+                parameter_vn=parameter_vn,
+                show_order=show_order,
+                unit=unit,
+                control_range_low=control_range_low,
+                base_line=base_line,
+                control_range_high=control_range_high,
+                sampling_frequency=sampling_frequency,
+                input_time=input_time,
+                auto_value=auto_value,
+                scada_table=scada_table,
+                scada_column=scada_column,
+                text_color=text_color,
+                pda_value=pda_value,
+                create_at=timezone.now(),
+                create_by=request.user
+            ))
+
+    with transaction.atomic():
+        if param_define_to_update:
+            ParameterDefine.objects.bulk_update(param_define_to_update, [
+                "parameter_cn", "parameter_vn", "show_order", "base_line", "control_range_high", "control_range_low",
+                "sampling_frequency", "unit", "auto_value", "pda_value", "side", "scada_column", "scada_table",
+                "input_time", "text_color", "update_at", "update_by", "parameter_tw"
+            ])
+        if param_define_to_create:
+            ParameterDefine.objects.bulk_create(param_define_to_create)
+
+
+def lab_parameter_sheet(df, request):
+    plant_codes = df["Plant"].unique()
+    machine_codes = df["Machine"].unique()
+    item_no_codes = df["Item No"].unique()
+    process_type_codes = df["Process Type"].unique()
+    parameter_name_codes = df["Parameter Name"].unique()
+
+    plant_dict = {p.plant_code: p for p in Plant.objects.filter(plant_code__in=plant_codes)}
+    machine_dict = {m.mach_code: m for m in Machine.objects.filter(mach_code__in=machine_codes)}
+
+    lab_param_dict = {
+        (p.plant.plant_code, p.mach.mach_code, p.item_no, p.process_type, p.parameter_name): p
+        for p in Lab_Parameter_Control.objects.filter(
+            plant__in=plant_dict.values(),
+            mach__in=machine_dict.values(),
+            item_no__in=item_no_codes,
+            process_type__in=process_type_codes,
+            parameter_name__in=parameter_name_codes
+        )
+    }
+
+    lab_params_to_update = []
+    lab_params_to_create = []
+
+    for _, row in df.iterrows():
+        plant_code = to_string_or_none(row["Plant"])
+        machine_code = to_string_or_none(row["Machine"])
+        item_no = to_string_or_none(row["Item No"])
+        process_type = to_string_or_none(row["Process Type"])
+        parameter_name = to_string_or_none(row["Parameter Name"])
+
+        if not all([plant_code, machine_code, item_no, process_type, parameter_name]):
+            continue
+
+        control_range_low = to_float_or_none(row["Control Range Low"])
+        base_line = to_float_or_none(row["Base Line"])
+        control_range_high = to_float_or_none(row["Control Range High"])
+
+        plant = plant_dict.get(plant_code)
+        machine = machine_dict.get(machine_code)
+
+        if not plant or not machine:
+            continue
+
+        key = (plant_code, machine_code, item_no, process_type, parameter_name)
+
+        if key in lab_param_dict:
+            obj = lab_param_dict[key]
+            if (obj.control_range_low != control_range_low or
+                    obj.base_line != base_line or
+                    obj.control_range_high != control_range_high):
+                obj.control_range_low = control_range_low
+                obj.base_line = base_line
+                obj.control_range_high = control_range_high
+                obj.create_at = timezone.now()
+                obj.create_by = request.user
+                lab_params_to_update.append(obj)
+        else:
+            lab_params_to_create.append(Lab_Parameter_Control(
+                plant=plant,
+                mach=machine,
+                item_no=item_no,
+                process_type=process_type,
+                parameter_name=parameter_name,
+                control_range_low=control_range_low,
+                base_line=base_line,
+                control_range_high=control_range_high,
+                create_at=timezone.now(),
+                create_by=request.user
+            ))
+
+    with transaction.atomic():
+        if lab_params_to_update:
+            Lab_Parameter_Control.objects.bulk_update(lab_params_to_update, [
+                "control_range_low", "base_line", "control_range_high", "create_at", "create_by"
+            ])
+        if lab_params_to_create:
+            Lab_Parameter_Control.objects.bulk_create(lab_params_to_create)
+
+
+SHEET_PROCESSORS = {
+    "Plant": plant_sheet,
+    "Machine": machine_sheet,
+    "Process Type": process_type_sheet,
+    "Param Type": parameter_type_sheet,
+    "Param Define": param_define_sheet,
+    "Lab Param": lab_parameter_sheet
+}
+
+
+def import_excel_data(request):
+    if request.method == "POST":
+        form = ExcelUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES["file"]
+            df_dict = pd.read_excel(excel_file, sheet_name=None)  # Đọc tất cả các sheet
+
+            for sheet_name, df in df_dict.items():
+                process_function = SHEET_PROCESSORS.get(sheet_name)
+                if process_function:
+                    process_function(df, request)  # Gọi function tương ứng
+
+            return render(request, "collection/collection_data_import.html",
+                          {"form": form, "message": "Upload successfully!"})
+
+    else:
+        form = ExcelUploadForm()
+
+    return render(request, "collection/collection_data_import.html", locals())
+
+# END_DATA_IMPORT

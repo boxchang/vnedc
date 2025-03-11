@@ -1,0 +1,60 @@
+{% extends 'collection/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% block title %} {% trans "Upload Excel File" %} {% endblock %}
+{% block js %}
+<style>
+
+    .upload {
+        padding: 0;
+        margin-top: 32px;
+        height: 51%;
+    }
+
+</style>
+{% endblock js %}
+
+
+{% block content %}
+        <div class="d-flex justify-content-start">
+        {% if message %}
+            <div id="alert-message" class="alert alert-success fade show position-absolute top-0 start-50
+            translate-middle-x mt-1 ml-1" role="alert">
+            {{ message }}
+            </div>
+
+            <script>
+                setTimeout(function() {
+                    var alert = document.getElementById("alert-message");
+                    if (alert) {
+                        alert.classList.remove("show");
+                        setTimeout(() => alert.remove(), 500);  // Xóa khỏi DOM sau khi ẩn
+                    }
+                }, 3000);
+
+                sessionStorage.removeItem('message');
+            </script>
+
+        {% endif %}
+        </div>
+
+
+{#        <h3 class="mt-2 text-center">{% trans "Upload Location Excel File" %}</h3>#}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-5">
+                    {% crispy form %}
+                </div>
+
+                <div class="col-12 col-md-1 text-center upload">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-upload"></i> {% trans "Upload" %}
+                    </button>
+                </div>
+
+            </div>
+        </form>
+{% endblock content %}
+

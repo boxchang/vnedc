@@ -38,6 +38,7 @@ class RecordForm(forms.Form):
             }
         )
 
+
 class CustomChoiceField(forms.ChoiceField):
     def to_python(self, value):
         """Return a string."""
@@ -48,6 +49,7 @@ class CustomChoiceField(forms.ChoiceField):
     def valid_value(self, value):
         # Allow both predefined choices and custom input
         return True
+
 
 class DailyInfoForm(forms.ModelForm):
     CHOICES = [(_('Chlorine Free'), _('Chlorine Free')), (_('Polymer Free'), _('Polymer Free')), (_('Alkaline Tank pH Test'), _('Alkaline Tank pH Test')), (_('Machine Shutdown'), _('Machine Shutdown')),]
@@ -79,7 +81,6 @@ class DailyInfoForm(forms.ModelForm):
                   'prod_name_a2', 'prod_size_a2', 'prod_name_b1', 'prod_size_b1',
                   'prod_name_b2', 'prod_size_b2', 'remark', 'coagulant_time_hour', 'coagulant_time_min',
                   'latex_time_hour', 'latex_time_min', 'tooling_time_hour', 'tooling_time_min', 'remark2', 'handmold_spec')
-
 
     def __init__(self, *args, submit_title='Submit', **kwargs):
         super().__init__(*args, **kwargs)
@@ -144,3 +145,14 @@ class DailyInfoForm(forms.ModelForm):
         )
 
 
+class ExcelUploadForm(forms.Form):
+    file = forms.FileField(
+        label=_("Choose Excel File"),
+        widget=forms.ClearableFileInput(attrs={"class": "form-control"})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
