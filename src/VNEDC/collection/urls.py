@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^test/', test, name='test'),
     url('download-excel2/', generate_excel_file_big, name='download_excel2'),
     url(r'^product_info_report/', product_info_report, name='product_info_report'),
-    url(r'^import-excel-data/', import_excel_data, name='import_excel_data'),
+    url(r'^import_excel_data/', import_excel_data, name='import_excel_data'),
 ]

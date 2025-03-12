@@ -12,7 +12,7 @@ from VNEDC.database import vnedc_database
 from collection.forms import DailyInfoForm, ExcelUploadForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
     Daily_Prod_Info_Head, Lab_Parameter_Control, Parameter_Type
-from jobs.database import mes_database, scada_database
+from jobs.database import scada_database
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill

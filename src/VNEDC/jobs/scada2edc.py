@@ -3,7 +3,7 @@ import os
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
-from jobs.database import vnedc_database, scada_database
+from jobs.database import vnedc_database, scada_database, gd_mes_database, lk_mes_database
 from datetime import datetime, timedelta
 
 
@@ -11,16 +11,23 @@ class SGADA2EDC(object):
     start_date = ""
     end_date = ""
     debug = False
+    mes_db = None
+    vnedc_db = None
 
-    def __init__(self, start_date, end_date, debug):
+    def __init__(self, start_date, end_date, debug, plant):
+        if plant == "GD":
+            self.mes_db = gd_mes_database()
+        elif plant == "LK":
+            self.mes_db = lk_mes_database()
+        self.vnedc_db = vnedc_database()
         self.start_date = start_date
         self.end_date = end_date
         self.debug = debug
 
     def execute(self):
-        db = vnedc_database()
+
         sql = """SELECT * FROM [VNEDC].[dbo].[collection_parameterdefine] where auto_value = 1"""
-        defines = db.select_sql_dict(sql)
+        defines = self.vnedc_db.select_sql_dict(sql)
 
         tmp_start_date = datetime.strptime(start_date, '%Y-%m-%d')
         tmp_end_date = datetime.strptime(end_date, '%Y-%m-%d')
@@ -31,7 +38,7 @@ class SGADA2EDC(object):
 
 
     def convert_data(self, data_date, defines):
-        db = scada_database()
+
         if self.debug:
             times = ["00", "06", "12", "18"]
         else:
@@ -55,7 +62,7 @@ class SGADA2EDC(object):
                     datetime_s = "{date} {time}:00".format(date=data_date, time=time)
                     datetime_e = "{date} {time}:10".format(date=data_date, time=time)
                     sql = f"""select {scada_column} from {scada_table} where datetime >= CONVERT(DATETIME, '{datetime_s}') and datetime <= CONVERT(DATETIME, '{datetime_e}')"""
-                    records = db.select_sql_dict(sql)
+                    records = self.mes_db.select_sql_dict(sql)
 
                     if records:
                         record = records[0]
@@ -73,26 +80,25 @@ class SGADA2EDC(object):
 
     def isVNEDCExisted(self, data_date, plant, mach, process_type, time, parameter_name):
         result = False
-        db = vnedc_database()
+
         sql = """select * from collection_parametervalue 
                  where plant_id='{plant}' and mach_id='{mach}' and data_date='{data_date}' and data_time='{data_time}' 
                  and process_type='{process_type}' and parameter_name='{parameter_name}' """ \
             .format(plant=plant, mach=mach, data_date=data_date, process_type=process_type,
                     parameter_name=parameter_name, data_time=time)
         # print(sql)
-        records = db.select_sql_dict(sql)
+        records = self.vnedc_db.select_sql_dict(sql)
         if records:
             result = True
         return result
 
     def insert_vnedc(self, data_date, plant, mach, process_type, time, parameter_name, parameter_value):
-        db = vnedc_database()
 
         sql = """insert into collection_parametervalue(data_date, plant_id, mach_id, process_type, data_time, parameter_name, parameter_value, create_at, update_at, create_by_id, update_by_id) 
                                 Values('{date_date}', '{plant}', '{mach}', '{process_type}', '{data_time}', '{parameter_name}', {parameter_value}, GETDATE(), GETDATE(), 1, 1)""" \
             .format(date_date=data_date, plant=plant, mach=mach, process_type=process_type, data_time=time, parameter_name=parameter_name, parameter_value=parameter_value)
         print(sql)
-        db.execute_sql(sql)
+        self.vnedc_db.execute_sql(sql)
 
 
 debug = False
@@ -100,5 +106,9 @@ start_date = datetime.today().strftime('%Y-%m-%d')
 end_date = datetime.today().strftime('%Y-%m-%d')
 # start_date = "2024-07-25"
 # end_date = "2024-07-26"
-sgada = SGADA2EDC(start_date, end_date, debug)
-sgada.execute()
+
+plant_list = ['LK', 'GD']
+
+for plant in plant_list:
+    sgada = SGADA2EDC(start_date, end_date, debug, plant)
+    sgada.execute()
