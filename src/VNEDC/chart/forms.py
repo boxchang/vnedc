@@ -81,6 +81,7 @@ class SearchForm(forms.Form):
         )
 
 class ProductionSearchForm(forms.Form):
+    plant = forms.ModelChoiceField(required=True, label=_('plant'), queryset=Plant.objects.all())
     data_date_start = forms.DateField(label=_("Start Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     data_date_end = forms.DateField(label=_("End Date"), widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     product = forms.ChoiceField(required=True, label=_('Product'), widget=forms.Select(attrs={'class': 'select2'}))
@@ -102,10 +103,10 @@ class ProductionSearchForm(forms.Form):
             Div(
                 Div(
                     Div(
-                        Div('product', css_class='col'),
+                        Div('plant', css_class='col'),
                         css_class='row'),
                     Div(
-                        Div('data_date_start', css_class='col'),
+                        Div('product', css_class='col'),
                         css_class='row'
                     ),
                     css_class='col-md-3'
@@ -115,7 +116,7 @@ class ProductionSearchForm(forms.Form):
                         Div('process_type', css_class='col'),
                         css_class='row'),
                     Div(
-                        Div('data_date_end', css_class='col'),
+                        Div('data_date_start', css_class='col'),
                         css_class='row'
                     ),
                     css_class='col-md-3'
@@ -124,6 +125,10 @@ class ProductionSearchForm(forms.Form):
                     Div(
                         Div('param_code', css_class='col'),
                         css_class='row'),
+                    Div(
+                        Div('data_date_end', css_class='col'),
+                        css_class='row'
+                    ),
                     css_class='col-md-3'
                 ),
                 Div(

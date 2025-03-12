@@ -42,8 +42,10 @@ def get_product_choices(start_date, end_date):
         AND SAP_FactoryDescr like '%NBR%'
         order by ProductItem
         """
-    mes_db = mes_database()
-    rows = mes_db.select_sql_dict(sql)
+    gdmes_db = mes_database("GD")
+    lkmes_db = mes_database("LK")
+
+    rows = gdmes_db.select_sql_dict(sql) + lkmes_db.select_sql_dict(sql)
     choices = [('', '---')] + [(row['ProductItem'], row['ProductItem']) for row in rows]
     return choices
 

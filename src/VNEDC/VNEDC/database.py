@@ -62,14 +62,22 @@ class sap_database:
             cur.execute(sql)
 
 
-class mes_database:
+class mes_database():
+    plant = None
+
+    def __init__(self, plant=None):
+        if plant:
+            self.plant = plant
+        else:
+            self.plant = "GD"
+
     def select_sql(self, sql):
-        with connections['MES'].cursor() as cur:
+        with connections[self.plant+"MES"].cursor() as cur:
             cur.execute(sql)
             return cur.fetchall()
 
     def select_sql_dict(self, sql):
-        with connections['MES'].cursor() as cur:
+        with connections[self.plant+"MES"].cursor() as cur:
             cur.execute(sql)
             desc = cur.description
             column_names = [col[0] for col in desc]
@@ -78,7 +86,7 @@ class mes_database:
             return data
 
     def select_sql_dict_param(self, sql, param):
-        with connections['MES'].cursor() as cur:
+        with connections[self.plant+"MES"].cursor() as cur:
             cur.execute(sql, param)
             desc = cur.description
             column_names = [col[0] for col in desc]
@@ -87,8 +95,9 @@ class mes_database:
             return data
 
     def execute_sql(self, sql):
-        with connections['MES'].cursor() as cur:
+        with connections[self.plant+"MES"].cursor() as cur:
             cur.execute(sql)
+
 
 class vnedc_database:
     def select_sql(self, sql):

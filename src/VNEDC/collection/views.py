@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
-from VNEDC.database import vnedc_database
+from VNEDC.database import vnedc_database, mes_database
 from collection.forms import DailyInfoForm, ExcelUploadForm
 from collection.models import ParameterDefine, Process_Type, Plant, Machine, Daily_Prod_Info, ParameterValue, \
     Daily_Prod_Info_Head, Lab_Parameter_Control, Parameter_Type
@@ -277,7 +277,7 @@ def record_message(msg):
     return r.json()
 
 
-def get_production_choices(end_date):
+def get_production_choices(end_date, plant2):
     date_obj = datetime.strptime(end_date, "%Y-%m-%d")
     date_obj_minus_one = date_obj - timedelta(days=365)
     start_date = date_obj_minus_one.strftime("%Y-%m-%d")
@@ -286,7 +286,7 @@ def get_production_choices(end_date):
         SELECT distinct ProductItem as prod_name
         FROM [PMG_MES_WorkOrder] where SAP_FactoryDescr like '%NBR%' and WorkOrderDate between '{start_date}' and '{end_date}'
 		order by ProductItem"""
-    mes_db = mes_database()
+    mes_db = mes_database(plant2)
     mes_rows = mes_db.select_sql_dict(sql1)
     mes_list = [mes_rows['prod_name'] for mes_rows in mes_rows]
 
@@ -327,6 +327,7 @@ def daily_info_create(request):
 
     if sPlant:
         machs = Machine.objects.filter(plant=sPlant)
+        sPlant2 = sPlant[0:2]
 
     plant = Plant.objects.get(plant_code=sPlant)
     mach = Machine.objects.get(mach_code=sMach)
@@ -340,7 +341,7 @@ def daily_info_create(request):
         if not info:  # 新增
             form = DailyInfoForm(request.POST)
 
-            choices = get_production_choices(sData_date)
+            choices = get_production_choices(sData_date, sPlant2)
             form.fields['prod_name_a1'].choices = choices
             form.fields['prod_name_a2'].choices = choices
             form.fields['prod_name_b1'].choices = choices
@@ -362,7 +363,7 @@ def daily_info_create(request):
         else:  # 更新
             form = DailyInfoForm(request.POST, instance=info)
 
-            choices = get_production_choices(sData_date)
+            choices = get_production_choices(sData_date, sPlant2)
             form.fields['prod_name_a1'].choices = choices
             form.fields['prod_name_a2'].choices = choices
             form.fields['prod_name_b1'].choices = choices
@@ -411,7 +412,7 @@ def daily_info_create(request):
 
         msg = _("Update Done")
 
-    choices = get_production_choices(sData_date)
+    choices = get_production_choices(sData_date, sPlant2)
     form.fields['prod_name_a1'].choices = choices
     form.fields['prod_name_a2'].choices = choices
     form.fields['prod_name_b1'].choices = choices
