@@ -159,6 +159,12 @@ function validate(evt) {
                     <a class="box-nav-btn" href="{% url 'oee_report' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Report' %}" target="_blank">
                         <i class="fa fa-inbox"></i>
                     </a>
+                    {% if user.is_superuser %}
+                    <a class="box-nav-btn" href="{% url 'import_excel_data' %}" role="button" data-bs-toggle="tooltip" data-bs-placement="right" title="{% trans 'Report' %}" target="_blank">
+                        <i class="fa fa-upload"></i>
+                    </a>
+                    {% endif %}
+
                 </div>
             </div>
         </div>

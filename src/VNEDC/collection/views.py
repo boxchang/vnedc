@@ -1777,82 +1777,36 @@ def to_string_or_null(value):
 
 
 def plant_sheet(df, request):
-    plant_codes = df["Plant Code"].unique()
-    plant_dict = {p.plant_code: p for p in Plant.objects.filter(plant_code__in=plant_codes)}
+    try:
+        for _, row in df.iterrows():
+            plant_code = to_string_or_none(row["Plant Code"])
+            plant_name = to_string_or_none(row["Plant Name"])
 
-    plants_to_update = []
-    plants_to_create = []
-
-    for _, row in df.iterrows():
-        plant_code = to_string_or_none(row["Plant Code"])
-        plant_name = to_string_or_none(row["Plant Name"])
-
-        if plant_code in plant_dict:
-            obj = plant_dict[plant_code]
-            if obj.plant_code != plant_code or obj.plant_name != plant_name:
-                obj.plant_code = plant_code
-                obj.plant_name = plant_name
-                obj.update_at = timezone.now()
-                obj.update_by = request.user
-                plants_to_update.append(obj)
-        else:
-            plants_to_create.append(Plant(
+            Plant.objects.update_or_create(
                 plant_code=plant_code,
-                plant_name=plant_name,
-                update_at=timezone.now(),
-                update_by=request.user
-            ))
+                defaults={'plant_name': plant_name, 'update_at': timezone.now(), 'update_by': request.user}
+            )
+    except Exception as e:
+        print(e)
 
-    with transaction.atomic():
-        if plants_to_update:
-            Plant.objects.bulk_update(plants_to_update, ["plant_name", "update_at", "update_by"])
-        if plants_to_create:
-            Plant.objects.bulk_create(plants_to_create)
 
 
 def machine_sheet(df, request):
-    mach_codes = df["Mach Code"].unique()
-    mach_dict = {m.mach_code: m for m in Machine.objects.filter(mach_code__in=mach_codes)}
+    try:
+        for _, row in df.iterrows():
+            mach_code = to_string_or_none(row["Mach Code"])
+            mach_name = to_string_or_none(row["Mach Name"])
+            mold_type = to_string_or_none(row["Mold Type"])
+            plant_code = to_string_or_none(row["Plant"])
 
-    machines_to_update = []
-    machines_to_create = []
-
-    for _, row in df.iterrows():
-        mach_code = to_string_or_none(row["Mach Code"])
-        mach_name = to_string_or_none(row["Mach Name"])
-        mold_type = to_string_or_none(row["Mold Type"])
-        plant_code = to_string_or_none(row["Plant"])
-
-        if mach_code in mach_dict:
-            obj = mach_dict[mach_code]
-            if obj.mach_code != mach_code or obj.mach_name != mach_name or obj.mold_type != mold_type \
-                    or str(obj.plant) != plant_code:
-                obj.mach_code = mach_code
-                obj.mach_name = mach_name
-                obj.mold_type = mold_type
-                obj.plant = Plant.objects.get(plant_code=plant_code)
-                obj.update_at = timezone.now()
-                obj.update_by = request.user
-                machines_to_update.append(obj)
-        else:
-            plant_instance = Plant.objects.filter(plant_code=plant_code).first()
-
-            machines_to_create.append(Machine(
+            Machine.objects.update_or_create(
+                plant=plant_code,
                 mach_code=mach_code,
-                mach_name=mach_name,
-                mold_type=mold_type,
-                plant=plant_instance,
-                update_at=timezone.now(),
-                update_by=request.user
-            ))
+                defaults={'mold_type': mold_type, 'mach_name': mach_name, 'update_at': timezone.now(), 'update_by': request.user}
+            )
 
-    with transaction.atomic():
-        if machines_to_update:
-            Machine.objects.bulk_update(machines_to_update, ["mach_name", "mold_type", "plant",
-                                                             "update_at", "update_by"])
-        if machines_to_create:
-            Machine.objects.bulk_create(machines_to_create)
-
+    except Exception as e:
+        print(e)
 
 def process_type_sheet(df, request):
     process_type_codes = df["Process Code"].unique()

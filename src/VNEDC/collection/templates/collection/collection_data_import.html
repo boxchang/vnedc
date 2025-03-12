@@ -17,6 +17,13 @@
 
 
 {% block content %}
+        <div class="card" style="width: 100%;">
+            <div class="card-body">
+                <h5 class="card-title">Download Template</h5>
+                <p class="card-text">Click download file</p>
+                <a href="{% static '/templates/parameter_define_data_importing_template.xlsx' %}" class="btn btn-primary">下載</a>
+            </div>
+        </div>
         <div class="d-flex justify-content-start">
         {% if message %}
             <div id="alert-message" class="alert alert-success fade show position-absolute top-0 start-50
