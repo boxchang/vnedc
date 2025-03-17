@@ -12,9 +12,9 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'VNEDC_Test',
-        'USER': 'vnedc_test',
-        'PASSWORD': 'vnedc_test#2024',
+        'NAME': 'VNEDC',
+        'USER': 'vnedc',
+        'PASSWORD': 'vnedc#2024',
         'HOST': '10.13.104.181',
         'PORT': '1433',
 
