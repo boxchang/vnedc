@@ -58,8 +58,14 @@ def file_list(request, subpath=''):
     }
     return render(request, 'filelist/file_list.html', context)
 
-def download_file(request, subpath):
-    file_path = os.path.join(settings.FILE_LIST_DIRECTORY, subpath)
+def download_file(request, key, subpath):
+    disk = "W:\\"
+    if key == "NBR1":
+        disk = "X:\\"
+    elif key == "NBR2":
+        disk = "W:\\"
+
+    file_path = os.path.join(disk, subpath)
     if os.path.exists(file_path) and os.path.isfile(file_path):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/octet-stream")

@@ -48,7 +48,7 @@
             {% endfor %}
             {% for file, mod_date in files %}
                 <tr>
-                    <td><a href="{% url 'download_file' file %}">{{ file|basename }}</a></td>
+                    <td><a href="{% url 'download_file' key=user_selection subpath=file %}">{{ file|basename }}</a></td>
                     <td>{{ mod_date }}</td>
                 </tr>
             {% endfor %}
