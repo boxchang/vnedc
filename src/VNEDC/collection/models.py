@@ -87,9 +87,9 @@ class ParameterDefine(models.Model):
     scada_table = models.CharField(max_length=50, null=True, blank=True)
     scada_column = models.CharField(max_length=50, null=True, blank=True)
     text_color = models.CharField(max_length=50, null=True, blank=True)
-    create_at = models.DateTimeField(default=timezone.now)
+    create_at = models.DateTimeField(default=timezone.now, null=True)
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
-                                  related_name='param_define_create_by')
+                                  related_name='param_define_create_by', null=True)
     update_at = models.DateTimeField(default=timezone.now)
     update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                                   related_name='param_define_update_by')
@@ -174,8 +174,8 @@ class Lab_Parameter_Control(models.Model):
     control_range_low = models.FloatField(null=True, blank=True)
     base_line = models.FloatField(null=True, blank=True)
     control_range_high = models.FloatField(null=True, blank=True)
-    create_at = models.DateTimeField(default=timezone.now)
+    create_at = models.DateTimeField(default=timezone.now, null=True)
     create_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
-                                  related_name='lab_param_create_by')
+                                  related_name='lab_param_create_by', null=True)
 
 
