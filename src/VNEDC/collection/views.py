@@ -1853,7 +1853,6 @@ def parameter_type_sheet(df, request):
 
 def param_define_sheet(df, request):
     try:
-        user = request.user if request.user and request.user.is_authenticated else None
         for _, row in df.iterrows():
             plant_code = to_string_or_none(row["Plant"])
             machine_code = to_string_or_none(row["Machine"])
@@ -1906,13 +1905,14 @@ def param_define_sheet(df, request):
                     'input_time': input_time,
                     'text_color': text_color,
                     'update_at': timezone.now(),
-                    'update_by': user if user else None
+                    'update_by': request.user,
+                    'create_by': request.user
                 }
             )
             if created:
                 ParameterDefine.objects.filter(id=obj.id).update(
                     create_at=timezone.now(),
-                    create_by=user if user else None
+                    create_by=request.user
                 )
     except Exception as e:
         print(e)
@@ -1967,7 +1967,7 @@ SHEET_PROCESSORS = {
     "Lab Param": lab_parameter_sheet
 }
 
-
+@login_required
 def import_excel_data(request):
     if request.method == "POST":
         form = ExcelUploadForm(request.POST, request.FILES)
