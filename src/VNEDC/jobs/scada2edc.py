@@ -3,7 +3,7 @@ import os
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
-from jobs.database import vnedc_database, scada_database, gd_mes_database, lk_mes_database
+from jobs.database import vnedc_database, scada_database, gd_mes_database, lk_mes_database, lk_scada_database
 from datetime import datetime, timedelta
 
 
@@ -16,9 +16,9 @@ class SGADA2EDC(object):
 
     def __init__(self, start_date, end_date, debug, plant):
         if plant == "GD":
-            self.mes_db = gd_mes_database()
+            self.mes_db = scada_database()
         elif plant == "LK":
-            self.mes_db = lk_mes_database()
+            self.mes_db = lk_scada_database()
         self.vnedc_db = vnedc_database()
         self.start_date = start_date
         self.end_date = end_date
