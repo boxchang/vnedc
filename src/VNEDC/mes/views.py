@@ -1623,5 +1623,8 @@ def monthly_check(request):
 
     return render(request, 'mes/monthly_check.html', locals())
 
+def daily_report_comment(request):
+    return render(request, 'mes/daily_report_comment.html', locals())
+
 def test(request):
     return render(request, 'mes/test.html', locals())
