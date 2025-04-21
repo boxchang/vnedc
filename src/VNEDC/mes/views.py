@@ -11,7 +11,7 @@ from django.shortcuts import render
 
 from collection.models import ParameterValue, Plant, Machine
 from users.models import CustomUser
-from .forms import DateRangeForm
+from .forms import DateRangeForm, DailyReportCmt
 from datetime import datetime
 import calendar
 
@@ -1623,8 +1623,69 @@ def monthly_check(request):
 
     return render(request, 'mes/monthly_check.html', locals())
 
+
 def daily_report_comment(request):
+
+    if request.method == 'POST':
+        form = DailyReportCmt(request.POST)
+
+        if form.is_valid():
+            db = vnedc_database()
+
+            date = form.cleaned_data['date']
+            comment = form.cleaned_data['comment']
+
+            if comment:
+
+                sql_insert = f"""
+                                INSERT INTO [MES_OLAP].[dbo].[daily_report_comment] (report_date, comment)
+                                VALUES ('{date}', '{comment}');
+                            """
+
+                rows_insert = db.execute_sql(sql_insert)
+
+            sql_all = f"""
+                            SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                        """
+            rows_all = db.select_sql_dict(sql_all)
+            print(rows_all)
+
+            if request.is_ajax():
+                return JsonResponse({'data': rows_all})
+
+            return render(request, 'mes/daily_report_comment.html', locals())
+
+    else:
+        form = DailyReportCmt()
+
     return render(request, 'mes/daily_report_comment.html', locals())
+
+
+def daily_report_delete(request):
+
+    if request.method == 'DELETE':
+
+        db = vnedc_database()
+        data = json.loads(request.body)
+
+        date = datetime.strptime(data.get('report_date'), '%Y-%m-%d').date()
+        comment = data.get('comment')
+
+        sql = f"""
+                DELETE [MES_OLAP].[dbo].[daily_report_comment]
+                WHERE report_date='{date}' AND comment='{comment}'
+            """
+
+        rows = db.execute_sql_custom(sql)
+        print(rows)
+
+        if rows > 0:
+            return JsonResponse({'status': 'ok', 'message': 'Delete successful', 'rows': rows})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'No records found to delete', 'rows': rows})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
 
 def test(request):
     return render(request, 'mes/test.html', locals())

@@ -127,3 +127,8 @@ class vnedc_database:
         with connections['VNEDC'].cursor() as cur:
             cur.execute(sql)
 
+    def execute_sql_custom(self, sql):
+        with connections['VNEDC'].cursor() as cur:
+            cur.execute(sql)
+            return cur.rowcount
+
