@@ -1625,12 +1625,13 @@ def monthly_check(request):
 
 
 def daily_report_comment(request):
+    db = vnedc_database()
+    form = DailyReportCmt()
 
     if request.method == 'POST':
         form = DailyReportCmt(request.POST)
 
         if form.is_valid():
-            db = vnedc_database()
 
             date = form.cleaned_data['date']
             comment = form.cleaned_data['comment']
@@ -1648,17 +1649,24 @@ def daily_report_comment(request):
                             SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
                         """
             rows_all = db.select_sql_dict(sql_all)
-            print(rows_all)
 
             if request.is_ajax():
                 return JsonResponse({'data': rows_all})
 
             return render(request, 'mes/daily_report_comment.html', locals())
 
-    else:
-        form = DailyReportCmt()
-
     return render(request, 'mes/daily_report_comment.html', locals())
+
+
+def daily_report_all(request):
+    db = vnedc_database()
+
+    sql_all = f"""
+                    SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                """
+    rows_all = db.select_sql_dict(sql_all)
+
+    return JsonResponse({'data': rows_all})
 
 
 def daily_report_delete(request):

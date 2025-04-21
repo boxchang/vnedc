@@ -34,76 +34,104 @@ Monthly Check
     </div>
 
     <script>
+    $(document).ready(function () {
+        const deleteUrl = "{% url 'daily_report_delete' %}";
 
-    const deleteUrl = "{% url 'daily_report_delete' %}";
 
-    $("#form").on("submit", function(e) {
-        e.preventDefault();
+        function renderJsGrid() {
+            $("#jsGrid").jsGrid({
+                width: "100%",
+                height: "700px",
 
-        $.ajax({
-            url: "{% url 'daily_report_comment' %}",
-            type: "POST",
-            data: $(this).serialize(),  // gửi form
-            success: function(response) {
-                $("#id_comment").val('');
-                $("#jsGrid").jsGrid({
-                    width: "100%",
-                    height: "700px",
+                inserting: false,
+                editing: false,
+                sorting: true,
+                paging: false,
+                autoload: true,
+                controller:{
+                    loadData: function(filter) {
+                        console.log("Calling loadData with filter:", filter);
+                        return $.ajax({
+                            url: "{% url 'daily_report_all' %}",
+                            type: "GET",
+                            data: filter,
+                            dataType: "json",
+                            }).then(function(response) {
+                                console.log("Dữ liệu từ server:", response);  // Kiểm tra dữ liệu trả về từ server
+                                return response.data;  // Chắc chắn trả về đúng phần dữ liệu chứa trong 'data'
+                            });
+                    },
+                },
 
-                    inserting: false,
-                    editing: false,
-                    sorting: true,
-                    paging: false,
-
-                    data: response.data,
-
-                    fields: [
-                        { name: "report_date", type: "date", title: "Date", align: "center" },
-                        { name: "comment", type: "text", title: "Comment", align: "center" },
-                        {
-                            name: "delete",
-                            align: "center",
-                            title: "",
-                            itemTemplate: function(_, item) {
-                                return $("<button>")
-                                    .text("Delete")
-                                    .addClass("btn btn-danger btn-sm")
-                                    .on("click", function () {
-                                        if (confirm("Do you want to delete this one?")) {
-                                            fetch(deleteUrl, {
-                                                method: 'DELETE',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRFToken': '{{ csrf_token }}',
-                                                },
-                                                body: JSON.stringify({
-                                                    report_date: item.report_date,
-                                                    comment: item.comment
-                                                })
+                fields: [
+                    { name: "report_date", type: "date", title: "Date", align: "center" },
+                    { name: "comment", type: "text", title: "Comment", align: "center" },
+                    {
+                        name: "delete",
+                        align: "center",
+                        title: "",
+                        itemTemplate: function(_, item) {
+                            return $("<button>")
+                                .text("Delete")
+                                .addClass("btn btn-danger btn-sm")
+                                .on("click", function () {
+                                    if (confirm("Do you want to delete this one?")) {
+                                        fetch(deleteUrl, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRFToken': '{{ csrf_token }}',
+                                            },
+                                            body: JSON.stringify({
+                                                report_date: item.report_date,
+                                                comment: item.comment
                                             })
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                if (data.status === 'ok') {
-                                                    alert("Delete successfully!");
-                                                    $("button[type='submit']").trigger('click');
-                                                } else {
-                                                    alert("Error??");
-                                                }
-                                            })
-                                            .catch(error => {
-                                                alert("Error: " + error);
-                                            });
-                                        }
-                                    });
-                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.status === 'ok') {
+                                                alert("Delete successfully!");
+                                                $("button[type='submit']").trigger('click');
+                                            } else {
+                                                alert("Error??");
+                                            }
+                                        })
+                                        .catch(error => {
+                                            alert("Error: " + error);
+                                        });
+                                    }
+                                });
                         }
-                    ]
-                });
-            },
-            error: function(xhr) {
-                alert("Lỗi: " + JSON.stringify(xhr.responseJSON));
-            }
+                    }
+                ]
+            });
+        }
+
+        renderJsGrid();
+
+        $("#form").on("submit", function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{% url 'daily_report_comment' %}",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    $("#id_comment").val('');
+
+                    // Xóa bảng cũ trước khi render lại
+                    $("#jsGrid").jsGrid("destroy");
+
+                    // Render lại với dữ liệu mới
+                    renderJsGrid(response.data);
+                },
+                error: function(xhr) {
+                    alert("Lỗi: " + JSON.stringify(xhr.responseJSON));
+                }
+            });
         });
+
+
     });
 </script>
 {% endblock content %}
