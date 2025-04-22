@@ -20,7 +20,7 @@ Monthly Check
     <div class="container-fluid mt-3">
         <div class="row d-flex justify-content-center">
             <div class="col-6">
-                <div class="card p-4 shadow-sm">
+                <div class="card p-4 shadow-sm" id="detailsDialog">
                     <form method="post" id="form">
                         {% crispy form %}
                         <button type="submit" class="btn btn-primary btn-lg">Save</button>
@@ -32,6 +32,7 @@ Monthly Check
         <table id="jsGrid"></table>
 
     </div>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
 
     <script>
     $(document).ready(function () {
@@ -67,9 +68,19 @@ Monthly Check
                     { name: "report_date", type: "date", title: "Date", align: "center" },
                     { name: "comment", type: "text", title: "Comment", align: "center" },
                     {
+                        headerTemplate: function() {
+                            return $("<button>").attr("type", "button").text("Add")
+                                    .on("click", function () {
+                                        showDetailsDialog("Add", {'report_date': '', 'comment': ''});
+                                    });
+                        },
+                        modeSwitchButton: false,
+                        editButton: false,
                         name: "delete",
                         align: "center",
                         title: "",
+                        filtering: false,
+                        sorting: false,
                         itemTemplate: function(_, item) {
                             return $("<button>")
                                 .text("Delete")
@@ -102,12 +113,72 @@ Monthly Check
                                     }
                                 });
                         }
-                    }
+                    },
+
                 ]
             });
+
+
+
+
+            $("#detailsDialog").dialog({
+                autoOpen: false,
+                width: 400,
+                close: function() {
+                    const validator = $("#detailsForm").data('validator');
+                    if (validator) {
+                        validator.resetForm();
+                        $("#detailsForm").find(".error").removeClass("error");
+                    }
+                }
+            });
+
+
+
+            $("#detailsForm").validate({
+                rules: {
+                    name: "required",
+                    age: { required: true, range: [18, 150] },
+                    address: { required: true, minlength: 10 },
+                    country: "required"
+                },
+                messages: {
+                    name: "Please enter name",
+                    age: "Please enter valid age",
+                    address: "Please enter address (more than 10 chars)",
+                    country: "Please select country"
+                },
+                submitHandler: function() {
+                    formSubmitHandler();
+                }
+            });
+
         }
 
         renderJsGrid();
+
+        let showDetailsDialog = function(dialogType, client) {
+            $("#report_date").val(client.report_date);
+            $("#comment").val(client.comment);
+
+            formSubmitHandler = function() {
+                saveClient(client, dialogType === "Add");
+            };
+
+            $("#detailsDialog").dialog("option", "title", dialogType + " Client").dialog("open");
+        };
+
+
+        let saveClient = function(client, isNew) {
+            $.extend(client, {
+                report_date: $("#report_date").val(),
+                comment: $("#comment").val(),
+            });
+
+            $("#jsGrid").jsGrid(isNew ? "insertItem" : "updateItem", client);
+
+            $("#detailsDialog").dialog("close");
+        };
 
         $("#form").on("submit", function(e) {
             e.preventDefault();
