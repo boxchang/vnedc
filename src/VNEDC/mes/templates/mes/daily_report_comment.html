@@ -31,7 +31,6 @@ Monthly Check
         <table id="jsGrid"></table>
 
     </div>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
 
     <script>
     $(document).ready(function () {
@@ -120,34 +119,10 @@ Monthly Check
                 ]
             });
 
-
-
             $("#detailsDialog").dialog({
                 autoOpen: false,
                 width: 400,
-                close: function() {
-                    const validator = $("#detailsForm").data('validator');
-                    if (validator) {
-                        validator.resetForm();
-                        $("#detailsForm").find(".error").removeClass("error");
-                    }
-                }
-            });
 
-
-
-            $("#detailsForm").validate({
-                rules: {
-                    report_date: "required",
-                    comment: { required: true, minlength: 10 },
-                },
-                messages: {
-                    report_date: "Please enter report_date",
-                    comment: "Please enter comment",
-                },
-                submitHandler: function() {
-                    formSubmitHandler();
-                }
             });
 
         }
