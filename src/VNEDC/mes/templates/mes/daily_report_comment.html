@@ -28,7 +28,6 @@ Monthly Check
                 </div>
             </div>
         </div>
-        <hr>
         <table id="jsGrid"></table>
 
     </div>
@@ -37,7 +36,6 @@ Monthly Check
     <script>
     $(document).ready(function () {
         const deleteUrl = "{% url 'daily_report_delete' %}";
-
 
         function renderJsGrid() {
             $("#jsGrid").jsGrid({
@@ -120,7 +118,6 @@ Monthly Check
 
 
 
-
             $("#detailsDialog").dialog({
                 autoOpen: false,
                 width: 400,
@@ -137,16 +134,12 @@ Monthly Check
 
             $("#detailsForm").validate({
                 rules: {
-                    name: "required",
-                    age: { required: true, range: [18, 150] },
-                    address: { required: true, minlength: 10 },
-                    country: "required"
+                    report_date: "required",
+                    comment: { required: true, minlength: 10 },
                 },
                 messages: {
-                    name: "Please enter name",
-                    age: "Please enter valid age",
-                    address: "Please enter address (more than 10 chars)",
-                    country: "Please select country"
+                    report_date: "Please enter report_date",
+                    comment: "Please enter comment",
                 },
                 submitHandler: function() {
                     formSubmitHandler();
@@ -195,6 +188,7 @@ Monthly Check
 
                     // Render lại với dữ liệu mới
                     renderJsGrid(response.data);
+                    $("#detailsDialog").dialog("close");
                 },
                 error: function(xhr) {
                     alert("Lỗi: " + JSON.stringify(xhr.responseJSON));
