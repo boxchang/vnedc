@@ -56,8 +56,8 @@ Monthly Check
                             data: filter,
                             dataType: "json",
                             }).then(function(response) {
-                                console.log("Dữ liệu từ server:", response);  // Kiểm tra dữ liệu trả về từ server
-                                return response.data;  // Chắc chắn trả về đúng phần dữ liệu chứa trong 'data'
+                                console.log("Dữ liệu từ server:", response);
+                                return response.data;
                             });
                     },
                 },
@@ -67,7 +67,11 @@ Monthly Check
                     { name: "comment", type: "text", title: "Comment", align: "center" },
                     {
                         headerTemplate: function() {
-                            return $("<button>").attr("type", "button").text("Add")
+                            return $("<button>")
+                                .attr("type", "button")
+                                .text("Add")
+                                .addClass("btn btn-success btn-lg")
+                                .html('<i class="fas fa-plus"></i>')
                                     .on("click", function () {
                                         showDetailsDialog("Add", {'report_date': '', 'comment': ''});
                                     });
@@ -81,7 +85,7 @@ Monthly Check
                         sorting: false,
                         itemTemplate: function(_, item) {
                             return $("<button>")
-                                .text("Delete")
+                                .html('<i class="fas fa-trash"></i>')
                                 .addClass("btn btn-danger btn-sm")
                                 .on("click", function () {
                                     if (confirm("Do you want to delete this one?")) {
@@ -161,17 +165,6 @@ Monthly Check
             $("#detailsDialog").dialog("option", "title", dialogType + " Client").dialog("open");
         };
 
-
-        let saveClient = function(client, isNew) {
-            $.extend(client, {
-                report_date: $("#report_date").val(),
-                comment: $("#comment").val(),
-            });
-
-            $("#jsGrid").jsGrid(isNew ? "insertItem" : "updateItem", client);
-
-            $("#detailsDialog").dialog("close");
-        };
 
         $("#form").on("submit", function(e) {
             e.preventDefault();
