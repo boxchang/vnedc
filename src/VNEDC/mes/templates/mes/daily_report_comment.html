@@ -122,7 +122,7 @@ Monthly Check
             $("#detailsDialog").dialog({
                 autoOpen: false,
                 width: 400,
-
+                modal: true
             });
 
         }
@@ -137,7 +137,7 @@ Monthly Check
                 saveClient(client, dialogType === "Add");
             };
 
-            $("#detailsDialog").dialog("option", "title", dialogType + " Client").dialog("open");
+            $("#detailsDialog").dialog("option", "title", dialogType + " Note").dialog("open");
         };
 
 
