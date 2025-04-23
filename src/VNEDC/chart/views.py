@@ -528,6 +528,7 @@ def heat_value(request):
 
 
 def get_heat_data(request):
+    machine = request.GET.get('machine')
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
@@ -542,9 +543,17 @@ def get_heat_data(request):
                 (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
                 (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
             FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-            ORDER BY CreationTime;
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
+            AND CONVERT(DATETIME, '{end_date} 23:59:59', 120) 
         """
+
+    if machine:
+        sql += f" AND Machine='{machine}'"
+
+    sql += """
+    ORDER BY CreationTime;
+    """
+
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
@@ -560,7 +569,9 @@ def get_heat_data(request):
 
     return JsonResponse(result, safe=False)
 
+
 def get_flow_data(request):
+    machine = request.GET.get('machine')
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
@@ -575,9 +586,16 @@ def get_flow_data(request):
                 (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
                 (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
             FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-            ORDER BY CreationTime;
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
+            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
         """
+
+    if machine:
+        sql += f" AND Machine='{machine}'"
+
+    sql += """
+        ORDER BY CreationTime;
+    """
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
@@ -593,7 +611,9 @@ def get_flow_data(request):
 
     return JsonResponse(result, safe=False)
 
+
 def get_heat_data2(request):
+    machine = request.GET.get('machine')
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
@@ -602,14 +622,21 @@ def get_heat_data2(request):
 
     mes_db = mes_database('LK')
     sql = f"""
-                SELECT 
-                    CONVERT(varchar, CreationTime, 23) CreationTime,
-                    avg(PreHeat) PreHeat, avg(PostHeat) PostHeat
-                FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-                where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-                Group by CONVERT(varchar, CreationTime, 23)
-    			ORDER BY CreationTime;
+            SELECT 
+                CONVERT(varchar, CreationTime, 23) CreationTime,
+                avg(PreHeat) PreHeat, avg(PostHeat) PostHeat
+            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
+            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
             """
+
+    if machine:
+        sql += f" AND Machine='{machine}'"
+
+    sql += """
+        Group by CONVERT(varchar, CreationTime, 23)
+        ORDER BY CreationTime;
+    """
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
@@ -624,7 +651,9 @@ def get_heat_data2(request):
 
     return JsonResponse(result, safe=False)
 
+
 def get_flow_data2(request):
+    machine = request.GET.get('machine')
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
@@ -637,10 +666,19 @@ def get_flow_data2(request):
                 CONVERT(varchar, CreationTime, 23) CreationTime,
                 avg(PreFlow) PreFlow, avg(PostFlow) PostFlow
             FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-            Group by CONVERT(varchar, CreationTime, 23)
-			ORDER BY CreationTime;
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
+            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            
         """
+
+    if machine:
+        sql += f" AND Machine='{machine}'"
+
+    sql += """
+        Group by CONVERT(varchar, CreationTime, 23)
+        ORDER BY CreationTime;
+    """
+
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
@@ -652,5 +690,4 @@ def get_flow_data2(request):
         }
         for row in rows
     ]
-
     return JsonResponse(result, safe=False)

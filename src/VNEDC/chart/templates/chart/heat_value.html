@@ -40,6 +40,7 @@ function setDefaultDates() {
 }
 
 function loadChartData() {
+    const machine = $('#machine').val();
     const startDate = $('#startDate').val();
     const endDate = $('#endDate').val();
 
@@ -52,6 +53,7 @@ function loadChartData() {
         url: '{% url 'get_heat_data' %}',  // 請換成你實際的 URL
         method: 'GET',
         data: {
+            machine: machine,
             start_date: startDate,
             end_date: endDate
         },
@@ -144,6 +146,7 @@ function loadChartData() {
         url: '{% url 'get_flow_data' %}',  // 請換成你實際的 URL
         method: 'GET',
         data: {
+            machine: machine,
             start_date: startDate,
             end_date: endDate
         },
@@ -236,6 +239,7 @@ function loadChartData() {
         url: "{% url 'get_heat_data2' %}",
         method: "GET",
         data: {
+            machine: machine,
             start_date: startDate,
             end_date: endDate
         },
@@ -304,6 +308,7 @@ function loadChartData() {
         url: "{% url 'get_flow_data2' %}",
         method: "GET",
         data: {
+            machine: machine,
             start_date: startDate,
             end_date: endDate
         },
@@ -381,6 +386,17 @@ function loadChartData() {
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 p-3">
+
+            <label for="machine">Machine:</label>
+            <select name="machine" id="machine" style="height: 30px;">
+              <option value="">--------</option>
+              <option value="VN_LK_NBR1_L07">VN_LK_NBR1_L07</option>
+              <option value="VN_LK_NBR1_L08">VN_LK_NBR1_L08</option>
+              <option value="VN_LK_NBR2_L13">VN_LK_NBR2_L13</option>
+              <option value="VN_LK_NBR2_L14">VN_LK_NBR2_L14</option>
+              <option value="VN_LK_NBR2_L19">VN_LK_NBR2_L19</option>
+            </select>
+{#            Machine: <input type="text" id="machine">#}
             開始日期: <input type="date" id="startDate">
             結束日期: <input type="date" id="endDate">
             <button onclick="loadChartData()">查詢</button>
