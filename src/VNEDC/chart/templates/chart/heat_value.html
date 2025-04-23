@@ -1,0 +1,406 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% block head %}
+
+{% endblock %}
+{% block title %}
+Index
+{% endblock title %}
+{% block breadcrumb %}
+
+{% endblock %}
+
+{% block base_js %}
+<script src="{% static "chart.js/js/chart.min.js" %}"></script>
+<script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
+<script>
+let heatChart = null;
+let flowChart = null;
+let heatChart2 = null;
+let flowChart2 = null;
+
+$(document).ready(function () {
+    setDefaultDates();
+    loadChartData();
+});
+
+function getFormattedDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
+function setDefaultDates() {
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 6); // 今天+6天共7天
+
+    $('#startDate').val(getFormattedDate(sevenDaysAgo));
+    $('#endDate').val(getFormattedDate(today));
+}
+
+function loadChartData() {
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+
+    if (!startDate || !endDate) {
+        alert("請選擇日期範圍");
+        return;
+    }
+
+    $.ajax({
+        url: '{% url 'get_heat_data' %}',  // 請換成你實際的 URL
+        method: 'GET',
+        data: {
+            start_date: startDate,
+            end_date: endDate
+        },
+        success: function (response) {
+            const labels = response.map(item => item.CreationTime);
+            const SumHeat = response.map(item => item.SumHeat);
+            const avgInOilTMP = response.map(item => item.avg_in_tmp);
+            const avgOutOilTMP = response.map(item => item.avg_out_tmp);
+
+            const ctx = document.getElementById('heatChart').getContext('2d');
+
+            if (heatChart) {
+                heatChart.destroy();
+            }
+
+            heatChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'SumHeat (直接熱值)',
+                            data: SumHeat,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'AvgInOilTMP (進口平均溫度)',
+                            data: avgInOilTMP,
+                            type: 'line',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1',
+                        },
+                        {
+                            label: 'AvgOutOilTMP (出口平均溫度)',
+                            data: avgOutOilTMP,
+                            type: 'line',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    stacked: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'PMG Heat Chart',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'SumHeat (直接熱值)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Oil Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function () {
+            alert("資料取得失敗！");
+        }
+    });
+
+    $.ajax({
+        url: '{% url 'get_flow_data' %}',  // 請換成你實際的 URL
+        method: 'GET',
+        data: {
+            start_date: startDate,
+            end_date: endDate
+        },
+        success: function (response) {
+            const labels = response.map(item => item.CreationTime);
+            const SumHeat = response.map(item => item.SumFlow);
+            const avgInOilTMP = response.map(item => item.avg_in_tmp);
+            const avgOutOilTMP = response.map(item => item.avg_out_tmp);
+
+            const ctx = document.getElementById('flowChart').getContext('2d');
+
+            if (flowChart) {
+                flowChart.destroy();
+            }
+
+            flowChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'SumFlow (流量)',
+                            data: SumHeat,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'AvgInOilTMP (進口平均溫度)',
+                            data: avgInOilTMP,
+                            type: 'line',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1',
+                        },
+                        {
+                            label: 'AvgOutOilTMP (出口平均溫度)',
+                            data: avgOutOilTMP,
+                            type: 'line',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    stacked: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'PMG Flow Chart',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'SumFlow (流量)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Oil Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function () {
+            alert("資料取得失敗！");
+        }
+    });
+
+    $.ajax({
+        url: "{% url 'get_heat_data2' %}",
+        method: "GET",
+        data: {
+            start_date: startDate,
+            end_date: endDate
+        },
+        dataType: "json",
+        success: function (data) {
+            const labels = data.map(row => row.CreationTime);
+            const preHeat = data.map(row => row.PreHeat);
+            const postHeat = data.map(row => row.PostHeat);
+
+            const ctx = document.getElementById('heatChart2').getContext('2d');
+            if (heatChart2) heatChart2.destroy();
+
+            heatChart2 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'PreHeat',
+                            data: preHeat,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            stack: 'heatStack',
+                        },
+                        {
+                            label: 'PostHeat',
+                            data: postHeat,
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            stack: 'heatStack',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每日 PreHeat + PostHeat 堆疊柱狀圖'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: '日期'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Heat 數值'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            alert("取得資料失敗：" + error);
+        }
+    });
+
+    $.ajax({
+        url: "{% url 'get_flow_data2' %}",
+        method: "GET",
+        data: {
+            start_date: startDate,
+            end_date: endDate
+        },
+        dataType: "json",
+        success: function (data) {
+            const labels = data.map(row => row.CreationTime);
+            const preFlow = data.map(row => row.PreFlow);
+            const postFlow = data.map(row => row.PostFlow);
+
+            const ctx = document.getElementById('flowChart2').getContext('2d');
+            if (flowChart2) flowChart2.destroy();
+
+            flowChart2 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'PreFlow',
+                            data: preFlow,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            stack: 'flowStack',
+                        },
+                        {
+                            label: 'PostFlow',
+                            data: postFlow,
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            stack: 'flowStack',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每日 PreFlow + PostFlow 堆疊柱狀圖'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: '日期'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Flow 數值'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            alert("取得資料失敗：" + error);
+        }
+    });
+}
+
+</script>
+
+{% endblock %}
+
+{% block ready %}
+
+{% endblock ready %}
+
+{% block container %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 p-3">
+            開始日期: <input type="date" id="startDate">
+            結束日期: <input type="date" id="endDate">
+            <button onclick="loadChartData()">查詢</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <canvas id="heatChart" width="800" height="400"></canvas>
+        </div>
+        <div class="col-6">
+            <canvas id="flowChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <canvas id="heatChart2" width="800" height="400"></canvas>
+        </div>
+        <div class="col-6">
+            <canvas id="flowChart2" width="800" height="400"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}

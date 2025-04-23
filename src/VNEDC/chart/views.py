@@ -7,6 +7,7 @@ from chart.forms import SearchForm, ProductionSearchForm, RateSearchForm
 from collection.models import ParameterValue, ParameterDefine, Parameter_Type
 import random
 from collection.models import Process_Type, Plant, Machine
+from django.utils.dateparse import parse_date
 import matplotlib.pyplot as plt
 import base64
 import io
@@ -521,3 +522,135 @@ def get_param_code_api(request):
                                                                          name=record.param_type_code)
 
     return JsonResponse(html, safe=False)
+
+def heat_value(request):
+    return render(request, 'chart/heat_value.html', locals())
+
+
+def get_heat_data(request):
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
+
+    mes_db = mes_database('LK')
+    sql = f"""
+            SELECT 
+                CreationTime,
+                SumHeat,
+                (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
+                (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
+            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            ORDER BY CreationTime;
+        """
+    rows = mes_db.select_sql_dict(sql)
+
+    # 將結果轉成 JSON 格式
+    result = [
+        {
+            "CreationTime": row['CreationTime'].strftime("%Y-%m-%d"),
+            "SumHeat": row['SumHeat'],
+            "avg_in_tmp": row['avg_in_tmp'],
+            "avg_out_tmp": row['avg_out_tmp'],
+        }
+        for row in rows
+    ]
+
+    return JsonResponse(result, safe=False)
+
+def get_flow_data(request):
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
+
+    mes_db = mes_database('LK')
+    sql = f"""
+            SELECT 
+                CreationTime,
+                SumFlow,
+                (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
+                (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
+            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            ORDER BY CreationTime;
+        """
+    rows = mes_db.select_sql_dict(sql)
+
+    # 將結果轉成 JSON 格式
+    result = [
+        {
+            "CreationTime": row['CreationTime'].strftime("%Y-%m-%d"),
+            "SumFlow": row['SumFlow'],
+            "avg_in_tmp": row['avg_in_tmp'],
+            "avg_out_tmp": row['avg_out_tmp'],
+        }
+        for row in rows
+    ]
+
+    return JsonResponse(result, safe=False)
+
+def get_heat_data2(request):
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
+
+    mes_db = mes_database('LK')
+    sql = f"""
+                SELECT 
+                    CONVERT(varchar, CreationTime, 23) CreationTime,
+                    avg(PreHeat) PreHeat, avg(PostHeat) PostHeat
+                FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+                where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+                Group by CONVERT(varchar, CreationTime, 23)
+    			ORDER BY CreationTime;
+            """
+    rows = mes_db.select_sql_dict(sql)
+
+    # 將結果轉成 JSON 格式
+    result = [
+        {
+            "CreationTime": row['CreationTime'],
+            "PreHeat": row['PreHeat'],
+            "PostHeat": row['PostHeat']
+        }
+        for row in rows
+    ]
+
+    return JsonResponse(result, safe=False)
+
+def get_flow_data2(request):
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
+
+    mes_db = mes_database('LK')
+    sql = f"""
+            SELECT 
+                CONVERT(varchar, CreationTime, 23) CreationTime,
+                avg(PreFlow) PreFlow, avg(PostFlow) PostFlow
+            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            Group by CONVERT(varchar, CreationTime, 23)
+			ORDER BY CreationTime;
+        """
+    rows = mes_db.select_sql_dict(sql)
+
+    # 將結果轉成 JSON 格式
+    result = [
+        {
+            "CreationTime": row['CreationTime'],
+            "PreFlow": row['PreFlow'],
+            "PostFlow": row['PostFlow']
+        }
+        for row in rows
+    ]
+
+    return JsonResponse(result, safe=False)
