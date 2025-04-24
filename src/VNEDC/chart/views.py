@@ -671,7 +671,7 @@ def get_box_heat_rate(request):
     FORMAT(CreationTime, 'yyyy-MM-dd') Date,CAST(DATEPART(hour, CreationTime) as INT) Period,
     avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat
     FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-    where Machine = 'VN_LK_NBR1_L07'
+    where Machine = '{machine}'
     and ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
 		or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
 		or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
@@ -682,8 +682,8 @@ def get_box_heat_rate(request):
     heat = mes_db.select_sql_dict(sql)
     heat_df = pd.DataFrame(heat)
 
-    if heat_df.empty:
-        return JsonResponse({'message': '尚未有資料'}, safe=False)
+    if heat_df.empty or counting_df.empty:
+        return JsonResponse({'message': '停機或尚未有熱值資料'}, safe=False)
 
     counting_df['Date'] = counting_df['Date'].astype(str)
     heat_df['Date'] = heat_df['Date'].astype(str)
