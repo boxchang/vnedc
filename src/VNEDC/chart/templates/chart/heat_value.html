@@ -6,13 +6,19 @@
 
 {% endblock %}
 {% block title %}
-Index
+熱值查詢
 {% endblock title %}
 {% block breadcrumb %}
 
 {% endblock %}
 
 {% block base_js %}
+<style>
+  .table-right-align td, .table-right-align th {
+    text-align: right;
+  }
+</style>
+
 <script src="{% static "chart.js/js/chart.min.js" %}"></script>
 <script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
 <style>

@@ -698,7 +698,7 @@ def get_box_heat_rate(request):
 
     html_table = df.to_html(
         index=False,
-        classes='table table-bordered table-striped table-hover table-sm',
+        classes='table table-bordered table-striped table-hover table-sm table-right-align',  # 加上自訂 class
         border=0,
         justify='center'
     )
