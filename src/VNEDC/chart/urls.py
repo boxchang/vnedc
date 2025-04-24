@@ -2,7 +2,7 @@ from django.urls import re_path as url
 
 from chart.views import param_value, param_value_api, get_param_define_api, param_value_product_api, \
     param_value_product, get_param_code_api, get_machines_by_plant, param_value_rate_api, param_value_rate, heat_value, \
-    get_heat_data, get_flow_data, get_flow_data2, get_heat_data2
+    get_heat_data, get_flow_data, get_box_heat_rate
 
 urlpatterns = [
     url(r'^param_value/$', param_value, name='param_value'),
@@ -17,6 +17,5 @@ urlpatterns = [
     url(r'^heat_value/$', heat_value, name='heat_value'),
     url(r'^get_heat_data/$', get_heat_data, name='get_heat_data'),
     url(r'^get_flow_data/$', get_flow_data, name='get_flow_data'),
-    url(r'^get_heat_data2/$', get_heat_data2, name='get_heat_data2'),
-    url(r'^get_flow_data2/$', get_flow_data2, name='get_flow_data2'),
+    url(r'^get_box_heat_rate/$', get_box_heat_rate, name='get_box_heat_rate'),
 ]

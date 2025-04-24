@@ -8,6 +8,8 @@ from collection.models import ParameterValue, ParameterDefine, Parameter_Type
 import random
 from collection.models import Process_Type, Plant, Machine
 from django.utils.dateparse import parse_date
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import base64
 import io
@@ -524,6 +526,16 @@ def get_param_code_api(request):
     return JsonResponse(html, safe=False)
 
 def heat_value(request):
+    mes_db = mes_database('LK')
+    sql = """
+    SELECT distinct machine
+    FROM [PMG_DEVICE].[dbo].[PMG_Heat_Config]
+    """
+    rows = mes_db.select_sql_dict(sql)
+    option_str = ""
+    for row in rows:
+        option_str += f"""<option value="{row['machine']}">{row['machine']}</option>"""
+
     return render(request, 'chart/heat_value.html', locals())
 
 
@@ -536,30 +548,29 @@ def get_heat_data(request):
         return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
 
     mes_db = mes_database('LK')
-    sql = f"""
-            SELECT 
-                CreationTime,
-                SumHeat,
-                (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
-                (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
-            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
-            AND CONVERT(DATETIME, '{end_date} 23:59:59', 120) 
+
+    machine = f" AND Machine='{machine}'" if machine else ''
+
+    sql = f"""        
+                SELECT 
+                        FORMAT(CreationTime, 'MMdd-HH') CreationTime,
+                        round(avg(SumHeat),0) SumHeat,
+                        round(avg((PreInOilTMP + PostInOilTMP) / 2.0), 1) AS avg_in_tmp,
+                        round(avg((PreOutOilTMP + PostOutOilTMP) / 2.0), 1) AS avg_out_tmp
+                    FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+                    where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
+                    AND CONVERT(DATETIME, '{end_date} 23:59:59', 120) 
+                    {machine}
+            GROUP BY FORMAT(CreationTime, 'MMdd-HH')
+            ORDER BY FORMAT(CreationTime, 'MMdd-HH')
         """
-
-    if machine:
-        sql += f" AND Machine='{machine}'"
-
-    sql += """
-    ORDER BY CreationTime;
-    """
 
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
     result = [
         {
-            "CreationTime": row['CreationTime'].strftime("%Y-%m-%d"),
+            "CreationTime": row['CreationTime'],
             "SumHeat": row['SumHeat'],
             "avg_in_tmp": row['avg_in_tmp'],
             "avg_out_tmp": row['avg_out_tmp'],
@@ -579,29 +590,29 @@ def get_flow_data(request):
         return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
 
     mes_db = mes_database('LK')
+
+    machine = f" AND Machine='{machine}'" if machine else ''
+
     sql = f"""
             SELECT 
-                CreationTime,
-                SumFlow,
-                (PreInOilTMP + PostInOilTMP) / 2.0 AS avg_in_tmp,
-                (PreOutOilTMP + PostOutOilTMP) / 2.0 AS avg_out_tmp
+                FORMAT(CreationTime, 'MMdd-HH') CreationTime,
+                round(avg(SumFlow),0) SumFlow,
+                round(avg((PreInOilTMP + PostInOilTMP) / 2.0), 1) AS avg_in_tmp,
+                round(avg((PreOutOilTMP + PostOutOilTMP) / 2.0), 1) AS avg_out_tmp
             FROM [PMG_DEVICE].[dbo].[PMG_Heat]
             where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
             and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            {machine}
+            GROUP BY FORMAT(CreationTime, 'MMdd-HH')
+            ORDER BY FORMAT(CreationTime, 'MMdd-HH')
         """
 
-    if machine:
-        sql += f" AND Machine='{machine}'"
-
-    sql += """
-        ORDER BY CreationTime;
-    """
     rows = mes_db.select_sql_dict(sql)
 
     # 將結果轉成 JSON 格式
     result = [
         {
-            "CreationTime": row['CreationTime'].strftime("%Y-%m-%d"),
+            "CreationTime": row['CreationTime'],
             "SumFlow": row['SumFlow'],
             "avg_in_tmp": row['avg_in_tmp'],
             "avg_out_tmp": row['avg_out_tmp'],
@@ -612,82 +623,84 @@ def get_flow_data(request):
     return JsonResponse(result, safe=False)
 
 
-def get_heat_data2(request):
+def get_box_heat_rate(request):
     machine = request.GET.get('machine')
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
-    if not start_date or not end_date:
-        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
-
     mes_db = mes_database('LK')
+
     sql = f"""
-            SELECT 
-                CONVERT(varchar, CreationTime, 23) CreationTime,
-                avg(PreHeat) PreHeat, avg(PostHeat) PostHeat
-            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
-            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-            """
-
-    if machine:
-        sql += f" AND Machine='{machine}'"
-
-    sql += """
-        Group by CONVERT(varchar, CreationTime, 23)
-        ORDER BY CreationTime;
+    select InspectionDate Date,MachineName,sum(c.sum_qty) output
+        from (
+        SELECT FORMAT(CreationTime, 'yyyy-MM-dd') AS CountingDate,CAST(DATEPART(hour, CreationTime) as INT) Period ,m.mes_machine Name,m.line Line, max(Speed) max_speed,min(Speed) min_speed,round(avg(Speed),0) avg_speed,sum(Qty2) sum_qty
+        FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] c, [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m
+        where CreationTime between '{start_date} 00:00:00' and '{end_date} 23:59:59'
+        and c.MachineName = m.counting_machine and m.mes_machine = '{machine}'
+        group by m.mes_machine,FORMAT(CreationTime, 'yyyy-MM-dd'),DATEPART(hour, CreationTime),m.line
+        ) c 
+        JOIN [PMGMES].[dbo].[PMG_MES_RunCard] r 
+        on c.Name = r.MachineName and c.Line = r.LineName and c.Period = r.Period and c.CountingDate = r.InspectionDate
+        JOIN [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] ipqc on ipqc.RunCardId = r.Id and OptionName = 'Weight'
+        JOIN [PMGMES].[dbo].[PMG_MES_WorkOrderInfo] w on r.WorkOrderId = w.WorkOrderId AND r.LineName = w.LineId
+        where w.StartDate IS NOT NULL
+        and r.MachineName = '{machine}'
+        group by InspectionDate,MachineName
+        order by InspectionDate
     """
-    rows = mes_db.select_sql_dict(sql)
+    counting = mes_db.select_sql_dict(sql)
+    counting_df = pd.DataFrame(counting)
 
-    # 將結果轉成 JSON 格式
-    result = [
-        {
-            "CreationTime": row['CreationTime'],
-            "PreHeat": row['PreHeat'],
-            "PostHeat": row['PostHeat']
-        }
-        for row in rows
-    ]
-
-    return JsonResponse(result, safe=False)
-
-
-def get_flow_data2(request):
-    machine = request.GET.get('machine')
-    start_date = parse_date(request.GET.get('start_date'))
-    end_date = parse_date(request.GET.get('end_date'))
-
-    if not start_date or not end_date:
-        return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
-
-    mes_db = mes_database('LK')
     sql = f"""
-            SELECT 
-                CONVERT(varchar, CreationTime, 23) CreationTime,
-                avg(PreFlow) PreFlow, avg(PostFlow) PostFlow
-            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
-            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
-            
-        """
-
-    if machine:
-        sql += f" AND Machine='{machine}'"
-
-    sql += """
-        Group by CONVERT(varchar, CreationTime, 23)
-        ORDER BY CreationTime;
+    SELECT 
+    FORMAT(CreationTime, 'yyyy-MM-dd') Date,
+    avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat
+    FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+    where Machine = '{machine}'
+    and CreationTime between '{start_date} 00:00:00' and '{end_date} 23:59:59'
+    GROUP BY FORMAT(CreationTime, 'yyyy-MM-dd')
     """
+    heat = mes_db.select_sql_dict(sql)
+    heat_df = pd.DataFrame(heat)
 
-    rows = mes_db.select_sql_dict(sql)
+    if heat_df.empty:
+        return JsonResponse({'message': '尚未有資料'}, safe=False)
 
-    # 將結果轉成 JSON 格式
-    result = [
-        {
-            "CreationTime": row['CreationTime'],
-            "PreFlow": row['PreFlow'],
-            "PostFlow": row['PostFlow']
-        }
-        for row in rows
-    ]
+    counting_df['Date'] = counting_df['Date'].astype(str)
+    heat_df['Date'] = heat_df['Date'].astype(str)
+
+    df = pd.merge(counting_df, heat_df, on=['Date'], how='left')
+
+    df = df[['Date', 'MachineName', 'output', 'SumFlow', 'SumHeat']]
+    df['Boxes'] = np.ceil(df['output'] / 1000).astype(int)
+    df['Box_Heat_Rate'] = df.apply(
+        lambda row: round(row['SumHeat'] / row['Boxes'], 0) if row['Boxes'] != 0 else 0,
+        axis=1
+    )
+    df['Box_Heat_Rate'] = df['Box_Heat_Rate'].fillna(0)
+    df['SumFlow'] = df['SumFlow'].fillna(0).astype(int)
+    df['SumHeat'] = df['SumHeat'].fillna(0).astype(int)
+    df['output'] = df['output'].fillna(0).astype(int)
+
+    df_dict = df[['Date', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
+
+    df = df.rename(columns={
+        'Date': '作業日期',
+        'MachineName': '機台名稱',
+        'output': '手套產出量',
+        'SumFlow': '平均日流量',
+        'SumHeat': '平均日熱值',
+        'Boxes': '產出箱數',
+        'Box_Heat_Rate': '每箱耗用熱值',
+
+    })
+
+    html_table = df.to_html(
+        index=False,
+        classes='table table-bordered table-striped table-hover table-sm',
+        border=0,
+        justify='center'
+    )
+
+    result = {'df_dict': df_dict, 'html_table': html_table}
     return JsonResponse(result, safe=False)
