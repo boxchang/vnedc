@@ -14,18 +14,17 @@
 
 {% block base_js %}
 <style>
-  .table-right-align td, .table-right-align th {
-    text-align: right;
-  }
-</style>
+    .table-right-align td, .table-right-align th {
+        text-align: right;
+    }
 
-<script src="{% static "chart.js/js/chart.min.js" %}"></script>
-<script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
-<style>
     input, button, select {
         margin: 5px;
     }
 </style>
+
+<script src="{% static "chart.js/js/chart.min.js" %}"></script>
+<script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
 <script>
 let heatChart = null;
 let flowChart = null;
