@@ -525,6 +525,7 @@ def get_param_code_api(request):
 
     return JsonResponse(html, safe=False)
 
+
 def heat_value(request):
     mes_db = mes_database('LK')
     sql = """
