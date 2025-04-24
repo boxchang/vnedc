@@ -94,14 +94,14 @@ function loadChartData() {
                     labels: labels,
                     datasets: [
                         {
-                            label: '直接熱值',
+                            label: '直接熱值(小時)',
                             data: SumHeat,
                             backgroundColor: barColor,
                             yAxisID: 'y',
                             order: 2
                         },
                         {
-                            label: '進口平均溫度',
+                            label: '進口平均溫度(小時)',
                             data: avgInOilTMP,
                             type: 'line',
                             borderColor: 'rgba(54, 162, 235, 1)',
@@ -110,7 +110,7 @@ function loadChartData() {
                             order: 1
                         },
                         {
-                            label: '出口平均溫度',
+                            label: '出口平均溫度(小時)',
                             data: avgOutOilTMP,
                             type: 'line',
                             borderColor: 'rgba(75, 192, 192, 1)',
@@ -232,14 +232,14 @@ function loadChartData() {
                     labels: labels,
                     datasets: [
                         {
-                            label: '流量',
+                            label: '流量(小時)',
                             data: SumHeat,
                             backgroundColor: barColor,
                             yAxisID: 'y',
                             order: 2
                         },
                         {
-                            label: '進口平均溫度',
+                            label: '進口平均溫度(小時)',
                             data: avgInOilTMP,
                             type: 'line',
                             borderColor: 'rgba(54, 162, 235, 1)',
@@ -248,7 +248,7 @@ function loadChartData() {
                             order: 1
                         },
                         {
-                            label: '出口平均溫度',
+                            label: '出口平均溫度(小時)',
                             data: avgOutOilTMP,
                             type: 'line',
                             borderColor: 'rgba(75, 192, 192, 1)',
@@ -377,14 +377,14 @@ function loadChartData() {
                     labels: labels,
                     datasets: [
                         {
-                            label: '每日產出箱數',
+                            label: '產出箱數(日)',
                             data: boxes,
                             backgroundColor: barColor,
                             yAxisID: 'y',
                             order: 2
                         },
                         {
-                            label: '每箱耗用熱值',
+                            label: '每箱平均耗用熱值(日)',
                             data: box_heat_rate,
                             type: 'line',
                             borderColor: 'rgba(0, 200, 255, 0.6)',
@@ -413,7 +413,7 @@ function loadChartData() {
                         },
                         title: {
                             display: true,
-                            text: '產量熱值比',
+                            text: '產量耗用熱值圖',
                             font: {
                                 size: title_font_size
                             }
@@ -453,7 +453,7 @@ function loadChartData() {
                             },
                             title: {
                                 display: true,
-                                text: '產量熱值比',
+                                text: '每箱平均耗用熱值',
                                 font: {
                                     size: title_font_size
                                 }

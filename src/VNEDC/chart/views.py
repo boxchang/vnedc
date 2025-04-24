@@ -544,6 +544,9 @@ def get_heat_data(request):
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
+    tmp_end_plus = (end_date + timedelta(days=1)).strftime('%Y-%m-%d')
+    tmp_end_minus = (end_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
     if not start_date or not end_date:
         return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
 
@@ -558,8 +561,9 @@ def get_heat_data(request):
                         round(avg((PreInOilTMP + PostInOilTMP) / 2.0), 1) AS avg_in_tmp,
                         round(avg((PreOutOilTMP + PostOutOilTMP) / 2.0), 1) AS avg_out_tmp
                     FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-                    where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
-                    AND CONVERT(DATETIME, '{end_date} 23:59:59', 120) 
+                    where ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+		                or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+		                or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
                     {machine}
             GROUP BY FORMAT(CreationTime, 'MMdd-HH')
             ORDER BY FORMAT(CreationTime, 'MMdd-HH')
@@ -586,6 +590,9 @@ def get_flow_data(request):
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
+    tmp_end_plus = (end_date + timedelta(days=1)).strftime('%Y-%m-%d')
+    tmp_end_minus = (end_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
     if not start_date or not end_date:
         return JsonResponse({"error": "請提供有效的 start_date 和 end_date"}, status=400)
 
@@ -600,8 +607,9 @@ def get_flow_data(request):
                 round(avg((PreInOilTMP + PostInOilTMP) / 2.0), 1) AS avg_in_tmp,
                 round(avg((PreOutOilTMP + PostOutOilTMP) / 2.0), 1) AS avg_out_tmp
             FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-            where CreationTime between CONVERT(DATETIME, '{start_date} 00:00:00', 120) 
-            and CONVERT(DATETIME, '{end_date} 23:59:59', 120)
+            where ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+            or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+            or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
             {machine}
             GROUP BY FORMAT(CreationTime, 'MMdd-HH')
             ORDER BY FORMAT(CreationTime, 'MMdd-HH')
@@ -628,6 +636,9 @@ def get_box_heat_rate(request):
     start_date = parse_date(request.GET.get('start_date'))
     end_date = parse_date(request.GET.get('end_date'))
 
+    tmp_end_plus = (end_date + timedelta(days=1)).strftime('%Y-%m-%d')
+    tmp_end_minus = (end_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
     mes_db = mes_database('LK')
 
     sql = f"""
@@ -635,7 +646,9 @@ def get_box_heat_rate(request):
         from (
         SELECT FORMAT(CreationTime, 'yyyy-MM-dd') AS CountingDate,CAST(DATEPART(hour, CreationTime) as INT) Period ,m.mes_machine Name,m.line Line, max(Speed) max_speed,min(Speed) min_speed,round(avg(Speed),0) avg_speed,sum(Qty2) sum_qty
         FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] c, [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m
-        where CreationTime between '{start_date} 00:00:00' and '{end_date} 23:59:59'
+        where ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+		or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+		or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
         and c.MachineName = m.counting_machine and m.mes_machine = '{machine}'
         group by m.mes_machine,FORMAT(CreationTime, 'yyyy-MM-dd'),DATEPART(hour, CreationTime),m.line
         ) c 
@@ -652,13 +665,18 @@ def get_box_heat_rate(request):
     counting_df = pd.DataFrame(counting)
 
     sql = f"""
-    SELECT 
-    FORMAT(CreationTime, 'yyyy-MM-dd') Date,
+    SELECT Date, avg(SumFlow) SumFlow, sum(SumHeat) SumHeat FROM (
+	SELECT 
+    FORMAT(CreationTime, 'yyyy-MM-dd') Date,CAST(DATEPART(hour, CreationTime) as INT) Period,
     avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat
     FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-    where Machine = '{machine}'
-    and CreationTime between '{start_date} 00:00:00' and '{end_date} 23:59:59'
-    GROUP BY FORMAT(CreationTime, 'yyyy-MM-dd')
+    where Machine = 'VN_LK_NBR1_L07'
+    and ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+		or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+		or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
+    GROUP BY FORMAT(CreationTime, 'yyyy-MM-dd'),CAST(DATEPART(hour, CreationTime) as INT)
+	) A GROUP BY Date
+    
     """
     heat = mes_db.select_sql_dict(sql)
     heat_df = pd.DataFrame(heat)
@@ -678,9 +696,9 @@ def get_box_heat_rate(request):
         axis=1
     )
     df['Box_Heat_Rate'] = df['Box_Heat_Rate'].fillna(0)
-    df['SumFlow'] = df['SumFlow'].fillna(0).astype(int)
-    df['SumHeat'] = df['SumHeat'].fillna(0).astype(int)
-    df['output'] = df['output'].fillna(0).astype(int)
+    df['SumFlow'] = df['SumFlow'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
+    df['SumHeat'] = df['SumHeat'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
+    df['output'] = df['output'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
 
     df_dict = df[['Date', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
 
@@ -688,9 +706,9 @@ def get_box_heat_rate(request):
         'Date': '作業日期',
         'MachineName': '機台名稱',
         'output': '手套產出量',
-        'SumFlow': '平均日流量',
-        'SumHeat': '平均日熱值',
-        'Boxes': '產出箱數',
+        'Boxes': '估算產出箱數',
+        'SumHeat': '日累加熱值',
+        'SumFlow': '日平均流量',
         'Box_Heat_Rate': '每箱耗用熱值',
 
     })
