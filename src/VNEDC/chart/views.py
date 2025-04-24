@@ -696,14 +696,22 @@ def get_box_heat_rate(request):
         lambda row: round(row['SumHeat'] / row['Boxes'], 0) if row['Boxes'] != 0 else 0,
         axis=1
     )
-    df['Box_Heat_Rate'] = df['Box_Heat_Rate'].fillna(0)
-    df['SumFlow'] = df['SumFlow'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
-    df['SumHeat'] = df['SumHeat'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
-    df['output'] = df['output'].fillna(0).astype(int).apply(lambda x: f"{x:,.0f}")
+
+    df['Box_Heat_Rate'] = df['Box_Heat_Rate'].fillna(0).astype(int)
+    df['SumFlow'] = df['SumFlow'].fillna(0).astype(int)
+    df['SumHeat'] = df['SumHeat'].fillna(0).astype(int)
+    df['output'] = df['output'].fillna(0).astype(int)
 
     df_dict = df[['Date', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
 
-    df = df.rename(columns={
+    table_df = df.copy()
+
+    table_df['Box_Heat_Rate'] = table_df['Box_Heat_Rate'].apply(lambda x: f"{x:,.0f}")
+    table_df['SumFlow'] = table_df['SumFlow'].apply(lambda x: f"{x:,.0f}")
+    table_df['SumHeat'] = table_df['SumHeat'].apply(lambda x: f"{x:,.0f}")
+    table_df['output'] = table_df['output'].apply(lambda x: f"{x:,.0f}")
+
+    table_df = table_df.rename(columns={
         'Date': '作業日期',
         'MachineName': '機台名稱',
         'output': '手套產出量',
@@ -714,7 +722,7 @@ def get_box_heat_rate(request):
 
     })
 
-    html_table = df.to_html(
+    html_table = table_df.to_html(
         index=False,
         classes='table table-bordered table-striped table-hover table-sm table-right-align',  # 加上自訂 class
         border=0,

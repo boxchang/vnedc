@@ -178,8 +178,11 @@ function validate(evt) {
            {% endblock content %}
         </div>
         <div class="col-1">
+        <a href="{% url 'heat_value' %}" class="btn btn-info" style="width:220px;">
+            熱值資料
+        </a>
         {% if request.session.plant %}
-        <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:220px;">
+        <a href="{% url 'daily_info_create' %}" class="btn btn-info" style="width:220px;margin-top: 5px;">
             {% trans 'Production Data' %}
         </a>
         {% endif %}
