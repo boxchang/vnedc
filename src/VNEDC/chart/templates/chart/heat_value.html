@@ -15,6 +15,11 @@ Index
 {% block base_js %}
 <script src="{% static "chart.js/js/chart.min.js" %}"></script>
 <script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
+<style>
+    input, button, select {
+        margin: 5px;
+    }
+</style>
 <script>
 let heatChart = null;
 let flowChart = null;
@@ -488,16 +493,18 @@ function loadChartData() {
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 p-3">
-
-            <label for="machine">Machine:</label>
-            <select name="machine" id="machine" style="height: 30px;">
-              <option value="">--------</option>
-              {{ option_str|safe }}
-            </select>
-{#            Machine: <input type="text" id="machine">#}
-            開始日期: <input type="date" id="startDate">
-            結束日期: <input type="date" id="endDate">
-            <button onclick="checkMachine()">查詢</button>
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="machine">Machine:</label>
+                    <select class="form-control" name="machine" id="machine">
+                      <option value="">--------</option>
+                      {{ option_str|safe }}
+                    </select>
+                </div>
+                開始日期: <input type="date" class="form-control" id="startDate">
+                結束日期: <input type="date" class="form-control" id="endDate">
+                <button onclick="checkMachine()" class="btn btn-info" type="button">查詢</button>
+            </form>
         </div>
     </div>
     <div class="row">
