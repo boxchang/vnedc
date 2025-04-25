@@ -365,7 +365,7 @@ function loadChartData() {
             }
 
             const data = response.df_dict;
-            const labels = data.map(item => item.Date);
+            const labels = data.map(item => item.belong_to);
             const boxes = data.map(item => item.Boxes);
             const box_heat_rate = data.map(item => item.Box_Heat_Rate);
             $('#table-container').html(response.html_table);

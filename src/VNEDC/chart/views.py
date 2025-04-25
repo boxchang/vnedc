@@ -643,41 +643,38 @@ def get_box_heat_rate(request):
     mes_db = mes_database('LK')
 
     sql = f"""
-    select InspectionDate Date,MachineName,sum(c.sum_qty) output
-        from (
-        SELECT FORMAT(CreationTime, 'yyyy-MM-dd') AS CountingDate,CAST(DATEPART(hour, CreationTime) as INT) Period ,m.mes_machine Name,m.line Line, max(Speed) max_speed,min(Speed) min_speed,round(avg(Speed),0) avg_speed,sum(Qty2) sum_qty
-        FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] c, [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m
-        where ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
-		or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
-		or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
-        and c.MachineName = m.counting_machine and m.mes_machine = '{machine}'
-        group by m.mes_machine,FORMAT(CreationTime, 'yyyy-MM-dd'),DATEPART(hour, CreationTime),m.line
-        ) c 
-        JOIN [PMGMES].[dbo].[PMG_MES_RunCard] r 
-        on c.Name = r.MachineName and c.Line = r.LineName and c.Period = r.Period and c.CountingDate = r.InspectionDate
-        JOIN [PMGMES].[dbo].[PMG_MES_IPQCInspectingRecord] ipqc on ipqc.RunCardId = r.Id and OptionName = 'Weight'
-        JOIN [PMGMES].[dbo].[PMG_MES_WorkOrderInfo] w on r.WorkOrderId = w.WorkOrderId AND r.LineName = w.LineId
-        where w.StartDate IS NOT NULL
-        and r.MachineName = '{machine}'
-        group by InspectionDate,MachineName
-        order by InspectionDate
+        SELECT belong_to, Name MachineName, sum(Qty2) output FROM (
+            SELECT FORMAT(CreationTime, 'yyyy-MM-dd') AS CountingDate,
+            CASE WHEN CAST(DATEPART(hour, CreationTime) as INT) BETWEEN 0 AND 5 THEN FORMAT(DATEADD(DAY, -1, CreationTime), 'yyyy-MM-dd')
+                    ELSE FORMAT(CreationTime, 'yyyy-MM-dd') END AS belong_to,
+            CAST(DATEPART(hour, CreationTime) as INT) Period ,m.mes_machine Name,m.line Line,Qty2
+            FROM [PMG_DEVICE].[dbo].[COUNTING_DATA] c, [PMG_DEVICE].[dbo].[COUNTING_DATA_MACHINE] m
+            where ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+            or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+            or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
+            and c.MachineName = m.counting_machine and m.mes_machine = '{machine}'
+        ) A GROUP BY belong_to, Name
+        Order by belong_to
     """
     counting = mes_db.select_sql_dict(sql)
     counting_df = pd.DataFrame(counting)
 
     sql = f"""
-    SELECT Date, avg(SumFlow) SumFlow, sum(SumHeat) SumHeat FROM (
-	SELECT 
-    FORMAT(CreationTime, 'yyyy-MM-dd') Date,CAST(DATEPART(hour, CreationTime) as INT) Period,
-    avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat
-    FROM [PMG_DEVICE].[dbo].[PMG_Heat]
-    where Machine = '{machine}'
-    and ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
-		or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
-		or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
-    GROUP BY FORMAT(CreationTime, 'yyyy-MM-dd'),CAST(DATEPART(hour, CreationTime) as INT)
-	) A GROUP BY Date
-    
+    SELECT belong_to, avg(SumFlow) SumFlow, sum(SumHeat) SumHeat FROM (
+        SELECT belong_to,Period, avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat FROM (
+            SELECT FORMAT(CreationTime, 'yyyy-MM-dd') Date,
+            CASE WHEN CAST(DATEPART(hour, CreationTime) as INT) BETWEEN 0 AND 5 THEN FORMAT(DATEADD(DAY, -1, CreationTime), 'yyyy-MM-dd')
+                ELSE FORMAT(CreationTime, 'yyyy-MM-dd') END AS belong_to,
+            CAST(DATEPART(hour, CreationTime) as INT) Period,
+            SumFlow,SumHeat
+            FROM [PMG_DEVICE].[dbo].[PMG_Heat]
+            where Machine = '{machine}'
+            and ((CreationTime between '{start_date} 06:00:00' and '{start_date} 23:59:59')
+                or (CreationTime between '{start_date} 06:00:00' and '{tmp_end_minus} 23:59:59')
+                or (CreationTime between '{end_date} 00:00:00' and '{tmp_end_plus} 05:59:59'))
+        ) A GROUP BY belong_to,Period
+    ) AA GROUP BY belong_to
+    Order by belong_to
     """
     heat = mes_db.select_sql_dict(sql)
     heat_df = pd.DataFrame(heat)
@@ -685,12 +682,12 @@ def get_box_heat_rate(request):
     if heat_df.empty or counting_df.empty:
         return JsonResponse({'message': '停機或尚未有熱值資料'}, safe=False)
 
-    counting_df['Date'] = counting_df['Date'].astype(str)
-    heat_df['Date'] = heat_df['Date'].astype(str)
+    counting_df['belong_to'] = counting_df['belong_to'].astype(str)
+    heat_df['belong_to'] = heat_df['belong_to'].astype(str)
 
-    df = pd.merge(counting_df, heat_df, on=['Date'], how='left')
+    df = pd.merge(counting_df, heat_df, on=['belong_to'], how='left')
 
-    df = df[['Date', 'MachineName', 'output', 'SumFlow', 'SumHeat']]
+    df = df[['belong_to', 'MachineName', 'output', 'SumFlow', 'SumHeat']]
     df['Boxes'] = np.ceil(df['output'] / 1000).astype(int)
     df['Box_Heat_Rate'] = df.apply(
         lambda row: round(row['SumHeat'] / row['Boxes'], 0) if row['Boxes'] != 0 else 0,
@@ -702,7 +699,7 @@ def get_box_heat_rate(request):
     df['SumHeat'] = df['SumHeat'].fillna(0).astype(int)
     df['output'] = df['output'].fillna(0).astype(int)
 
-    df_dict = df[['Date', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
+    df_dict = df[['belong_to', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
 
     table_df = df.copy()
 
@@ -712,7 +709,7 @@ def get_box_heat_rate(request):
     table_df['output'] = table_df['output'].apply(lambda x: f"{x:,.0f}")
 
     table_df = table_df.rename(columns={
-        'Date': '作業日期',
+        'belong_to': '作業日期',
         'MachineName': '機台名稱',
         'output': '手套產出量',
         'Boxes': '估算產出箱數',
