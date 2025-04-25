@@ -47,10 +47,12 @@ function getFormattedDate(date) {
 function setDefaultDates() {
     const today = new Date();
     const sevenDaysAgo = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1)
     sevenDaysAgo.setDate(today.getDate() - 6); // 今天+6天共7天
 
     $('#startDate').val(getFormattedDate(sevenDaysAgo));
-    $('#endDate').val(getFormattedDate(today));
+    $('#endDate').val(getFormattedDate(yesterday));
 }
 
 function checkMachine() {
