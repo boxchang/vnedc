@@ -21,10 +21,16 @@
     input, button, select {
         margin: 5px;
     }
+
+    #download {
+        margin-top: 48px;
+        height: 50%;
+    }
 </style>
 
 <script src="{% static "chart.js/js/chart.min.js" %}"></script>
 <script src="{% static "chart.js/js/chartjs-plugin-datalabels@2.0.0.js" %}"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script>
 let heatChart = null;
 let flowChart = null;
@@ -486,6 +492,25 @@ function loadChartData() {
 
 }
 
+function downloadTableAsExcel(tableId, filename = 'data.xlsx') {
+    let table = document.querySelector('#table-container table');
+
+    if (!table) {
+        alert("Cannot find the Id: " + tableId);
+        return;
+    }
+
+    // Tạo workbook từ bảng
+    let wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+    // Ghi ra file Excel
+    XLSX.writeFile(wb, filename);
+}
+
+function showDownloadButton() {
+    document.getElementById('download').classList.remove('d-none');
+}
+
 </script>
 
 {% endblock %}
@@ -508,7 +533,7 @@ function loadChartData() {
                 </div>
                 開始日期: <input type="date" class="form-control" id="startDate">
                 結束日期: <input type="date" class="form-control" id="endDate">
-                <button onclick="checkMachine()" class="btn btn-info" type="button">查詢</button>
+                <button onclick="checkMachine(); showDownloadButton();" class="btn btn-info" type="button">查詢</button>
             </form>
         </div>
     </div>
@@ -525,7 +550,15 @@ function loadChartData() {
             <canvas id="flowChart"></canvas>
         </div>
     </div>
-    <div id="table-container" class="row p-5">
+
+    <div class="row">
+        <div id="table-container" class="row p-5 col-11"></div>
+        <a onclick="downloadTableAsExcel('#table-container', 'data-table.xlsx')"
+           class="btn btn-success col-1 d-none" id="download" role="button">
+            <i class="fas fa-download"></i>
+        </a>
     </div>
+
+
 </div>
 {% endblock %}
