@@ -659,6 +659,29 @@ def get_box_heat_rate(request):
     counting = mes_db.select_sql_dict(sql)
     counting_df = pd.DataFrame(counting)
 
+    tmp_start_plus = (start_date + timedelta(days=1)).strftime('%Y-%m-%d')
+
+    sql = f"""
+    SELECT belong_to, sum(ActualQty) scrap_qty from (
+        SELECT ActualQty,
+               CASE 
+                   WHEN r.Period BETWEEN 0 AND 5 THEN DATEADD(DAY, -1, r.InspectionDate)
+                   ELSE r.InspectionDate
+               END AS belong_to
+          FROM [PMGMES].[dbo].[PMG_MES_RunCard] r
+          JOIN [PMGMES].[dbo].[PMG_MES_Scrap] s ON r.Id = s.RunCardId
+         WHERE r.MachineName = '{machine}'
+           AND (
+                (r.InspectionDate = '{start_date}' AND r.Period BETWEEN 6 AND 23)
+             OR (r.InspectionDate BETWEEN '{tmp_start_plus}' AND '{end_date}')
+             OR (r.InspectionDate = '{end_date}' AND r.Period BETWEEN 0 AND 5)
+           )
+        ) A 
+        group by belong_to
+    """
+    scrap = mes_db.select_sql_dict(sql)
+    scrap_df = pd.DataFrame(scrap)
+
     sql = f"""
     SELECT belong_to, avg(SumFlow) SumFlow, sum(SumHeat) SumHeat FROM (
         SELECT belong_to,Period, avg(SumFlow) SumFlow, round(avg(SumHeat),0) SumHeat FROM (
@@ -687,8 +710,14 @@ def get_box_heat_rate(request):
 
     df = pd.merge(counting_df, heat_df, on=['belong_to'], how='left')
 
-    df = df[['belong_to', 'MachineName', 'output', 'SumFlow', 'SumHeat']]
-    df['Boxes'] = np.ceil(df['output'] / 1000).astype(int)
+    df['belong_to'] = pd.to_datetime(df['belong_to'])
+    scrap_df['belong_to'] = pd.to_datetime(scrap_df['belong_to'])
+    df = pd.merge(df, scrap_df, on=['belong_to'], how='left')
+    df['scrap_qty'] = df['scrap_qty'].fillna(0)
+    df['sum_qty'] = df['output'] + df['scrap_qty']
+
+    df = df[['belong_to', 'MachineName', 'sum_qty', 'SumFlow', 'SumHeat']]
+    df['Boxes'] = np.ceil(df['sum_qty'] / 1000).astype(int)
     df['Box_Heat_Rate'] = df.apply(
         lambda row: round(row['SumHeat'] / row['Boxes'], 0) if row['Boxes'] != 0 else 0,
         axis=1
@@ -697,21 +726,21 @@ def get_box_heat_rate(request):
     df['Box_Heat_Rate'] = df['Box_Heat_Rate'].fillna(0).astype(int)
     df['SumFlow'] = df['SumFlow'].fillna(0).astype(int)
     df['SumHeat'] = df['SumHeat'].fillna(0).astype(int)
-    df['output'] = df['output'].fillna(0).astype(int)
+    df['sum_qty'] = df['sum_qty'].fillna(0).astype(int)
 
-    df_dict = df[['belong_to', 'Boxes', 'output', 'Box_Heat_Rate']].to_dict(orient='records')
+    df_dict = df[['belong_to', 'Boxes', 'sum_qty', 'Box_Heat_Rate']].to_dict(orient='records')
 
     table_df = df.copy()
 
     table_df['Box_Heat_Rate'] = table_df['Box_Heat_Rate'].apply(lambda x: f"{x:,.0f}")
     table_df['SumFlow'] = table_df['SumFlow'].apply(lambda x: f"{x:,.0f}")
     table_df['SumHeat'] = table_df['SumHeat'].apply(lambda x: f"{x:,.0f}")
-    table_df['output'] = table_df['output'].apply(lambda x: f"{x:,.0f}")
+    table_df['sum_qty'] = table_df['sum_qty'].apply(lambda x: f"{x:,.0f}")
 
     table_df = table_df.rename(columns={
         'belong_to': '作業日期',
         'MachineName': '機台名稱',
-        'output': '手套產出量',
+        'sum_qty': '手套產出量',
         'Boxes': '估算產出箱數',
         'SumHeat': '日累加熱值',
         'SumFlow': '日平均流量',
