@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from VNEDC.database import mes_database, vnedc_database
+from VNEDC.database import mes_database, vnedc_database, gdmes_olap_database
 from datetime import datetime, timedelta
 import json
 from django.http import HttpResponseBadRequest
@@ -1625,7 +1625,7 @@ def monthly_check(request):
 
 
 def daily_report_comment(request):
-    db = vnedc_database()
+    db = gdmes_olap_database()
     form = DailyReportCmt()
 
     if request.method == 'POST':
@@ -1659,7 +1659,7 @@ def daily_report_comment(request):
 
 
 def daily_report_all(request):
-    db = vnedc_database()
+    db = gdmes_olap_database()
 
     sql_all = f"""
                     SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
@@ -1673,7 +1673,7 @@ def daily_report_delete(request):
 
     if request.method == 'DELETE':
 
-        db = vnedc_database()
+        db = gdmes_olap_database()
         data = json.loads(request.body)
 
         date = datetime.strptime(data.get('report_date'), '%Y-%m-%d').date()

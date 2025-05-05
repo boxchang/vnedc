@@ -82,4 +82,28 @@ DATABASES = {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     },
+    'GD_OLAP': {
+        'ENGINE': 'mssql',
+        'NAME': 'MES_OLAP',
+        'USER': 'sa',
+        'PASSWORD': '!QAw3ed',
+        'HOST': '10.13.102.22',
+        'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+    'LK_OLAP': {
+        'ENGINE': 'mssql',
+        'NAME': 'MES_OLAP',
+        'USER': 'sa',
+        'PASSWORD': '!QAw3ed',
+        'HOST': '10.14.102.11',
+        'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
 }
