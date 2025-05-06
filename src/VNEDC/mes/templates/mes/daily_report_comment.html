@@ -8,7 +8,9 @@
 {% block js %}
 
 <style>
-
+    .nav-item {
+        width: 5vw;
+    }
 </style>
 
 
@@ -18,26 +20,65 @@ Monthly Check
 {% endblock title %}
 {% block content %}
     <div class="container-fluid mt-3">
-        <div class="row d-flex justify-content-center">
-            <div class="col-6">
-                <div class="card p-4 shadow-sm" id="detailsDialog">
-                    <form method="post" id="form">
-                        {% crispy form %}
-                        <button type="submit" class="btn btn-primary btn-lg">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <table id="jsGrid"></table>
 
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active text-center" id="gd-tab" data-toggle="tab" href="#gd" role="tab" data-tabtype="gd">GD</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-center" id="lk-tab" data-toggle="tab" href="#lk" role="tab" data-tabtype="lk">LK</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="gd" role="tabpanel">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-6">
+                        <div class="card p-4 shadow-sm" id="detailsDialog_gd">
+                            <form method="post" id="form_gd">
+                                {% crispy form %}
+                                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <table id="jsGrid_gd"></table>
+            </div>
+
+            <div class="tab-pane fade" id="lk" role="tabpanel">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-6">
+                        <div class="card p-4 shadow-sm" id="detailsDialog_lk">
+                            <form method="post" id="form_lk">
+                                {% crispy form %}
+                                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <table id="jsGrid_lk"></table>
+            </div>
+
+        </div>
     </div>
 
     <script>
     $(document).ready(function () {
         const deleteUrl = "{% url 'daily_report_delete' %}";
 
-        function renderJsGrid() {
-            $("#jsGrid").jsGrid({
+        function renderJsGrid(tabtype) {
+            const gridId = "#jsGrid_" + tabtype;
+            const dialogId = "#detailsDialog_" + tabtype;
+
+            $(dialogId).dialog({
+                autoOpen: false,
+                width: 400,
+                modal: true
+            });
+
+            $(gridId).jsGrid("destroy");
+
+            $(gridId).jsGrid({
                 width: "100%",
                 height: "700px",
 
@@ -48,6 +89,7 @@ Monthly Check
                 autoload: true,
                 controller:{
                     loadData: function(filter) {
+                        filter.tabtype = tabtype;
                         console.log("Calling loadData with filter:", filter);
                         return $.ajax({
                             url: "{% url 'daily_report_all' %}",
@@ -72,7 +114,7 @@ Monthly Check
                                 .addClass("btn btn-success btn-lg")
                                 .html('<i class="fas fa-plus"></i>')
                                     .on("click", function () {
-                                        showDetailsDialog("Add", {'report_date': '', 'comment': ''});
+                                        showDetailsDialog("Add", {'report_date': '', 'comment': ''}, tabtype);
                                     });
                         },
                         modeSwitchButton: false,
@@ -96,14 +138,16 @@ Monthly Check
                                             },
                                             body: JSON.stringify({
                                                 report_date: item.report_date,
-                                                comment: item.comment
+                                                comment: item.comment,
+                                                tabtype: tabtype
                                             })
                                         })
                                         .then(response => response.json())
                                         .then(data => {
                                             if (data.status === 'ok') {
                                                 alert("Delete successfully!");
-                                                $("button[type='submit']").trigger('click');
+                                                renderJsGrid(tabtype);
+                                                {#$("button[type='submit']").trigger('click');#}
                                             } else {
                                                 alert("Error??");
                                             }
@@ -119,44 +163,45 @@ Monthly Check
                 ]
             });
 
-            $("#detailsDialog").dialog({
-                autoOpen: false,
-                width: 400,
-                modal: true
-            });
 
         }
 
-        renderJsGrid();
+        renderJsGrid("gd");
 
-        let showDetailsDialog = function(dialogType, client) {
-            $("#report_date").val(client.report_date);
-            $("#comment").val(client.comment);
+        // Khi click tab khác
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            const tabtype = $(e.target).data("tabtype");  // "gd" hoặc "lk"
+            renderJsGrid(tabtype);
+        });
 
-            formSubmitHandler = function() {
-                saveClient(client, dialogType === "Add");
-            };
 
-            $("#detailsDialog").dialog("option", "title", dialogType + " Note").dialog("open");
+        let showDetailsDialog = function(dialogType, client, tabtype) {
+            const dialogId = "#detailsDialog_" + tabtype;
+            $(`${dialogId} #report_date`).val(client.report_date);
+            $(`${dialogId} #comment`).val(client.comment);
+
+            $(dialogId).dialog("option", "title", dialogType + " Note").dialog("open");
         };
 
 
-        $("#form").on("submit", function(e) {
+        $("#form_gd, #form_lk").on("submit", function(e) {
             e.preventDefault();
+            const $form = $(this);
+            const tabtype = $(".tab-pane.show.active").attr("id");
+            const dialogId = "#detailsDialog_" + tabtype;
+            const jsGrid = "#jsGrid_" + tabtype;
 
             $.ajax({
                 url: "{% url 'daily_report_comment' %}",
                 type: "POST",
-                data: $(this).serialize(),
+                data: $(this).serialize() + "&tabtype=" + tabtype,
                 success: function(response) {
-                    $("#id_comment").val('');
+                    $form.find("#id_comment").val('');
 
-                    // Xóa bảng cũ trước khi render lại
-                    $("#jsGrid").jsGrid("destroy");
+                    $(jsGrid).jsGrid("destroy");
 
-                    // Render lại với dữ liệu mới
-                    renderJsGrid(response.data);
-                    $("#detailsDialog").dialog("close");
+                    renderJsGrid(tabtype);
+                    $(dialogId).dialog("close");
                 },
                 error: function(xhr) {
                     alert("Lỗi: " + JSON.stringify(xhr.responseJSON));

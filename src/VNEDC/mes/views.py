@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from VNEDC.database import mes_database, vnedc_database, gdmes_olap_database
+from VNEDC.database import mes_database, vnedc_database, gdmes_olap_database, lkmes_olap_database
 from datetime import datetime, timedelta
 import json
 from django.http import HttpResponseBadRequest
@@ -1625,30 +1625,45 @@ def monthly_check(request):
 
 
 def daily_report_comment(request):
-    db = gdmes_olap_database()
     form = DailyReportCmt()
 
     if request.method == 'POST':
         form = DailyReportCmt(request.POST)
+        tabtype = request.POST.get('tabtype')
 
         if form.is_valid():
 
             date = form.cleaned_data['date']
             comment = form.cleaned_data['comment']
 
-            if comment:
+            if comment and tabtype == 'gd':
+                gddb = gdmes_olap_database()
 
                 sql_insert = f"""
                                 INSERT INTO [MES_OLAP].[dbo].[daily_report_comment] (report_date, comment)
                                 VALUES ('{date}', '{comment}');
                             """
 
-                rows_insert = db.execute_sql(sql_insert)
+                rows_insert = gddb.execute_sql(sql_insert)
 
-            sql_all = f"""
-                            SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
-                        """
-            rows_all = db.select_sql_dict(sql_all)
+                sql_all = f"""
+                                SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                            """
+                rows_all = gddb.select_sql_dict(sql_all)
+            elif comment and tabtype == 'lk':
+                lkdb = lkmes_olap_database()
+
+                sql_insert = f"""
+                                                INSERT INTO [MES_OLAP].[dbo].[daily_report_comment] (report_date, comment)
+                                                VALUES ('{date}', '{comment}');
+                                            """
+
+                rows_insert = lkdb.execute_sql(sql_insert)
+
+                sql_all = f"""
+                                                SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                                            """
+                rows_all = lkdb.select_sql_dict(sql_all)
 
             if request.is_ajax():
                 return JsonResponse({'data': rows_all})
@@ -1659,12 +1674,20 @@ def daily_report_comment(request):
 
 
 def daily_report_all(request):
-    db = gdmes_olap_database()
+    tabtype = request.GET.get('tabtype')
+    gddb = gdmes_olap_database()
+    lkdb = lkmes_olap_database()
 
-    sql_all = f"""
-                    SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
-                """
-    rows_all = db.select_sql_dict(sql_all)
+    if tabtype == 'gd':
+        sql_all = f"""
+                        SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                    """
+        rows_all = gddb.select_sql_dict(sql_all)
+    elif tabtype == 'lk':
+        sql_all = f"""
+                        SELECT * FROM [MES_OLAP].[dbo].[daily_report_comment]
+                    """
+        rows_all = lkdb.select_sql_dict(sql_all)
 
     return JsonResponse({'data': rows_all})
 
@@ -1673,19 +1696,35 @@ def daily_report_delete(request):
 
     if request.method == 'DELETE':
 
-        db = gdmes_olap_database()
         data = json.loads(request.body)
+        tabtype = data.get('tabtype')
 
-        date = datetime.strptime(data.get('report_date'), '%Y-%m-%d').date()
-        comment = data.get('comment')
+        if tabtype == 'gd':
+            gddb = gdmes_olap_database()
 
-        sql = f"""
-                DELETE [MES_OLAP].[dbo].[daily_report_comment]
-                WHERE report_date='{date}' AND comment='{comment}'
-            """
+            date = datetime.strptime(data.get('report_date'), '%Y-%m-%d').date()
+            comment = data.get('comment')
 
-        rows = db.execute_sql_custom(sql)
-        print(rows)
+            sql = f"""
+                    DELETE [MES_OLAP].[dbo].[daily_report_comment]
+                    WHERE report_date='{date}' AND comment='{comment}'
+                """
+
+            rows = gddb.execute_sql_custom(sql)
+            print(rows)
+        elif tabtype == 'lk':
+            lkdb = lkmes_olap_database()
+
+            date = datetime.strptime(data.get('report_date'), '%Y-%m-%d').date()
+            comment = data.get('comment')
+
+            sql = f"""
+                    DELETE [MES_OLAP].[dbo].[daily_report_comment]
+                    WHERE report_date='{date}' AND comment='{comment}'
+                """
+
+            rows = lkdb.execute_sql_custom(sql)
+            print(rows)
 
         if rows > 0:
             return JsonResponse({'status': 'ok', 'message': 'Delete successful', 'rows': rows})
